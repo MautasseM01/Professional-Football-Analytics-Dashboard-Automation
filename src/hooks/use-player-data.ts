@@ -30,7 +30,10 @@ export const usePlayerData = () => {
       if (data && data.length > 0) {
         // Log the first player to see its structure
         console.log("First player structure:", data[0]);
+        
+        // IMPORTANT: Always use the data from Supabase, no hardcoded override
         setPlayers(data as Player[]);
+        
         // Set the first player as selected by default
         setSelectedPlayer(data[0] as Player);
       } else {

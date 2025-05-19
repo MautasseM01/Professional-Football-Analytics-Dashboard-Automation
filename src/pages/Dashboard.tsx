@@ -11,10 +11,12 @@ import { Button } from "@/components/ui/button";
 import { Menu, RefreshCw } from "lucide-react";
 
 const Dashboard = () => {
+  // Get data directly from the hook, no local override
   const { players, selectedPlayer, selectPlayer, loading, refreshData } = usePlayerData();
   const [showSidebar, setShowSidebar] = useState(true);
 
   const handleRefresh = () => {
+    console.log("Manual refresh triggered");
     refreshData();
   };
 
