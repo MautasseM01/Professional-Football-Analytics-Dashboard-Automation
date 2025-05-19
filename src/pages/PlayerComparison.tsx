@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,6 +11,13 @@ import { Badge } from "@/components/ui/badge";
 import { Player } from "@/types";
 import { PolarAngleAxis, PolarGrid, PolarRadiusAxis, Radar, RadarChart, ResponsiveContainer } from "recharts";
 import { MultiPlayerSelect } from "@/components/MultiPlayerSelect";
+
+// Define interfaces for our attribute objects
+interface AttributeItem {
+  key: string;
+  label: string;
+  calculated?: boolean; // Added optional calculated property
+}
 
 const PlayerComparison = () => {
   const { players, loading } = usePlayerData();
@@ -35,7 +41,7 @@ const PlayerComparison = () => {
 
   // Format data for KPI comparison table
   const formatTableData = () => {
-    const kpis = [
+    const kpis: AttributeItem[] = [
       { key: 'distance', label: 'Total Distance (km)' },
       { key: 'sprintDistance', label: 'Sprint Distance (km)', calculated: true },
       { key: 'maxSpeed', label: 'Max Speed (km/h)', calculated: true },
@@ -65,17 +71,17 @@ const PlayerComparison = () => {
 
   // Format data for radar chart
   const formatRadarData = () => {
-    const attributes: Record<string, Array<{key: string, label: string}>> = {
+    const attributes: Record<string, AttributeItem[]> = {
       physical: [
         { key: 'distance', label: 'Distance' },
-        { key: 'sprintDistance', label: 'Sprint Dist.' },
-        { key: 'maxSpeed', label: 'Max Speed' },
+        { key: 'sprintDistance', label: 'Sprint Dist.', calculated: true },
+        { key: 'maxSpeed', label: 'Max Speed', calculated: true },
         { key: 'stamina', label: 'Stamina', calculated: true }
       ],
       attacking: [
         { key: 'shots_total', label: 'Shots' },
         { key: 'shots_on_target', label: 'Shots on Target' },
-        { key: 'passCompletion', label: 'Pass %' },
+        { key: 'passCompletion', label: 'Pass %', calculated: true },
         { key: 'keyPasses', label: 'Key Passes', calculated: true }
       ],
       defending: [
