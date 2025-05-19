@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/integrations/supabase/client";
+import { supabase, checkTableExists } from "@/lib/supabase";
 import { Player } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { toast } from "@/components/ui/sonner";
@@ -15,26 +15,34 @@ export const usePlayerData = () => {
   const fetchPlayers = async () => {
     setLoading(true);
     try {
-      console.log("Fetching players from Supabase...");
+      console.log("Checking available tables in Supabase...");
+      // First check if the "players" table exists
+      const playersTableExists = await checkTableExists('players');
       
-      // Make sure we're using the correct client from integrations
+      // Try alternative table name - singular form
+      const playerTableExists = !playersTableExists ? await checkTableExists('player') : false;
+      
+      const tableToUse = playersTableExists ? 'players' : (playerTableExists ? 'player' : 'players');
+      
+      console.log(`Attempting to fetch data from '${tableToUse}' table...`);
+      
       const { data, error: fetchError } = await supabase
-        .from("players")
+        .from(tableToUse)
         .select("*");
       
       if (fetchError) {
         throw fetchError;
       }
       
-      console.log("Players data received:", data);
+      console.log(`${tableToUse} data received:`, data);
       
       if (data && data.length > 0) {
         setPlayers(data as Player[]);
         // Set the first player as selected by default
         setSelectedPlayer(data[0] as Player);
       } else {
-        console.log("No players found in the database");
-        toast("No player data found in the Supabase database");
+        console.log(`No data found in the ${tableToUse} table`);
+        toast(`No player data found in the Supabase ${tableToUse} table`);
       }
     } catch (error: any) {
       console.error("Error fetching players:", error);
@@ -52,7 +60,7 @@ export const usePlayerData = () => {
   useEffect(() => {
     fetchPlayers();
     
-    // Set up a subscription to player changes
+    // Set up a subscription to player changes - try both table names
     const playersSubscription = supabase
       .channel('public:players')
       .on('postgres_changes', { 
@@ -64,9 +72,22 @@ export const usePlayerData = () => {
         fetchPlayers();
       })
       .subscribe();
+      
+    const playerSubscription = supabase
+      .channel('public:player')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'player' 
+      }, () => {
+        console.log('Player table changed, refreshing data');
+        fetchPlayers();
+      })
+      .subscribe();
     
     return () => {
       playersSubscription.unsubscribe();
+      playerSubscription.unsubscribe();
     };
   }, []);
   
