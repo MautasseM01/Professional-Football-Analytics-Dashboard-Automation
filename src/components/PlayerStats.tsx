@@ -47,26 +47,6 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
     ? ((player.tackles_won / player.tackles_attempted) * 100).toFixed(1)
     : "0";
 
-  // Convert Google Drive URL to a direct image URL if needed
-  const getImageUrl = (url: string) => {
-    if (!url) return null;
-    
-    // Check if it's a Google Drive URL
-    if (url.includes('drive.google.com/file/d/')) {
-      // Extract the file ID
-      const fileIdMatch = url.match(/\/d\/(.*?)\/view/);
-      if (fileIdMatch && fileIdMatch[1]) {
-        // Return the direct link format
-        return `https://drive.google.com/uc?export=view&id=${fileIdMatch[1]}`;
-      }
-    }
-    
-    // Return the original URL if it's not a Google Drive URL
-    return url;
-  };
-
-  const heatmapImageUrl = getImageUrl(player.heatmapUrl);
-
   return (
     <div className="space-y-6">
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -102,10 +82,10 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
             <CardDescription>Player's match positioning and movement</CardDescription>
           </CardHeader>
           <CardContent>
-            {heatmapImageUrl ? (
+            {player.heatmapUrl ? (
               <div className="relative aspect-video w-full overflow-hidden rounded-md">
                 <img 
-                  src={heatmapImageUrl} 
+                  src={player.heatmapUrl} 
                   alt={`${player.name} heatmap`} 
                   className="object-cover w-full h-full"
                   onError={(e) => {
