@@ -110,10 +110,8 @@ export const MultiPlayerSelect: React.FC<MultiPlayerSelectProps> = ({
                             setInputValue("");
                           }
                         }}
-                        disabled={isDisabled}
-                        aria-selected={isSelected}
                         aria-disabled={isDisabled}
-                        data-selected={isSelected ? "true" : undefined}
+                        aria-selected={isSelected}
                         className={cn(
                           "flex items-center gap-2 text-club-light-gray",
                           isSelected ? "bg-club-gold/20 text-club-gold" : "",
