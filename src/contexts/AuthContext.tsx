@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { supabase } from '@/integrations/supabase/client';
+import { supabase } from '@/lib/supabase';
 import { AuthUser } from '../types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -64,6 +64,50 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Special case for demo user
+      if (email === "demo@example.com" && password === "demopassword123") {
+        console.log("Demo login detected, using special flow");
+        // For demo user, we'll use a pre-registered account or create one if needed
+        const { data, error } = await supabase.auth.signInWithPassword({ 
+          email: "demo@example.com", 
+          password: "demopassword123"
+        });
+        
+        if (error) {
+          // If the demo account doesn't exist yet, create it
+          if (error.message.includes("Invalid login credentials")) {
+            const { error: signUpError } = await supabase.auth.signUp({
+              email: "demo@example.com",
+              password: "demopassword123",
+              options: {
+                data: {
+                  name: "Demo User",
+                }
+              }
+            });
+            
+            if (signUpError) throw signUpError;
+            
+            // Try signing in again
+            const { error: retryError } = await supabase.auth.signInWithPassword({
+              email: "demo@example.com",
+              password: "demopassword123"
+            });
+            
+            if (retryError) throw retryError;
+          } else {
+            throw error;
+          }
+        }
+        
+        toast({
+          title: "Demo Login",
+          description: "You are now logged in as a demo user",
+        });
+        return;
+      }
+      
+      // Regular sign in for non-demo users
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       toast({

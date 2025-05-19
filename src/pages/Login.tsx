@@ -68,6 +68,28 @@ const Login = () => {
     }
   };
 
+  const handleDemoLogin = async () => {
+    setIsLoading(true);
+    try {
+      // Use demo credentials
+      await signIn("demo@example.com", "demopassword123");
+      navigate("/dashboard");
+      toast({
+        title: "Demo Login Successful",
+        description: "You are now logged in as a demo user",
+      });
+    } catch (error) {
+      console.error("Demo login error:", error);
+      toast({
+        title: "Demo Login Failed",
+        description: "Please try again or use regular login",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-club-black p-4">
       <div className="w-full max-w-md">
@@ -169,6 +191,25 @@ const Login = () => {
                 </form>
               </TabsContent>
             </Tabs>
+
+            {/* Demo Login Button */}
+            <div className="mt-4">
+              <Button 
+                onClick={handleDemoLogin} 
+                className="w-full bg-green-600 text-white hover:bg-green-700"
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center">
+                    <div className="animate-spin w-4 h-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                    Logging in...
+                  </div>
+                ) : "Demo Login (No Sign Up Required)"}
+              </Button>
+              <p className="text-xs text-center text-club-light-gray/60 mt-2">
+                Use this option to quickly explore the dashboard with sample data
+              </p>
+            </div>
           </CardContent>
           <CardFooter className="flex flex-col">
             <div className="relative w-full my-4">
