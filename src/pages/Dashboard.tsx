@@ -7,10 +7,16 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
+import { Menu, RefreshCw } from "lucide-react";
 
 const Dashboard = () => {
-  const { players, selectedPlayer, selectPlayer, loading } = usePlayerData();
+  const { players, selectedPlayer, selectPlayer, loading, refreshData } = usePlayerData();
   const [showSidebar, setShowSidebar] = useState(true);
+
+  const handleRefresh = () => {
+    refreshData();
+  };
 
   return (
     <div className="flex h-screen bg-club-black text-club-light-gray">
@@ -25,6 +31,15 @@ const Dashboard = () => {
             </div>
             
             <div className="flex items-center gap-3">
+              <Button 
+                variant="outline" 
+                size="icon"
+                className="text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold"
+                onClick={handleRefresh}
+                title="Refresh player data"
+              >
+                <RefreshCw size={18} />
+              </Button>
               <button
                 onClick={() => setShowSidebar(!showSidebar)}
                 className="p-2 rounded-md text-club-light-gray hover:bg-club-gold/10 hover:text-club-gold transition-colors"
@@ -48,6 +63,7 @@ const Dashboard = () => {
                 <Select
                   value={selectedPlayer?.id.toString()}
                   onValueChange={(value) => selectPlayer(parseInt(value))}
+                  disabled={players.length === 0}
                 >
                   <SelectTrigger className="bg-club-black border-club-gold/30 focus:ring-club-gold/30">
                     <SelectValue placeholder="Select a player" />
@@ -88,8 +104,16 @@ const Dashboard = () => {
             <PlayerStats player={selectedPlayer} />
           ) : (
             <Alert className="bg-club-gold/10 border-club-gold/30">
-              <AlertDescription>
-                No player data found. Please check your Supabase database connection.
+              <AlertDescription className="flex flex-col gap-4">
+                <p>No player data found. Please check your Supabase database connection or add players to your database.</p>
+                <Button 
+                  variant="outline" 
+                  className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
+                  onClick={handleRefresh}
+                >
+                  <RefreshCw size={16} className="mr-2" />
+                  Retry Loading Data
+                </Button>
               </AlertDescription>
             </Alert>
           )}
@@ -100,5 +124,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-import { Menu } from "lucide-react";
