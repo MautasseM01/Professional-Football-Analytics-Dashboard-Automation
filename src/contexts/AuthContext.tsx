@@ -24,6 +24,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        console.log("Auth state changed:", event, session);
         if (session?.user) {
           setUser({
             id: session.user.id,
@@ -39,6 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session } }) => {
+      console.log("Current session:", session);
       if (session?.user) {
         setUser({
           id: session.user.id,
@@ -64,6 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
+      console.log("Signing in with:", email);
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       toast({
@@ -71,6 +74,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "You have been logged in.",
       });
     } catch (error: any) {
+      console.error("Login error:", error);
       toast({
         title: "Login failed",
         description: error.message || "An error occurred during sign in.",

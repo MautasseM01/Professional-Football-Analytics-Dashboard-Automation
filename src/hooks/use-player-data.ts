@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { Player } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { toast } from "@/components/ui/sonner";
@@ -16,12 +16,14 @@ export const usePlayerData = () => {
     setLoading(true);
     try {
       console.log("Fetching players from Supabase...");
-      const { data, error } = await supabase
+      
+      // Make sure we're using the correct client from integrations
+      const { data, error: fetchError } = await supabase
         .from("players")
         .select("*");
       
-      if (error) {
-        throw error;
+      if (fetchError) {
+        throw fetchError;
       }
       
       console.log("Players data received:", data);
@@ -66,7 +68,6 @@ export const usePlayerData = () => {
     return () => {
       playersSubscription.unsubscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   const selectPlayer = (id: number) => {
