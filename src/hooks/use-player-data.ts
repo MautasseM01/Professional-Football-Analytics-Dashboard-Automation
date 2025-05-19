@@ -5,6 +5,55 @@ import { Player } from "@/types";
 import { toast } from "@/components/ui/sonner";
 import { useToast } from "@/hooks/use-toast";
 
+// Demo player data
+const DEMO_PLAYERS: Player[] = [
+  {
+    id: 1,
+    name: "Marcus Johnson",
+    position: "Forward",
+    matches: 12,
+    distance: 124.5,
+    passes_attempted: 342,
+    passes_completed: 297,
+    shots_total: 28,
+    shots_on_target: 17,
+    tackles_attempted: 45,
+    tackles_won: 32,
+    heatmapUrl: "https://i.imgur.com/dNXW5pT.png",
+    reportUrl: "https://example.com/reports/player1.pdf"
+  },
+  {
+    id: 2,
+    name: "Alex Thompson",
+    position: "Midfielder",
+    matches: 14,
+    distance: 156.2,
+    passes_attempted: 512,
+    passes_completed: 478,
+    shots_total: 12,
+    shots_on_target: 5,
+    tackles_attempted: 78,
+    tackles_won: 52,
+    heatmapUrl: "https://i.imgur.com/PDwZzv5.png",
+    reportUrl: "https://example.com/reports/player2.pdf"
+  },
+  {
+    id: 3,
+    name: "David Rodriguez",
+    position: "Defender",
+    matches: 15,
+    distance: 132.8,
+    passes_attempted: 265,
+    passes_completed: 241,
+    shots_total: 4,
+    shots_on_target: 1,
+    tackles_attempted: 126,
+    tackles_won: 98,
+    heatmapUrl: "https://i.imgur.com/3b7I4RR.png",
+    reportUrl: "https://example.com/reports/player3.pdf"
+  }
+];
+
 export const usePlayerData = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
@@ -15,6 +64,20 @@ export const usePlayerData = () => {
   const fetchPlayers = async () => {
     setLoading(true);
     setError(null);
+    
+    // Check if we're in demo mode
+    const isDemoMode = localStorage.getItem("demoMode") === "true";
+    
+    if (isDemoMode) {
+      // Use demo data instead of calling Supabase
+      console.log("Demo mode active, using mock player data");
+      setPlayers(DEMO_PLAYERS);
+      setSelectedPlayer(DEMO_PLAYERS[0]);
+      setLoading(false);
+      toast("Demo player data loaded successfully!");
+      return;
+    }
+    
     try {
       console.log("Fetching players from Supabase...");
       const { data, error } = await supabase
@@ -71,22 +134,25 @@ export const usePlayerData = () => {
   useEffect(() => {
     fetchPlayers();
     
-    // Set up a subscription to player changes
-    const playersSubscription = supabase
-      .channel('public:players')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'players' 
-      }, (payload) => {
-        console.log('Players table changed, payload:', payload);
-        fetchPlayers();
-      })
-      .subscribe();
-    
-    return () => {
-      playersSubscription.unsubscribe();
-    };
+    // Only set up subscription if not in demo mode
+    if (localStorage.getItem("demoMode") !== "true") {
+      // Set up a subscription to player changes
+      const playersSubscription = supabase
+        .channel('public:players')
+        .on('postgres_changes', { 
+          event: '*', 
+          schema: 'public', 
+          table: 'players' 
+        }, (payload) => {
+          console.log('Players table changed, payload:', payload);
+          fetchPlayers();
+        })
+        .subscribe();
+      
+      return () => {
+        playersSubscription.unsubscribe();
+      };
+    }
   }, []);
   
   const selectPlayer = (id: number) => {

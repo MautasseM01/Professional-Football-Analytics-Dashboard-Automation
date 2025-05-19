@@ -21,6 +21,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
+    // Check if we're in demo mode first
+    if (localStorage.getItem("demoMode") === "true") {
+      // If in demo mode, set the demo user
+      setUser({
+        id: "demo-user-id",
+        email: "coach@smhfoot.fr",
+        user_metadata: {
+          name: "Coach Demo"
+        }
+      });
+      setLoading(false);
+      return;
+    }
+
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
