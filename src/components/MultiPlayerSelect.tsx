@@ -88,7 +88,7 @@ export const MultiPlayerSelect: React.FC<MultiPlayerSelectProps> = ({
                 No players found.
               </CommandEmpty>
               <CommandGroup className="max-h-[300px] overflow-auto">
-                {filteredPlayers.map((player) => {
+                {Array.isArray(filteredPlayers) && filteredPlayers.map((player) => {
                   const isSelected = selectedPlayerIds.includes(player.id);
                   const isDisabled = selectedPlayerIds.length >= max && !isSelected;
                   
