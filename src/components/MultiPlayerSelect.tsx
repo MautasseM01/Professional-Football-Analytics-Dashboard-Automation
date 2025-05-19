@@ -95,19 +95,19 @@ export const MultiPlayerSelect: React.FC<MultiPlayerSelectProps> = ({
                   return (
                     <CommandItem
                       key={player.id}
-                      value={`${player.id}-${player.name}`}
+                      value={String(player.id)}
                       onSelect={() => {
                         if (!isDisabled) {
                           togglePlayer(player.id);
-                          setInputValue(""); // Clear search after selection
+                          setInputValue("");
                         }
                       }}
                       disabled={isDisabled}
                       className={cn(
                         "flex items-center gap-2 text-club-light-gray",
-                        isSelected && "bg-club-gold/20 text-club-gold",
-                        isDisabled && "opacity-50 cursor-not-allowed"
+                        isSelected ? "bg-club-gold/20 text-club-gold" : ""
                       )}
+                      data-selected={isSelected}
                     >
                       <div className={cn(
                         "flex h-4 w-4 items-center justify-center rounded-sm border border-club-gold/50",
