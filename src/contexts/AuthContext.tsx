@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { AuthUser } from '../types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -21,37 +21,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // DEMO DETECTION: Check if we've logged in with demo credentials before
-    const demoMode = localStorage.getItem("demoMode") === "true";
-    
-    if (demoMode) {
-      console.log("Demo mode detected, attempting to sign in with demo credentials");
-      // We need to actually sign in with Supabase using the demo account
-      // to ensure we have proper auth for API calls
-      supabase.auth.signInWithPassword({
-        email: "coach@smhfoot.fr", 
-        password: "password123"
-      }).then(({ data, error }) => {
-        if (error) {
-          console.error("Demo auto-login failed:", error);
-          // If we can't sign in with the demo account, clear demoMode and let normal flow happen
-          localStorage.removeItem("demoMode");
-        } else {
-          console.log("Demo auto-login successful");
-          setUser({
-            id: data.user?.id || "demo-user-id",
-            email: data.user?.email || "coach@smhfoot.fr",
-            user_metadata: data.user?.user_metadata || {
-              name: "Coach Demo"
-            }
-          });
-        }
-        setLoading(false);
-      });
-      
-      return;
-    }
-
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
@@ -95,51 +64,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      // Special case for demo user
-      if (email === "coach@smhfoot.fr" && password === "password123") {
-        console.log("Demo login detected");
-        
-        // For demo login, we need to actually authenticate with Supabase
-        const { data, error } = await supabase.auth.signInWithPassword({ 
-          email, 
-          password 
-        });
-        
-        if (error) {
-          // If login fails, we should check if we need to create the demo account
-          console.log("Demo login failed, attempting to create demo account");
-          
-          const { error: signUpError } = await supabase.auth.signUp({ 
-            email, 
-            password 
-          });
-          
-          if (signUpError) {
-            throw signUpError;
-          }
-          
-          // Try logging in again after signup
-          const { error: secondLoginError } = await supabase.auth.signInWithPassword({ 
-            email, 
-            password 
-          });
-          
-          if (secondLoginError) {
-            throw secondLoginError;
-          }
-        }
-        
-        // Store a marker in localStorage to remember we're in demo mode
-        localStorage.setItem("demoMode", "true");
-        
-        toast({
-          title: "Demo Login",
-          description: "You are now logged in as a demo coach user",
-        });
-        return;
-      }
-      
-      // Regular sign in for non-demo users
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw error;
       toast({
@@ -177,20 +101,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
-      // Check if we're in demo mode
-      if (localStorage.getItem("demoMode") === "true") {
-        // Just clear the demo mode and reset user state
-        localStorage.removeItem("demoMode");
-        setUser(null);
-        
-        toast({
-          title: "Logged out",
-          description: "You have been logged out from demo mode.",
-        });
-        return;
-      }
-      
-      // Regular logout for non-demo users
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       toast({
