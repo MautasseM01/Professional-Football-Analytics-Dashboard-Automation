@@ -88,7 +88,14 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                   src={player.heatmapUrl} 
                   alt={`${player.name} heatmap`} 
                   className="object-cover w-full h-full"
+                  onError={(e) => {
+                    console.error("Error loading heatmap image:", e);
+                    e.currentTarget.src = "/placeholder.svg";
+                  }}
                 />
+                <div className="absolute bottom-2 right-2 bg-club-black/70 text-xs px-2 py-1 rounded">
+                  {player.name}'s Heatmap
+                </div>
               </div>
             ) : (
               <Alert className="bg-club-gold/10 border-club-gold/30">
