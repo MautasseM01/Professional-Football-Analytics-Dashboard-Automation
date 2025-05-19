@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Player } from "@/types";
-import { useToast } from "@/hooks/use-toast";
 import { toast } from "@/components/ui/sonner";
+import { useToast } from "@/hooks/use-toast";
 
 export const usePlayerData = () => {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -14,6 +14,7 @@ export const usePlayerData = () => {
   
   const fetchPlayers = async () => {
     setLoading(true);
+    setError(null);
     try {
       console.log("Fetching players from Supabase...");
       const { data, error } = await supabase
@@ -27,12 +28,32 @@ export const usePlayerData = () => {
       console.log("Players data received:", data);
       
       if (data && data.length > 0) {
-        setPlayers(data as Player[]);
+        // Make sure we're mapping the data correctly based on the actual column names
+        const mappedPlayers = data.map(player => ({
+          id: player.id,
+          name: player.name || '',
+          position: player.position || '',
+          matches: player.matches || 0,
+          distance: player.distance || 0,
+          passes_attempted: player.passes_attempted || 0,
+          passes_completed: player.passes_completed || 0,
+          shots_total: player.shots_total || 0,
+          shots_on_target: player.shots_on_target || 0,
+          tackles_attempted: player.tackles_attempted || 0,
+          tackles_won: player.tackles_won || 0,
+          heatmapUrl: player.heatmapUrl || '',
+          reportUrl: player.reportUrl || ''
+        })) as Player[];
+        
+        console.log("Mapped player data:", mappedPlayers);
+        setPlayers(mappedPlayers);
         // Set the first player as selected by default
-        setSelectedPlayer(data[0] as Player);
+        setSelectedPlayer(mappedPlayers[0]);
+        toast("Player data loaded successfully!");
       } else {
         console.log("No players found in the database");
         toast("No player data found in the Supabase database");
+        setError("No player data available");
       }
     } catch (error: any) {
       console.error("Error fetching players:", error);
@@ -57,8 +78,8 @@ export const usePlayerData = () => {
         event: '*', 
         schema: 'public', 
         table: 'players' 
-      }, () => {
-        console.log('Players table changed, refreshing data');
+      }, (payload) => {
+        console.log('Players table changed, payload:', payload);
         fetchPlayers();
       })
       .subscribe();
@@ -66,7 +87,6 @@ export const usePlayerData = () => {
     return () => {
       playersSubscription.unsubscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   
   const selectPlayer = (id: number) => {

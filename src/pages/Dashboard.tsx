@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, RefreshCw } from "lucide-react";
 
 const Dashboard = () => {
-  const { players, selectedPlayer, selectPlayer, loading, refreshData } = usePlayerData();
+  const { players, selectedPlayer, selectPlayer, loading, error, refreshData } = usePlayerData();
   const [showSidebar, setShowSidebar] = useState(true);
 
   const handleRefresh = () => {
@@ -59,31 +59,32 @@ const Dashboard = () => {
             <CardContent>
               {loading ? (
                 <Skeleton className="h-10 w-full bg-club-gold/10" />
-              ) : (
+              ) : players.length > 0 ? (
                 <Select
                   value={selectedPlayer?.id.toString()}
                   onValueChange={(value) => selectPlayer(parseInt(value))}
-                  disabled={players.length === 0}
                 >
                   <SelectTrigger className="bg-club-black border-club-gold/30 focus:ring-club-gold/30">
                     <SelectValue placeholder="Select a player" />
                   </SelectTrigger>
                   <SelectContent className="bg-club-dark-gray border-club-gold/30">
-                    {players.length > 0 ? (
-                      players.map((player) => (
-                        <SelectItem 
-                          key={player.id} 
-                          value={player.id.toString()}
-                          className="focus:bg-club-gold/20 focus:text-club-gold"
-                        >
-                          {player.name} - {player.position}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <div className="p-2 text-sm text-club-light-gray/70">No players found</div>
-                    )}
+                    {players.map((player) => (
+                      <SelectItem 
+                        key={player.id} 
+                        value={player.id.toString()}
+                        className="focus:bg-club-gold/20 focus:text-club-gold"
+                      >
+                        {player.name} - {player.position}
+                      </SelectItem>
+                    ))}
                   </SelectContent>
                 </Select>
+              ) : (
+                <Alert className="bg-club-gold/10 border-club-gold/30">
+                  <AlertDescription>
+                    No players available. Check database connection.
+                  </AlertDescription>
+                </Alert>
               )}
             </CardContent>
           </Card>
@@ -100,7 +101,21 @@ const Dashboard = () => {
                 <Skeleton className="h-64 w-full bg-club-gold/10" />
               </div>
             </div>
-          ) : players.length > 0 ? (
+          ) : error ? (
+            <Alert className="bg-club-gold/10 border-club-gold/30">
+              <AlertDescription className="flex flex-col gap-4">
+                <p>{error}</p>
+                <Button 
+                  variant="outline" 
+                  className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
+                  onClick={handleRefresh}
+                >
+                  <RefreshCw size={16} className="mr-2" />
+                  Retry Loading Data
+                </Button>
+              </AlertDescription>
+            </Alert>
+          ) : players.length > 0 && selectedPlayer ? (
             <PlayerStats player={selectedPlayer} />
           ) : (
             <Alert className="bg-club-gold/10 border-club-gold/30">
