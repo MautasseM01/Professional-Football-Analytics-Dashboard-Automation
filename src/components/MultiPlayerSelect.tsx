@@ -103,6 +103,8 @@ export const MultiPlayerSelect: React.FC<MultiPlayerSelectProps> = ({
                         }
                       }}
                       disabled={isDisabled}
+                      aria-selected={isSelected}
+                      aria-disabled={isDisabled}
                       className={cn(
                         "flex items-center gap-2 text-club-light-gray",
                         isSelected ? "bg-club-gold/20 text-club-gold" : "",
