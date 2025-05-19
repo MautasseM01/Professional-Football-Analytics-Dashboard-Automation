@@ -17,6 +17,7 @@ import {
   Activity,
   Calendar
 } from "lucide-react";
+import { useState } from "react";
 
 interface PlayerStatsProps {
   player: Player | null;
@@ -24,6 +25,9 @@ interface PlayerStatsProps {
 
 export const PlayerStats = ({ player }: PlayerStatsProps) => {
   console.log("PlayerStats component received player:", player);
+  console.log("Heatmap URL:", player?.heatmapUrl);
+  
+  const [imageError, setImageError] = useState(false);
   
   if (!player) {
     return <div className="text-center py-8">No player selected</div>;
@@ -46,6 +50,16 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
   const tackleSuccessRate = player.tackles_attempted > 0
     ? ((player.tackles_won / player.tackles_attempted) * 100).toFixed(1)
     : "0";
+
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
+    console.error("Error loading heatmap image:", e);
+    console.log("Failed URL:", player.heatmapUrl);
+    setImageError(true);
+  };
+
+  const resetImageError = () => {
+    setImageError(false);
+  };
 
   return (
     <div className="space-y-6">
@@ -84,15 +98,27 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           <CardContent>
             {player.heatmapUrl ? (
               <div className="relative aspect-video w-full overflow-hidden rounded-md">
-                <img 
-                  src={player.heatmapUrl} 
-                  alt={`${player.name} heatmap`} 
-                  className="object-cover w-full h-full"
-                  onError={(e) => {
-                    console.error("Error loading heatmap image:", e);
-                    e.currentTarget.src = "/placeholder.svg";
-                  }}
-                />
+                {imageError ? (
+                  <div className="flex flex-col items-center justify-center h-full bg-club-black/50 p-4">
+                    <p className="text-center text-club-gold mb-2">Unable to load heatmap image</p>
+                    <Button 
+                      variant="outline" 
+                      onClick={resetImageError}
+                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
+                    >
+                      Retry
+                    </Button>
+                    <p className="text-xs text-club-light-gray/60 mt-2">URL: {player.heatmapUrl}</p>
+                  </div>
+                ) : (
+                  <img 
+                    src={player.heatmapUrl} 
+                    alt={`${player.name} heatmap`}
+                    crossOrigin="anonymous"
+                    className="object-cover w-full h-full"
+                    onError={handleImageError}
+                  />
+                )}
                 <div className="absolute bottom-2 right-2 bg-club-black/70 text-xs px-2 py-1 rounded">
                   {player.name}'s Heatmap
                 </div>
