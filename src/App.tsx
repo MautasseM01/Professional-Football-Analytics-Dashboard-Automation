@@ -9,6 +9,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import PlayerComparison from "./pages/PlayerComparison";
 
 const queryClient = new QueryClient();
 
@@ -54,7 +55,7 @@ const App = () => (
               path="/player-analysis/comparison" 
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <PlayerComparison />
                 </ProtectedRoute>
               } 
             />
