@@ -22,6 +22,8 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Navigate to="/dashboard" replace />} />
             <Route path="/login" element={<Login />} />
+            
+            {/* Main dashboard route */}
             <Route 
               path="/dashboard" 
               element={
@@ -30,8 +32,10 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            
+            {/* Player Analysis routes */}
             <Route 
-              path="/team-comparison" 
+              path="/player-analysis" 
               element={
                 <ProtectedRoute>
                   <Dashboard />
@@ -39,7 +43,7 @@ const App = () => (
               } 
             />
             <Route 
-              path="/advanced-analytics" 
+              path="/player-analysis/stats" 
               element={
                 <ProtectedRoute>
                   <Dashboard />
@@ -47,13 +51,43 @@ const App = () => (
               } 
             />
             <Route 
-              path="/calendar" 
+              path="/player-analysis/comparison" 
               element={
                 <ProtectedRoute>
                   <Dashboard />
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/player-analysis/development" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Team Performance routes */}
+            <Route 
+              path="/team-performance" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Reports route */}
+            <Route 
+              path="/reports" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Settings route */}
             <Route 
               path="/settings" 
               element={
@@ -62,6 +96,8 @@ const App = () => (
                 </ProtectedRoute>
               } 
             />
+            
+            {/* 404 Not Found */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </TooltipProvider>

@@ -60,32 +60,34 @@ const Dashboard = () => {
             </CardHeader>
             <CardContent>
               {loading ? (
-                <Skeleton className="h-10 w-full bg-club-gold/10" />
+                <Skeleton className="h-10 w-full max-w-full sm:max-w-md mx-auto bg-club-gold/10" />
               ) : (
-                <Select
-                  value={selectedPlayer?.id.toString()}
-                  onValueChange={(value) => selectPlayer(parseInt(value))}
-                  disabled={players.length === 0}
-                >
-                  <SelectTrigger className="bg-club-black border-club-gold/30 focus:ring-club-gold/30">
-                    <SelectValue placeholder="Select a player" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-club-dark-gray border-club-gold/30">
-                    {players.length > 0 ? (
-                      players.map((player) => (
-                        <SelectItem 
-                          key={player.id} 
-                          value={player.id.toString()}
-                          className="focus:bg-club-gold/20 focus:text-club-gold"
-                        >
-                          {player.name} - {player.position}
-                        </SelectItem>
-                      ))
-                    ) : (
-                      <div className="p-2 text-sm text-club-light-gray/70">No players found</div>
-                    )}
-                  </SelectContent>
-                </Select>
+                <div className="max-w-full sm:max-w-md mx-auto">
+                  <Select
+                    value={selectedPlayer?.id.toString()}
+                    onValueChange={(value) => selectPlayer(parseInt(value))}
+                    disabled={players.length === 0}
+                  >
+                    <SelectTrigger className="bg-club-black border-club-gold/30 focus:ring-club-gold/30 w-full">
+                      <SelectValue placeholder="Select a player" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-club-dark-gray border-club-gold/30 max-w-[90vw] sm:max-w-md">
+                      {players.length > 0 ? (
+                        players.map((player) => (
+                          <SelectItem 
+                            key={player.id} 
+                            value={player.id.toString()}
+                            className="focus:bg-club-gold/20 focus:text-club-gold pr-2"
+                          >
+                            <span className="truncate block">{player.name} - {player.position}</span>
+                          </SelectItem>
+                        ))
+                      ) : (
+                        <div className="p-2 text-sm text-club-light-gray/70">No players found</div>
+                      )}
+                    </SelectContent>
+                  </Select>
+                </div>
               )}
             </CardContent>
           </Card>
