@@ -72,11 +72,11 @@ const Login = () => {
     setIsLoading(true);
     try {
       // Use demo credentials
-      await signIn("demo@example.com", "demopassword123");
+      await signIn("coach@smhfoot.fr", "password123");
       navigate("/dashboard");
       toast({
         title: "Demo Login Successful",
-        description: "You are now logged in as a demo user",
+        description: "You are now logged in as a coach",
       });
     } catch (error) {
       console.error("Demo login error:", error);

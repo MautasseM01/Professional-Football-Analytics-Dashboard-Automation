@@ -65,23 +65,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signIn = async (email: string, password: string) => {
     try {
       // Special case for demo user
-      if (email === "demo@example.com" && password === "demopassword123") {
+      if (email === "coach@smhfoot.fr" && password === "password123") {
         console.log("Demo login detected, using special flow");
         // For demo user, we'll use a pre-registered account or create one if needed
         const { data, error } = await supabase.auth.signInWithPassword({ 
-          email: "demo@example.com", 
-          password: "demopassword123"
+          email: "coach@smhfoot.fr", 
+          password: "password123"
         });
         
         if (error) {
           // If the demo account doesn't exist yet, create it
           if (error.message.includes("Invalid login credentials")) {
             const { error: signUpError } = await supabase.auth.signUp({
-              email: "demo@example.com",
-              password: "demopassword123",
+              email: "coach@smhfoot.fr",
+              password: "password123",
               options: {
                 data: {
-                  name: "Demo User",
+                  name: "Coach Demo",
                 }
               }
             });
@@ -90,8 +90,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             
             // Try signing in again
             const { error: retryError } = await supabase.auth.signInWithPassword({
-              email: "demo@example.com",
-              password: "demopassword123"
+              email: "coach@smhfoot.fr",
+              password: "password123"
             });
             
             if (retryError) throw retryError;
