@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { supabase } from '../lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
 import { AuthUser } from '../types';
 import { useToast } from '@/hooks/use-toast';
 
@@ -21,38 +21,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    const fetchUser = async () => {
-      setLoading(true);
-      try {
-        const { data: { session }, error } = await supabase.auth.getSession();
-        
-        if (error) {
-          throw error;
-        }
-        
-        if (session?.user) {
-          setUser({
-            id: session.user.id,
-            email: session.user.email,
-            user_metadata: session.user.user_metadata
-          });
-        }
-      } catch (error) {
-        console.error('Error fetching user session:', error);
-        toast({
-          title: "Authentication Error",
-          description: "Failed to fetch user session.",
-          variant: "destructive",
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchUser();
-
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+    // Set up auth state listener FIRST
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
         if (session?.user) {
           setUser({
             id: session.user.id,
@@ -66,8 +37,28 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
     );
 
+    // THEN check for existing session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUser({
+          id: session.user.id,
+          email: session.user.email,
+          user_metadata: session.user.user_metadata
+        });
+      }
+      setLoading(false);
+    }).catch(error => {
+      console.error('Error fetching user session:', error);
+      toast({
+        title: "Authentication Error",
+        description: "Failed to fetch user session.",
+        variant: "destructive",
+      });
+      setLoading(false);
+    });
+
     return () => {
-      authListener.subscription.unsubscribe();
+      subscription.unsubscribe();
     };
   }, [toast]);
 
@@ -128,6 +119,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signUp = async (email: string, password: string) => {
     try {
+      console.log("Signing up with:", email);
       const { error } = await supabase.auth.signUp({ 
         email, 
         password,
@@ -141,6 +133,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         description: "Please check your email to verify your account.",
       });
     } catch (error: any) {
+      console.error("Sign up error:", error);
       toast({
         title: "Registration failed",
         description: error.message || "An error occurred during sign up.",
