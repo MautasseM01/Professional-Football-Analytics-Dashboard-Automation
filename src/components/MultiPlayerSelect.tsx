@@ -45,6 +45,11 @@ export const MultiPlayerSelect: React.FC<MultiPlayerSelectProps> = ({
     }
   };
 
+  // Filter players based on search input
+  const filteredPlayers = players.filter(player => 
+    player.name.toLowerCase().includes(inputValue.toLowerCase())
+  );
+
   return (
     <div className="w-full">
       {loading ? (
@@ -83,7 +88,7 @@ export const MultiPlayerSelect: React.FC<MultiPlayerSelectProps> = ({
                 No players found.
               </CommandEmpty>
               <CommandGroup className="max-h-[300px] overflow-auto">
-                {players.map((player) => {
+                {filteredPlayers.map((player) => {
                   const isSelected = selectedPlayerIds.includes(player.id);
                   const isDisabled = selectedPlayerIds.length >= max && !isSelected;
                   
@@ -99,7 +104,8 @@ export const MultiPlayerSelect: React.FC<MultiPlayerSelectProps> = ({
                       }}
                       disabled={isDisabled}
                       className={cn(
-                        "flex items-center gap-2 text-club-light-gray aria-selected:bg-club-gold/20 aria-selected:text-club-gold",
+                        "flex items-center gap-2 text-club-light-gray",
+                        isSelected && "bg-club-gold/20 text-club-gold",
                         isDisabled && "opacity-50 cursor-not-allowed"
                       )}
                     >
