@@ -20,27 +20,11 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "@/hooks/use-toast";
+import { getGoogleDriveThumbnailUrl } from "@/lib/image-utils";
 
 interface PlayerStatsProps {
   player: Player | null;
 }
-
-// Helper function to convert Google Drive URL to a proxied URL
-const getProxiedImageUrl = (url: string | null): string | null => {
-  if (!url) return null;
-  
-  // Check if it's a Google Drive URL
-  const googleDriveRegex = /drive\.google\.com\/[^\/]+\/[^\/]+\/([^\/\?]+)/;
-  const match = url.match(googleDriveRegex);
-  
-  if (match) {
-    const fileId = match[1];
-    // Use cors-anywhere proxy or similar service
-    return `https://cors-anywhere.herokuapp.com/https://drive.google.com/uc?export=view&id=${fileId}`;
-  }
-  
-  return url;
-};
 
 export const PlayerStats = ({ player }: PlayerStatsProps) => {
   console.log("PlayerStats component received player:", player);
@@ -49,12 +33,19 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
   const [imageError, setImageError] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   
+  // Reset state when player changes to ensure image corresponds to current player
   useEffect(() => {
-    if (player?.heatmapUrl) {
-      setImageUrl(player.heatmapUrl);
+    if (player) {
+      console.log(`Player changed to: ${player.name}, Setting image URL to: ${player.heatmapUrl}`);
+      // Reset the image error state when player changes
       setImageError(false);
+      // Set the image URL directly from the player data
+      setImageUrl(player.heatmapUrl);
+    } else {
+      // Clear the image URL when no player is selected
+      setImageUrl(null);
     }
-  }, [player]);
+  }, [player?.id]); // Using player.id ensures this runs only when the selected player changes
   
   if (!player) {
     return <div className="text-center py-8">No player selected</div>;
@@ -90,20 +81,20 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
   };
 
   const tryAlternativeUrl = () => {
-    if (player.heatmapUrl) {
-      // Try using an image proxy service
-      const fileId = player.heatmapUrl.split('id=')[1];
-      if (fileId) {
-        const newUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
-        console.log("Trying alternative URL:", newUrl);
-        setImageUrl(newUrl);
+    if (player && player.heatmapUrl) {
+      // Try using an image proxy service or thumbnail
+      const thumbnailUrl = getGoogleDriveThumbnailUrl(player.heatmapUrl);
+      if (thumbnailUrl) {
+        console.log(`Trying thumbnail URL for ${player.name}:`, thumbnailUrl);
+        setImageUrl(thumbnailUrl);
         setImageError(false);
       }
     }
   };
 
   const resetImageError = () => {
-    if (player.heatmapUrl) {
+    if (player && player.heatmapUrl) {
+      console.log(`Resetting to original URL for ${player.name}:`, player.heatmapUrl);
       setImageUrl(player.heatmapUrl);
       setImageError(false);
     }
