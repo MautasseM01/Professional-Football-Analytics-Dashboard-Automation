@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Player } from "@/types";
@@ -65,19 +64,6 @@ export const usePlayerData = () => {
     setLoading(true);
     setError(null);
     
-    // Check if we're in demo mode
-    const isDemoMode = localStorage.getItem("demoMode") === "true";
-    
-    if (isDemoMode) {
-      // Use demo data instead of calling Supabase
-      console.log("Demo mode active, using mock player data");
-      setPlayers(DEMO_PLAYERS);
-      setSelectedPlayer(DEMO_PLAYERS[0]);
-      setLoading(false);
-      toast("Demo player data loaded successfully!");
-      return;
-    }
-    
     try {
       console.log("Fetching players from Supabase...");
       const { data, error } = await supabase
@@ -114,16 +100,24 @@ export const usePlayerData = () => {
         setSelectedPlayer(mappedPlayers[0]);
         toast("Player data loaded successfully!");
       } else {
-        console.log("No players found in the database");
-        toast("No player data found in the Supabase database");
-        setError("No player data available");
+        console.log("No players found in the database, using demo data");
+        // Fallback to demo data if no players found
+        setPlayers(DEMO_PLAYERS);
+        setSelectedPlayer(DEMO_PLAYERS[0]);
+        toast("No data found in Supabase. Using demo data instead!");
       }
     } catch (error: any) {
       console.error("Error fetching players:", error);
       setError(error.message || "Failed to fetch players");
+      
+      // Fallback to demo data on error
+      console.log("Using demo data as fallback due to error");
+      setPlayers(DEMO_PLAYERS);
+      setSelectedPlayer(DEMO_PLAYERS[0]);
+      
       uiToast({
         title: "Data Fetch Error",
-        description: "Failed to load player data: " + error.message,
+        description: "Failed to load player data from Supabase: " + error.message + ". Using demo data instead.",
         variant: "destructive",
       });
     } finally {
@@ -134,25 +128,22 @@ export const usePlayerData = () => {
   useEffect(() => {
     fetchPlayers();
     
-    // Only set up subscription if not in demo mode
-    if (localStorage.getItem("demoMode") !== "true") {
-      // Set up a subscription to player changes
-      const playersSubscription = supabase
-        .channel('public:players')
-        .on('postgres_changes', { 
-          event: '*', 
-          schema: 'public', 
-          table: 'players' 
-        }, (payload) => {
-          console.log('Players table changed, payload:', payload);
-          fetchPlayers();
-        })
-        .subscribe();
-      
-      return () => {
-        playersSubscription.unsubscribe();
-      };
-    }
+    // Set up a subscription to player changes
+    const playersSubscription = supabase
+      .channel('public:players')
+      .on('postgres_changes', { 
+        event: '*', 
+        schema: 'public', 
+        table: 'players' 
+      }, (payload) => {
+        console.log('Players table changed, payload:', payload);
+        fetchPlayers();
+      })
+      .subscribe();
+    
+    return () => {
+      playersSubscription.unsubscribe();
+    };
   }, []);
   
   const selectPlayer = (id: number) => {
