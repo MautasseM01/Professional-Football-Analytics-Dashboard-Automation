@@ -15,19 +15,46 @@ import {
   PieChart, 
   Download,
   Activity,
-  Calendar
+  Calendar,
+  ImageOff
 } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { toast } from "@/hooks/use-toast";
 
 interface PlayerStatsProps {
   player: Player | null;
 }
 
+// Helper function to convert Google Drive URL to a proxied URL
+const getProxiedImageUrl = (url: string | null): string | null => {
+  if (!url) return null;
+  
+  // Check if it's a Google Drive URL
+  const googleDriveRegex = /drive\.google\.com\/[^\/]+\/[^\/]+\/([^\/\?]+)/;
+  const match = url.match(googleDriveRegex);
+  
+  if (match) {
+    const fileId = match[1];
+    // Use cors-anywhere proxy or similar service
+    return `https://cors-anywhere.herokuapp.com/https://drive.google.com/uc?export=view&id=${fileId}`;
+  }
+  
+  return url;
+};
+
 export const PlayerStats = ({ player }: PlayerStatsProps) => {
   console.log("PlayerStats component received player:", player);
-  console.log("Heatmap URL:", player?.heatmapUrl);
+  console.log("Original Heatmap URL:", player?.heatmapUrl);
   
   const [imageError, setImageError] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if (player?.heatmapUrl) {
+      setImageUrl(player.heatmapUrl);
+      setImageError(false);
+    }
+  }, [player]);
   
   if (!player) {
     return <div className="text-center py-8">No player selected</div>;
@@ -53,12 +80,33 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.error("Error loading heatmap image:", e);
-    console.log("Failed URL:", player.heatmapUrl);
+    console.log("Failed URL:", imageUrl);
     setImageError(true);
+    toast({
+      title: "Image loading error",
+      description: "Could not load the player heatmap image",
+      variant: "destructive"
+    });
+  };
+
+  const tryAlternativeUrl = () => {
+    if (player.heatmapUrl) {
+      // Try using an image proxy service
+      const fileId = player.heatmapUrl.split('id=')[1];
+      if (fileId) {
+        const newUrl = `https://drive.google.com/thumbnail?id=${fileId}&sz=w1000`;
+        console.log("Trying alternative URL:", newUrl);
+        setImageUrl(newUrl);
+        setImageError(false);
+      }
+    }
   };
 
   const resetImageError = () => {
-    setImageError(false);
+    if (player.heatmapUrl) {
+      setImageUrl(player.heatmapUrl);
+      setImageError(false);
+    }
   };
 
   return (
@@ -100,23 +148,37 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
               <div className="relative aspect-video w-full overflow-hidden rounded-md">
                 {imageError ? (
                   <div className="flex flex-col items-center justify-center h-full bg-club-black/50 p-4">
+                    <ImageOff className="text-club-gold mb-2" size={36} />
                     <p className="text-center text-club-gold mb-2">Unable to load heatmap image</p>
-                    <Button 
-                      variant="outline" 
-                      onClick={resetImageError}
-                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
-                    >
-                      Retry
-                    </Button>
-                    <p className="text-xs text-club-light-gray/60 mt-2">URL: {player.heatmapUrl}</p>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        onClick={resetImageError}
+                        className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
+                      >
+                        Retry Original
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={tryAlternativeUrl}
+                        className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
+                      >
+                        Try Thumbnail
+                      </Button>
+                    </div>
+                    <p className="text-xs text-club-light-gray/60 mt-4 text-center">
+                      The image cannot be loaded due to CORS restrictions from Google Drive.
+                      <br/>Try uploading the image to a CORS-enabled image hosting service.
+                    </p>
                   </div>
                 ) : (
                   <img 
-                    src={player.heatmapUrl} 
+                    src={imageUrl || player.heatmapUrl} 
                     alt={`${player.name} heatmap`}
-                    crossOrigin="anonymous"
                     className="object-cover w-full h-full"
+                    crossOrigin="anonymous"
                     onError={handleImageError}
+                    referrerPolicy="no-referrer"
                   />
                 )}
                 <div className="absolute bottom-2 right-2 bg-club-black/70 text-xs px-2 py-1 rounded">
