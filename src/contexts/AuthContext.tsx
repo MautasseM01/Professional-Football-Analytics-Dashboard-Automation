@@ -66,43 +66,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     try {
       // Special case for demo user
       if (email === "coach@smhfoot.fr" && password === "password123") {
-        console.log("Demo login detected, using special flow");
-        // For demo user, we'll use a pre-registered account or create one if needed
-        const { data, error } = await supabase.auth.signInWithPassword({ 
-          email: "coach@smhfoot.fr", 
-          password: "password123"
+        console.log("Demo login detected, bypassing normal flow");
+        
+        // Demo mode - create a fake session
+        setUser({
+          id: "demo-user-id",
+          email: "coach@smhfoot.fr",
+          user_metadata: {
+            name: "Coach Demo"
+          }
         });
         
-        if (error) {
-          // If the demo account doesn't exist yet, create it
-          if (error.message.includes("Invalid login credentials")) {
-            const { error: signUpError } = await supabase.auth.signUp({
-              email: "coach@smhfoot.fr",
-              password: "password123",
-              options: {
-                data: {
-                  name: "Coach Demo",
-                }
-              }
-            });
-            
-            if (signUpError) throw signUpError;
-            
-            // Try signing in again
-            const { error: retryError } = await supabase.auth.signInWithPassword({
-              email: "coach@smhfoot.fr",
-              password: "password123"
-            });
-            
-            if (retryError) throw retryError;
-          } else {
-            throw error;
-          }
-        }
+        // Store a marker in localStorage to remember we're in demo mode
+        localStorage.setItem("demoMode", "true");
         
         toast({
           title: "Demo Login",
-          description: "You are now logged in as a demo user",
+          description: "You are now logged in as a demo coach user",
         });
         return;
       }
@@ -145,6 +125,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signOut = async () => {
     try {
+      // Check if we're in demo mode
+      if (localStorage.getItem("demoMode") === "true") {
+        // Just clear the demo mode and reset user state
+        localStorage.removeItem("demoMode");
+        setUser(null);
+        
+        toast({
+          title: "Logged out",
+          description: "You have been logged out from demo mode.",
+        });
+        return;
+      }
+      
+      // Regular logout for non-demo users
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
       toast({
