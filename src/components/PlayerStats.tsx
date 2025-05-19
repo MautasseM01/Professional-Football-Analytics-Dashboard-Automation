@@ -14,6 +14,8 @@ import {
   BarChart, 
   PieChart, 
   Download,
+  Activity,
+  Calendar
 } from "lucide-react";
 
 interface PlayerStatsProps {
@@ -21,6 +23,8 @@ interface PlayerStatsProps {
 }
 
 export const PlayerStats = ({ player }: PlayerStatsProps) => {
+  console.log("PlayerStats component received player:", player);
+  
   if (!player) {
     return <div className="text-center py-8">No player selected</div>;
   }
@@ -135,6 +139,3 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
     </div>
   );
 };
-
-import { Activity } from "lucide-react";
-import { Calendar } from "lucide-react";
