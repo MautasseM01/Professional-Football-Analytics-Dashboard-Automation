@@ -96,12 +96,14 @@ export function MultiPlayerSelect({
         </PopoverTrigger>
         <PopoverContent className="w-full p-0" align="start">
           <Command shouldFilter={false}>
-            <CommandInput 
-              placeholder="Search players..." 
-              value={searchQuery}
-              onValueChange={setSearchQuery}
-              startIcon={<Search className="h-4 w-4" />}
-            />
+            <div className="flex items-center border-b px-3">
+              <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+              <CommandInput 
+                placeholder="Search players..." 
+                value={searchQuery}
+                onValueChange={setSearchQuery}
+              />
+            </div>
             <CommandList>
               <CommandEmpty>No players found</CommandEmpty>
               <CommandGroup>

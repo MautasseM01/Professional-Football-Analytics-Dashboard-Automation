@@ -199,30 +199,33 @@ export default function PlayerComparison() {
             <CardContent>
               <div className="w-full h-[500px]">
                 <ChartContainer config={chartConfig}>
-                  <ResponsiveContainer width="100%" height="100%">
-                    <RadarChart data={radarData} className="mx-auto">
-                      <PolarGrid />
-                      <PolarAngleAxis dataKey="category" />
-                      
-                      {selectedPlayers.map((player, index) => (
-                        <Radar
-                          key={player.id}
-                          name={player.name}
-                          dataKey={player.name}
-                          stroke={playerColors[index % playerColors.length]}
-                          fill={playerColors[index % playerColors.length]}
-                          fillOpacity={0.2}
-                        />
-                      ))}
-                    </RadarChart>
-                  </ResponsiveContainer>
-                  <ChartLegend>
-                    <ChartLegendContent payload={selectedPlayers.map((player, index) => ({
-                      value: player.name,
-                      color: playerColors[index % playerColors.length],
-                      dataKey: player.name
-                    }))} />
-                  </ChartLegend>
+                  {/* Wrap the ResponsiveContainer in a fragment to make it a single child */}
+                  <>
+                    <ResponsiveContainer width="100%" height="100%">
+                      <RadarChart data={radarData} className="mx-auto">
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="category" />
+                        
+                        {selectedPlayers.map((player, index) => (
+                          <Radar
+                            key={player.id}
+                            name={player.name}
+                            dataKey={player.name}
+                            stroke={playerColors[index % playerColors.length]}
+                            fill={playerColors[index % playerColors.length]}
+                            fillOpacity={0.2}
+                          />
+                        ))}
+                      </RadarChart>
+                    </ResponsiveContainer>
+                    <ChartLegend>
+                      <ChartLegendContent payload={selectedPlayers.map((player, index) => ({
+                        value: player.name,
+                        color: playerColors[index % playerColors.length],
+                        dataKey: player.name
+                      }))} />
+                    </ChartLegend>
+                  </>
                 </ChartContainer>
               </div>
             </CardContent>
