@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
+import PlayerComparison from "./pages/PlayerComparison";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -54,7 +55,7 @@ const App = () => (
               path="/player-analysis/comparison" 
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <PlayerComparison />
                 </ProtectedRoute>
               } 
             />
