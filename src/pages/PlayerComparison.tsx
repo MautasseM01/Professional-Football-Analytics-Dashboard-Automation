@@ -11,6 +11,9 @@ import { Player } from "@/types";
 import { ChartContainer, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from "recharts";
 import { MultiPlayerSelect } from "@/components/MultiPlayerSelect";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { UserRound } from "lucide-react";
 
 const formatPercentage = (value: number): string => {
   return `${value.toFixed(1)}%`;
@@ -37,6 +40,52 @@ export default function PlayerComparison() {
   const getPassCompletionPercentage = (player: Player): number => {
     if (!player.passes_attempted || player.passes_attempted === 0) return 0;
     return (player.passes_completed / player.passes_attempted) * 100;
+  };
+
+  // Determine the highest value in a row for highlighting
+  const getHighestValuesInRow = (statFunction: (player: Player) => number | null | undefined) => {
+    if (!selectedPlayers.length) return {};
+    
+    const validValues = selectedPlayers
+      .map(player => ({ id: player.id, value: statFunction(player) }))
+      .filter(item => item.value !== null && item.value !== undefined);
+      
+    if (!validValues.length) return {};
+    
+    const maxValue = Math.max(...validValues.map(item => Number(item.value)));
+    
+    return validValues.reduce((acc, item) => {
+      if (Number(item.value) === maxValue) {
+        acc[item.id] = true;
+      }
+      return acc;
+    }, {} as Record<number, boolean>);
+  };
+
+  // Get highest values for each stat type
+  const highestDistance = useMemo(() => 
+    getHighestValuesInRow(player => player.distance), [selectedPlayers]);
+    
+  const highestPassCompletion = useMemo(() => 
+    getHighestValuesInRow(player => {
+      if (!player.passes_attempted || player.passes_attempted === 0) return null;
+      return (player.passes_completed / player.passes_attempted) * 100;
+    }), [selectedPlayers]);
+    
+  const highestShotsOnTarget = useMemo(() => 
+    getHighestValuesInRow(player => player.shots_on_target), [selectedPlayers]);
+    
+  const highestTacklesWon = useMemo(() => 
+    getHighestValuesInRow(player => player.tackles_won), [selectedPlayers]);
+
+  // Generate initials from player name for avatar fallback
+  const getPlayerInitials = (name: string): string => {
+    return name
+      .split(' ')
+      .map(part => part.charAt(0))
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   };
 
   // Prepare data for radar chart
@@ -143,7 +192,15 @@ export default function PlayerComparison() {
                       <TableHead>Metric</TableHead>
                       {selectedPlayers.map((player) => (
                         <TableHead key={player.id} className="text-center">
-                          {player.name}
+                          <div className="flex items-center justify-center gap-2">
+                            <Avatar className="h-8 w-8">
+                              <AvatarImage src={`https://i.pravatar.cc/100?u=${player.id}`} alt={player.name} />
+                              <AvatarFallback className="bg-club-dark-gray text-club-gold">
+                                {getPlayerInitials(player.name)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <span>{player.name}</span>
+                          </div>
                         </TableHead>
                       ))}
                     </TableRow>
@@ -152,34 +209,56 @@ export default function PlayerComparison() {
                     <TableRow>
                       <TableCell className="font-medium">Total Distance (km)</TableCell>
                       {selectedPlayers.map((player) => (
-                        <TableCell key={`distance-${player.id}`} className="text-center">
-                          {player.distance ? player.distance.toFixed(1) : "N/A"}
+                        <TableCell 
+                          key={`distance-${player.id}`} 
+                          className={`text-center ${highestDistance[player.id] ? 'bg-green-100/10' : ''}`}
+                        >
+                          {player.distance ? 
+                            player.distance.toFixed(1) : 
+                            <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                          }
                         </TableCell>
                       ))}
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-medium">Pass Completion %</TableCell>
                       {selectedPlayers.map((player) => (
-                        <TableCell key={`passes-${player.id}`} className="text-center">
-                          {player.passes_attempted && player.passes_attempted > 0
-                            ? formatPercentage(getPassCompletionPercentage(player))
-                            : "N/A"}
+                        <TableCell 
+                          key={`passes-${player.id}`} 
+                          className={`text-center ${highestPassCompletion[player.id] ? 'bg-green-100/10' : ''}`}
+                        >
+                          {player.passes_attempted && player.passes_attempted > 0 ?
+                            formatPercentage(getPassCompletionPercentage(player)) :
+                            <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                          }
                         </TableCell>
                       ))}
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-medium">Shots on Target</TableCell>
                       {selectedPlayers.map((player) => (
-                        <TableCell key={`shots-${player.id}`} className="text-center">
-                          {player.shots_on_target ?? "N/A"}
+                        <TableCell 
+                          key={`shots-${player.id}`} 
+                          className={`text-center ${highestShotsOnTarget[player.id] ? 'bg-green-100/10' : ''}`}
+                        >
+                          {player.shots_on_target !== null && player.shots_on_target !== undefined ?
+                            player.shots_on_target :
+                            <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                          }
                         </TableCell>
                       ))}
                     </TableRow>
                     <TableRow>
                       <TableCell className="font-medium">Tackles Won</TableCell>
                       {selectedPlayers.map((player) => (
-                        <TableCell key={`tackles-${player.id}`} className="text-center">
-                          {player.tackles_won ?? "N/A"}
+                        <TableCell 
+                          key={`tackles-${player.id}`} 
+                          className={`text-center ${highestTacklesWon[player.id] ? 'bg-green-100/10' : ''}`}
+                        >
+                          {player.tackles_won !== null && player.tackles_won !== undefined ?
+                            player.tackles_won :
+                            <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                          }
                         </TableCell>
                       ))}
                     </TableRow>

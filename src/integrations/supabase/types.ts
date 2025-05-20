@@ -15,13 +15,16 @@ export type Database = {
           heatmapUrl: string | null
           id: number
           matches: number | null
+          maxSpeed: number | null
           name: string | null
+          passCompletionPct: number | null
           passes_attempted: number | null
           passes_completed: number | null
           position: string | null
           reportUrl: string | null
           shots_on_target: number | null
           shots_total: number | null
+          sprintDistance: number | null
           tackles_attempted: number | null
           tackles_won: number | null
         }
@@ -30,13 +33,16 @@ export type Database = {
           heatmapUrl?: string | null
           id: number
           matches?: number | null
+          maxSpeed?: number | null
           name?: string | null
+          passCompletionPct?: number | null
           passes_attempted?: number | null
           passes_completed?: number | null
           position?: string | null
           reportUrl?: string | null
           shots_on_target?: number | null
           shots_total?: number | null
+          sprintDistance?: number | null
           tackles_attempted?: number | null
           tackles_won?: number | null
         }
@@ -45,13 +51,16 @@ export type Database = {
           heatmapUrl?: string | null
           id?: number
           matches?: number | null
+          maxSpeed?: number | null
           name?: string | null
+          passCompletionPct?: number | null
           passes_attempted?: number | null
           passes_completed?: number | null
           position?: string | null
           reportUrl?: string | null
           shots_on_target?: number | null
           shots_total?: number | null
+          sprintDistance?: number | null
           tackles_attempted?: number | null
           tackles_won?: number | null
         }
