@@ -76,10 +76,10 @@ export const usePlayerAttributes = (player: Player | null) => {
       } catch (err: any) {
         console.error('Error in usePlayerAttributes:', err);
         setError(err.message);
-        // Fix: Update the toast call to use the correct format for sonner toast
+        // Fix: Update the toast call to match sonner's API which doesn't support variant
         toast("Data fetch error", {
           description: `Could not load player attributes: ${err.message}`,
-          variant: "destructive",
+          // Remove the variant property as it's not supported in sonner's toast API
         });
       } finally {
         setLoading(false);
