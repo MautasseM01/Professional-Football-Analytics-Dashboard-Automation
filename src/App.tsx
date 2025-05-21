@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import PlayerComparison from "./pages/PlayerComparison";
+import PlayerStats from "./pages/PlayerStats";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -47,7 +48,7 @@ const App = () => (
               path="/player-analysis/stats" 
               element={
                 <ProtectedRoute>
-                  <Dashboard />
+                  <PlayerStats />
                 </ProtectedRoute>
               } 
             />
