@@ -76,8 +76,8 @@ export const usePlayerAttributes = (player: Player | null) => {
       } catch (err: any) {
         console.error('Error in usePlayerAttributes:', err);
         setError(err.message);
-        toast({
-          title: "Data fetch error",
+        // Fix: Update the toast call to use the correct format for sonner toast
+        toast("Data fetch error", {
           description: `Could not load player attributes: ${err.message}`,
           variant: "destructive",
         });
