@@ -40,3 +40,6 @@ export type NavigationItem = {
   icon: React.ComponentType<{ className?: string }>;
   current: boolean;
 };
+
+// Re-export the Shot types for backwards compatibility
+export * from './shot';

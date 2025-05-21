@@ -1,9 +1,12 @@
 
 import { 
-  Player, 
-  ShotFilters,
-  Shot
+  Player
 } from "@/types";
+import { 
+  ShotFilters,
+  Shot,
+  ShotOutcome
+} from "@/types/shot";
 import { Filter, CalendarDays, User } from "lucide-react";
 import { 
   Select, 
@@ -13,7 +16,6 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ShotOutcome } from "@/types/shot";
 
 interface ShotMapFiltersProps {
   players: Player[];

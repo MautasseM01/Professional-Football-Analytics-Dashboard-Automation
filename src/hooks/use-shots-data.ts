@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Shot, ShotFilters } from "@/types/shot";
+import { Shot, ShotFilters, ShotOutcome } from "@/types/shot";
 import { Player } from "@/types";
 import { toast } from "@/components/ui/sonner";
 
@@ -30,10 +30,22 @@ export const useShotsData = () => {
           throw new Error(`Error fetching shots data: ${fetchError.message}`);
         }
 
-        // Process the data to include player name from the join
+        // Process the data to include player name from the join and ensure types are correct
         const processedData: Shot[] = data?.map(shot => ({
-          ...shot,
-          player_name: shot.players?.name || "Unknown Player"
+          id: shot.id,
+          player_id: shot.player_id,
+          player_name: shot.players?.name || "Unknown Player",
+          match_id: shot.match_id,
+          match_name: shot.match_name,
+          x_coordinate: shot.x_coordinate,
+          y_coordinate: shot.y_coordinate,
+          minute: shot.minute,
+          // Ensure period is cast to the correct type
+          period: shot.period as "First Half" | "Second Half" | "Extra Time" | "Penalties",
+          outcome: shot.outcome as ShotOutcome,
+          assisted_by: shot.assisted_by || undefined,
+          distance: shot.distance || undefined,
+          date: shot.date
         })) || [];
 
         setShots(processedData);
