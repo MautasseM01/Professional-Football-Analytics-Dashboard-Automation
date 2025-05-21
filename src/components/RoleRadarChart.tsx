@@ -16,6 +16,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { PlayerAttributes, PositionalAverage } from "@/hooks/use-player-attributes";
 import { Player } from "@/types";
+import { useState } from "react";
 
 interface RoleRadarChartProps {
   player: Player | null;
@@ -241,5 +242,3 @@ export const RoleRadarChart = ({
     </Card>
   );
 };
-
-import { useState } from "react";
