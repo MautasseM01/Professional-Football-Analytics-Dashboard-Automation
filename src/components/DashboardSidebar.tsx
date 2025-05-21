@@ -14,7 +14,8 @@ import {
   LayoutDashboard,
   UserRound,
   LineChart,
-  ArrowUpRight 
+  ArrowUpRight,
+  MessageSquare 
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { 
@@ -28,6 +29,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { FeedbackForm } from "./FeedbackForm";
 
 interface SubNavigationItem {
   name: string;
@@ -77,6 +79,7 @@ const navigation: NavigationItem[] = [
 export const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const { signOut, user } = useAuth();
   const location = useLocation();
 
@@ -240,10 +243,21 @@ export const DashboardSidebar = () => {
           </nav>
         </div>
 
+        {/* Feedback button and sign out section */}
         <div className="border-t border-club-gold/20 p-4">
           {!collapsed ? (
-            <div className="flex flex-col">
-              <div className="text-sm text-club-light-gray mb-2 truncate">
+            <div className="flex flex-col space-y-3">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setFeedbackOpen(true)}
+                className="justify-start border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
+              >
+                <MessageSquare className="mr-2 h-4 w-4 text-club-gold" />
+                <span>Send Feedback</span>
+              </Button>
+              
+              <div className="text-sm text-club-light-gray truncate">
                 {user?.email || "User"}
               </div>
               <Button
@@ -255,22 +269,42 @@ export const DashboardSidebar = () => {
               </Button>
             </div>
           ) : (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="ghost"
-                  onClick={signOut}
-                  className="w-full flex justify-center text-club-light-gray hover:text-club-gold hover:bg-club-gold/10"
-                >
-                  <Settings size={20} />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
-                Sign out
-              </TooltipContent>
-            </Tooltip>
+            <>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    onClick={() => setFeedbackOpen(true)}
+                    className="w-full flex justify-center text-club-light-gray hover:text-club-gold hover:bg-club-gold/10 mb-2"
+                  >
+                    <MessageSquare size={20} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
+                  Send Feedback
+                </TooltipContent>
+              </Tooltip>
+              
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost"
+                    onClick={signOut}
+                    className="w-full flex justify-center text-club-light-gray hover:text-club-gold hover:bg-club-gold/10"
+                  >
+                    <Settings size={20} />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
+                  Sign out
+                </TooltipContent>
+              </Tooltip>
+            </>
           )}
         </div>
+        
+        {/* Feedback form dialog */}
+        <FeedbackForm open={feedbackOpen} onOpenChange={setFeedbackOpen} />
       </div>
     </TooltipProvider>
   );
