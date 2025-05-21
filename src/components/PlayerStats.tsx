@@ -7,6 +7,7 @@ import {
   Activity,
   Calendar,
   Info,
+  LineChart,
 } from "lucide-react";
 import { HeatmapCard } from "./HeatmapCard";
 import { TackleSuccessCard } from "./TackleSuccessCard";
@@ -16,6 +17,8 @@ import {
   TooltipProvider, 
   TooltipTrigger 
 } from "@/components/ui/tooltip";
+import { useState } from "react";
+import { PerformanceTrendsCard } from "./PerformanceTrendsCard";
 
 interface PlayerStatsProps {
   player: Player | null;
@@ -127,6 +130,15 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <HeatmapCard player={player} />
           <TackleSuccessCard player={player} />
+        </div>
+        
+        {/* Performance Trends Section */}
+        <div className="mt-6">
+          <h2 className="text-xl font-semibold mb-4 text-club-gold flex items-center gap-2">
+            <LineChart size={20} />
+            Performance Trends
+          </h2>
+          <PerformanceTrendsCard player={player} />
         </div>
       </div>
     </TooltipProvider>
