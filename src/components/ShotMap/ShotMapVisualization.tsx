@@ -1,43 +1,38 @@
 
+import React from "react";
 import { FootballPitch } from "./FootballPitch";
 import { ShotPoint } from "./ShotPoint";
-import { ShotMapLegend } from "./ShotMapLegend";
 import { Shot } from "@/types/shot";
+import { LoadingOverlay } from "../LoadingOverlay";
 
 interface ShotMapVisualizationProps {
   shots: Shot[];
   loading: boolean;
+  filterLoading: boolean;
 }
 
-export const ShotMapVisualization = ({ 
-  shots, 
-  loading 
-}: ShotMapVisualizationProps) => {
-  return (
-    <div className="space-y-4">
-      <div className="bg-club-black/40 p-4 rounded-lg">
-        <div className="relative">
-          <FootballPitch className="rounded-lg overflow-hidden shadow-xl">
-            {!loading && shots.map((shot) => (
-              <ShotPoint key={shot.id} shot={shot} />
-            ))}
-          </FootballPitch>
-          
-          {loading && (
-            <div className="absolute inset-0 flex items-center justify-center bg-club-black/60 rounded-lg">
-              <div className="text-club-light-gray">Loading shot data...</div>
-            </div>
-          )}
-          
-          {!loading && shots.length === 0 && (
-            <div className="absolute inset-0 flex items-center justify-center bg-club-black/60 rounded-lg">
-              <div className="text-club-light-gray">No shots match the selected filters</div>
-            </div>
-          )}
-        </div>
+export const ShotMapVisualization = ({ shots, loading, filterLoading }: ShotMapVisualizationProps) => {
+  if (loading) {
+    return (
+      <div className="w-full p-6 flex justify-center items-center min-h-[500px] bg-club-dark-gray rounded-lg">
+        <Loader className="h-8 w-8 text-club-gold animate-spin" />
       </div>
-      
-      <ShotMapLegend />
+    );
+  }
+
+  return (
+    <div className="relative w-full">
+      <LoadingOverlay isLoading={filterLoading} />
+      <div className="w-full bg-club-dark-gray p-6 rounded-lg relative">
+        <FootballPitch>
+          {shots.map((shot) => (
+            <ShotPoint key={shot.id} shot={shot} />
+          ))}
+        </FootballPitch>
+      </div>
     </div>
   );
 };
+
+// Import Loader component
+import { Loader } from "lucide-react";

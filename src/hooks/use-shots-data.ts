@@ -11,6 +11,7 @@ export const useShotsData = () => {
   const [filters, setFilters] = useState<ShotFilters>({});
   const [matches, setMatches] = useState<{ id: number; name: string }[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filterLoading, setFilterLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Fetch shots data
@@ -106,12 +107,18 @@ export const useShotsData = () => {
 
   // Update filters
   const updateFilters = (newFilters: Partial<ShotFilters>) => {
+    setFilterLoading(true);
     setFilters(prev => ({ ...prev, ...newFilters }));
+    // Add a small delay to simulate network request and ensure the loading state is visible
+    setTimeout(() => setFilterLoading(false), 500);
   };
 
   // Reset filters
   const resetFilters = () => {
+    setFilterLoading(true);
     setFilters({});
+    // Add a small delay to simulate network request and ensure the loading state is visible
+    setTimeout(() => setFilterLoading(false), 500);
   };
 
   return {
@@ -122,6 +129,7 @@ export const useShotsData = () => {
     updateFilters,
     resetFilters,
     loading,
+    filterLoading,
     error
   };
 };
