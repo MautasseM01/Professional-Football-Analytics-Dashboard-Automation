@@ -9,6 +9,7 @@ import { ProtectedRoute } from "./components/ProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import PlayerComparison from "./pages/PlayerComparison";
 import PlayerStats from "./pages/PlayerStats";
+import ShotMap from "./pages/ShotMap";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -65,6 +66,16 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* New Shot Map route */}
+            <Route 
+              path="/player-analysis/shot-map" 
+              element={
+                <ProtectedRoute>
+                  <ShotMap />
                 </ProtectedRoute>
               } 
             />
