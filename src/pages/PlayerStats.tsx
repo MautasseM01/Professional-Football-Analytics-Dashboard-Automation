@@ -1,3 +1,4 @@
+
 import { usePlayerData } from "@/hooks/use-player-data";
 import { usePlayerAttributes } from "@/hooks/use-player-attributes";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
@@ -6,11 +7,16 @@ import { RoleRadarChart } from "@/components/RoleRadarChart";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User } from "lucide-react";
 import { useState, useEffect } from "react";
+import { CoachNotesTextarea } from "@/components/CoachNotesTextarea";
+import { PDFReportGenerator } from "@/components/PDFReportGenerator";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const PlayerStats = () => {
   const { players, selectedPlayer, selectPlayer, loading, error } = usePlayerData();
   const { attributes, positionalAverage, loading: attrLoading, error: attrError } = usePlayerAttributes(selectedPlayer);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>("");
+  const [coachNotes, setCoachNotes] = useState<string>("");
+  const [performanceData, setPerformanceData] = useState<any[]>([]);
 
   // Set the selected player ID when players data is loaded
   useEffect(() => {
@@ -20,9 +26,29 @@ const PlayerStats = () => {
     }
   }, [players, selectedPlayerId, selectPlayer]);
 
+  // Generate sample performance data for the selected player
+  useEffect(() => {
+    if (selectedPlayer) {
+      // Generate mock performance trend data for the Total Distance metric
+      const mockData = Array.from({ length: 10 }, (_, i) => {
+        const baseValue = selectedPlayer.distance || 8;
+        const variation = (Math.random() * 2 - 1) * 1.5; // Random variation between -1.5 and 1.5
+        return {
+          match: `Match ${i+1}`,
+          date: new Date(2023, 0, i+1).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          value: Math.max(5, Number((baseValue + variation).toFixed(2))),
+        };
+      });
+      
+      setPerformanceData(mockData);
+    }
+  }, [selectedPlayer]);
+
   const handlePlayerChange = (value: string) => {
     setSelectedPlayerId(value);
     selectPlayer(Number(value));
+    // Reset coach's notes when changing players
+    setCoachNotes("");
   };
 
   return (
@@ -61,6 +87,32 @@ const PlayerStats = () => {
               </Select>
             </div>
           </div>
+
+          {/* PDF Report Generation Card */}
+          <Card className="border-club-gold/20 bg-club-dark-gray mb-8">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-club-gold flex items-center justify-between">
+                <span>Player Performance Report</span>
+                <PDFReportGenerator 
+                  player={selectedPlayer}
+                  attributes={attributes}
+                  positionalAverage={positionalAverage}
+                  coachNotes={coachNotes}
+                  performanceData={performanceData}
+                />
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="mb-4 text-club-light-gray/80">
+                Generate a comprehensive PDF report including the player's performance data, radar charts, 
+                and your personalized coaching notes.
+              </p>
+              <CoachNotesTextarea 
+                value={coachNotes}
+                onChange={setCoachNotes}
+              />
+            </CardContent>
+          </Card>
 
           {loading ? (
             <div className="text-center py-8">Loading player data...</div>

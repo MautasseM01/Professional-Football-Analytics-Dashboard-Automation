@@ -19,6 +19,9 @@ import {
 } from "@/components/ui/tooltip";
 import { useState } from "react";
 import { PerformanceTrendsCard } from "./PerformanceTrendsCard";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { getGoogleDriveThumbnailUrl } from "@/lib/image-utils";
 
 interface PlayerStatsProps {
   player: Player | null;
@@ -39,9 +42,67 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
     ? ((player.shots_on_target / player.shots_total) * 100).toFixed(1)
     : "0";
 
+  // Generate player avatar initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(' ')
+      .map(word => word.charAt(0).toUpperCase())
+      .slice(0, 2)
+      .join('');
+  };
+
   return (
     <TooltipProvider>
       <div className="space-y-6">
+        {/* Player Profile Card */}
+        <Card className="bg-club-black/50 border-club-gold/20">
+          <CardContent className="pt-6">
+            <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+              <div className="flex-shrink-0">
+                <Avatar className="h-24 w-24 rounded-lg border-2 border-club-gold/30">
+                  {player.heatmapUrl ? (
+                    <AvatarImage 
+                      src={getGoogleDriveThumbnailUrl(player.heatmapUrl) || player.heatmapUrl} 
+                      alt={player.name} 
+                      className="object-cover"
+                    />
+                  ) : (
+                    <AvatarFallback className="text-2xl bg-club-gold/20 text-club-gold">
+                      {getInitials(player.name || "Player Name")}
+                    </AvatarFallback>
+                  )}
+                </Avatar>
+              </div>
+              
+              <div className="text-center md:text-left">
+                <h2 className="text-2xl font-bold text-club-gold">{player.name}</h2>
+                <div className="flex flex-col md:flex-row md:gap-6 mt-2">
+                  <p className="text-club-light-gray/80">
+                    <span className="font-medium text-club-light-gray">Position:</span> {player.position}
+                  </p>
+                  <p className="text-club-light-gray/80">
+                    <span className="font-medium text-club-light-gray">Matches:</span> {player.matches}
+                  </p>
+                  <p className="text-club-light-gray/80">
+                    <span className="font-medium text-club-light-gray">Max Speed:</span> {player.maxSpeed?.toFixed(1) || "N/A"} km/h
+                  </p>
+                </div>
+                
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <span className="px-2 py-1 bg-club-gold/20 text-club-gold text-xs rounded-full">
+                    Season 2023-24
+                  </span>
+                  {player.position && (
+                    <span className="px-2 py-1 bg-club-dark-bg text-club-light-gray text-xs rounded-full">
+                      {player.position}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Tooltip>
             <TooltipTrigger asChild>
