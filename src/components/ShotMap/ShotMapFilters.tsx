@@ -13,6 +13,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { ShotOutcome } from "@/types/shot";
 
 interface ShotMapFiltersProps {
   players: Player[];
@@ -30,7 +31,7 @@ export const ShotMapFilters = ({
   onResetFilters
 }: ShotMapFiltersProps) => {
   const periods = ["First Half", "Second Half", "Extra Time", "Penalties"];
-  const outcomes: Shot['outcome'][] = ["Goal", "Shot on Target", "Shot Off Target", "Blocked Shot"];
+  const outcomes: ShotOutcome[] = ["Goal", "Shot on Target", "Shot Off Target", "Blocked Shot"];
   
   return (
     <div className="space-y-4">
@@ -131,7 +132,7 @@ export const ShotMapFilters = ({
           <Select
             value={filters.outcome?.toString() || ""}
             onValueChange={(value) => 
-              onUpdateFilters({ outcome: value as Shot['outcome'] || null })
+              onUpdateFilters({ outcome: value as ShotOutcome || null })
             }
           >
             <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray">

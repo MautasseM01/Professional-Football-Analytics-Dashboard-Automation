@@ -146,6 +146,62 @@ export type Database = {
         }
         Relationships: []
       }
+      shots: {
+        Row: {
+          assisted_by: string | null
+          created_at: string | null
+          date: string
+          distance: number | null
+          id: number
+          match_id: number
+          match_name: string
+          minute: number
+          outcome: string
+          period: string
+          player_id: number
+          x_coordinate: number
+          y_coordinate: number
+        }
+        Insert: {
+          assisted_by?: string | null
+          created_at?: string | null
+          date?: string
+          distance?: number | null
+          id?: number
+          match_id: number
+          match_name: string
+          minute: number
+          outcome: string
+          period: string
+          player_id: number
+          x_coordinate: number
+          y_coordinate: number
+        }
+        Update: {
+          assisted_by?: string | null
+          created_at?: string | null
+          date?: string
+          distance?: number | null
+          id?: number
+          match_id?: number
+          match_name?: string
+          minute?: number
+          outcome?: string
+          period?: string
+          player_id?: number
+          x_coordinate?: number
+          y_coordinate?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shots_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           created_at: string | null
