@@ -21,7 +21,7 @@ interface ShotMapFiltersProps {
   players: Player[];
   matches: { id: number; name: string }[];
   filters: ShotFilters;
-  onUpdateFilters: (filters: Partial<ShotFilters>) => void;
+  onApplyFilters: (filters: Partial<ShotFilters>) => void;
   onResetFilters: () => void;
 }
 
@@ -29,7 +29,7 @@ export const ShotMapFilters = ({
   players,
   matches,
   filters,
-  onUpdateFilters,
+  onApplyFilters,
   onResetFilters
 }: ShotMapFiltersProps) => {
   const periods = ["First Half", "Second Half", "Extra Time", "Penalties"];
@@ -61,7 +61,7 @@ export const ShotMapFilters = ({
           <Select
             value={filters.playerId?.toString() || ""}
             onValueChange={(value) => 
-              onUpdateFilters({ playerId: value ? Number(value) : null })
+              onApplyFilters({ playerId: value ? Number(value) : null })
             }
           >
             <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray">
@@ -86,7 +86,7 @@ export const ShotMapFilters = ({
           <Select
             value={filters.matchId?.toString() || ""}
             onValueChange={(value) => 
-              onUpdateFilters({ matchId: value ? Number(value) : null })
+              onApplyFilters({ matchId: value ? Number(value) : null })
             }
           >
             <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray">
@@ -110,7 +110,7 @@ export const ShotMapFilters = ({
           <Select
             value={filters.period?.toString() || ""}
             onValueChange={(value) => 
-              onUpdateFilters({ period: value || null })
+              onApplyFilters({ period: value || null })
             }
           >
             <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray">
@@ -134,7 +134,7 @@ export const ShotMapFilters = ({
           <Select
             value={filters.outcome?.toString() || ""}
             onValueChange={(value) => 
-              onUpdateFilters({ outcome: value as ShotOutcome || null })
+              onApplyFilters({ outcome: value as ShotOutcome || null })
             }
           >
             <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray">
