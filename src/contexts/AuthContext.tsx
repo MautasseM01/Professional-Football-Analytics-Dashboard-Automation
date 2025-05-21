@@ -1,7 +1,7 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { AuthUser } from '../types';
+import { AuthUser, UserRole } from '../types';
 import { useToast } from '@/hooks/use-toast';
 
 type AuthContextType = {

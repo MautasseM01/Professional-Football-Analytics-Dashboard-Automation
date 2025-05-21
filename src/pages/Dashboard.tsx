@@ -1,23 +1,99 @@
 
 import { useState } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
+import { useUserProfile } from "@/hooks/use-user-profile";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
-import { PlayerStats } from "@/components/PlayerStats";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { PlayerDashboard } from "@/components/dashboards/PlayerDashboard";
+import { CoachDashboard } from "@/components/dashboards/CoachDashboard";
+import { AnalystDashboard } from "@/components/dashboards/AnalystDashboard";
+import { PerformanceDirectorDashboard } from "@/components/dashboards/PerformanceDirectorDashboard";
+import { ManagementDashboard } from "@/components/dashboards/ManagementDashboard";
+import { AdminDashboard } from "@/components/dashboards/AdminDashboard";
+import { UnassignedRoleDashboard } from "@/components/dashboards/UnassignedRoleDashboard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Menu, RefreshCw } from "lucide-react";
+import { Menu, RefreshCw, UserIcon } from "lucide-react";
 
 const Dashboard = () => {
-  // Get data directly from the hook, no local override
-  const { players, selectedPlayer, selectPlayer, loading, refreshData } = usePlayerData();
+  const { loading: playerDataLoading, refreshData } = usePlayerData();
+  const { profile, loading: profileLoading, error } = useUserProfile();
   const [showSidebar, setShowSidebar] = useState(true);
 
   const handleRefresh = () => {
     console.log("Manual refresh triggered");
     refreshData();
+  };
+
+  // Render appropriate content based on user role
+  const renderDashboardContent = () => {
+    if (profileLoading) {
+      return (
+        <div className="space-y-6">
+          <Skeleton className="h-8 w-64 bg-club-gold/10" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Skeleton className="h-80 w-full bg-club-gold/10" />
+            <Skeleton className="h-80 w-full bg-club-gold/10" />
+            <Skeleton className="h-80 w-full bg-club-gold/10" />
+          </div>
+        </div>
+      );
+    }
+
+    if (error) {
+      return (
+        <Alert className="bg-club-gold/10 border-club-gold/30">
+          <AlertDescription className="flex flex-col gap-4">
+            <p>Error loading user profile: {error}</p>
+            <Button 
+              variant="outline" 
+              className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
+              onClick={handleRefresh}
+            >
+              <RefreshCw size={16} className="mr-2" />
+              Retry Loading Data
+            </Button>
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    if (!profile) {
+      return (
+        <Alert className="bg-club-gold/10 border-club-gold/30">
+          <AlertDescription className="flex flex-col gap-4">
+            <p>User profile not found. Please try refreshing the page or contact an administrator.</p>
+            <Button 
+              variant="outline" 
+              className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
+              onClick={handleRefresh}
+            >
+              <RefreshCw size={16} className="mr-2" />
+              Retry Loading Data
+            </Button>
+          </AlertDescription>
+        </Alert>
+      );
+    }
+
+    // Return the appropriate dashboard based on user role
+    switch (profile.role) {
+      case 'player':
+        return <PlayerDashboard profile={profile} />;
+      case 'coach':
+        return <CoachDashboard profile={profile} />;
+      case 'analyst':
+        return <AnalystDashboard profile={profile} />;
+      case 'performance_director':
+        return <PerformanceDirectorDashboard profile={profile} />;
+      case 'management':
+        return <ManagementDashboard profile={profile} />;
+      case 'admin':
+        return <AdminDashboard profile={profile} />;
+      case 'unassigned':
+      default:
+        return <UnassignedRoleDashboard profile={profile} />;
+    }
   };
 
   return (
@@ -28,17 +104,33 @@ const Dashboard = () => {
         <header className="border-b border-club-gold/20 bg-club-black sticky top-0 z-10">
           <div className="flex justify-between items-center px-6 py-4">
             <div>
-              <h1 className="text-xl font-bold text-club-gold">Player Analytics Dashboard</h1>
-              <p className="text-sm text-club-light-gray/70">View detailed statistics for each player</p>
+              <h1 className="text-xl font-bold text-club-gold">Striker Insights Arena</h1>
+              <p className="text-sm text-club-light-gray/70">
+                {profileLoading ? (
+                  <Skeleton className="h-4 w-40 bg-club-gold/10 inline-block" />
+                ) : profile?.role ? (
+                  `${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} Dashboard`
+                ) : (
+                  "Dashboard"
+                )}
+              </p>
             </div>
             
             <div className="flex items-center gap-3">
+              {!profileLoading && profile && (
+                <div className="flex items-center mr-2 px-3 py-1.5 bg-club-dark-gray rounded-full border border-club-gold/20">
+                  <UserIcon size={16} className="text-club-gold mr-2" />
+                  <span className="text-club-light-gray text-sm">
+                    {profile.full_name || profile.email || "User"}
+                  </span>
+                </div>
+              )}
               <Button 
                 variant="outline" 
                 size="icon"
                 className="text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold"
                 onClick={handleRefresh}
-                title="Refresh player data"
+                title="Refresh data"
               >
                 <RefreshCw size={18} />
               </Button>
@@ -53,74 +145,7 @@ const Dashboard = () => {
         </header>
         
         <main className="p-6">
-          <Card className="border-club-gold/20 bg-club-dark-gray mb-6">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-club-gold text-lg">Player Selection</CardTitle>
-              <CardDescription>Choose a player to view their analytics</CardDescription>
-            </CardHeader>
-            <CardContent>
-              {loading ? (
-                <Skeleton className="h-10 w-full max-w-full sm:max-w-md mx-auto bg-club-gold/10" />
-              ) : (
-                <div className="max-w-full sm:max-w-md mx-auto">
-                  <Select
-                    value={selectedPlayer?.id.toString()}
-                    onValueChange={(value) => selectPlayer(parseInt(value))}
-                    disabled={players.length === 0}
-                  >
-                    <SelectTrigger className="bg-club-black border-club-gold/30 focus:ring-club-gold/30 w-full">
-                      <SelectValue placeholder="Select a player" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-club-dark-gray border-club-gold/30 max-w-[90vw] sm:max-w-md">
-                      {players.length > 0 ? (
-                        players.map((player) => (
-                          <SelectItem 
-                            key={player.id} 
-                            value={player.id.toString()}
-                            className="focus:bg-club-gold/20 focus:text-club-gold pr-2"
-                          >
-                            <span className="truncate block">{player.name} - {player.position}</span>
-                          </SelectItem>
-                        ))
-                      ) : (
-                        <div className="p-2 text-sm text-club-light-gray/70">No players found</div>
-                      )}
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          {loading ? (
-            <div className="space-y-6">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                {[...Array(4)].map((_, i) => (
-                  <Skeleton key={i} className="h-24 w-full bg-club-gold/10" />
-                ))}
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <Skeleton className="h-64 w-full md:col-span-2 bg-club-gold/10" />
-                <Skeleton className="h-64 w-full bg-club-gold/10" />
-              </div>
-            </div>
-          ) : players.length > 0 ? (
-            <PlayerStats player={selectedPlayer} />
-          ) : (
-            <Alert className="bg-club-gold/10 border-club-gold/30">
-              <AlertDescription className="flex flex-col gap-4">
-                <p>No player data found. Please check your Supabase database connection or add players to your database.</p>
-                <Button 
-                  variant="outline" 
-                  className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
-                  onClick={handleRefresh}
-                >
-                  <RefreshCw size={16} className="mr-2" />
-                  Retry Loading Data
-                </Button>
-              </AlertDescription>
-            </Alert>
-          )}
+          {renderDashboardContent()}
         </main>
       </div>
     </div>

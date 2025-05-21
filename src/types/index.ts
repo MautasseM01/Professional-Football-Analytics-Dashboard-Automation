@@ -23,6 +23,17 @@ export interface AuthUser {
   };
 }
 
+export type UserRole = 'player' | 'coach' | 'analyst' | 'performance_director' | 'management' | 'admin' | 'unassigned';
+
+export interface UserProfile {
+  id: string;
+  email?: string;
+  full_name?: string;
+  role?: UserRole;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export type NavigationItem = {
   name: string;
   href: string;
