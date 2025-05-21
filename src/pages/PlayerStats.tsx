@@ -1,13 +1,15 @@
-
 import { usePlayerData } from "@/hooks/use-player-data";
+import { usePlayerAttributes } from "@/hooks/use-player-attributes";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { PlayerStats as PlayerStatsComponent } from "@/components/PlayerStats";
+import { RoleRadarChart } from "@/components/RoleRadarChart";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { User } from "lucide-react";
 import { useState, useEffect } from "react";
 
 const PlayerStats = () => {
   const { players, selectedPlayer, selectPlayer, loading, error } = usePlayerData();
+  const { attributes, positionalAverage, loading: attrLoading, error: attrError } = usePlayerAttributes(selectedPlayer);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string>("");
 
   // Set the selected player ID when players data is loaded
@@ -65,7 +67,21 @@ const PlayerStats = () => {
           ) : error ? (
             <div className="text-red-500 py-8">Error loading player data: {error}</div>
           ) : (
-            <PlayerStatsComponent player={selectedPlayer} />
+            <>
+              {/* Role Radar Chart */}
+              <div className="mb-8">
+                <RoleRadarChart 
+                  player={selectedPlayer}
+                  attributes={attributes}
+                  positionalAverage={positionalAverage}
+                  loading={attrLoading}
+                  error={attrError}
+                />
+              </div>
+              
+              {/* Existing Player Stats Component */}
+              <PlayerStatsComponent player={selectedPlayer} />
+            </>
           )}
         </div>
       </main>

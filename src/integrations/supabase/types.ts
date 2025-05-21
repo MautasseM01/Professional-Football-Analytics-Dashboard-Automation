@@ -9,6 +9,50 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      player_attributes: {
+        Row: {
+          aerial_duels_won: number
+          created_at: string | null
+          finishing: number
+          holdup_play: number
+          id: number
+          pace: number
+          player_id: number
+          updated_at: string | null
+          work_rate_attacking: number
+        }
+        Insert: {
+          aerial_duels_won: number
+          created_at?: string | null
+          finishing: number
+          holdup_play: number
+          id?: number
+          pace: number
+          player_id: number
+          updated_at?: string | null
+          work_rate_attacking: number
+        }
+        Update: {
+          aerial_duels_won?: number
+          created_at?: string | null
+          finishing?: number
+          holdup_play?: number
+          id?: number
+          pace?: number
+          player_id?: number
+          updated_at?: string | null
+          work_rate_attacking?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_attributes_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       players: {
         Row: {
           distance: number | null
@@ -63,6 +107,42 @@ export type Database = {
           sprintDistance?: number | null
           tackles_attempted?: number | null
           tackles_won?: number | null
+        }
+        Relationships: []
+      }
+      positional_averages: {
+        Row: {
+          aerial_duels_won: number
+          created_at: string | null
+          finishing: number
+          holdup_play: number
+          id: number
+          pace: number
+          position: string
+          updated_at: string | null
+          work_rate_attacking: number
+        }
+        Insert: {
+          aerial_duels_won: number
+          created_at?: string | null
+          finishing: number
+          holdup_play: number
+          id?: number
+          pace: number
+          position: string
+          updated_at?: string | null
+          work_rate_attacking: number
+        }
+        Update: {
+          aerial_duels_won?: number
+          created_at?: string | null
+          finishing?: number
+          holdup_play?: number
+          id?: number
+          pace?: number
+          position?: string
+          updated_at?: string | null
+          work_rate_attacking?: number
         }
         Relationships: []
       }
