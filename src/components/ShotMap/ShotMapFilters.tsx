@@ -68,7 +68,7 @@ export const ShotMapFilters = ({
               <SelectValue placeholder="All players" />
             </SelectTrigger>
             <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-              <SelectItem value="">All players</SelectItem>
+              <SelectItem value="all-players">All players</SelectItem>
               {players.map((player) => (
                 <SelectItem key={player.id} value={player.id.toString()}>
                   {player.name}
@@ -86,14 +86,14 @@ export const ShotMapFilters = ({
           <Select
             value={filters.matchId?.toString() || ""}
             onValueChange={(value) => 
-              onApplyFilters({ matchId: value ? Number(value) : null })
+              onApplyFilters({ matchId: value !== "all-matches" ? Number(value) : null })
             }
           >
             <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray">
               <SelectValue placeholder="All matches" />
             </SelectTrigger>
             <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-              <SelectItem value="">All matches</SelectItem>
+              <SelectItem value="all-matches">All matches</SelectItem>
               {matches.map((match) => (
                 <SelectItem key={match.id} value={match.id.toString()}>
                   {match.name}
@@ -110,14 +110,14 @@ export const ShotMapFilters = ({
           <Select
             value={filters.period?.toString() || ""}
             onValueChange={(value) => 
-              onApplyFilters({ period: value || null })
+              onApplyFilters({ period: value !== "all-periods" ? value : null })
             }
           >
             <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray">
               <SelectValue placeholder="All periods" />
             </SelectTrigger>
             <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-              <SelectItem value="">All periods</SelectItem>
+              <SelectItem value="all-periods">All periods</SelectItem>
               {periods.map((period) => (
                 <SelectItem key={period} value={period}>
                   {period}
@@ -134,14 +134,14 @@ export const ShotMapFilters = ({
           <Select
             value={filters.outcome?.toString() || ""}
             onValueChange={(value) => 
-              onApplyFilters({ outcome: value as ShotOutcome || null })
+              onApplyFilters({ outcome: value !== "all-outcomes" ? value as ShotOutcome : null })
             }
           >
             <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray">
               <SelectValue placeholder="All outcomes" />
             </SelectTrigger>
             <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-              <SelectItem value="">All outcomes</SelectItem>
+              <SelectItem value="all-outcomes">All outcomes</SelectItem>
               {outcomes.map((outcome) => (
                 <SelectItem key={outcome} value={outcome}>
                   {outcome}
