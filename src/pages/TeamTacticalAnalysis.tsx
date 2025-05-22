@@ -28,17 +28,23 @@ const TeamTacticalAnalysis = () => {
   const { data: matches, isLoading: isLoadingMatches } = useQuery({
     queryKey: ["matches"],
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("matches")
-        .select("*")
-        .order("date", { ascending: false });
-      
-      if (error) {
-        toast.error("Failed to load matches");
-        throw error;
+      try {
+        const { data, error } = await supabase
+          .from("matches")
+          .select("*")
+          .order("date", { ascending: false });
+        
+        if (error) {
+          toast.error("Failed to load matches");
+          throw error;
+        }
+        
+        // Ensure the data conforms to our Match interface
+        return (data as Match[]) || [];
+      } catch (error) {
+        console.error("Error fetching matches:", error);
+        return [] as Match[];
       }
-      
-      return data as Match[];
     }
   });
 

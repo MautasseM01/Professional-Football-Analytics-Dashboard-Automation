@@ -51,9 +51,9 @@ const PlayerNode: React.FC<PlayerNodeProps> = ({ player, x, y }) => {
           zIndex: 10, // Ensure nodes appear above connections
         }}
         className="transition-transform hover:scale-110 cursor-pointer"
-        title={`${player.name} (${player.position})`}
+        title={`${player.name} (${player.position || 'Unknown'})`}
       >
-        {player.number}
+        {player.number || '?'}
       </div>
       
       {/* Pass count label */}

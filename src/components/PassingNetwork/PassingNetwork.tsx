@@ -44,69 +44,74 @@ export const PassingNetwork = ({
   const { data: networkData, isLoading } = useQuery({
     queryKey: ["passing-network", matchId],
     queryFn: async () => {
-      // First get player positions
-      const { data: positions, error: positionsError } = await supabase
-        .from("player_match_positions")
-        .select("*, player:players(id, name, number, position)")
-        .eq("match_id", matchId);
-      
-      if (positionsError) {
-        toast.error("Failed to load player positions");
-        throw positionsError;
-      }
-      
-      // Then get passing data
-      const { data: passes, error: passesError } = await supabase
-        .from("match_passes")
-        .select("*")
-        .eq("match_id", matchId);
-      
-      if (passesError) {
-        toast.error("Failed to load passing data");
-        throw passesError;
-      }
-      
-      // Transform position data
-      const playerPositions: PlayerPosition[] = positions.map((pos: any) => {
-        const passesByPlayer = passes.filter((pass: any) => 
-          pass.from_player_id === pos.player_id
-        );
+      try {
+        // First get player positions
+        const { data: positions, error: positionsError } = await supabase
+          .from("player_match_positions")
+          .select("*, player:players(id, name, number, position)")
+          .eq("match_id", matchId);
+        
+        if (positionsError) {
+          toast.error("Failed to load player positions");
+          throw positionsError;
+        }
+        
+        // Then get passing data
+        const { data: passes, error: passesError } = await supabase
+          .from("match_passes")
+          .select("*")
+          .eq("match_id", matchId);
+        
+        if (passesError) {
+          toast.error("Failed to load passing data");
+          throw passesError;
+        }
+        
+        // Transform position data
+        const playerPositions: PlayerPosition[] = positions.map((pos: any) => {
+          const passesByPlayer = passes.filter((pass: any) => 
+            pass.from_player_id === pos.player_id
+          );
+          
+          return {
+            id: pos.player_id,
+            name: pos.player?.name || "Unknown",
+            number: pos.player?.number || 0,
+            position: pos.player?.position || "Unknown",
+            x: pos.avg_x_position,
+            y: pos.avg_y_position,
+            totalPasses: passesByPlayer.length
+          };
+        });
+        
+        // Calculate pass connections
+        const connections: PassConnection[] = [];
+        passes.forEach((pass: any) => {
+          const existingConnection = connections.find(
+            c => c.from === pass.from_player_id && c.to === pass.to_player_id
+          );
+          
+          if (existingConnection) {
+            existingConnection.count++;
+          } else {
+            connections.push({
+              from: pass.from_player_id,
+              to: pass.to_player_id,
+              count: 1,
+              direction: pass.direction as 'forward' | 'backward' | 'sideways',
+              outcome: pass.outcome as 'successful' | 'unsuccessful'
+            });
+          }
+        });
         
         return {
-          id: pos.player_id,
-          name: pos.player.name,
-          number: pos.player.number || 0,  // Default to 0 if number is missing
-          position: pos.player.position || "Unknown",  // Default to Unknown if position is missing
-          x: pos.avg_x_position,
-          y: pos.avg_y_position,
-          totalPasses: passesByPlayer.length
+          players: playerPositions,
+          connections
         };
-      });
-      
-      // Calculate pass connections
-      const connections: PassConnection[] = [];
-      passes.forEach((pass: any) => {
-        const existingConnection = connections.find(
-          c => c.from === pass.from_player_id && c.to === pass.to_player_id
-        );
-        
-        if (existingConnection) {
-          existingConnection.count++;
-        } else {
-          connections.push({
-            from: pass.from_player_id,
-            to: pass.to_player_id,
-            count: 1,
-            direction: pass.direction as 'forward' | 'backward' | 'sideways',
-            outcome: pass.outcome as 'successful' | 'unsuccessful'
-          });
-        }
-      });
-      
-      return {
-        players: playerPositions,
-        connections
-      };
+      } catch (error) {
+        console.error("Error fetching network data:", error);
+        return { players: [], connections: [] };
+      }
     },
     enabled: !!matchId
   });
@@ -150,14 +155,14 @@ export const PassingNetwork = ({
     return () => {
       window.removeEventListener('resize', updateDimensions);
     };
-  }, [containerRef]);
+  }, []);
 
   return (
     <div className="w-full h-full relative" ref={containerRef}>
       <LoadingOverlay isLoading={isLoading} />
       
       <FootballPitch width={dimensions.width} height={dimensions.height}>
-        {networkData && (
+        {networkData && networkData.players && networkData.players.length > 0 ? (
           <>
             {/* Render passing connections (edges) first so they appear behind nodes */}
             {filteredConnections.map((connection, idx) => {
@@ -194,6 +199,10 @@ export const PassingNetwork = ({
               />
             ))}
           </>
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center text-white bg-black/30 rounded">
+            {isLoading ? 'Loading data...' : 'No player data available for this match'}
+          </div>
         )}
       </FootballPitch>
     </div>
