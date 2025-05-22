@@ -1,6 +1,6 @@
 
 import React from "react";
-import { PlayerPosition } from "./PassingNetwork";
+import { PlayerPosition } from "./types";
 
 interface PlayerNodeProps {
   player: PlayerPosition;

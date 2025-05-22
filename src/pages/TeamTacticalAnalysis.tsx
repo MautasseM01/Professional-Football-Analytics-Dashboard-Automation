@@ -6,7 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Filter } from "lucide-react";
-import { PassingNetwork } from "@/components/PassingNetwork/PassingNetwork";
+import { PassingNetwork } from "@/components/PassingNetwork";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
