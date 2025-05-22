@@ -10,6 +10,7 @@ import Dashboard from "./pages/Dashboard";
 import PlayerComparison from "./pages/PlayerComparison";
 import PlayerStats from "./pages/PlayerStats";
 import ShotMap from "./pages/ShotMap";
+import TeamTacticalAnalysis from "./pages/TeamTacticalAnalysis";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
@@ -70,7 +71,7 @@ const App = () => (
               } 
             />
             
-            {/* New Shot Map route */}
+            {/* Shot Map route */}
             <Route 
               path="/player-analysis/shot-map" 
               element={
@@ -86,6 +87,16 @@ const App = () => (
               element={
                 <ProtectedRoute>
                   <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
+            
+            {/* Team Tactical Analysis route */}
+            <Route 
+              path="/team-performance/tactical-analysis" 
+              element={
+                <ProtectedRoute>
+                  <TeamTacticalAnalysis />
                 </ProtectedRoute>
               } 
             />

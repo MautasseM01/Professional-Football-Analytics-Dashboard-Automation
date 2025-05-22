@@ -32,13 +32,18 @@ export const navigationItems: NavigationItem[] = [
     subItems: [
       { name: "Individual Player Stats", href: "/player-analysis/stats" },
       { name: "Player Comparison", href: "/player-analysis/comparison" },
-      { name: "Player Development", href: "/player-analysis/development" }
+      { name: "Player Development", href: "/player-analysis/development" },
+      { name: "Shot Map", href: "/player-analysis/shot-map" }
     ]
   },
   { 
     name: "Team Performance", 
     href: "/team-performance", 
-    icon: Users
+    icon: Users,
+    subItems: [
+      { name: "Team Overview", href: "/team-performance" },
+      { name: "Tactical Analysis", href: "/team-performance/tactical-analysis" }
+    ]
   },
   { 
     name: "Reports", 
