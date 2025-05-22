@@ -1,5 +1,5 @@
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -38,7 +38,7 @@ export const PassingNetwork = ({
   passOutcomeFilter
 }: PassingNetworkProps) => {
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const containerRef = useState<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Query player positions and passing data
   const { data: networkData, isLoading } = useQuery({
@@ -75,8 +75,8 @@ export const PassingNetwork = ({
         return {
           id: pos.player_id,
           name: pos.player.name,
-          number: pos.player.number,
-          position: pos.player.position,
+          number: pos.player.number || 0,  // Default to 0 if number is missing
+          position: pos.player.position || "Unknown",  // Default to Unknown if position is missing
           x: pos.avg_x_position,
           y: pos.avg_y_position,
           totalPasses: passesByPlayer.length
@@ -97,8 +97,8 @@ export const PassingNetwork = ({
             from: pass.from_player_id,
             to: pass.to_player_id,
             count: 1,
-            direction: pass.direction,
-            outcome: pass.outcome
+            direction: pass.direction as 'forward' | 'backward' | 'sideways',
+            outcome: pass.outcome as 'successful' | 'unsuccessful'
           });
         }
       });
@@ -124,14 +124,14 @@ export const PassingNetwork = ({
 
   // Calculate a color based on pass count
   const getEdgeColor = (count: number): string => {
-    const maxCount = Math.max(...filteredConnections.map(c => c.count));
+    const maxCount = Math.max(...(filteredConnections.length ? filteredConnections.map(c => c.count) : [1]));
     const intensity = Math.min(0.2 + (count / maxCount) * 0.8, 1);
     return `rgba(212, 175, 55, ${intensity})`; // Gold color with varying opacity
   };
 
   // Calculate edge width based on pass count
   const getEdgeWidth = (count: number): number => {
-    const maxCount = Math.max(...filteredConnections.map(c => c.count));
+    const maxCount = Math.max(...(filteredConnections.length ? filteredConnections.map(c => c.count) : [1]));
     return 1 + (count / maxCount) * 4;
   };
 
@@ -153,7 +153,7 @@ export const PassingNetwork = ({
   }, [containerRef]);
 
   return (
-    <div className="w-full h-full relative" ref={node => containerRef[1](node)}>
+    <div className="w-full h-full relative" ref={containerRef}>
       <LoadingOverlay isLoading={isLoading} />
       
       <FootballPitch width={dimensions.width} height={dimensions.height}>

@@ -26,7 +26,7 @@ const PlayerNode: React.FC<PlayerNodeProps> = ({ player, x, y }) => {
   };
 
   const nodeSize = 40; // Base size for the player node
-  const bgColor = getPositionColor(player.position);
+  const bgColor = getPositionColor(player.position || "unknown");
   
   return (
     <>

@@ -9,6 +9,82 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      match_passes: {
+        Row: {
+          created_at: string | null
+          direction: string
+          from_player_id: number
+          id: number
+          match_id: number
+          outcome: string
+          to_player_id: number
+        }
+        Insert: {
+          created_at?: string | null
+          direction: string
+          from_player_id: number
+          id?: number
+          match_id: number
+          outcome: string
+          to_player_id: number
+        }
+        Update: {
+          created_at?: string | null
+          direction?: string
+          from_player_id?: number
+          id?: number
+          match_id?: number
+          outcome?: string
+          to_player_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_passes_from_player_id_fkey"
+            columns: ["from_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_passes_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "match_passes_to_player_id_fkey"
+            columns: ["to_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          date: string
+          id: number
+          location: string
+          opponent: string
+          result: string
+        }
+        Insert: {
+          date: string
+          id?: number
+          location: string
+          opponent: string
+          result: string
+        }
+        Update: {
+          date?: string
+          id?: number
+          location?: string
+          opponent?: string
+          result?: string
+        }
+        Relationships: []
+      }
       player_attributes: {
         Row: {
           aerial_duels_won: number
@@ -46,6 +122,48 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "player_attributes_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_match_positions: {
+        Row: {
+          avg_x_position: number
+          avg_y_position: number
+          created_at: string | null
+          id: number
+          match_id: number
+          player_id: number
+        }
+        Insert: {
+          avg_x_position: number
+          avg_y_position: number
+          created_at?: string | null
+          id?: number
+          match_id: number
+          player_id: number
+        }
+        Update: {
+          avg_x_position?: number
+          avg_y_position?: number
+          created_at?: string | null
+          id?: number
+          match_id?: number
+          player_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_match_positions_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_match_positions_player_id_fkey"
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "players"
