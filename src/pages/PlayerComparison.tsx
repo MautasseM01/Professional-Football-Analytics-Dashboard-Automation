@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { 
   Card, CardContent, CardDescription, CardHeader, CardTitle 
@@ -14,6 +13,7 @@ import { MultiPlayerSelect } from "@/components/MultiPlayerSelect";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { UserRound } from "lucide-react";
+import { DashboardLayout } from "@/components/DashboardLayout";
 
 const formatPercentage = (value: number): string => {
   return `${value.toFixed(1)}%`;
@@ -149,168 +149,170 @@ export default function PlayerComparison() {
   }, [selectedPlayers]);
 
   return (
-    <div className="container mx-auto py-6 space-y-6">
-      <div className="flex flex-col space-y-2">
-        <h1 className="text-3xl font-bold">Player Comparison</h1>
-        <p className="text-muted-foreground">
-          Compare stats between multiple players (select 2-4 players)
-        </p>
-      </div>
+    <DashboardLayout>
+      <div className="container mx-auto py-6 space-y-6">
+        <div className="flex flex-col space-y-2">
+          <h1 className="text-3xl font-bold">Player Comparison</h1>
+          <p className="text-muted-foreground">
+            Compare stats between multiple players (select 2-4 players)
+          </p>
+        </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Player Selection</CardTitle>
-          <CardDescription>
-            Select 2 to 4 players to compare their performance metrics
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <MultiPlayerSelect 
-            players={players || []}
-            selectedPlayerIds={selectedPlayerIds}
-            onChange={handlePlayerSelectionChange}
-            loading={loading}
-            maxSelections={4}
-          />
-        </CardContent>
-      </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle>Player Selection</CardTitle>
+            <CardDescription>
+              Select 2 to 4 players to compare their performance metrics
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <MultiPlayerSelect 
+              players={players || []}
+              selectedPlayerIds={selectedPlayerIds}
+              onChange={handlePlayerSelectionChange}
+              loading={loading}
+              maxSelections={4}
+            />
+          </CardContent>
+        </Card>
 
-      {selectedPlayers.length > 0 && (
-        <>
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance Metrics Comparison</CardTitle>
-              <CardDescription>
-                Key performance indicators for the selected players
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="overflow-x-auto">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Metric</TableHead>
-                      {selectedPlayers.map((player) => (
-                        <TableHead key={player.id} className="text-center">
-                          <div className="flex items-center justify-center gap-2">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src={`https://i.pravatar.cc/100?u=${player.id}`} alt={player.name} />
-                              <AvatarFallback className="bg-club-dark-gray text-club-gold">
-                                {getPlayerInitials(player.name)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <span>{player.name}</span>
-                          </div>
-                        </TableHead>
-                      ))}
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    <TableRow>
-                      <TableCell className="font-medium">Total Distance (km)</TableCell>
-                      {selectedPlayers.map((player) => (
-                        <TableCell 
-                          key={`distance-${player.id}`} 
-                          className={`text-center ${highestDistance[player.id] ? 'bg-green-100/10' : ''}`}
-                        >
-                          {player.distance ? 
-                            player.distance.toFixed(1) : 
-                            <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
-                          }
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Pass Completion %</TableCell>
-                      {selectedPlayers.map((player) => (
-                        <TableCell 
-                          key={`passes-${player.id}`} 
-                          className={`text-center ${highestPassCompletion[player.id] ? 'bg-green-100/10' : ''}`}
-                        >
-                          {player.passes_attempted && player.passes_attempted > 0 ?
-                            formatPercentage(getPassCompletionPercentage(player)) :
-                            <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
-                          }
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Shots on Target</TableCell>
-                      {selectedPlayers.map((player) => (
-                        <TableCell 
-                          key={`shots-${player.id}`} 
-                          className={`text-center ${highestShotsOnTarget[player.id] ? 'bg-green-100/10' : ''}`}
-                        >
-                          {player.shots_on_target !== null && player.shots_on_target !== undefined ?
-                            player.shots_on_target :
-                            <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
-                          }
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                    <TableRow>
-                      <TableCell className="font-medium">Tackles Won</TableCell>
-                      {selectedPlayers.map((player) => (
-                        <TableCell 
-                          key={`tackles-${player.id}`} 
-                          className={`text-center ${highestTacklesWon[player.id] ? 'bg-green-100/10' : ''}`}
-                        >
-                          {player.tackles_won !== null && player.tackles_won !== undefined ?
-                            player.tackles_won :
-                            <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
-                          }
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  </TableBody>
-                </Table>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Performance Radar Chart</CardTitle>
-              <CardDescription>
-                Visual comparison of player attributes across key categories
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="w-full h-[500px]">
-                <ChartContainer config={chartConfig}>
-                  {/* Wrap the ResponsiveContainer in a fragment to make it a single child */}
-                  <>
-                    <ResponsiveContainer width="100%" height="100%">
-                      <RadarChart data={radarData} className="mx-auto">
-                        <PolarGrid />
-                        <PolarAngleAxis dataKey="category" />
-                        
-                        {selectedPlayers.map((player, index) => (
-                          <Radar
-                            key={player.id}
-                            name={player.name}
-                            dataKey={player.name}
-                            stroke={playerColors[index % playerColors.length]}
-                            fill={playerColors[index % playerColors.length]}
-                            fillOpacity={0.2}
-                          />
+        {selectedPlayers.length > 0 && (
+          <>
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance Metrics Comparison</CardTitle>
+                <CardDescription>
+                  Key performance indicators for the selected players
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="overflow-x-auto">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead>Metric</TableHead>
+                        {selectedPlayers.map((player) => (
+                          <TableHead key={player.id} className="text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              <Avatar className="h-8 w-8">
+                                <AvatarImage src={`https://i.pravatar.cc/100?u=${player.id}`} alt={player.name} />
+                                <AvatarFallback className="bg-club-dark-gray text-club-gold">
+                                  {getPlayerInitials(player.name)}
+                                </AvatarFallback>
+                              </Avatar>
+                              <span>{player.name}</span>
+                            </div>
+                          </TableHead>
                         ))}
-                      </RadarChart>
-                    </ResponsiveContainer>
-                    <ChartLegend>
-                      <ChartLegendContent payload={selectedPlayers.map((player, index) => ({
-                        value: player.name,
-                        color: playerColors[index % playerColors.length],
-                        dataKey: player.name
-                      }))} />
-                    </ChartLegend>
-                  </>
-                </ChartContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </>
-      )}
-    </div>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell className="font-medium">Total Distance (km)</TableCell>
+                        {selectedPlayers.map((player) => (
+                          <TableCell 
+                            key={`distance-${player.id}`} 
+                            className={`text-center ${highestDistance[player.id] ? 'bg-green-100/10' : ''}`}
+                          >
+                            {player.distance ? 
+                              player.distance.toFixed(1) : 
+                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                            }
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="font-medium">Pass Completion %</TableCell>
+                        {selectedPlayers.map((player) => (
+                          <TableCell 
+                            key={`passes-${player.id}`} 
+                            className={`text-center ${highestPassCompletion[player.id] ? 'bg-green-100/10' : ''}`}
+                          >
+                            {player.passes_attempted && player.passes_attempted > 0 ?
+                              formatPercentage(getPassCompletionPercentage(player)) :
+                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                            }
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="font-medium">Shots on Target</TableCell>
+                        {selectedPlayers.map((player) => (
+                          <TableCell 
+                            key={`shots-${player.id}`} 
+                            className={`text-center ${highestShotsOnTarget[player.id] ? 'bg-green-100/10' : ''}`}
+                          >
+                            {player.shots_on_target !== null && player.shots_on_target !== undefined ?
+                              player.shots_on_target :
+                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                            }
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                      <TableRow>
+                        <TableCell className="font-medium">Tackles Won</TableCell>
+                        {selectedPlayers.map((player) => (
+                          <TableCell 
+                            key={`tackles-${player.id}`} 
+                            className={`text-center ${highestTacklesWon[player.id] ? 'bg-green-100/10' : ''}`}
+                          >
+                            {player.tackles_won !== null && player.tackles_won !== undefined ?
+                              player.tackles_won :
+                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                            }
+                          </TableCell>
+                        ))}
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Performance Radar Chart</CardTitle>
+                <CardDescription>
+                  Visual comparison of player attributes across key categories
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="w-full h-[500px]">
+                  <ChartContainer config={chartConfig}>
+                    {/* Wrap the ResponsiveContainer in a fragment to make it a single child */}
+                    <>
+                      <ResponsiveContainer width="100%" height="100%">
+                        <RadarChart data={radarData} className="mx-auto">
+                          <PolarGrid />
+                          <PolarAngleAxis dataKey="category" />
+                          
+                          {selectedPlayers.map((player, index) => (
+                            <Radar
+                              key={player.id}
+                              name={player.name}
+                              dataKey={player.name}
+                              stroke={playerColors[index % playerColors.length]}
+                              fill={playerColors[index % playerColors.length]}
+                              fillOpacity={0.2}
+                            />
+                          ))}
+                        </RadarChart>
+                      </ResponsiveContainer>
+                      <ChartLegend>
+                        <ChartLegendContent payload={selectedPlayers.map((player, index) => ({
+                          value: player.name,
+                          color: playerColors[index % playerColors.length],
+                          dataKey: player.name
+                        }))} />
+                      </ChartLegend>
+                    </>
+                  </ChartContainer>
+                </div>
+              </CardContent>
+            </Card>
+          </>
+        )}
+      </div>
+    </DashboardLayout>
   );
 }
