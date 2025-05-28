@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { HeatmapCard } from "./HeatmapCard";
 import { TackleSuccessCard } from "./TackleSuccessCard";
+import { DisciplinaryCard } from "./DisciplinaryCard";
 import { 
   Tooltip, 
   TooltipContent, 
@@ -103,7 +104,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
           <Tooltip>
             <TooltipTrigger asChild>
               <div>
@@ -184,6 +185,17 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
             </TooltipTrigger>
             <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
               <p>Percentage of shots that were on target compared to total shots taken. Measures a player's shooting precision and efficiency.</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div>
+                <DisciplinaryCard playerId={player.id} />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
+              <p>Player's disciplinary record including yellow and red cards. Risk levels: SAFE (0-3), AT RISK (4), CRITICAL (5+).</p>
             </TooltipContent>
           </Tooltip>
         </div>
