@@ -37,6 +37,8 @@ export const usePlayerAttributes = (player: Player | null) => {
   useEffect(() => {
     const fetchData = async () => {
       if (!player) {
+        setAttributes(null);
+        setPositionalAverage(null);
         setLoading(false);
         return;
       }
@@ -45,41 +47,45 @@ export const usePlayerAttributes = (player: Player | null) => {
       setError(null);
 
       try {
-        // Fetch player attributes
+        console.log('Fetching attributes for player:', player.id, player.name);
+        
+        // Fetch player attributes - use maybeSingle() to handle no results gracefully
         const { data: playerAttrData, error: playerAttrError } = await supabase
           .from('player_attributes')
           .select('*')
           .eq('player_id', player.id)
-          .single();
+          .maybeSingle();
 
         if (playerAttrError) {
+          console.error('Player attributes error:', playerAttrError);
           throw new Error(`Error fetching player attributes: ${playerAttrError.message}`);
         }
 
+        console.log('Player attributes data:', playerAttrData);
         setAttributes(playerAttrData as PlayerAttributes);
 
-        // Fetch positional average for strikers (or the player's position if available)
+        // Fetch positional average for the player's position
         const position = player.position || 'Striker';
+        console.log('Fetching positional average for position:', position);
         
         const { data: avgData, error: avgError } = await supabase
           .from('positional_averages')
           .select('*')
           .eq('position', position)
-          .single();
+          .maybeSingle();
 
         if (avgError) {
           console.warn(`Warning: Could not fetch positional average: ${avgError.message}`);
         } else {
+          console.log('Positional average data:', avgData);
           setPositionalAverage(avgData as PositionalAverage);
         }
 
       } catch (err: any) {
         console.error('Error in usePlayerAttributes:', err);
         setError(err.message);
-        // Fix: Update the toast call to match sonner's API which doesn't support variant
         toast("Data fetch error", {
           description: `Could not load player attributes: ${err.message}`,
-          // Remove the variant property as it's not supported in sonner's toast API
         });
       } finally {
         setLoading(false);
@@ -87,7 +93,7 @@ export const usePlayerAttributes = (player: Player | null) => {
     };
 
     fetchData();
-  }, [player]);
+  }, [player?.id]); // Depend on player.id instead of entire player object
 
   return { attributes, positionalAverage, loading, error };
 };

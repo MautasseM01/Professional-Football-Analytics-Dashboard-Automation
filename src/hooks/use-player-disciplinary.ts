@@ -6,14 +6,24 @@ export const usePlayerDisciplinary = (playerId: number | null) => {
   return useQuery({
     queryKey: ['player-disciplinary', playerId],
     queryFn: async () => {
-      if (!playerId) return null;
+      if (!playerId) {
+        console.log('No player ID provided to usePlayerDisciplinary');
+        return null;
+      }
+      
+      console.log('Fetching disciplinary data for player ID:', playerId);
       
       const { data, error } = await supabase
         .from('player_disciplinary')
         .select('card_type')
         .eq('player_id', playerId);
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching disciplinary data:', error);
+        throw error;
+      }
+      
+      console.log('Disciplinary data for player', playerId, ':', data);
       
       const yellowCards = data?.filter(record => record.card_type === 'Yellow').length || 0;
       const redCards = data?.filter(record => record.card_type === 'Red').length || 0;
@@ -30,14 +40,19 @@ export const usePlayerDisciplinary = (playerId: number | null) => {
         riskColor = 'text-amber-500';
       }
       
-      return {
+      const result = {
         yellowCards,
         redCards,
         totalCards,
         riskLevel,
         riskColor
       };
+      
+      console.log('Processed disciplinary result for player', playerId, ':', result);
+      return result;
     },
-    enabled: !!playerId
+    enabled: !!playerId,
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    cacheTime: 10 * 60 * 1000, // 10 minutes
   });
 };
