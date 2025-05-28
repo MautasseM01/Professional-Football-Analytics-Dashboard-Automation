@@ -129,6 +129,79 @@ export type Database = {
           },
         ]
       }
+      player_disciplinary: {
+        Row: {
+          card_type: string | null
+          competition: string | null
+          created_at: string | null
+          id: number
+          match_date: string | null
+          player_id: number | null
+        }
+        Insert: {
+          card_type?: string | null
+          competition?: string | null
+          created_at?: string | null
+          id?: number
+          match_date?: string | null
+          player_id?: number | null
+        }
+        Update: {
+          card_type?: string | null
+          competition?: string | null
+          created_at?: string | null
+          id?: number
+          match_date?: string | null
+          player_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_disciplinary_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_eligibility: {
+        Row: {
+          id: number
+          is_eligible: boolean | null
+          notes: string | null
+          player_id: number | null
+          registration_date: string | null
+          registration_expires: string | null
+          suspension_until: string | null
+        }
+        Insert: {
+          id?: number
+          is_eligible?: boolean | null
+          notes?: string | null
+          player_id?: number | null
+          registration_date?: string | null
+          registration_expires?: string | null
+          suspension_until?: string | null
+        }
+        Update: {
+          id?: number
+          is_eligible?: boolean | null
+          notes?: string | null
+          player_id?: number | null
+          registration_date?: string | null
+          registration_expires?: string | null
+          suspension_until?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_eligibility_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_match_positions: {
         Row: {
           avg_x_position: number
@@ -319,6 +392,33 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      team_admin_status: {
+        Row: {
+          admin_violations: string[] | null
+          compliance_score: number | null
+          id: number
+          last_updated: string | null
+          points_deducted: number | null
+          season: string | null
+        }
+        Insert: {
+          admin_violations?: string[] | null
+          compliance_score?: number | null
+          id?: number
+          last_updated?: string | null
+          points_deducted?: number | null
+          season?: string | null
+        }
+        Update: {
+          admin_violations?: string[] | null
+          compliance_score?: number | null
+          id?: number
+          last_updated?: string | null
+          points_deducted?: number | null
+          season?: string | null
+        }
+        Relationships: []
       }
       user_feedback: {
         Row: {

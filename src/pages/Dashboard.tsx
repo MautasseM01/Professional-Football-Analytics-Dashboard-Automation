@@ -10,6 +10,7 @@ import { PerformanceDirectorDashboard } from "@/components/dashboards/Performanc
 import { ManagementDashboard } from "@/components/dashboards/ManagementDashboard";
 import { AdminDashboard } from "@/components/dashboards/AdminDashboard";
 import { UnassignedRoleDashboard } from "@/components/dashboards/UnassignedRoleDashboard";
+import { ComplianceWidget } from "@/components/ComplianceWidget";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
@@ -145,6 +146,9 @@ const Dashboard = () => {
         </header>
         
         <main className="p-6">
+          <div className="mb-6">
+            <ComplianceWidget />
+          </div>
           {renderDashboardContent()}
         </main>
       </div>
