@@ -25,8 +25,9 @@ export const usePlayerDisciplinary = (playerId: number | null) => {
       
       console.log('Disciplinary data for player', playerId, ':', data);
       
-      const yellowCards = data?.filter(record => record.card_type === 'Yellow').length || 0;
-      const redCards = data?.filter(record => record.card_type === 'Red').length || 0;
+      // Fix: Use lowercase to match your database values
+      const yellowCards = data?.filter(record => record.card_type === 'yellow').length || 0;
+      const redCards = data?.filter(record => record.card_type === 'red').length || 0;
       const totalCards = yellowCards + redCards;
       
       let riskLevel: 'SAFE' | 'AT RISK' | 'CRITICAL' = 'SAFE';
