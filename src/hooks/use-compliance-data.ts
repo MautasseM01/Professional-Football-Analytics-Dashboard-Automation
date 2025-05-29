@@ -1,93 +1,96 @@
 
-import { useQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
 export const useComplianceData = () => {
-  return useQuery({
-    queryKey: ['compliance-data'],
-    queryFn: async () => {
-      console.log('Fetching compliance data...');
-      
-      // Fix team_admin_status query to handle multiple rows properly
-      let { data: adminStatus, error: adminError } = await supabase
-        .from('team_admin_status')
-        .select('compliance_score, points_deducted, admin_violations')
-        .eq('season', '2024-25')
-        .order('last_updated', { ascending: false })
-        .limit(1)
-        .single();
-      
-      // If no current season data exists, get the most recent row
-      if (adminError || !adminStatus) {
-        console.log('No current season data found, fetching most recent...');
-        const { data: fallbackData, error: fallbackError } = await supabase
+  const [data, setData] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchComplianceData = async () => {
+      try {
+        setIsLoading(true);
+        setError(null);
+        console.log('Fetching compliance data...');
+
+        // SAFE team_admin_status query (no .single())
+        const { data: adminStatus, error: adminError } = await supabase
           .from('team_admin_status')
           .select('compliance_score, points_deducted, admin_violations')
+          .eq('season', '2024-25')
           .order('last_updated', { ascending: false })
-          .limit(1)
-          .single();
+          .limit(1);
+
+        // SAFE player_disciplinary query (correct schema)
+        const { data: disciplinaryData, error: discError } = await supabase
+          .from('player_disciplinary')
+          .select('player_id, card_type, match_date, competition')
+          .order('match_date', { ascending: false });
+
+        // SAFE player_eligibility query (correct schema)  
+        const { data: eligibilityData, error: eligError } = await supabase
+          .from('player_eligibility')
+          .select('player_id, is_eligible, registration_expires, suspension_until, notes');
+
+        // SAFE players query
+        const { data: playersData, error: playersError } = await supabase
+          .from('players')
+          .select('id, name, position');
+
+        if (adminError || discError || eligError || playersError) {
+          console.error('Query errors:', { adminError, discError, eligError, playersError });
+          throw new Error('Failed to fetch compliance data');
+        }
+
+        // Process the data safely
+        const adminData = adminStatus?.[0] || { compliance_score: 0, points_deducted: 0, admin_violations: [] };
         
-        if (fallbackError) {
-          console.error('Error fetching team admin status:', fallbackError);
-          throw fallbackError;
-        }
-        
-        adminStatus = fallbackData;
+        // Calculate players at risk from disciplinary records
+        const cardCounts = {};
+        disciplinaryData?.forEach(record => {
+          if (!cardCounts[record.player_id]) {
+            cardCounts[record.player_id] = { yellows: 0, reds: 0 };
+          }
+          if (record.card_type === 'yellow') cardCounts[record.player_id].yellows++;
+          if (record.card_type === 'red') cardCounts[record.player_id].reds++;
+        });
+
+        const playersAtRisk = Object.entries(cardCounts)
+          .filter(([playerId, cards]) => cards.yellows >= 4 || cards.reds > 0)
+          .map(([playerId, cards]) => {
+            const player = playersData?.find(p => p.id === parseInt(playerId));
+            return {
+              id: parseInt(playerId),
+              name: player?.name || 'Unknown',
+              yellows: cards.yellows,
+              reds: cards.reds,
+              risk: cards.yellows >= 4 ? 'High' : 'Medium'
+            };
+          });
+
+        const result = {
+          complianceScore: adminData.compliance_score,
+          pointsDeducted: adminData.points_deducted,
+          playersAtRisk: playersAtRisk.length,
+          highRiskCount: playersAtRisk.length,
+          playersAtRiskDetails: playersAtRisk,
+          totalPlayers: playersData?.length || 0
+        };
+
+        console.log('Compliance data result:', result);
+        setData(result);
+
+      } catch (err) {
+        setError(err.message);
+        console.error('Compliance data error:', err);
+      } finally {
+        setIsLoading(false);
       }
-      
-      // Fix player_eligibility query to use correct schema
-      const { data: ineligiblePlayersData, error: ineligiblePlayersError } = await supabase
-        .from('player_eligibility')
-        .select('player_id, is_eligible, registration_expires, suspension_until, notes')
-        .eq('is_eligible', false);
-      
-      if (ineligiblePlayersError) {
-        console.error('Error fetching ineligible players:', ineligiblePlayersError);
-        throw ineligiblePlayersError;
-      }
-      
-      // Fix player_disciplinary query to use correct schema
-      const { data: disciplinaryData, error: disciplinaryError } = await supabase
-        .from('player_disciplinary')
-        .select('player_id, card_type, match_date, competition')
-        .order('match_date', { ascending: false });
-      
-      if (disciplinaryError) {
-        console.error('Error fetching disciplinary data:', disciplinaryError);
-        throw disciplinaryError;
-      }
-      
-      // Process disciplinary data correctly
-      const playersAtRisk = disciplinaryData?.reduce((acc: Record<number, { yellows: number; reds: number; playerId: number }>, record) => {
-        if (!acc[record.player_id]) {
-          acc[record.player_id] = { yellows: 0, reds: 0, playerId: record.player_id };
-        }
-        if (record.card_type === 'yellow') {
-          acc[record.player_id].yellows++;
-        } else if (record.card_type === 'red') {
-          acc[record.player_id].reds++;
-        }
-        return acc;
-      }, {}) || {};
-      
-      // Get players at risk (4+ yellow cards or recent red card)
-      const atRiskPlayers = Object.values(playersAtRisk).filter(player => 
-        player.yellows >= 4 || player.reds > 0
-      );
-      
-      const highRiskCount = atRiskPlayers.length;
-      
-      const result = {
-        complianceScore: adminStatus?.compliance_score || 0,
-        pointsDeducted: adminStatus?.points_deducted || 0,
-        playersAtRisk: ineligiblePlayersData?.length || 0,
-        highRiskCount
-      };
-      
-      console.log('Compliance data result:', result);
-      return result;
-    },
-    staleTime: 5 * 60 * 1000, // 5 minutes
-    gcTime: 10 * 60 * 1000, // 10 minutes
-  });
+    };
+
+    fetchComplianceData();
+  }, []);
+
+  return { data, isLoading, error };
 };
