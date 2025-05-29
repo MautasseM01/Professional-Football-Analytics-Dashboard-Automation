@@ -133,44 +133,48 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
   }, [player, selectedKPI, selectedTimePeriod, showMovingAverage]);
   
   return (
-    <Card className="bg-club-dark-bg border-club-gold/20">
-      <CardHeader className="pb-2">
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-          <CardTitle className="text-club-light-gray">
+    <Card className="bg-club-dark-bg border-club-gold/20 w-full">
+      <CardHeader className="p-4 sm:p-6 pb-2">
+        <div className="flex flex-col gap-4">
+          <CardTitle className="text-club-light-gray text-lg sm:text-xl">
             {player.name}'s Performance Trend
           </CardTitle>
           
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-            <div className="w-full sm:w-40">
-              <Select value={selectedKPI} onValueChange={setSelectedKPI}>
-                <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray">
-                  <SelectValue placeholder="Select KPI" />
-                </SelectTrigger>
-                <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-                  {KPI_OPTIONS.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          <div className="flex flex-col gap-3">
+            {/* First row: Dropdowns */}
+            <div className="flex flex-col sm:flex-row gap-3">
+              <div className="flex-1 min-w-0">
+                <Select value={selectedKPI} onValueChange={setSelectedKPI}>
+                  <SelectTrigger className="w-full bg-club-black border-club-gold/30 text-club-light-gray h-9 sm:h-10">
+                    <SelectValue placeholder="Select KPI" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray z-50">
+                    {KPI_OPTIONS.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="flex-1 min-w-0">
+                <Select value={selectedTimePeriod} onValueChange={setSelectedTimePeriod}>
+                  <SelectTrigger className="w-full bg-club-black border-club-gold/30 text-club-light-gray h-9 sm:h-10">
+                    <SelectValue placeholder="Time Period" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray z-50">
+                    {TIME_PERIOD_OPTIONS.map(option => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
             
-            <div className="w-full sm:w-40">
-              <Select value={selectedTimePeriod} onValueChange={setSelectedTimePeriod}>
-                <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray">
-                  <SelectValue placeholder="Time Period" />
-                </SelectTrigger>
-                <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-                  {TIME_PERIOD_OPTIONS.map(option => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
+            {/* Second row: Checkbox */}
             <div className="flex items-center space-x-2">
               <Checkbox 
                 id="movingAverage" 
@@ -180,17 +184,17 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
               />
               <Label 
                 htmlFor="movingAverage"
-                className="text-club-light-gray text-sm"
+                className="text-club-light-gray text-sm cursor-pointer select-none"
               >
-                Show 3-Match Avg
+                Show 3-Match Average
               </Label>
             </div>
           </div>
         </div>
       </CardHeader>
       
-      <CardContent>
-        <div className="h-[350px] w-full mt-2">
+      <CardContent className="p-4 sm:p-6 pt-2">
+        <div className="h-[300px] sm:h-[350px] w-full">
           <ChartContainer 
             config={{
               value: { color: "#D4AF37" }, // Club gold color 
@@ -200,28 +204,35 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
             <ResponsiveContainer width="100%" height="100%">
               <RechartsLineChart
                 data={matchData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+                margin={{ 
+                  top: 20, 
+                  right: 10, 
+                  left: 10, 
+                  bottom: 60 
+                }}
               >
                 <CartesianGrid strokeDasharray="3 3" stroke="#333" />
                 <XAxis 
                   dataKey="match" 
                   stroke="#9CA3AF"
-                  tick={{ fill: '#9CA3AF' }}
+                  tick={{ fill: '#9CA3AF', fontSize: 12 }}
                   tickLine={{ stroke: '#9CA3AF' }}
                   axisLine={{ stroke: '#9CA3AF' }}
                   label={{ 
                     value: 'Match', 
                     position: 'insideBottom', 
                     offset: -15, 
-                    fill: '#9CA3AF' 
+                    fill: '#9CA3AF',
+                    fontSize: 12
                   }}
                   angle={-45}
                   textAnchor="end"
                   height={60}
+                  interval={0}
                 />
                 <YAxis 
                   stroke="#9CA3AF"
-                  tick={{ fill: '#9CA3AF' }}
+                  tick={{ fill: '#9CA3AF', fontSize: 12 }}
                   tickLine={{ stroke: '#9CA3AF' }}
                   axisLine={{ stroke: '#9CA3AF' }}
                   label={{ 
@@ -229,14 +240,15 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                     angle: -90, 
                     position: 'insideLeft', 
                     style: { textAnchor: 'middle' }, 
-                    fill: '#9CA3AF' 
+                    fill: '#9CA3AF',
+                    fontSize: 12
                   }}
                 />
                 <Tooltip 
                   content={({ active, payload }) => {
                     if (active && payload && payload.length) {
                       return (
-                        <div className="bg-club-black p-3 border border-club-gold/30 rounded shadow text-club-light-gray">
+                        <div className="bg-club-black p-3 border border-club-gold/30 rounded shadow text-club-light-gray text-sm">
                           <p className="font-semibold">{payload[0].payload.match}</p>
                           <p className="text-club-light-gray">{payload[0].payload.date}</p>
                           <p className="text-club-gold">{selectedKPILabel}: {payload[0].value}</p>
@@ -253,7 +265,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                   verticalAlign="top" 
                   height={36} 
                   formatter={(value) => (
-                    <span style={{ color: "#9CA3AF" }}>{value}</span>
+                    <span style={{ color: "#9CA3AF", fontSize: "12px" }}>{value}</span>
                   )}
                 />
                 <Line
@@ -262,8 +274,8 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                   name={selectedKPILabel}
                   stroke="#D4AF37" // Club gold
                   strokeWidth={2}
-                  dot={{ r: 4, strokeWidth: 2 }}
-                  activeDot={{ r: 6, strokeWidth: 2 }}
+                  dot={{ r: 3, strokeWidth: 2 }}
+                  activeDot={{ r: 5, strokeWidth: 2 }}
                 />
                 {showMovingAverage && (
                   <Line

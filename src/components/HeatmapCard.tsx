@@ -84,33 +84,38 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   };
 
   return (
-    <Card className="border-club-gold/20 bg-club-dark-gray md:col-span-2">
-      <CardHeader className="flex flex-row items-center justify-between">
-        <div>
-          <CardTitle className="text-club-gold">Performance Heatmap</CardTitle>
-          <CardDescription>Player's match positioning and movement</CardDescription>
+    <Card className="border-club-gold/20 bg-club-dark-gray w-full h-full">
+      <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
+          <div className="min-w-0">
+            <CardTitle className="text-club-gold text-lg sm:text-xl">Performance Heatmap</CardTitle>
+            <CardDescription className="text-sm sm:text-base">Player's match positioning and movement</CardDescription>
+          </div>
+          <div className="flex-shrink-0">
+            <Select onValueChange={handlePeriodChange} value={selectedPeriod}>
+              <SelectTrigger className="w-full sm:w-[160px] lg:w-[180px] bg-club-black text-white border-club-gold/30 h-9 sm:h-10">
+                <SelectValue placeholder="Select Period" />
+              </SelectTrigger>
+              <SelectContent className="bg-club-dark-gray text-white border-club-gold/30 z-50">
+                <SelectItem value="Full Match">Full Match</SelectItem>
+                <SelectItem value="First Half">First Half</SelectItem>
+                <SelectItem value="Second Half">Second Half</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </div>
-        <Select onValueChange={handlePeriodChange} value={selectedPeriod}>
-          <SelectTrigger className="w-[180px] bg-club-black text-white border-club-gold/30">
-            <SelectValue placeholder="Select Period" />
-          </SelectTrigger>
-          <SelectContent className="bg-club-dark-gray text-white border-club-gold/30">
-            <SelectItem value="Full Match">Full Match</SelectItem>
-            <SelectItem value="First Half">First Half</SelectItem>
-            <SelectItem value="Second Half">Second Half</SelectItem>
-          </SelectContent>
-        </Select>
       </CardHeader>
-      <CardContent>
+      <CardContent className="p-4 sm:p-6 pt-0">
         {player.heatmapUrl ? (
-          <div className="space-y-4">
-            <div className="relative aspect-video w-full overflow-hidden rounded-md">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="relative w-full rounded-md overflow-hidden bg-green-800/20" style={{ aspectRatio: '16/10' }}>
               {/* Football pitch SVG */}
               <svg 
                 className="absolute inset-0 w-full h-full z-10" 
                 viewBox="0 0 1050 680" 
                 fill="none" 
                 xmlns="http://www.w3.org/2000/svg"
+                preserveAspectRatio="xMidYMid meet"
               >
                 {/* Pitch outline */}
                 <rect x="50" y="50" width="950" height="580" stroke="#FFFFFF" strokeWidth="2" fill="none" />
@@ -143,27 +148,29 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               
               {imageError ? (
                 <div className="flex flex-col items-center justify-center h-full bg-club-black/50 p-4 z-20 relative">
-                  <ImageOff className="text-club-gold mb-2" size={36} />
-                  <p className="text-center text-club-gold mb-2">Unable to load heatmap image</p>
-                  <div className="flex gap-2">
+                  <ImageOff className="text-club-gold mb-2" size={32} sm:size={36} />
+                  <p className="text-center text-club-gold mb-2 text-sm sm:text-base">Unable to load heatmap image</p>
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Button 
                       variant="outline" 
                       onClick={resetImageError}
-                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
+                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold text-xs sm:text-sm h-8 sm:h-9"
+                      size="sm"
                     >
                       Retry Original
                     </Button>
                     <Button 
                       variant="outline" 
                       onClick={tryAlternativeUrl}
-                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
+                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold text-xs sm:text-sm h-8 sm:h-9"
+                      size="sm"
                     >
                       Try Thumbnail
                     </Button>
                   </div>
-                  <p className="text-xs text-club-light-gray/60 mt-4 text-center">
+                  <p className="text-xs text-club-light-gray/60 mt-3 sm:mt-4 text-center max-w-xs">
                     The image cannot be loaded due to CORS restrictions from Google Drive.
-                    <br/>Try uploading the image to a CORS-enabled image hosting service.
+                    <br className="hidden sm:block"/>Try uploading the image to a CORS-enabled image hosting service.
                   </p>
                 </div>
               ) : (
@@ -178,16 +185,16 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                   />
                 </>
               )}
-              <div className="absolute bottom-2 right-2 bg-club-black/70 text-xs px-2 py-1 rounded z-20">
+              <div className="absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-club-black/70 text-xs px-2 py-1 rounded z-20">
                 {player.name}'s Heatmap • {selectedPeriod}
               </div>
             </div>
             
             {/* Heatmap Color Legend */}
-            <div className="flex flex-col space-y-1">
-              <p className="text-xs text-club-light-gray">Intensity Scale:</p>
+            <div className="flex flex-col space-y-1 sm:space-y-2">
+              <p className="text-xs sm:text-sm text-club-light-gray">Intensity Scale:</p>
               <div className="flex items-center gap-1">
-                <div className="h-4 flex-1 rounded-md" style={{
+                <div className="h-3 sm:h-4 flex-1 rounded-md" style={{
                   background: `linear-gradient(to right, ${colorScaleStops.map(s => s.color).join(', ')})`
                 }}></div>
               </div>

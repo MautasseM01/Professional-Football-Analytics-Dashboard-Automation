@@ -54,13 +54,13 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
 
   return (
     <TooltipProvider>
-      <div className="space-y-6">
+      <div className="space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto px-2 sm:px-4">
         {/* Player Profile Card */}
-        <Card className="bg-club-black/50 border-club-gold/20">
-          <CardContent className="pt-6">
-            <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
+        <Card className="bg-club-black/50 border-club-gold/20 w-full">
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start">
               <div className="flex-shrink-0">
-                <Avatar className="h-24 w-24 rounded-lg border-2 border-club-gold/30">
+                <Avatar className="h-20 w-20 sm:h-24 sm:w-24 rounded-lg border-2 border-club-gold/30">
                   {player.heatmapUrl ? (
                     <AvatarImage 
                       src={getGoogleDriveThumbnailUrl(player.heatmapUrl) || player.heatmapUrl} 
@@ -68,28 +68,28 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                       className="object-cover"
                     />
                   ) : (
-                    <AvatarFallback className="text-2xl bg-club-gold/20 text-club-gold">
+                    <AvatarFallback className="text-xl sm:text-2xl bg-club-gold/20 text-club-gold">
                       {getInitials(player.name || "Player Name")}
                     </AvatarFallback>
                   )}
                 </Avatar>
               </div>
               
-              <div className="text-center md:text-left">
-                <h2 className="text-2xl font-bold text-club-gold">{player.name}</h2>
-                <div className="flex flex-col md:flex-row md:gap-6 mt-2">
-                  <p className="text-club-light-gray/80">
+              <div className="text-center sm:text-left w-full">
+                <h2 className="text-xl sm:text-2xl font-bold text-club-gold">{player.name}</h2>
+                <div className="flex flex-col sm:flex-row sm:gap-4 lg:gap-6 mt-2 space-y-1 sm:space-y-0">
+                  <p className="text-club-light-gray/80 text-sm sm:text-base">
                     <span className="font-medium text-club-light-gray">Position:</span> {player.position}
                   </p>
-                  <p className="text-club-light-gray/80">
+                  <p className="text-club-light-gray/80 text-sm sm:text-base">
                     <span className="font-medium text-club-light-gray">Matches:</span> {player.matches}
                   </p>
-                  <p className="text-club-light-gray/80">
+                  <p className="text-club-light-gray/80 text-sm sm:text-base">
                     <span className="font-medium text-club-light-gray">Max Speed:</span> {player.maxSpeed?.toFixed(1) || "N/A"} km/h
                   </p>
                 </div>
                 
-                <div className="mt-4 flex flex-wrap gap-2">
+                <div className="mt-3 sm:mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
                   <span className="px-2 py-1 bg-club-gold/20 text-club-gold text-xs rounded-full">
                     Season 2023-24
                   </span>
@@ -104,10 +104,11 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           </CardContent>
         </Card>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        {/* Stats Cards Grid - Responsive */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div>
+              <div className="w-full">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1">
@@ -116,18 +117,18 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                     </div>
                   } 
                   value={player.matches} 
-                  icon={<Calendar size={24} />} 
+                  icon={<Calendar size={20} sm:size={24} />} 
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
+            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray max-w-xs">
               <p>Total number of matches the player has participated in during the current season.</p>
             </TooltipContent>
           </Tooltip>
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div>
+              <div className="w-full">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1">
@@ -137,18 +138,18 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                   } 
                   value={player.distance} 
                   subValue="kilometers" 
-                  icon={<Activity size={24} />} 
+                  icon={<Activity size={20} sm:size={24} />} 
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
+            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray max-w-xs">
               <p>Total distance covered by the player during matches, measured in kilometers. Indicates player's mobility and endurance.</p>
             </TooltipContent>
           </Tooltip>
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div>
+              <div className="w-full">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1">
@@ -158,18 +159,18 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                   } 
                   value={`${passCompletionRate}%`} 
                   subValue={`${player.passes_completed}/${player.passes_attempted} passes`} 
-                  icon={<BarChart size={24} />} 
+                  icon={<BarChart size={20} sm:size={24} />} 
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
+            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray max-w-xs">
               <p>Percentage of successful passes relative to total pass attempts. Higher percentage indicates better passing accuracy and decision-making.</p>
             </TooltipContent>
           </Tooltip>
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div>
+              <div className="w-full">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1">
@@ -179,36 +180,41 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                   } 
                   value={`${shotsAccuracy}%`} 
                   subValue={`${player.shots_on_target}/${player.shots_total} shots`} 
-                  icon={<PieChart size={24} />} 
+                  icon={<PieChart size={20} sm:size={24} />} 
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
+            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray max-w-xs">
               <p>Percentage of shots that were on target compared to total shots taken. Measures a player's shooting precision and efficiency.</p>
             </TooltipContent>
           </Tooltip>
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div>
+              <div className="w-full">
                 <DisciplinaryCard playerId={player.id} />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
+            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray max-w-xs">
               <p>Player's disciplinary record including yellow and red cards. Risk levels: SAFE (0-3), AT RISK (4), CRITICAL (5+).</p>
             </TooltipContent>
           </Tooltip>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <HeatmapCard player={player} />
-          <TackleSuccessCard player={player} />
+        {/* Heatmap and Tackle Success Cards - Responsive Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+          <div className="lg:col-span-2">
+            <HeatmapCard player={player} />
+          </div>
+          <div className="lg:col-span-1">
+            <TackleSuccessCard player={player} />
+          </div>
         </div>
         
         {/* Performance Trends Section */}
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold mb-4 text-club-gold flex items-center gap-2">
-            <LineChart size={20} />
+        <div className="mt-4 sm:mt-6">
+          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-club-gold flex items-center gap-2">
+            <LineChart size={18} sm:size={20} />
             Performance Trends
           </h2>
           <PerformanceTrendsCard player={player} />
