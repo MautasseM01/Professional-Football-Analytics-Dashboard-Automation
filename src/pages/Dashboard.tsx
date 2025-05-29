@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { useUserProfile } from "@/hooks/use-user-profile";
@@ -14,6 +13,7 @@ import { ComplianceWidget } from "@/components/ComplianceWidget";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Menu, RefreshCw, UserIcon } from "lucide-react";
 
 const Dashboard = () => {
@@ -98,11 +98,11 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="flex h-screen bg-club-black text-club-light-gray">
+    <div className="flex h-screen bg-club-black text-club-light-gray transition-colors duration-300">
       {showSidebar && <DashboardSidebar />}
       
       <div className="flex-1 overflow-auto">
-        <header className="border-b border-club-gold/20 bg-club-black sticky top-0 z-10">
+        <header className="border-b border-club-gold/20 bg-club-black sticky top-0 z-10 transition-colors duration-300">
           <div className="flex justify-between items-center px-6 py-4">
             <div>
               <h1 className="text-xl font-bold text-club-gold">Striker Insights Arena</h1>
@@ -119,13 +119,14 @@ const Dashboard = () => {
             
             <div className="flex items-center gap-3">
               {!profileLoading && profile && (
-                <div className="flex items-center mr-2 px-3 py-1.5 bg-club-dark-gray rounded-full border border-club-gold/20">
+                <div className="flex items-center mr-2 px-3 py-1.5 bg-club-dark-gray rounded-full border border-club-gold/20 transition-colors duration-300">
                   <UserIcon size={16} className="text-club-gold mr-2" />
                   <span className="text-club-light-gray text-sm">
                     {profile.full_name || profile.email || "User"}
                   </span>
                 </div>
               )}
+              <ThemeToggle />
               <Button 
                 variant="outline" 
                 size="icon"
@@ -145,7 +146,7 @@ const Dashboard = () => {
           </div>
         </header>
         
-        <main className="p-6">
+        <main className="p-6 bg-club-black transition-colors duration-300">
           <div className="mb-6" data-compliance-widget>
             <ComplianceWidget />
           </div>
