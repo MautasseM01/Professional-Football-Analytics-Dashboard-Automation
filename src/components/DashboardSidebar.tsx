@@ -54,7 +54,7 @@ export const DashboardSidebar = () => {
               <img
                 src="/lovable-uploads/eb223be6-87a6-402c-a270-20313a00080c.png"
                 alt="Club Logo"
-                className="w-8 h-8 mr-2"
+                className="w-8 h-8 mr-2 rounded-lg"
               />
               <span className="text-lg font-semibold text-club-gold truncate">SMH Analytics</span>
             </div>
