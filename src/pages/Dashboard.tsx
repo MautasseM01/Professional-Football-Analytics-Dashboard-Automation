@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { useUserProfile } from "@/hooks/use-user-profile";
@@ -13,24 +14,16 @@ import { ComplianceWidget } from "@/components/ComplianceWidget";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
-import { Menu, RefreshCw, UserIcon, X } from "lucide-react";
+import { Menu, RefreshCw, UserIcon } from "lucide-react";
 
 const Dashboard = () => {
   const { loading: playerDataLoading, refreshData } = usePlayerData();
   const { profile, loading: profileLoading, error } = useUserProfile();
   const [showSidebar, setShowSidebar] = useState(true);
-  const [showBanner, setShowBanner] = useState(true);
 
   const handleRefresh = () => {
     console.log("Manual refresh triggered");
     refreshData();
-  };
-
-  const scrollToCompliance = () => {
-    const complianceElement = document.querySelector('[data-compliance-widget]');
-    if (complianceElement) {
-      complianceElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    }
   };
 
   // Render appropriate content based on user role
@@ -153,27 +146,6 @@ const Dashboard = () => {
         </header>
         
         <main className="p-6">
-          {showBanner && (
-            <div className="mb-4 bg-club-gold/5 border border-club-gold/20 rounded-lg p-3 flex items-center justify-between group hover:bg-club-gold/10 transition-colors cursor-pointer" onClick={scrollToCompliance}>
-              <div className="flex items-center gap-2">
-                <span className="text-sm">🛡️</span>
-                <span className="text-sm text-club-light-gray/90">
-                  Administrative Compliance Active - Preventing costly admin errors
-                </span>
-              </div>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setShowBanner(false);
-                }}
-                className="p-1 rounded hover:bg-club-gold/20 text-club-light-gray/60 hover:text-club-light-gray transition-colors"
-                title="Dismiss"
-              >
-                <X size={14} />
-              </button>
-            </div>
-          )}
-          
           <div className="mb-6" data-compliance-widget>
             <ComplianceWidget />
           </div>
