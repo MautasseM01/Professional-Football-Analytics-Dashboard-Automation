@@ -1,6 +1,8 @@
+
 import { useState } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { PlayerDashboard } from "@/components/dashboards/PlayerDashboard";
 import { CoachDashboard } from "@/components/dashboards/CoachDashboard";
@@ -9,16 +11,17 @@ import { PerformanceDirectorDashboard } from "@/components/dashboards/Performanc
 import { ManagementDashboard } from "@/components/dashboards/ManagementDashboard";
 import { AdminDashboard } from "@/components/dashboards/AdminDashboard";
 import { UnassignedRoleDashboard } from "@/components/dashboards/UnassignedRoleDashboard";
-import { ComplianceWidget } from "@/components/ComplianceWidget";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { LanguageSelector } from "@/components/LanguageSelector";
 import { Menu, RefreshCw, UserIcon } from "lucide-react";
 
 const Dashboard = () => {
   const { loading: playerDataLoading, refreshData } = usePlayerData();
   const { profile, loading: profileLoading, error } = useUserProfile();
+  const { t } = useLanguage();
   const [showSidebar, setShowSidebar] = useState(true);
 
   const handleRefresh = () => {
@@ -105,14 +108,14 @@ const Dashboard = () => {
         <header className="border-b border-club-gold/20 bg-club-black sticky top-0 z-10 transition-colors duration-300">
           <div className="flex justify-between items-center px-6 py-4">
             <div>
-              <h1 className="text-xl font-bold text-club-gold">Striker Insights Arena</h1>
+              <h1 className="text-xl font-bold text-club-gold">{t('header.title')}</h1>
               <p className="text-sm text-club-light-gray/70">
                 {profileLoading ? (
                   <Skeleton className="h-4 w-40 bg-club-gold/10 inline-block" />
                 ) : profile?.role ? (
-                  `${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} Dashboard`
+                  `${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} ${t('header.dashboard')}`
                 ) : (
-                  "Dashboard"
+                  t('header.dashboard')
                 )}
               </p>
             </div>
@@ -126,6 +129,7 @@ const Dashboard = () => {
                   </span>
                 </div>
               )}
+              <LanguageSelector />
               <ThemeToggle />
               <Button 
                 variant="outline" 
@@ -147,9 +151,6 @@ const Dashboard = () => {
         </header>
         
         <main className="p-6 bg-club-black transition-colors duration-300">
-          <div className="mb-6" data-compliance-widget>
-            <ComplianceWidget />
-          </div>
           {renderDashboardContent()}
         </main>
       </div>

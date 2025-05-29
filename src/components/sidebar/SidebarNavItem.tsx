@@ -14,6 +14,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { NavigationItem } from "./navigation-items";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface SidebarNavItemProps {
   item: NavigationItem;
@@ -29,6 +30,7 @@ export function SidebarNavItem({
   toggleSubMenu 
 }: SidebarNavItemProps) {
   const location = useLocation();
+  const { t } = useLanguage();
   
   const isActive = (href: string) => {
     return location.pathname === href || location.pathname.startsWith(href + '/');
@@ -73,12 +75,12 @@ export function SidebarNavItem({
                     parentIsActive || isActive(item.href) ? "text-club-gold" : "text-club-light-gray group-hover:text-club-gold"
                   )}
                 />
-                {!collapsed && <span>{item.name}</span>}
+                {!collapsed && <span>{t(item.translationKey)}</span>}
               </Link>
             </TooltipTrigger>
             {collapsed && (
               <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
-                {item.name}
+                {t(item.translationKey)}
               </TooltipContent>
             )}
           </Tooltip>
@@ -121,7 +123,7 @@ export function SidebarNavItem({
                     isActive(subItem.href) ? "text-club-gold" : "text-club-light-gray/70"
                   )} 
                 />
-                <span>{subItem.name}</span>
+                <span>{t(subItem.translationKey)}</span>
               </Link>
             ))}
           </CollapsibleContent>
@@ -149,12 +151,12 @@ export function SidebarNavItem({
               isActive(item.href) ? "text-club-gold" : "text-club-light-gray group-hover:text-club-gold"
             )}
           />
-          {!collapsed && <span className="ml-3">{item.name}</span>}
+          {!collapsed && <span className="ml-3">{t(item.translationKey)}</span>}
         </Link>
       </TooltipTrigger>
       {collapsed && (
         <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
-          {item.name}
+          {t(item.translationKey)}
         </TooltipContent>
       )}
     </Tooltip>
