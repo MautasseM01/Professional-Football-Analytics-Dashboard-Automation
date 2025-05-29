@@ -35,10 +35,10 @@ export const useComplianceData = () => {
         adminStatus = fallbackData;
       }
       
-      // Fetch ineligible players count
+      // Fix player_eligibility query to use correct schema
       const { data: ineligiblePlayersData, error: ineligiblePlayersError } = await supabase
         .from('player_eligibility')
-        .select('player_id')
+        .select('player_id, is_eligible, registration_expires, suspension_until, notes')
         .eq('is_eligible', false);
       
       if (ineligiblePlayersError) {
@@ -46,26 +46,36 @@ export const useComplianceData = () => {
         throw ineligiblePlayersError;
       }
       
-      // Fix disciplinary data query to avoid multiple rows issues
+      // Fix player_disciplinary query to use correct schema
       const { data: disciplinaryData, error: disciplinaryError } = await supabase
         .from('player_disciplinary')
-        .select('player_id, card_type');
+        .select('player_id, card_type, match_date, competition')
+        .order('match_date', { ascending: false });
       
       if (disciplinaryError) {
         console.error('Error fetching disciplinary data:', disciplinaryError);
         throw disciplinaryError;
       }
       
-      // Count yellow cards per player
-      const playerCardCounts = disciplinaryData.reduce((acc: Record<number, number>, record) => {
+      // Process disciplinary data correctly
+      const playersAtRisk = disciplinaryData?.reduce((acc: Record<number, { yellows: number; reds: number; playerId: number }>, record) => {
+        if (!acc[record.player_id]) {
+          acc[record.player_id] = { yellows: 0, reds: 0, playerId: record.player_id };
+        }
         if (record.card_type === 'yellow') {
-          acc[record.player_id] = (acc[record.player_id] || 0) + 1;
+          acc[record.player_id].yellows++;
+        } else if (record.card_type === 'red') {
+          acc[record.player_id].reds++;
         }
         return acc;
-      }, {});
+      }, {}) || {};
       
-      // Count players with 4+ yellow cards
-      const highRiskCount = Object.values(playerCardCounts).filter(count => count >= 4).length;
+      // Get players at risk (4+ yellow cards or recent red card)
+      const atRiskPlayers = Object.values(playersAtRisk).filter(player => 
+        player.yellows >= 4 || player.reds > 0
+      );
+      
+      const highRiskCount = atRiskPlayers.length;
       
       const result = {
         complianceScore: adminStatus?.compliance_score || 0,
