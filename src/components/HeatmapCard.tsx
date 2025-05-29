@@ -148,7 +148,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               
               {imageError ? (
                 <div className="flex flex-col items-center justify-center h-full bg-club-black/50 p-4 z-20 relative">
-                  <ImageOff className="text-club-gold mb-2" size={32} sm:size={36} />
+                  <ImageOff className="text-club-gold mb-2 w-8 h-8 sm:w-9 sm:h-9" />
                   <p className="text-center text-club-gold mb-2 text-sm sm:text-base">Unable to load heatmap image</p>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Button 

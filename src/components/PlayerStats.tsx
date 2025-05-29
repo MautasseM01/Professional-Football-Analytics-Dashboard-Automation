@@ -54,7 +54,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
 
   return (
     <TooltipProvider>
-      <div className="space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto px-2 sm:px-4">
+      <div className="space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         {/* Player Profile Card */}
         <Card className="bg-club-black/50 border-club-gold/20 w-full">
           <CardContent className="p-4 sm:p-6">
@@ -105,7 +105,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
         </Card>
 
         {/* Stats Cards Grid - Responsive */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="w-full">
@@ -113,11 +113,11 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                   title={
                     <div className="flex items-center gap-1">
                       Matches Played
-                      <Info size={14} className="text-club-light-gray/60" />
+                      <Info className="w-3.5 h-3.5 text-club-light-gray/60" />
                     </div>
                   } 
                   value={player.matches} 
-                  icon={<Calendar size={20} sm:size={24} />} 
+                  icon={<Calendar className="w-5 h-5 sm:w-6 sm:h-6" />} 
                 />
               </div>
             </TooltipTrigger>
@@ -133,12 +133,12 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                   title={
                     <div className="flex items-center gap-1">
                       Distance Covered
-                      <Info size={14} className="text-club-light-gray/60" />
+                      <Info className="w-3.5 h-3.5 text-club-light-gray/60" />
                     </div>
                   } 
                   value={player.distance} 
                   subValue="kilometers" 
-                  icon={<Activity size={20} sm:size={24} />} 
+                  icon={<Activity className="w-5 h-5 sm:w-6 sm:h-6" />} 
                 />
               </div>
             </TooltipTrigger>
@@ -154,12 +154,12 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                   title={
                     <div className="flex items-center gap-1">
                       Pass Completion
-                      <Info size={14} className="text-club-light-gray/60" />
+                      <Info className="w-3.5 h-3.5 text-club-light-gray/60" />
                     </div>
                   } 
                   value={`${passCompletionRate}%`} 
                   subValue={`${player.passes_completed}/${player.passes_attempted} passes`} 
-                  icon={<BarChart size={20} sm:size={24} />} 
+                  icon={<BarChart className="w-5 h-5 sm:w-6 sm:h-6" />} 
                 />
               </div>
             </TooltipTrigger>
@@ -175,12 +175,12 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                   title={
                     <div className="flex items-center gap-1">
                       Shot Accuracy
-                      <Info size={14} className="text-club-light-gray/60" />
+                      <Info className="w-3.5 h-3.5 text-club-light-gray/60" />
                     </div>
                   } 
                   value={`${shotsAccuracy}%`} 
                   subValue={`${player.shots_on_target}/${player.shots_total} shots`} 
-                  icon={<PieChart size={20} sm:size={24} />} 
+                  icon={<PieChart className="w-5 h-5 sm:w-6 sm:h-6" />} 
                 />
               </div>
             </TooltipTrigger>
@@ -214,7 +214,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
         {/* Performance Trends Section */}
         <div className="mt-4 sm:mt-6">
           <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-club-gold flex items-center gap-2">
-            <LineChart size={18} sm:size={20} />
+            <LineChart className="w-4 h-4 sm:w-5 sm:h-5" />
             Performance Trends
           </h2>
           <PerformanceTrendsCard player={player} />
