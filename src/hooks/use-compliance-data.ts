@@ -8,11 +8,13 @@ export const useComplianceData = () => {
     queryFn: async () => {
       console.log('Fetching compliance data...');
       
-      // Try to fetch current season (2024-25) team admin status first
-      let { data: adminStatus, error: adminError } = await supabase
+      // Fix team_admin_status query to handle multiple rows properly
+      const { data: adminStatus, error: adminError } = await supabase
         .from('team_admin_status')
         .select('compliance_score, points_deducted, admin_violations')
         .eq('season', '2024-25')
+        .order('last_updated', { ascending: false })
+        .limit(1)
         .single();
       
       // If no current season data exists, get the most recent row
@@ -44,7 +46,7 @@ export const useComplianceData = () => {
         throw ineligiblePlayersError;
       }
       
-      // Fetch disciplinary data for high-risk players (4+ yellow cards)
+      // Fix disciplinary data query to avoid multiple rows issues
       const { data: disciplinaryData, error: disciplinaryError } = await supabase
         .from('player_disciplinary')
         .select('player_id, card_type');
