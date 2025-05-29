@@ -1,13 +1,14 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/types";
-import { Users, Settings, Database, ClipboardList, Shield, AlertTriangle, TrendingDown } from "lucide-react";
+import { Users, Settings, Database, ClipboardList, Shield, AlertTriangle, TrendingDown, X } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { StatCard } from "@/components/StatCard";
 import { useComplianceData } from "@/hooks/use-compliance-data";
 import { usePlayersAtRisk, PlayerAtRisk } from "@/hooks/use-players-at-risk";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { useState } from "react";
 
 interface AdminDashboardProps {
@@ -18,6 +19,7 @@ export const AdminDashboard = ({ profile }: AdminDashboardProps) => {
   const { data: complianceData, isLoading: complianceLoading } = useComplianceData();
   const { data: playersAtRisk, isLoading: playersLoading } = usePlayersAtRisk();
   const [riskFilter, setRiskFilter] = useState<'all' | 'high' | 'suspended'>('all');
+  const [alertDismissed, setAlertDismissed] = useState(false);
 
   const userManagement = {
     totalUsers: 127,
@@ -83,11 +85,76 @@ export const AdminDashboard = ({ profile }: AdminDashboardProps) => {
     return isEligible ? 'bg-green-600/80 text-white' : 'bg-red-600/80 text-white';
   };
 
+  // Check if compliance alert should be shown
+  const shouldShowAlert = () => {
+    if (alertDismissed || complianceLoading) return false;
+    
+    const complianceScore = complianceData?.complianceScore || 0;
+    const pointsDeducted = complianceData?.pointsDeducted || 0;
+    const highRiskCount = complianceData?.highRiskCount || 0;
+    
+    return complianceScore < 70 || pointsDeducted > 0 || highRiskCount > 2;
+  };
+
+  // Get alert severity and styling
+  const getAlertSeverity = () => {
+    const complianceScore = complianceData?.complianceScore || 0;
+    const pointsDeducted = complianceData?.pointsDeducted || 0;
+    
+    if (complianceScore < 50 || pointsDeducted > 3) {
+      return {
+        severity: 'critical',
+        bgColor: 'bg-red-600/90',
+        borderColor: 'border-red-500',
+        textColor: 'text-white'
+      };
+    }
+    
+    return {
+      severity: 'warning',
+      bgColor: 'bg-amber-600/90',
+      borderColor: 'border-amber-500',
+      textColor: 'text-white'
+    };
+  };
+
+  const alertStyle = getAlertSeverity();
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-club-gold">
         Welcome back, {profile.full_name || "Administrator"}
       </h1>
+
+      {/* Compliance Alert Banner */}
+      {shouldShowAlert() && (
+        <Alert className={`${alertStyle.bgColor} ${alertStyle.borderColor} ${alertStyle.textColor} border-2`}>
+          <AlertTriangle className="h-5 w-5" />
+          <div className="flex items-center justify-between w-full">
+            <AlertDescription className="flex-1">
+              <span className="font-semibold">⚠️ Compliance Alert:</span>{" "}
+              {complianceData?.highRiskCount || 0} players at suspension risk, {complianceData?.pointsDeducted || 0} points deducted this season
+            </AlertDescription>
+            <div className="flex items-center space-x-2 ml-4">
+              <Button 
+                variant="outline" 
+                size="sm"
+                className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+              >
+                View Details
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setAlertDismissed(true)}
+                className="h-8 w-8 p-0 text-white hover:bg-white/20"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+          </div>
+        </Alert>
+      )}
 
       {/* Compliance Metrics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
