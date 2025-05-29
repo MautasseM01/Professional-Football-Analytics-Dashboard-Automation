@@ -8,15 +8,29 @@ export const useComplianceData = () => {
     queryFn: async () => {
       console.log('Fetching compliance data...');
       
-      // Fetch team admin status
-      const { data: teamAdminData, error: teamAdminError } = await supabase
+      // Try to fetch current season (2024-25) team admin status first
+      let { data: adminStatus, error: adminError } = await supabase
         .from('team_admin_status')
-        .select('compliance_score, points_deducted')
+        .select('compliance_score, points_deducted, admin_violations')
+        .eq('season', '2024-25')
         .single();
       
-      if (teamAdminError) {
-        console.error('Error fetching team admin status:', teamAdminError);
-        throw teamAdminError;
+      // If no current season data exists, get the most recent row
+      if (adminError || !adminStatus) {
+        console.log('No current season data found, fetching most recent...');
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('team_admin_status')
+          .select('compliance_score, points_deducted, admin_violations')
+          .order('last_updated', { ascending: false })
+          .limit(1)
+          .single();
+        
+        if (fallbackError) {
+          console.error('Error fetching team admin status:', fallbackError);
+          throw fallbackError;
+        }
+        
+        adminStatus = fallbackData;
       }
       
       // Fetch ineligible players count
@@ -52,8 +66,8 @@ export const useComplianceData = () => {
       const highRiskCount = Object.values(playerCardCounts).filter(count => count >= 4).length;
       
       const result = {
-        complianceScore: teamAdminData?.compliance_score || 0,
-        pointsDeducted: teamAdminData?.points_deducted || 0,
+        complianceScore: adminStatus?.compliance_score || 0,
+        pointsDeducted: adminStatus?.points_deducted || 0,
         playersAtRisk: ineligiblePlayersData?.length || 0,
         highRiskCount
       };
