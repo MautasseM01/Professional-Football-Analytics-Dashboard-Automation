@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronDown, ChevronRight, ArrowUpRight } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -35,17 +34,25 @@ export function SidebarNavItem({
     return location.pathname === href || location.pathname.startsWith(href + '/');
   };
 
+  const isParentActive = (item: NavigationItem) => {
+    if (!item.subItems) return false;
+    return item.subItems.some(subItem => isActive(subItem.href));
+  };
+
   if (item.subItems) {
+    const parentIsActive = isParentActive(item);
+    const isOpen = openSubMenu === item.name;
+
     return (
       <Collapsible
-        open={openSubMenu === item.name}
+        open={isOpen}
         onOpenChange={() => {}}
         className="w-full"
       >
         <div
           className={cn(
             "group flex items-center px-2 py-3 rounded-md transition-all",
-            isActive(item.href)
+            parentIsActive || isActive(item.href)
               ? "bg-club-gold/20 text-club-gold"
               : "text-club-light-gray hover:bg-club-gold/10 hover:text-club-gold",
             collapsed ? "justify-center" : "justify-between"
@@ -63,7 +70,7 @@ export function SidebarNavItem({
                 <item.icon
                   className={cn(
                     "flex-shrink-0 h-6 w-6",
-                    isActive(item.href) ? "text-club-gold" : "text-club-light-gray group-hover:text-club-gold"
+                    parentIsActive || isActive(item.href) ? "text-club-gold" : "text-club-light-gray group-hover:text-club-gold"
                   )}
                 />
                 {!collapsed && <span>{item.name}</span>}
@@ -84,7 +91,7 @@ export function SidebarNavItem({
                 className="h-6 w-6 p-0 text-club-light-gray hover:text-club-gold hover:bg-transparent"
                 onClick={() => toggleSubMenu(item.name)}
               >
-                {openSubMenu === item.name ? (
+                {isOpen ? (
                   <ChevronDown size={16} />
                 ) : (
                   <ChevronRight size={16} />
@@ -103,7 +110,7 @@ export function SidebarNavItem({
                 className={cn(
                   "group flex items-center px-2 py-2 text-sm rounded-md transition-all",
                   isActive(subItem.href)
-                    ? "bg-club-gold/10 text-club-gold"
+                    ? "bg-club-gold/20 text-club-gold font-medium"
                     : "text-club-light-gray hover:bg-club-gold/5 hover:text-club-gold"
                 )}
               >

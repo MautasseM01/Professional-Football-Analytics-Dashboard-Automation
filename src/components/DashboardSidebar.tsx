@@ -1,5 +1,5 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +12,30 @@ export const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
+  const location = useLocation();
+
+  // Function to determine which parent menu should be open based on current route
+  const getActiveParentMenu = (pathname: string) => {
+    for (const item of navigationItems) {
+      if (item.subItems) {
+        const isSubItemActive = item.subItems.some(subItem => 
+          pathname === subItem.href || pathname.startsWith(subItem.href + '/')
+        );
+        if (isSubItemActive) {
+          return item.name;
+        }
+      }
+    }
+    return null;
+  };
+
+  // Update open submenu based on current route
+  useEffect(() => {
+    const activeParent = getActiveParentMenu(location.pathname);
+    if (activeParent) {
+      setOpenSubMenu(activeParent);
+    }
+  }, [location.pathname]);
 
   const toggleSubMenu = (name: string) => {
     setOpenSubMenu(openSubMenu === name ? null : name);
