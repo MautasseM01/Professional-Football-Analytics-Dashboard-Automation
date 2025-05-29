@@ -9,7 +9,7 @@ export const useComplianceData = () => {
       console.log('Fetching compliance data...');
       
       // Fix team_admin_status query to handle multiple rows properly
-      const { data: adminStatus, error: adminError } = await supabase
+      let { data: adminStatus, error: adminError } = await supabase
         .from('team_admin_status')
         .select('compliance_score, points_deducted, admin_violations')
         .eq('season', '2024-25')
