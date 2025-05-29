@@ -106,12 +106,15 @@ const Dashboard = () => {
       
       <div className="flex-1 overflow-auto">
         <header className="border-b border-club-gold/20 bg-club-black sticky top-0 z-10 transition-colors duration-300">
-          <div className="flex justify-between items-center px-6 py-4">
-            <div>
-              <h1 className="text-xl font-bold text-club-gold">{t('header.title')}</h1>
-              <p className="text-sm text-club-light-gray/70">
+          <div className="flex justify-between items-center px-4 sm:px-6 py-4">
+            {/* Left section - Title and page info */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg sm:text-xl font-bold text-club-gold truncate">
+                {t('header.title')}
+              </h1>
+              <p className="text-xs sm:text-sm text-club-light-gray/70 truncate">
                 {profileLoading ? (
-                  <Skeleton className="h-4 w-40 bg-club-gold/10 inline-block" />
+                  <Skeleton className="h-4 w-32 sm:w-40 bg-club-gold/10 inline-block" />
                 ) : profile?.role ? (
                   `${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} ${t('header.dashboard')}`
                 ) : (
@@ -120,37 +123,50 @@ const Dashboard = () => {
               </p>
             </div>
             
-            <div className="flex items-center gap-3">
+            {/* Right section - Controls */}
+            <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+              {/* User Profile - Hidden on mobile */}
               {!profileLoading && profile && (
-                <div className="flex items-center mr-2 px-3 py-1.5 bg-club-dark-gray rounded-full border border-club-gold/20 transition-colors duration-300">
-                  <UserIcon size={16} className="text-club-gold mr-2" />
-                  <span className="text-club-light-gray text-sm">
+                <div className="hidden sm:flex items-center px-2 sm:px-3 py-1.5 bg-club-dark-gray rounded-full border border-club-gold/20 transition-colors duration-300">
+                  <UserIcon size={14} className="text-club-gold mr-1.5 sm:mr-2" />
+                  <span className="text-club-light-gray text-xs sm:text-sm truncate max-w-20 sm:max-w-none">
                     {profile.full_name || profile.email || "User"}
                   </span>
                 </div>
               )}
+              
+              {/* Language Selector */}
               <LanguageSelector />
+              
+              {/* Theme Toggle */}
               <ThemeToggle />
+              
+              {/* Refresh Button */}
               <Button 
                 variant="outline" 
                 size="icon"
-                className="text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold"
+                className="text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold h-9 w-9 sm:h-10 sm:w-10"
                 onClick={handleRefresh}
                 title="Refresh data"
               >
-                <RefreshCw size={18} />
+                <RefreshCw size={16} className="sm:hidden" />
+                <RefreshCw size={18} className="hidden sm:block" />
               </Button>
+              
+              {/* Menu Toggle */}
               <button
                 onClick={() => setShowSidebar(!showSidebar)}
                 className="p-2 rounded-md text-club-light-gray hover:bg-club-gold/10 hover:text-club-gold transition-colors"
+                title="Toggle sidebar"
               >
-                <Menu size={20} />
+                <Menu size={18} className="sm:hidden" />
+                <Menu size={20} className="hidden sm:block" />
               </button>
             </div>
           </div>
         </header>
         
-        <main className="p-6 bg-club-black transition-colors duration-300">
+        <main className="p-4 sm:p-6 bg-club-black transition-colors duration-300">
           {renderDashboardContent()}
         </main>
       </div>
