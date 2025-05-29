@@ -14,6 +14,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { UserRound } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
+import { BackToTopButton } from "@/components/BackToTopButton";
 
 const formatPercentage = (value: number): string => {
   return `${value.toFixed(1)}%`;
@@ -313,6 +314,9 @@ export default function PlayerComparison() {
           </>
         )}
       </div>
+
+      {/* Back to Top Button */}
+      <BackToTopButton />
     </DashboardLayout>
   );
 }

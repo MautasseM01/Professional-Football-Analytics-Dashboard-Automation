@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
+import { BackToTopButton } from "@/components/BackToTopButton";
 import { Menu, RefreshCw, UserIcon } from "lucide-react";
 
 const Dashboard = () => {
@@ -176,6 +177,9 @@ const Dashboard = () => {
           {renderDashboardContent()}
         </main>
       </div>
+
+      {/* Back to Top Button */}
+      <BackToTopButton />
     </div>
   );
 };

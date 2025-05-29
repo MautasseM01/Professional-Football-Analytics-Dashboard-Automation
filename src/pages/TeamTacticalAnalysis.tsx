@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -11,6 +10,7 @@ import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { BackToTopButton } from "@/components/BackToTopButton";
 
 export interface Match {
   id: number;
@@ -156,6 +156,9 @@ const TeamTacticalAnalysis = () => {
           </Card>
         </div>
       </div>
+
+      {/* Back to Top Button */}
+      <BackToTopButton />
     </DashboardLayout>
   );
 };

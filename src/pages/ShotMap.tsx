@@ -6,6 +6,7 @@ import { usePlayerData } from "@/hooks/use-player-data";
 import { ShotMapFilters } from "@/components/ShotMap/ShotMapFilters";
 import { ShotMapVisualization } from "@/components/ShotMap/ShotMapVisualization";
 import { ShotMapLegend } from "@/components/ShotMap/ShotMapLegend";
+import { BackToTopButton } from "@/components/BackToTopButton";
 
 const ShotMap = () => {
   const { players } = usePlayerData();
@@ -55,6 +56,9 @@ const ShotMap = () => {
           )}
         </div>
       </main>
+
+      {/* Back to Top Button */}
+      <BackToTopButton />
     </div>
   );
 };

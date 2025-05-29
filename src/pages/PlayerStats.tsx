@@ -10,6 +10,7 @@ import { useState, useEffect } from "react";
 import { CoachNotesTextarea } from "@/components/CoachNotesTextarea";
 import { PDFReportGenerator } from "@/components/PDFReportGenerator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { BackToTopButton } from "@/components/BackToTopButton";
 
 const PlayerStats = () => {
   const { players, selectedPlayer, selectPlayer, loading, error } = usePlayerData();
@@ -154,6 +155,9 @@ const PlayerStats = () => {
           )}
         </div>
       </main>
+
+      {/* Back to Top Button */}
+      <BackToTopButton />
     </div>
   );
 };
