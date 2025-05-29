@@ -2,6 +2,19 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 
+interface CardCounts {
+  yellows: number;
+  reds: number;
+}
+
+interface PlayerAtRisk {
+  id: number;
+  name: string;
+  yellows: number;
+  reds: number;
+  risk: string;
+}
+
 export const useComplianceData = () => {
   const [data, setData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -47,7 +60,7 @@ export const useComplianceData = () => {
         const adminData = adminStatus?.[0] || { compliance_score: 0, points_deducted: 0, admin_violations: [] };
         
         // Calculate players at risk from disciplinary records
-        const cardCounts = {};
+        const cardCounts: Record<number, CardCounts> = {};
         disciplinaryData?.forEach(record => {
           if (!cardCounts[record.player_id]) {
             cardCounts[record.player_id] = { yellows: 0, reds: 0 };
@@ -56,7 +69,7 @@ export const useComplianceData = () => {
           if (record.card_type === 'red') cardCounts[record.player_id].reds++;
         });
 
-        const playersAtRisk = Object.entries(cardCounts)
+        const playersAtRisk: PlayerAtRisk[] = Object.entries(cardCounts)
           .filter(([playerId, cards]) => cards.yellows >= 4 || cards.reds > 0)
           .map(([playerId, cards]) => {
             const player = playersData?.find(p => p.id === parseInt(playerId));
