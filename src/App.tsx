@@ -46,7 +46,7 @@ const App = () => (
                   path="/player-analysis" 
                   element={
                     <ProtectedRoute>
-                      <Dashboard />
+                      <PlayerStats />
                     </ProtectedRoute>
                   } 
                 />
@@ -70,7 +70,7 @@ const App = () => (
                   path="/player-analysis/development" 
                   element={
                     <ProtectedRoute>
-                      <Dashboard />
+                      <PlayerStats />
                     </ProtectedRoute>
                   } 
                 />
@@ -90,7 +90,7 @@ const App = () => (
                   path="/team-performance" 
                   element={
                     <ProtectedRoute>
-                      <Dashboard />
+                      <TeamTacticalAnalysis />
                     </ProtectedRoute>
                   } 
                 />
@@ -105,7 +105,7 @@ const App = () => (
                   } 
                 />
                 
-                {/* Reports route */}
+                {/* Reports route - using Dashboard for now since no Reports page exists */}
                 <Route 
                   path="/reports" 
                   element={
@@ -115,7 +115,7 @@ const App = () => (
                   } 
                 />
                 
-                {/* Settings route */}
+                {/* Settings route - using Dashboard for now since no Settings page exists */}
                 <Route 
                   path="/settings" 
                   element={
