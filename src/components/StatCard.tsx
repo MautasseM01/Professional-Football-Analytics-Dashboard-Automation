@@ -10,18 +10,28 @@ interface StatCardProps {
 
 export const StatCard = ({ title, value, subValue, icon }: StatCardProps) => {
   return (
-    <Card className="border-club-gold/20 bg-club-dark-gray h-full w-full">
-      <CardContent className="p-4 sm:p-6">
-        <div className="flex items-center justify-between h-full">
-          <div className="min-w-0 flex-1">
-            <p className="text-sm text-club-light-gray/70 flex items-center mb-2">{title}</p>
-            <p className="text-xl sm:text-2xl font-bold text-club-gold break-words">{value}</p>
-            {subValue && (
-              <p className="text-xs text-club-light-gray/60 mt-1 break-words">{subValue}</p>
-            )}
+    <Card className="border-club-gold/20 bg-club-dark-gray h-full w-full transition-all duration-200 hover:border-club-gold/40 hover:shadow-lg group">
+      <CardContent className="p-4 sm:p-5 lg:p-6 h-full">
+        <div className="flex items-start justify-between h-full">
+          <div className="min-w-0 flex-1 space-y-2 sm:space-y-3">
+            <div className="text-xs sm:text-sm text-club-light-gray/70 font-medium leading-tight">
+              {title}
+            </div>
+            <div className="space-y-1">
+              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold break-words leading-tight group-hover:text-club-gold/90 transition-colors">
+                {value}
+              </div>
+              {subValue && (
+                <div className="text-xs sm:text-sm text-club-light-gray/60 break-words leading-tight">
+                  {subValue}
+                </div>
+              )}
+            </div>
           </div>
           {icon && (
-            <div className="text-club-gold/30 ml-2 flex-shrink-0">{icon}</div>
+            <div className="text-club-gold/30 ml-3 sm:ml-4 flex-shrink-0 group-hover:text-club-gold/50 transition-colors">
+              {icon}
+            </div>
           )}
         </div>
       </CardContent>

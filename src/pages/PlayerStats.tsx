@@ -54,45 +54,55 @@ const PlayerStats = () => {
   return (
     <div className="flex min-h-screen bg-club-dark-bg text-club-light-gray">
       <DashboardSidebar />
-      <main className="flex-1 p-6 lg:p-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-10">
-            <h1 className="text-3xl font-bold text-club-gold mb-2">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 xl:p-10 overflow-auto">
+        <div className="max-w-7xl mx-auto space-y-6 lg:space-y-8">
+          {/* Page Header */}
+          <div className="space-y-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">
               Player Analytics Dashboard
             </h1>
-            <p className="text-club-light-gray/70">
-              View detailed statistics for each player
+            <p className="text-sm sm:text-base text-club-light-gray/70 max-w-2xl">
+              View detailed statistics and performance analytics for individual players
             </p>
           </div>
 
-          <div className="bg-club-black/40 rounded-lg p-6 mb-8">
-            <h2 className="text-xl font-semibold text-club-gold mb-4">Player Selection</h2>
-            <p className="text-club-light-gray/70 mb-6">Choose a player to view their analytics</p>
-            
-            <div className="w-full max-w-xl">
-              <Select value={selectedPlayerId} onValueChange={handlePlayerChange}>
-                <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray">
-                  <div className="flex items-center gap-2">
-                    <User size={18} className="text-club-gold" />
-                    <SelectValue placeholder="Select a player" />
-                  </div>
-                </SelectTrigger>
-                <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-                  {players.map((player) => (
-                    <SelectItem key={player.id} value={player.id.toString()}>
-                      {player.name} - {player.position}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          {/* Player Selection Section */}
+          <Card className="bg-club-black/40 border-club-gold/20">
+            <CardHeader className="p-4 sm:p-6 pb-4">
+              <CardTitle className="text-lg sm:text-xl text-club-gold">Player Selection</CardTitle>
+              <p className="text-sm text-club-light-gray/70">Choose a player to view their comprehensive analytics</p>
+            </CardHeader>
+            <CardContent className="p-4 sm:p-6 pt-0">
+              <div className="w-full max-w-md">
+                <Select value={selectedPlayerId} onValueChange={handlePlayerChange}>
+                  <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray h-12 focus:ring-club-gold/50">
+                    <div className="flex items-center gap-3">
+                      <User size={20} className="text-club-gold flex-shrink-0" />
+                      <SelectValue placeholder="Select a player" />
+                    </div>
+                  </SelectTrigger>
+                  <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray z-50 max-h-60">
+                    {players.map((player) => (
+                      <SelectItem key={player.id} value={player.id.toString()} className="focus:bg-club-gold/20">
+                        <div className="flex items-center justify-between w-full">
+                          <span className="font-medium">{player.name}</span>
+                          <span className="text-club-light-gray/60 text-sm ml-2">{player.position}</span>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
 
           {/* PDF Report Generation Card */}
-          <Card className="border-club-gold/20 bg-club-dark-gray mb-8">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-club-gold flex items-center justify-between">
-                <span>Player Performance Report</span>
+          <Card className="border-club-gold/20 bg-club-dark-gray">
+            <CardHeader className="p-4 sm:p-6 pb-3">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                <CardTitle className="text-lg sm:text-xl text-club-gold">
+                  Player Performance Report
+                </CardTitle>
                 <PDFReportGenerator 
                   player={selectedPlayer}
                   attributes={attributes}
@@ -100,12 +110,12 @@ const PlayerStats = () => {
                   coachNotes={coachNotes}
                   performanceData={performanceData}
                 />
-              </CardTitle>
+              </div>
             </CardHeader>
-            <CardContent>
-              <p className="mb-4 text-club-light-gray/80">
+            <CardContent className="p-4 sm:p-6 pt-0 space-y-4">
+              <p className="text-sm sm:text-base text-club-light-gray/80 leading-relaxed">
                 Generate a comprehensive PDF report including the player's performance data, radar charts, 
-                and your personalized coaching notes.
+                and your personalized coaching notes for detailed analysis and record-keeping.
               </p>
               <CoachNotesTextarea 
                 value={coachNotes}
@@ -114,26 +124,33 @@ const PlayerStats = () => {
             </CardContent>
           </Card>
 
+          {/* Loading and Error States */}
           {loading ? (
-            <div className="text-center py-8">Loading player data...</div>
-          ) : error ? (
-            <div className="text-red-500 py-8">Error loading player data: {error}</div>
-          ) : (
-            <>
-              {/* Role Radar Chart */}
-              <div className="mb-8">
-                <RoleRadarChart 
-                  player={selectedPlayer}
-                  attributes={attributes}
-                  positionalAverage={positionalAverage}
-                  loading={attrLoading}
-                  error={attrError}
-                />
+            <div className="flex items-center justify-center min-h-[40vh]">
+              <div className="text-center space-y-3">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-club-gold mx-auto"></div>
+                <p className="text-club-light-gray">Loading player data...</p>
               </div>
+            </div>
+          ) : error ? (
+            <div className="text-center py-12">
+              <div className="text-red-500 text-lg font-medium mb-2">Error loading player data</div>
+              <p className="text-club-light-gray/70">{error}</p>
+            </div>
+          ) : (
+            <div className="space-y-6 lg:space-y-8">
+              {/* Role Radar Chart */}
+              <RoleRadarChart 
+                player={selectedPlayer}
+                attributes={attributes}
+                positionalAverage={positionalAverage}
+                loading={attrLoading}
+                error={attrError}
+              />
               
-              {/* Existing Player Stats Component */}
+              {/* Player Stats Component */}
               <PlayerStatsComponent player={selectedPlayer} />
-            </>
+            </div>
           )}
         </div>
       </main>

@@ -18,7 +18,6 @@ import {
   TooltipProvider, 
   TooltipTrigger 
 } from "@/components/ui/tooltip";
-import { useState } from "react";
 import { PerformanceTrendsCard } from "./PerformanceTrendsCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -32,7 +31,14 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
   console.log("PlayerStats component received player:", player);
   
   if (!player) {
-    return <div className="text-center py-8">No player selected</div>;
+    return (
+      <div className="flex items-center justify-center min-h-[50vh] text-center">
+        <div className="space-y-2">
+          <p className="text-lg text-club-light-gray">No player selected</p>
+          <p className="text-sm text-club-light-gray/60">Please select a player to view their statistics</p>
+        </div>
+      </div>
+    );
   }
 
   const passCompletionRate = player.passes_attempted > 0
@@ -54,13 +60,13 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
 
   return (
     <TooltipProvider>
-      <div className="space-y-4 sm:space-y-6 w-full max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+      <div className="w-full max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
         {/* Player Profile Card */}
         <Card className="bg-club-black/50 border-club-gold/20 w-full">
           <CardContent className="p-4 sm:p-6">
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-center sm:items-start">
+            <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
               <div className="flex-shrink-0">
-                <Avatar className="h-20 w-20 sm:h-24 sm:w-24 rounded-lg border-2 border-club-gold/30">
+                <Avatar className="h-20 w-20 sm:h-24 sm:w-24 lg:h-28 lg:w-28 rounded-xl border-2 border-club-gold/30">
                   {player.heatmapUrl ? (
                     <AvatarImage 
                       src={getGoogleDriveThumbnailUrl(player.heatmapUrl) || player.heatmapUrl} 
@@ -68,33 +74,39 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                       className="object-cover"
                     />
                   ) : (
-                    <AvatarFallback className="text-xl sm:text-2xl bg-club-gold/20 text-club-gold">
+                    <AvatarFallback className="text-xl sm:text-2xl lg:text-3xl bg-club-gold/20 text-club-gold rounded-xl">
                       {getInitials(player.name || "Player Name")}
                     </AvatarFallback>
                   )}
                 </Avatar>
               </div>
               
-              <div className="text-center sm:text-left w-full">
-                <h2 className="text-xl sm:text-2xl font-bold text-club-gold">{player.name}</h2>
-                <div className="flex flex-col sm:flex-row sm:gap-4 lg:gap-6 mt-2 space-y-1 sm:space-y-0">
-                  <p className="text-club-light-gray/80 text-sm sm:text-base">
-                    <span className="font-medium text-club-light-gray">Position:</span> {player.position}
-                  </p>
-                  <p className="text-club-light-gray/80 text-sm sm:text-base">
-                    <span className="font-medium text-club-light-gray">Matches:</span> {player.matches}
-                  </p>
-                  <p className="text-club-light-gray/80 text-sm sm:text-base">
-                    <span className="font-medium text-club-light-gray">Max Speed:</span> {player.maxSpeed?.toFixed(1) || "N/A"} km/h
-                  </p>
+              <div className="text-center sm:text-left flex-1 min-w-0">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold mb-2 break-words">
+                  {player.name}
+                </h2>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-4 text-sm sm:text-base">
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1">
+                    <span className="font-medium text-club-light-gray">Position:</span>
+                    <span className="text-club-light-gray/80">{player.position}</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1">
+                    <span className="font-medium text-club-light-gray">Matches:</span>
+                    <span className="text-club-light-gray/80">{player.matches}</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-1">
+                    <span className="font-medium text-club-light-gray">Max Speed:</span>
+                    <span className="text-club-light-gray/80">{player.maxSpeed?.toFixed(1) || "N/A"} km/h</span>
+                  </div>
                 </div>
                 
-                <div className="mt-3 sm:mt-4 flex flex-wrap gap-2 justify-center sm:justify-start">
-                  <span className="px-2 py-1 bg-club-gold/20 text-club-gold text-xs rounded-full">
+                <div className="mt-3 flex flex-wrap gap-2 justify-center sm:justify-start">
+                  <span className="px-3 py-1 bg-club-gold/20 text-club-gold text-xs font-medium rounded-full">
                     Season 2023-24
                   </span>
                   {player.position && (
-                    <span className="px-2 py-1 bg-club-dark-bg text-club-light-gray text-xs rounded-full">
+                    <span className="px-3 py-1 bg-club-dark-bg text-club-light-gray text-xs font-medium rounded-full">
                       {player.position}
                     </span>
                   )}
@@ -105,15 +117,15 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
         </Card>
 
         {/* Stats Cards Grid - Responsive */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 lg:gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-6">
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="w-full">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
-                      Matches Played
-                      <Info className="w-3.5 h-3.5 text-club-light-gray/60" />
+                    <div className="flex items-center gap-1.5">
+                      <span>Matches Played</span>
+                      <Info className="w-3.5 h-3.5 text-club-light-gray/60 flex-shrink-0" />
                     </div>
                   } 
                   value={player.matches} 
@@ -131,9 +143,9 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
               <div className="w-full">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
-                      Distance Covered
-                      <Info className="w-3.5 h-3.5 text-club-light-gray/60" />
+                    <div className="flex items-center gap-1.5">
+                      <span>Distance Covered</span>
+                      <Info className="w-3.5 h-3.5 text-club-light-gray/60 flex-shrink-0" />
                     </div>
                   } 
                   value={player.distance} 
@@ -152,9 +164,9 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
               <div className="w-full">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
-                      Pass Completion
-                      <Info className="w-3.5 h-3.5 text-club-light-gray/60" />
+                    <div className="flex items-center gap-1.5">
+                      <span>Pass Completion</span>
+                      <Info className="w-3.5 h-3.5 text-club-light-gray/60 flex-shrink-0" />
                     </div>
                   } 
                   value={`${passCompletionRate}%`} 
@@ -173,9 +185,9 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
               <div className="w-full">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
-                      Shot Accuracy
-                      <Info className="w-3.5 h-3.5 text-club-light-gray/60" />
+                    <div className="flex items-center gap-1.5">
+                      <span>Shot Accuracy</span>
+                      <Info className="w-3.5 h-3.5 text-club-light-gray/60 flex-shrink-0" />
                     </div>
                   } 
                   value={`${shotsAccuracy}%`} 
@@ -202,7 +214,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
         </div>
 
         {/* Heatmap and Tackle Success Cards - Responsive Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2">
             <HeatmapCard player={player} />
           </div>
@@ -212,13 +224,15 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
         </div>
         
         {/* Performance Trends Section */}
-        <div className="mt-4 sm:mt-6">
-          <h2 className="text-lg sm:text-xl font-semibold mb-3 sm:mb-4 text-club-gold flex items-center gap-2">
-            <LineChart className="w-4 h-4 sm:w-5 sm:h-5" />
-            Performance Trends
-          </h2>
+        <section className="space-y-4">
+          <header className="flex items-center gap-2">
+            <LineChart className="w-5 h-5 text-club-gold flex-shrink-0" />
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-club-gold">
+              Performance Trends
+            </h2>
+          </header>
           <PerformanceTrendsCard player={player} />
-        </div>
+        </section>
       </div>
     </TooltipProvider>
   );

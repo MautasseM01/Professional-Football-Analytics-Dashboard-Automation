@@ -84,16 +84,20 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   };
 
   return (
-    <Card className="border-club-gold/20 bg-club-dark-gray w-full h-full">
-      <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 sm:gap-4">
-          <div className="min-w-0">
-            <CardTitle className="text-club-gold text-lg sm:text-xl">Performance Heatmap</CardTitle>
-            <CardDescription className="text-sm sm:text-base">Player's match positioning and movement</CardDescription>
+    <Card className="border-club-gold/20 bg-club-dark-gray w-full h-full flex flex-col">
+      <CardHeader className="p-4 sm:p-6 pb-3 sm:pb-4 flex-shrink-0">
+        <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+          <div className="min-w-0 flex-1">
+            <CardTitle className="text-club-gold text-lg sm:text-xl lg:text-2xl font-semibold">
+              Performance Heatmap
+            </CardTitle>
+            <CardDescription className="text-sm sm:text-base text-club-light-gray/70 mt-1">
+              Player's match positioning and movement patterns
+            </CardDescription>
           </div>
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 w-full sm:w-auto">
             <Select onValueChange={handlePeriodChange} value={selectedPeriod}>
-              <SelectTrigger className="w-full sm:w-[160px] lg:w-[180px] bg-club-black text-white border-club-gold/30 h-9 sm:h-10">
+              <SelectTrigger className="w-full sm:w-[160px] lg:w-[180px] bg-club-black text-white border-club-gold/30 h-10 focus:ring-club-gold/50">
                 <SelectValue placeholder="Select Period" />
               </SelectTrigger>
               <SelectContent className="bg-club-dark-gray text-white border-club-gold/30 z-50">
@@ -105,13 +109,21 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-4 sm:p-6 pt-0">
+      
+      <CardContent className="p-4 sm:p-6 pt-0 flex-1 flex flex-col min-h-0">
         {player.heatmapUrl ? (
-          <div className="space-y-3 sm:space-y-4">
-            <div className="relative w-full rounded-md overflow-hidden bg-green-800/20" style={{ aspectRatio: '16/10' }}>
-              {/* Football pitch SVG */}
+          <div className="space-y-4 flex-1 flex flex-col">
+            <div 
+              className="relative w-full rounded-lg overflow-hidden bg-green-800/20 border border-green-700/30 flex-1"
+              style={{ 
+                aspectRatio: '16/10',
+                minHeight: '300px',
+                maxHeight: '500px'
+              }}
+            >
+              {/* Football pitch SVG overlay */}
               <svg 
-                className="absolute inset-0 w-full h-full z-10" 
+                className="absolute inset-0 w-full h-full z-10 pointer-events-none" 
                 viewBox="0 0 1050 680" 
                 fill="none" 
                 xmlns="http://www.w3.org/2000/svg"
@@ -147,14 +159,16 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               </svg>
               
               {imageError ? (
-                <div className="flex flex-col items-center justify-center h-full bg-club-black/50 p-4 z-20 relative">
-                  <ImageOff className="text-club-gold mb-2 w-8 h-8 sm:w-9 sm:h-9" />
-                  <p className="text-center text-club-gold mb-2 text-sm sm:text-base">Unable to load heatmap image</p>
-                  <div className="flex flex-col sm:flex-row gap-2">
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-club-black/60 p-4 z-20">
+                  <ImageOff className="text-club-gold mb-3 w-8 h-8 sm:w-10 sm:h-10" />
+                  <p className="text-center text-club-gold mb-3 text-sm sm:text-base font-medium">
+                    Unable to load heatmap image
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 w-full max-w-xs">
                     <Button 
                       variant="outline" 
                       onClick={resetImageError}
-                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold text-xs sm:text-sm h-8 sm:h-9"
+                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold text-xs sm:text-sm h-9 flex-1"
                       size="sm"
                     >
                       Retry Original
@@ -162,15 +176,15 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                     <Button 
                       variant="outline" 
                       onClick={tryAlternativeUrl}
-                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold text-xs sm:text-sm h-8 sm:h-9"
+                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold text-xs sm:text-sm h-9 flex-1"
                       size="sm"
                     >
                       Try Thumbnail
                     </Button>
                   </div>
-                  <p className="text-xs text-club-light-gray/60 mt-3 sm:mt-4 text-center max-w-xs">
-                    The image cannot be loaded due to CORS restrictions from Google Drive.
-                    <br className="hidden sm:block"/>Try uploading the image to a CORS-enabled image hosting service.
+                  <p className="text-xs text-club-light-gray/60 mt-3 text-center max-w-sm leading-relaxed">
+                    The image cannot be loaded due to CORS restrictions from Google Drive. 
+                    Try uploading the image to a CORS-enabled image hosting service.
                   </p>
                 </div>
               ) : (
@@ -178,37 +192,40 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                   <img 
                     src={imageUrl || player.heatmapUrl} 
                     alt={`${player.name} heatmap`}
-                    className="object-cover w-full h-full opacity-80 z-0"
+                    className="absolute inset-0 w-full h-full object-cover opacity-80"
                     crossOrigin="anonymous"
                     onError={handleImageError}
                     referrerPolicy="no-referrer"
                   />
+                  <div className="absolute bottom-2 right-2 bg-club-black/80 text-club-light-gray text-xs px-3 py-1.5 rounded-md z-20 font-medium">
+                    {player.name}'s Heatmap • {selectedPeriod}
+                  </div>
                 </>
               )}
-              <div className="absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-club-black/70 text-xs px-2 py-1 rounded z-20">
-                {player.name}'s Heatmap • {selectedPeriod}
-              </div>
             </div>
             
             {/* Heatmap Color Legend */}
-            <div className="flex flex-col space-y-1 sm:space-y-2">
-              <p className="text-xs sm:text-sm text-club-light-gray">Intensity Scale:</p>
-              <div className="flex items-center gap-1">
-                <div className="h-3 sm:h-4 flex-1 rounded-md" style={{
-                  background: `linear-gradient(to right, ${colorScaleStops.map(s => s.color).join(', ')})`
-                }}></div>
+            <div className="space-y-2 flex-shrink-0">
+              <p className="text-sm font-medium text-club-light-gray">Activity Intensity Scale:</p>
+              <div className="flex items-center gap-2">
+                <div 
+                  className="h-3 flex-1 rounded-md shadow-sm" 
+                  style={{
+                    background: `linear-gradient(to right, ${colorScaleStops.map(s => s.color).join(', ')})`
+                  }}
+                />
               </div>
-              <div className="flex justify-between px-1">
+              <div className="flex justify-between text-xs text-club-light-gray/80">
                 {colorScaleStops.filter(stop => stop.label).map((stop, i) => (
-                  <span key={i} className="text-xs text-club-light-gray">{stop.label}</span>
+                  <span key={i} className="font-medium">{stop.label}</span>
                 ))}
               </div>
             </div>
           </div>
         ) : (
-          <Alert className="bg-club-gold/10 border-club-gold/30">
-            <AlertDescription>
-              Heatmap not available for this player
+          <Alert className="bg-club-gold/10 border-club-gold/30 flex-1 flex items-center">
+            <AlertDescription className="text-club-light-gray">
+              Heatmap visualization not available for this player
             </AlertDescription>
           </Alert>
         )}
