@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { AccessibleNavigationItem } from "@/utils/roleAccess";
 
-export { AccessibleNavigationItem as NavigationItem };
+export type { AccessibleNavigationItem as NavigationItem };
 
 export const navigationItems: AccessibleNavigationItem[] = [
   { 
