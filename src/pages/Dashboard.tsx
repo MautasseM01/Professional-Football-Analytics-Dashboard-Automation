@@ -17,6 +17,7 @@ import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { BackToTopButton } from "@/components/BackToTopButton";
+import { RoleTester } from "@/components/RoleTester";
 import { Menu, RefreshCw, UserIcon } from "lucide-react";
 
 const Dashboard = () => {
@@ -130,6 +131,11 @@ const Dashboard = () => {
             
             {/* Right section - Controls */}
             <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-shrink-0">
+              {/* Role Tester - Only show when profile is loaded */}
+              {!profileLoading && profile && (
+                <RoleTester />
+              )}
+
               {/* User Profile - Hidden on mobile and small tablets */}
               {!profileLoading && profile && (
                 <div className="hidden lg:flex items-center px-2 lg:px-3 py-1.5 bg-club-dark-gray rounded-full border border-club-gold/20 transition-colors duration-300">
