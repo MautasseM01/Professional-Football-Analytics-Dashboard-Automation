@@ -7,6 +7,7 @@ import {
   TooltipTrigger
 } from "@/components/ui/tooltip";
 import { useAuth } from "@/contexts/AuthContext";
+import { useDevAuthContext } from "@/contexts/DevAuthContext";
 
 interface SidebarFooterProps {
   collapsed: boolean;
@@ -14,7 +15,22 @@ interface SidebarFooterProps {
 }
 
 export function SidebarFooter({ collapsed, onFeedbackClick }: SidebarFooterProps) {
-  const { signOut, user } = useAuth();
+  // Use the appropriate auth context based on environment
+  const isDevelopment = process.env.NODE_ENV === 'development';
+  
+  // Only call the hook that matches the current environment
+  const prodAuth = isDevelopment ? null : useAuth();
+  const devAuth = isDevelopment ? useDevAuthContext() : null;
+  
+  // Get the user and signOut from the appropriate context
+  const user = isDevelopment ? devAuth?.user : prodAuth?.user;
+  const signOut = isDevelopment ? 
+    () => {
+      console.log('🔧 [DEV] Sign out simulé');
+      // In dev mode, we could reload or redirect to simulate sign out
+      window.location.reload();
+    } : 
+    prodAuth?.signOut || (() => {});
 
   return (
     <div className="border-t border-club-gold/20 p-4">
