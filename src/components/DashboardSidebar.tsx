@@ -7,16 +7,29 @@ import { navigationItems } from "./sidebar/navigation-items";
 import { SidebarNavItem } from "./sidebar/SidebarNavItem";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { FeedbackForm } from "./FeedbackForm";
+import { useUserProfile } from "@/hooks/use-user-profile";
+import { hasAccess } from "@/utils/roleAccess";
 
 export const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const location = useLocation();
+  const { profile } = useUserProfile();
+
+  // Filter navigation items based on user role
+  const filteredNavigationItems = navigationItems.filter(item => 
+    hasAccess(profile?.role, item.allowedRoles)
+  ).map(item => ({
+    ...item,
+    subItems: item.subItems?.filter(subItem => 
+      hasAccess(profile?.role, subItem.allowedRoles)
+    )
+  }));
 
   // Function to determine which parent menu should be open based on current route
   const getActiveParentMenu = (pathname: string) => {
-    for (const item of navigationItems) {
+    for (const item of filteredNavigationItems) {
       if (item.subItems) {
         const isSubItemActive = item.subItems.some(subItem => 
           pathname === subItem.href || pathname.startsWith(subItem.href + '/')
@@ -72,7 +85,7 @@ export const DashboardSidebar = () => {
 
         <div className="flex-1 overflow-y-auto py-4">
           <nav className="px-2 space-y-1">
-            {navigationItems.map((item) => (
+            {filteredNavigationItems.map((item) => (
               <SidebarNavItem 
                 key={item.name}
                 item={item}

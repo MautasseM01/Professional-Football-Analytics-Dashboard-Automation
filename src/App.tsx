@@ -8,6 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
+import { RouteProtection } from "./components/RouteProtection";
 import Dashboard from "./pages/Dashboard";
 import PlayerComparison from "./pages/PlayerComparison";
 import PlayerStats from "./pages/PlayerStats";
@@ -36,7 +37,9 @@ const App = () => (
                   path="/dashboard" 
                   element={
                     <ProtectedRoute>
-                      <Dashboard />
+                      <RouteProtection>
+                        <Dashboard />
+                      </RouteProtection>
                     </ProtectedRoute>
                   } 
                 />
@@ -46,7 +49,9 @@ const App = () => (
                   path="/player-analysis" 
                   element={
                     <ProtectedRoute>
-                      <PlayerStats />
+                      <RouteProtection>
+                        <PlayerStats />
+                      </RouteProtection>
                     </ProtectedRoute>
                   } 
                 />
@@ -54,7 +59,9 @@ const App = () => (
                   path="/player-analysis/stats" 
                   element={
                     <ProtectedRoute>
-                      <PlayerStats />
+                      <RouteProtection>
+                        <PlayerStats />
+                      </RouteProtection>
                     </ProtectedRoute>
                   } 
                 />
@@ -62,7 +69,9 @@ const App = () => (
                   path="/player-analysis/comparison" 
                   element={
                     <ProtectedRoute>
-                      <PlayerComparison />
+                      <RouteProtection>
+                        <PlayerComparison />
+                      </RouteProtection>
                     </ProtectedRoute>
                   } 
                 />
@@ -70,7 +79,9 @@ const App = () => (
                   path="/player-analysis/development" 
                   element={
                     <ProtectedRoute>
-                      <PlayerStats />
+                      <RouteProtection>
+                        <PlayerStats />
+                      </RouteProtection>
                     </ProtectedRoute>
                   } 
                 />
@@ -80,7 +91,9 @@ const App = () => (
                   path="/player-analysis/shot-map" 
                   element={
                     <ProtectedRoute>
-                      <ShotMap />
+                      <RouteProtection>
+                        <ShotMap />
+                      </RouteProtection>
                     </ProtectedRoute>
                   } 
                 />
@@ -90,7 +103,9 @@ const App = () => (
                   path="/team-performance" 
                   element={
                     <ProtectedRoute>
-                      <TeamTacticalAnalysis />
+                      <RouteProtection>
+                        <TeamTacticalAnalysis />
+                      </RouteProtection>
                     </ProtectedRoute>
                   } 
                 />
@@ -100,27 +115,33 @@ const App = () => (
                   path="/team-performance/tactical-analysis" 
                   element={
                     <ProtectedRoute>
-                      <TeamTacticalAnalysis />
+                      <RouteProtection>
+                        <TeamTacticalAnalysis />
+                      </RouteProtection>
                     </ProtectedRoute>
                   } 
                 />
                 
-                {/* Reports route - using Dashboard for now since no Reports page exists */}
+                {/* Reports route */}
                 <Route 
                   path="/reports" 
                   element={
                     <ProtectedRoute>
-                      <Dashboard />
+                      <RouteProtection>
+                        <Dashboard />
+                      </RouteProtection>
                     </ProtectedRoute>
                   } 
                 />
                 
-                {/* Settings route - using Dashboard for now since no Settings page exists */}
+                {/* Settings route */}
                 <Route 
                   path="/settings" 
                   element={
                     <ProtectedRoute>
-                      <Dashboard />
+                      <RouteProtection>
+                        <Dashboard />
+                      </RouteProtection>
                     </ProtectedRoute>
                   } 
                 />

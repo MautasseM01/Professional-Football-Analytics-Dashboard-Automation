@@ -6,38 +6,49 @@ import {
   FileBarChart, 
   Settings 
 } from "lucide-react";
+import { AccessibleNavigationItem } from "@/utils/roleAccess";
 
-interface SubNavigationItem {
-  name: string;
-  href: string;
-  translationKey: string;
-}
+export { AccessibleNavigationItem as NavigationItem };
 
-export interface NavigationItem {
-  name: string;
-  href: string;
-  icon: React.ElementType;
-  translationKey: string;
-  subItems?: SubNavigationItem[];
-}
-
-export const navigationItems: NavigationItem[] = [
+export const navigationItems: AccessibleNavigationItem[] = [
   { 
     name: "Dashboard Home", 
     href: "/dashboard", 
     icon: LayoutDashboard,
-    translationKey: "nav.dashboard"
+    translationKey: "nav.dashboard",
+    allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player']
   },
   { 
     name: "Player Analysis", 
     href: "/player-analysis", 
     icon: UserRound,
     translationKey: "nav.playerAnalysis",
+    allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player'],
     subItems: [
-      { name: "Individual Player Stats", href: "/player-analysis/stats", translationKey: "nav.individualStats" },
-      { name: "Player Comparison", href: "/player-analysis/comparison", translationKey: "nav.playerComparison" },
-      { name: "Player Development", href: "/player-analysis/development", translationKey: "nav.playerDevelopment" },
-      { name: "Shot Map", href: "/player-analysis/shot-map", translationKey: "nav.shotMap" }
+      { 
+        name: "Individual Player Stats", 
+        href: "/player-analysis/stats", 
+        translationKey: "nav.individualStats",
+        allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player']
+      },
+      { 
+        name: "Player Comparison", 
+        href: "/player-analysis/comparison", 
+        translationKey: "nav.playerComparison",
+        allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director']
+      },
+      { 
+        name: "Player Development", 
+        href: "/player-analysis/development", 
+        translationKey: "nav.playerDevelopment",
+        allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director']
+      },
+      { 
+        name: "Shot Map", 
+        href: "/player-analysis/shot-map", 
+        translationKey: "nav.shotMap",
+        allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director']
+      }
     ]
   },
   { 
@@ -45,21 +56,34 @@ export const navigationItems: NavigationItem[] = [
     href: "/team-performance", 
     icon: Users,
     translationKey: "nav.teamPerformance",
+    allowedRoles: ['admin', 'management'],
     subItems: [
-      { name: "Team Overview", href: "/team-performance", translationKey: "nav.teamOverview" },
-      { name: "Tactical Analysis", href: "/team-performance/tactical-analysis", translationKey: "nav.tacticalAnalysis" }
+      { 
+        name: "Team Overview", 
+        href: "/team-performance", 
+        translationKey: "nav.teamOverview",
+        allowedRoles: ['admin', 'management']
+      },
+      { 
+        name: "Tactical Analysis", 
+        href: "/team-performance/tactical-analysis", 
+        translationKey: "nav.tacticalAnalysis",
+        allowedRoles: ['admin', 'management']
+      }
     ]
   },
   { 
     name: "Reports", 
     href: "/reports", 
     icon: FileBarChart,
-    translationKey: "nav.reports"
+    translationKey: "nav.reports",
+    allowedRoles: ['admin', 'management']
   },
   { 
     name: "Settings", 
     href: "/settings", 
     icon: Settings,
-    translationKey: "nav.settings"
+    translationKey: "nav.settings",
+    allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player']
   },
 ];
