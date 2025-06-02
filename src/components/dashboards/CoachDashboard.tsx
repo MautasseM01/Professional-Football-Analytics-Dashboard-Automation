@@ -12,30 +12,30 @@ interface CoachDashboardProps {
 export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
   const teamMetrics = {
     recentMatches: [
-      { opponent: "FC Barcelona", result: "W", score: "2-1" },
-      { opponent: "Real Madrid", result: "D", score: "0-0" },
-      { opponent: "Atletico Madrid", result: "L", score: "1-2" }
+      { opponent: "FC Riverside", result: "W", score: "2-1" },
+      { opponent: "Regional United", result: "D", score: "1-1" },
+      { opponent: "Town Athletic", result: "L", score: "0-2" }
     ],
-    nextMatch: { opponent: "Valencia", date: "May 25, 2025", location: "Home" },
+    nextMatch: { opponent: "Valley FC", date: "June 8, 2025", location: "Away" },
     stats: {
-      goalsScored: 12,
-      goalsConceded: 8,
-      possession: 53,
-      shots: 45
+      goalsScored: 24,
+      goalsConceded: 18,
+      possession: 48,
+      shots: 156
     }
   };
 
   const playerAlerts = [
-    { player: "Marcus Johnson", issue: "High training load", severity: "warning" },
-    { player: "Tom Williams", issue: "Decreased sprint distance", severity: "danger" },
+    { player: "Marcus Johnson", issue: "Missed 2 training sessions", severity: "warning" },
+    { player: "Tom Williams", issue: "Minor ankle concern", severity: "warning" },
     { player: "Alex Garcia", issue: "Improved passing accuracy", severity: "success" }
   ];
 
   const opponentSnapshot = {
-    name: "Valencia",
-    formation: "4-3-3",
-    keyPlayers: ["Carlos Soler", "José Gayà", "Gonçalo Guedes"],
-    weaknesses: ["Set piece defense", "Counter-attacks against"]
+    name: "Valley FC",
+    formation: "4-4-2",
+    keyPlayers: ["Dave Thompson", "Mike Carter", "Paul Richards"],
+    weaknesses: ["Weak left flank", "Struggle with pace"]
   };
 
   return (
@@ -89,7 +89,7 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
             </div>
             
             <div>
-              <h4 className="text-sm font-medium text-club-light-gray mb-2">Team Stats</h4>
+              <h4 className="text-sm font-medium text-club-light-gray mb-2">Season Stats</h4>
               <div className="grid grid-cols-2 gap-2">
                 <div className="p-2 bg-club-black/40 rounded text-center">
                   <div className="text-lg font-bold text-club-gold">{teamMetrics.stats.goalsScored}</div>
@@ -101,11 +101,11 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
                 </div>
                 <div className="p-2 bg-club-black/40 rounded text-center">
                   <div className="text-lg font-bold text-club-gold">{teamMetrics.stats.possession}%</div>
-                  <div className="text-xs text-club-light-gray/70">Possession</div>
+                  <div className="text-xs text-club-light-gray/70">Avg Possession</div>
                 </div>
                 <div className="p-2 bg-club-black/40 rounded text-center">
                   <div className="text-lg font-bold text-club-gold">{teamMetrics.stats.shots}</div>
-                  <div className="text-xs text-club-light-gray/70">Shots</div>
+                  <div className="text-xs text-club-light-gray/70">Total Shots</div>
                 </div>
               </div>
             </div>
@@ -117,10 +117,10 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center text-club-gold">
               <Bell className="mr-2 h-5 w-5" />
-              Player Alerts
+              Player Updates
             </CardTitle>
             <CardDescription className="text-club-light-gray/70">
-              Performance changes and notifications
+              Training attendance and player status
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -153,10 +153,10 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
             <CardHeader className="pb-2">
               <CardTitle className="flex items-center text-club-gold">
                 <Shield className="mr-2 h-5 w-5" />
-                Opponent Snapshot
+                Next Opponent
               </CardTitle>
               <CardDescription className="text-club-light-gray/70">
-                {opponentSnapshot.name} - Next match
+                {opponentSnapshot.name} - Match preparation
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
@@ -177,7 +177,7 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
               </div>
               
               <div>
-                <h4 className="text-sm font-medium text-club-light-gray">Weaknesses</h4>
+                <h4 className="text-sm font-medium text-club-light-gray">Tactical Notes</h4>
                 <ul className="list-disc list-inside text-sm text-club-light-gray/90 bg-club-black/40 p-2 rounded mt-1">
                   {opponentSnapshot.weaknesses.map((weakness, index) => (
                     <li key={index}>{weakness}</li>
@@ -189,16 +189,16 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
           
           <Card className="bg-club-dark-gray border-club-gold/20">
             <CardHeader className="pb-2">
-              <CardTitle className="text-club-gold">Quick Links</CardTitle>
+              <CardTitle className="text-club-gold">Quick Actions</CardTitle>
             </CardHeader>
             <CardContent className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 justify-start">
                 <Users className="mr-2 h-4 w-4" />
-                Squad Management
+                Team Selection
               </Button>
               <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 justify-start">
                 <FileBarChart className="mr-2 h-4 w-4" />
-                Tactical Planning
+                Training Plans
               </Button>
             </CardContent>
           </Card>

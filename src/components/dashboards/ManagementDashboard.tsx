@@ -11,34 +11,34 @@ interface ManagementDashboardProps {
 
 export const ManagementDashboard = ({ profile }: ManagementDashboardProps) => {
   const teamPerformance = {
-    leaguePosition: 4,
-    points: 67,
-    form: ["W", "W", "L", "D", "W"],
-    goalsScored: 58,
-    goalsConceded: 31,
+    leaguePosition: 6,
+    points: 28,
+    form: ["W", "L", "D", "W", "L"],
+    goalsScored: 24,
+    goalsConceded: 18,
     seasonObjectives: [
-      { objective: "Top 4 Finish", status: "on-track" },
-      { objective: "Champions League Quarterfinals", status: "achieved" },
-      { objective: "Domestic Cup Semifinal", status: "at-risk" }
+      { objective: "Mid-table Finish", status: "on-track" },
+      { objective: "Regional Cup Quarter Final", status: "achieved" },
+      { objective: "Youth Development Program", status: "on-track" }
     ]
   };
 
   const squadInvestment = {
-    totalValueEur: 423,
-    valueChange: 17,
-    contractsExpiring: 3,
+    totalValueEur: 150,
+    valueChange: 8,
+    contractsExpiring: 5,
     keyStats: [
-      { label: "Avg Age", value: "24.7" },
-      { label: "Academy Products", value: "6" },
-      { label: "New Signings", value: "3" }
+      { label: "Avg Age", value: "26.2" },
+      { label: "Local Players", value: "14" },
+      { label: "New Signings", value: "4" }
     ]
   };
 
   const riskDashboard = [
-    { area: "Goalkeeper Depth", level: "high", description: "Only one experienced GK" },
-    { area: "CM Workload", level: "medium", description: "High minutes in midfield" },
-    { area: "Striker Dependency", level: "medium", description: "Over-reliance on single forward" },
-    { area: "RB Position", level: "low", description: "Multiple viable options" }
+    { area: "Player Registration", level: "medium", description: "3 players awaiting documentation" },
+    { area: "Training Attendance", level: "low", description: "Good overall attendance rates" },
+    { area: "Injury Prevention", level: "medium", description: "Limited physio coverage" },
+    { area: "Financial Compliance", level: "high", description: "Budget constraints affecting operations" }
   ];
 
   return (
@@ -142,7 +142,7 @@ export const ManagementDashboard = ({ profile }: ManagementDashboardProps) => {
             <div className="bg-club-black/40 rounded p-3 flex justify-between items-center">
               <div>
                 <div className="text-sm text-club-light-gray/70">Squad Value</div>
-                <div className="font-bold text-xl text-club-gold">€{squadInvestment.totalValueEur}M</div>
+                <div className="font-bold text-xl text-club-gold">€{squadInvestment.totalValueEur}K</div>
               </div>
               <Badge className={
                 squadInvestment.valueChange >= 0 ? 'bg-green-600/80' : 'bg-red-600/80'
@@ -187,10 +187,10 @@ export const ManagementDashboard = ({ profile }: ManagementDashboardProps) => {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center text-club-gold">
               <AlertTriangle className="mr-2 h-5 w-5" />
-              Risk Dashboard
+              Administrative Dashboard
             </CardTitle>
             <CardDescription className="text-club-light-gray/70">
-              Key risk indicators and potential issues
+              Key administrative and operational concerns
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -219,7 +219,7 @@ export const ManagementDashboard = ({ profile }: ManagementDashboardProps) => {
             
             <div className="text-center mt-4">
               <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10">
-                View Detailed Risk Report
+                View Detailed Administrative Report
               </Button>
             </div>
           </CardContent>
