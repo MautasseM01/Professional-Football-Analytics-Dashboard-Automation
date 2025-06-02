@@ -62,7 +62,7 @@ export const navigationItems: AccessibleNavigationItem[] = [
         name: "Team Overview", 
         href: "/team-performance", 
         translationKey: "nav.teamOverview",
-        allowedRoles: ['admin', 'management', 'performance_director', 'coach']
+        allowedRoles: ['admin', 'management', 'performance_director']
       },
       { 
         name: "Tactical Analysis", 
@@ -84,6 +84,6 @@ export const navigationItems: AccessibleNavigationItem[] = [
     href: "/settings", 
     icon: Settings,
     translationKey: "nav.settings",
-    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']
+    allowedRoles: ['admin']
   },
 ];
