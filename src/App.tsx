@@ -8,7 +8,7 @@ import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { ProtectedRoute } from "./components/ProtectedRoute";
-import { RouteProtection } from "./components/RouteProtection";
+import { RoleProtectedRoute } from "./components/RoleProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import PlayerComparison from "./pages/PlayerComparison";
 import PlayerStats from "./pages/PlayerStats";
@@ -16,6 +16,7 @@ import ShotMap from "./pages/ShotMap";
 import TeamTacticalAnalysis from "./pages/TeamTacticalAnalysis";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
+import { AccessDenied } from "./components/AccessDenied";
 
 const queryClient = new QueryClient();
 
@@ -31,27 +32,28 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Navigate to="/dashboard" replace />} />
                 <Route path="/login" element={<Login />} />
+                <Route path="/access-denied" element={<AccessDenied />} />
                 
-                {/* Main dashboard route */}
+                {/* Dashboard - accessible to all authenticated users */}
                 <Route 
                   path="/dashboard" 
                   element={
                     <ProtectedRoute>
-                      <RouteProtection>
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst', 'coach', 'player', 'unassigned']}>
                         <Dashboard />
-                      </RouteProtection>
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
                 />
                 
-                {/* Player Analysis routes */}
+                {/* Player Analysis - Individual Stats (accessible to all roles except unassigned) */}
                 <Route 
                   path="/player-analysis" 
                   element={
                     <ProtectedRoute>
-                      <RouteProtection>
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']}>
                         <PlayerStats />
-                      </RouteProtection>
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
                 />
@@ -59,89 +61,93 @@ const App = () => (
                   path="/player-analysis/stats" 
                   element={
                     <ProtectedRoute>
-                      <RouteProtection>
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']}>
                         <PlayerStats />
-                      </RouteProtection>
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
                 />
+                
+                {/* Player Analysis - Comparison (not accessible to players) */}
                 <Route 
                   path="/player-analysis/comparison" 
                   element={
                     <ProtectedRoute>
-                      <RouteProtection>
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst', 'coach']}>
                         <PlayerComparison />
-                      </RouteProtection>
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
                 />
+                
+                {/* Player Analysis - Development (not accessible to players) */}
                 <Route 
                   path="/player-analysis/development" 
                   element={
                     <ProtectedRoute>
-                      <RouteProtection>
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst', 'coach']}>
                         <PlayerStats />
-                      </RouteProtection>
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
                 />
                 
-                {/* Shot Map route */}
+                {/* Shot Map (not accessible to players) */}
                 <Route 
                   path="/player-analysis/shot-map" 
                   element={
                     <ProtectedRoute>
-                      <RouteProtection>
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst', 'coach']}>
                         <ShotMap />
-                      </RouteProtection>
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
                 />
                 
-                {/* Team Performance routes */}
+                {/* Team Performance - Overview (not accessible to analysts and players) */}
                 <Route 
                   path="/team-performance" 
                   element={
                     <ProtectedRoute>
-                      <RouteProtection>
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'coach']}>
                         <TeamTacticalAnalysis />
-                      </RouteProtection>
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
                 />
                 
-                {/* Team Tactical Analysis route */}
+                {/* Team Tactical Analysis (accessible to more roles including analysts) */}
                 <Route 
                   path="/team-performance/tactical-analysis" 
                   element={
                     <ProtectedRoute>
-                      <RouteProtection>
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst', 'coach']}>
                         <TeamTacticalAnalysis />
-                      </RouteProtection>
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
                 />
                 
-                {/* Reports route */}
+                {/* Reports (higher-level roles only) */}
                 <Route 
                   path="/reports" 
                   element={
                     <ProtectedRoute>
-                      <RouteProtection>
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst']}>
                         <Dashboard />
-                      </RouteProtection>
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
                 />
                 
-                {/* Settings route */}
+                {/* Settings (accessible to all except unassigned) */}
                 <Route 
                   path="/settings" 
                   element={
                     <ProtectedRoute>
-                      <RouteProtection>
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']}>
                         <Dashboard />
-                      </RouteProtection>
+                      </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
                 />
