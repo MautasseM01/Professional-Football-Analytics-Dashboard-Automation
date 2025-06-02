@@ -16,38 +16,38 @@ export const navigationItems: AccessibleNavigationItem[] = [
     href: "/dashboard", 
     icon: LayoutDashboard,
     translationKey: "nav.dashboard",
-    allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player']
+    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player', 'unassigned']
   },
   { 
     name: "Player Analysis", 
     href: "/player-analysis", 
     icon: UserRound,
     translationKey: "nav.playerAnalysis",
-    allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player'],
+    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player'],
     subItems: [
       { 
         name: "Individual Player Stats", 
         href: "/player-analysis/stats", 
         translationKey: "nav.individualStats",
-        allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player']
+        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']
       },
       { 
         name: "Player Comparison", 
         href: "/player-analysis/comparison", 
         translationKey: "nav.playerComparison",
-        allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director']
+        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
       },
       { 
         name: "Player Development", 
         href: "/player-analysis/development", 
         translationKey: "nav.playerDevelopment",
-        allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director']
+        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
       },
       { 
         name: "Shot Map", 
         href: "/player-analysis/shot-map", 
         translationKey: "nav.shotMap",
-        allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director']
+        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
       }
     ]
   },
@@ -56,19 +56,19 @@ export const navigationItems: AccessibleNavigationItem[] = [
     href: "/team-performance", 
     icon: Users,
     translationKey: "nav.teamPerformance",
-    allowedRoles: ['admin', 'management'],
+    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach'],
     subItems: [
       { 
         name: "Team Overview", 
         href: "/team-performance", 
         translationKey: "nav.teamOverview",
-        allowedRoles: ['admin', 'management']
+        allowedRoles: ['admin', 'management', 'performance_director', 'coach']
       },
       { 
         name: "Tactical Analysis", 
         href: "/team-performance/tactical-analysis", 
         translationKey: "nav.tacticalAnalysis",
-        allowedRoles: ['admin', 'management']
+        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
       }
     ]
   },
@@ -77,13 +77,13 @@ export const navigationItems: AccessibleNavigationItem[] = [
     href: "/reports", 
     icon: FileBarChart,
     translationKey: "nav.reports",
-    allowedRoles: ['admin', 'management']
+    allowedRoles: ['admin', 'management', 'performance_director', 'analyst']
   },
   { 
     name: "Settings", 
     href: "/settings", 
     icon: Settings,
     translationKey: "nav.settings",
-    allowedRoles: ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player']
+    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']
   },
 ];

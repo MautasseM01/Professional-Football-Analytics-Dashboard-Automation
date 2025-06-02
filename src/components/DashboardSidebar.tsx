@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -17,15 +18,29 @@ export const DashboardSidebar = () => {
   const location = useLocation();
   const { profile } = useUserProfile();
 
+  // Debug: Log the current user role and navigation filtering
+  console.log('Current user role:', profile?.role);
+  console.log('All navigation items:', navigationItems);
+
   // Filter navigation items based on user role
-  const filteredNavigationItems = navigationItems.filter(item => 
-    hasAccess(profile?.role, item.allowedRoles)
-  ).map(item => ({
-    ...item,
-    subItems: item.subItems?.filter(subItem => 
-      hasAccess(profile?.role, subItem.allowedRoles)
-    )
-  }));
+  const filteredNavigationItems = navigationItems.filter(item => {
+    const hasItemAccess = hasAccess(profile?.role, item.allowedRoles);
+    console.log(`Item "${item.name}" - Role: ${profile?.role}, Has Access: ${hasItemAccess}`, item.allowedRoles);
+    return hasItemAccess;
+  }).map(item => {
+    const filteredSubItems = item.subItems?.filter(subItem => {
+      const hasSubItemAccess = hasAccess(profile?.role, subItem.allowedRoles);
+      console.log(`SubItem "${subItem.name}" - Role: ${profile?.role}, Has Access: ${hasSubItemAccess}`, subItem.allowedRoles);
+      return hasSubItemAccess;
+    });
+    
+    return {
+      ...item,
+      subItems: filteredSubItems
+    };
+  });
+
+  console.log('Filtered navigation items:', filteredNavigationItems);
 
   // Function to determine which parent menu should be open based on current route
   const getActiveParentMenu = (pathname: string) => {
@@ -102,7 +117,6 @@ export const DashboardSidebar = () => {
           onFeedbackClick={() => setFeedbackOpen(true)} 
         />
         
-        {/* Feedback form dialog */}
         <FeedbackForm open={feedbackOpen} onOpenChange={setFeedbackOpen} />
       </div>
     </TooltipProvider>
