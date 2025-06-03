@@ -20,13 +20,13 @@ export const PlayerAvatar = ({ player, size = "md", className = "" }: PlayerAvat
     lg: "text-xl"
   };
 
-  const numberBadgeSizes = {
-    sm: "h-3 w-3 text-[8px]",
-    md: "h-4 w-4 text-[10px]",
-    lg: "h-6 w-6 text-xs"
+  const numberSizes = {
+    sm: "text-lg font-black",
+    md: "text-xl font-black",
+    lg: "text-3xl font-black"
   };
 
-  // Generate player initials
+  // Generate player initials as fallback
   const getInitials = (name: string) => {
     return name
       .split(' ')
@@ -58,34 +58,30 @@ export const PlayerAvatar = ({ player, size = "md", className = "" }: PlayerAvat
         cursor-pointer
       `}
     >
-      {/* Player Initials */}
-      <span 
-        className={`
-          ${textSizes[size]} 
-          font-bold text-white 
-          select-none
-          drop-shadow-sm
-        `}
-      >
-        {initials}
-      </span>
-      
-      {/* Player Number Badge - only show if number exists and is valid */}
-      {playerNumber && playerNumber > 0 && (
-        <div 
+      {/* Jersey Number (Priority Display) */}
+      {playerNumber && playerNumber > 0 ? (
+        <span 
           className={`
-            ${numberBadgeSizes[size]}
-            absolute -bottom-0.5 -right-0.5
-            bg-club-black
-            border border-white
-            rounded-full
-            flex items-center justify-center
-            font-bold text-club-gold
-            shadow-sm
+            ${numberSizes[size]} 
+            text-white 
+            select-none
+            drop-shadow-md
           `}
         >
           {playerNumber}
-        </div>
+        </span>
+      ) : (
+        /* Fallback to Player Initials */
+        <span 
+          className={`
+            ${textSizes[size]} 
+            font-bold text-white 
+            select-none
+            drop-shadow-sm
+          `}
+        >
+          {initials}
+        </span>
       )}
     </div>
   );

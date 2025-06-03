@@ -17,13 +17,9 @@ export const StatCard = ({ title, value, subValue, icon, className = "" }: StatC
     <Card className={`border-club-gold/20 bg-club-dark-gray transition-all duration-200 hover:border-club-gold/40 hover:shadow-lg group ${className} ${
       isMobile ? 'w-full' : ''
     }`}>
-      <CardContent className={`h-full flex flex-col justify-between ${
-        isMobile 
-          ? 'p-4 min-h-[110px]' 
-          : 'p-4 sm:p-5 lg:p-6 min-h-[120px]'
-      }`}>
-        <div className="flex items-start justify-between">
-          <div className="min-w-0 flex-1 space-y-1.5 sm:space-y-2 lg:space-y-3">
+      <CardContent className={`h-[140px] p-5 flex flex-col justify-between`}>
+        <div className="flex items-start justify-between h-full">
+          <div className="min-w-0 flex-1 space-y-3 flex flex-col justify-center">
             <div className={`text-club-light-gray/70 font-medium leading-tight ${
               isMobile ? 'text-sm' : 'text-xs sm:text-sm'
             }`}>
@@ -48,8 +44,8 @@ export const StatCard = ({ title, value, subValue, icon, className = "" }: StatC
           </div>
           {icon && (
             <div className={`text-club-gold/30 flex-shrink-0 group-hover:text-club-gold/50 transition-colors ${
-              isMobile ? 'ml-2' : 'ml-3 sm:ml-4'
-            }`}>
+              isMobile ? 'ml-3' : 'ml-4'
+            } flex items-center justify-center`}>
               {icon}
             </div>
           )}

@@ -34,7 +34,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
 
   return (
     <TooltipProvider>
-      <div className={`grid gap-3 sm:gap-4 lg:gap-6 ${
+      <div className={`grid gap-4 ${
         isMobile 
           ? 'grid-cols-1 space-y-2' 
           : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5'
@@ -50,7 +50,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                   </div>
                 } 
                 value={player.matches} 
-                icon={<Calendar className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />} 
+                icon={<Calendar className="w-5 h-5 lg:w-6 lg:h-6" />} 
               />
             </div>
           </TooltipTrigger>
@@ -71,7 +71,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 } 
                 value={player.distance} 
                 subValue="kilometers" 
-                icon={<Activity className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />} 
+                icon={<Activity className="w-5 h-5 lg:w-6 lg:h-6" />} 
               />
             </div>
           </TooltipTrigger>
@@ -92,7 +92,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 } 
                 value={`${passCompletionRate}%`} 
                 subValue={`${player.passes_completed}/${player.passes_attempted} passes`} 
-                icon={<BarChart className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />} 
+                icon={<BarChart className="w-5 h-5 lg:w-6 lg:h-6" />} 
               />
             </div>
           </TooltipTrigger>
@@ -113,7 +113,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 } 
                 value={`${shotsAccuracy}%`} 
                 subValue={`${player.shots_on_target}/${player.shots_total} shots`} 
-                icon={<PieChart className="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" />} 
+                icon={<PieChart className="w-5 h-5 lg:w-6 lg:h-6" />} 
               />
             </div>
           </TooltipTrigger>
