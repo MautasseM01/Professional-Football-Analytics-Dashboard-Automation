@@ -62,10 +62,10 @@ const TeamOverview = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-6 p-6">
+      <div className="container-responsive space-y-6">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-club-gold">Team Overview</h1>
-          <p className="text-club-light-gray">
+          <h1 className="heading-primary">Team Overview</h1>
+          <p className="body-normal">
             Complete overview of team performance, statistics, and squad information
           </p>
         </div>
@@ -73,48 +73,48 @@ const TeamOverview = () => {
         {/* Season Statistics */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <Card className="bg-club-dark-gray border-club-gold/20">
-            <CardContent className="p-4">
+            <CardContent className="p-responsive-4">
               <div className="flex items-center gap-2">
                 <Trophy className="h-5 w-5 text-club-gold" />
                 <div>
-                  <p className="text-sm text-club-light-gray/70">League Position</p>
-                  <p className="text-2xl font-bold text-club-gold">#{teamStats.overview.position}</p>
+                  <p className="text-responsive-sm text-club-light-gray/70">League Position</p>
+                  <p className="text-responsive-2xl font-bold text-club-gold">#{teamStats.overview.position}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-club-dark-gray border-club-gold/20">
-            <CardContent className="p-4">
+            <CardContent className="p-responsive-4">
               <div className="flex items-center gap-2">
                 <Target className="h-5 w-5 text-club-gold" />
                 <div>
-                  <p className="text-sm text-club-light-gray/70">Points</p>
-                  <p className="text-2xl font-bold text-club-gold">{teamStats.overview.points}</p>
+                  <p className="text-responsive-sm text-club-light-gray/70">Points</p>
+                  <p className="text-responsive-2xl font-bold text-club-gold">{teamStats.overview.points}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-club-dark-gray border-club-gold/20">
-            <CardContent className="p-4">
+            <CardContent className="p-responsive-4">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-green-500" />
                 <div>
-                  <p className="text-sm text-club-light-gray/70">Goals For</p>
-                  <p className="text-2xl font-bold text-green-500">{teamStats.overview.goalsFor}</p>
+                  <p className="text-responsive-sm text-club-light-gray/70">Goals For</p>
+                  <p className="text-responsive-2xl font-bold text-green-500">{teamStats.overview.goalsFor}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-club-dark-gray border-club-gold/20">
-            <CardContent className="p-4">
+            <CardContent className="p-responsive-4">
               <div className="flex items-center gap-2">
                 <TrendingUp className="h-5 w-5 text-red-500 rotate-180" />
                 <div>
-                  <p className="text-sm text-club-light-gray/70">Goals Against</p>
-                  <p className="text-2xl font-bold text-red-500">{teamStats.overview.goalsAgainst}</p>
+                  <p className="text-responsive-sm text-club-light-gray/70">Goals Against</p>
+                  <p className="text-responsive-2xl font-bold text-red-500">{teamStats.overview.goalsAgainst}</p>
                 </div>
               </div>
             </CardContent>
@@ -124,13 +124,13 @@ const TeamOverview = () => {
         {/* Main Content Tabs */}
         <Tabs defaultValue="results" className="space-y-6">
           <TabsList className="bg-club-dark-gray border-club-gold/20">
-            <TabsTrigger value="results" className="data-[state=active]:bg-club-gold/20">
+            <TabsTrigger value="results" className="data-[state=active]:bg-club-gold/20 text-responsive-sm">
               Results & Fixtures
             </TabsTrigger>
-            <TabsTrigger value="squad" className="data-[state=active]:bg-club-gold/20">
+            <TabsTrigger value="squad" className="data-[state=active]:bg-club-gold/20 text-responsive-sm">
               Squad Overview
             </TabsTrigger>
-            <TabsTrigger value="performance" className="data-[state=active]:bg-club-gold/20">
+            <TabsTrigger value="performance" className="data-[state=active]:bg-club-gold/20 text-responsive-sm">
               Top Performers
             </TabsTrigger>
           </TabsList>
@@ -139,22 +139,22 @@ const TeamOverview = () => {
             {/* Recent Results */}
             <Card className="bg-club-dark-gray border-club-gold/20">
               <CardHeader>
-                <CardTitle className="text-club-gold flex items-center gap-2">
+                <CardTitle className="heading-quaternary text-club-gold flex items-center gap-2 mb-0">
                   <Calendar className="h-5 w-5" />
                   Recent Results
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {teamStats.recentResults.map((match, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-club-black/30 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-responsive-3 bg-club-black/30 rounded-lg">
                     <div className="flex flex-col">
-                      <span className="font-medium text-club-light-gray">{match.opponent}</span>
-                      <span className="text-sm text-club-light-gray/70 flex items-center gap-1">
+                      <span className="text-responsive-base font-medium text-club-light-gray">{match.opponent}</span>
+                      <span className="text-responsive-sm text-club-light-gray/70 flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
                         {match.location} • {new Date(match.date).toLocaleDateString()}
                       </span>
                     </div>
-                    <Badge className={`${getResultBadgeColor(match.result)} text-white`}>
+                    <Badge className={`${getResultBadgeColor(match.result)} text-white text-responsive-xs`}>
                       {match.result}
                     </Badge>
                   </div>
@@ -165,24 +165,24 @@ const TeamOverview = () => {
             {/* Upcoming Fixtures */}
             <Card className="bg-club-dark-gray border-club-gold/20">
               <CardHeader>
-                <CardTitle className="text-club-gold flex items-center gap-2">
+                <CardTitle className="heading-quaternary text-club-gold flex items-center gap-2 mb-0">
                   <Clock className="h-5 w-5" />
                   Upcoming Fixtures
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-3">
                 {teamStats.upcomingFixtures.map((match, index) => (
-                  <div key={index} className="flex items-center justify-between p-3 bg-club-black/30 rounded-lg">
+                  <div key={index} className="flex items-center justify-between p-responsive-3 bg-club-black/30 rounded-lg">
                     <div className="flex flex-col">
-                      <span className="font-medium text-club-light-gray">{match.opponent}</span>
-                      <span className="text-sm text-club-light-gray/70 flex items-center gap-1">
+                      <span className="text-responsive-base font-medium text-club-light-gray">{match.opponent}</span>
+                      <span className="text-responsive-sm text-club-light-gray/70 flex items-center gap-1">
                         <MapPin className="h-3 w-3" />
                         {match.location}
                       </span>
                     </div>
                     <div className="text-right">
-                      <div className="font-medium text-club-gold">{match.time}</div>
-                      <div className="text-sm text-club-light-gray/70">
+                      <div className="text-responsive-base font-medium text-club-gold">{match.time}</div>
+                      <div className="text-responsive-sm text-club-light-gray/70">
                         {new Date(match.date).toLocaleDateString()}
                       </div>
                     </div>
@@ -196,28 +196,28 @@ const TeamOverview = () => {
             <div className="grid md:grid-cols-2 gap-6">
               <Card className="bg-club-dark-gray border-club-gold/20">
                 <CardHeader>
-                  <CardTitle className="text-club-gold flex items-center gap-2">
+                  <CardTitle className="heading-quaternary text-club-gold flex items-center gap-2 mb-0">
                     <Users className="h-5 w-5" />
                     Squad Statistics
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="text-center p-3 bg-club-black/30 rounded-lg">
-                      <div className="text-2xl font-bold text-club-gold">{teamStats.squadStats.totalPlayers}</div>
-                      <div className="text-sm text-club-light-gray/70">Total Players</div>
+                    <div className="text-center p-responsive-3 bg-club-black/30 rounded-lg">
+                      <div className="text-responsive-2xl font-bold text-club-gold">{teamStats.squadStats.totalPlayers}</div>
+                      <div className="text-responsive-sm text-club-light-gray/70">Total Players</div>
                     </div>
-                    <div className="text-center p-3 bg-club-black/30 rounded-lg">
-                      <div className="text-2xl font-bold text-club-gold">{teamStats.squadStats.averageAge}</div>
-                      <div className="text-sm text-club-light-gray/70">Average Age</div>
+                    <div className="text-center p-responsive-3 bg-club-black/30 rounded-lg">
+                      <div className="text-responsive-2xl font-bold text-club-gold">{teamStats.squadStats.averageAge}</div>
+                      <div className="text-responsive-sm text-club-light-gray/70">Average Age</div>
                     </div>
-                    <div className="text-center p-3 bg-club-black/30 rounded-lg">
-                      <div className="text-2xl font-bold text-club-gold">{teamStats.squadStats.internationals}</div>
-                      <div className="text-sm text-club-light-gray/70">Internationals</div>
+                    <div className="text-center p-responsive-3 bg-club-black/30 rounded-lg">
+                      <div className="text-responsive-2xl font-bold text-club-gold">{teamStats.squadStats.internationals}</div>
+                      <div className="text-responsive-sm text-club-light-gray/70">Internationals</div>
                     </div>
-                    <div className="text-center p-3 bg-club-black/30 rounded-lg">
-                      <div className="text-2xl font-bold text-club-gold">{teamStats.squadStats.homegrownPlayers}</div>
-                      <div className="text-sm text-club-light-gray/70">Homegrown</div>
+                    <div className="text-center p-responsive-3 bg-club-black/30 rounded-lg">
+                      <div className="text-responsive-2xl font-bold text-club-gold">{teamStats.squadStats.homegrownPlayers}</div>
+                      <div className="text-responsive-sm text-club-light-gray/70">Homegrown</div>
                     </div>
                   </div>
                 </CardContent>
@@ -225,19 +225,19 @@ const TeamOverview = () => {
 
               <Card className="bg-club-dark-gray border-club-gold/20">
                 <CardHeader>
-                  <CardTitle className="text-club-gold">Win Rate Analysis</CardTitle>
+                  <CardTitle className="heading-quaternary text-club-gold mb-0">Win Rate Analysis</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="space-y-3">
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-responsive-sm mb-1">
                         <span>Wins</span>
                         <span>{teamStats.overview.wins}/20 games</span>
                       </div>
                       <Progress value={(teamStats.overview.wins / 20) * 100} className="h-2" />
                     </div>
                     <div>
-                      <div className="flex justify-between text-sm mb-1">
+                      <div className="flex justify-between text-responsive-sm mb-1">
                         <span>Goal Difference</span>
                         <span>+{teamStats.overview.goalsFor - teamStats.overview.goalsAgainst}</span>
                       </div>
@@ -252,25 +252,25 @@ const TeamOverview = () => {
           <TabsContent value="performance" className="space-y-6">
             <Card className="bg-club-dark-gray border-club-gold/20">
               <CardHeader>
-                <CardTitle className="text-club-gold flex items-center gap-2">
+                <CardTitle className="heading-quaternary text-club-gold flex items-center gap-2 mb-0">
                   <Award className="h-5 w-5" />
                   Top Performers This Season
                 </CardTitle>
-                <CardDescription className="text-club-light-gray/70">
+                <CardDescription className="text-responsive-sm text-club-light-gray/70">
                   Leading players across different categories
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid md:grid-cols-2 gap-6">
                   {teamStats.topPerformers.map((player, index) => (
-                    <div key={index} className="p-4 bg-club-black/30 rounded-lg">
+                    <div key={index} className="p-responsive-4 bg-club-black/30 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
-                        <h3 className="font-medium text-club-light-gray">{player.name}</h3>
-                        <Badge variant="outline" className="text-club-gold border-club-gold/30">
+                        <h3 className="text-responsive-base font-medium text-club-light-gray">{player.name}</h3>
+                        <Badge variant="outline" className="text-club-gold border-club-gold/30 text-responsive-xs">
                           {player.position}
                         </Badge>
                       </div>
-                      <div className="space-y-1 text-sm text-club-light-gray/70">
+                      <div className="space-y-1 text-responsive-sm text-club-light-gray/70">
                         {player.goals !== undefined && (
                           <div className="flex justify-between">
                             <span>Goals:</span>
