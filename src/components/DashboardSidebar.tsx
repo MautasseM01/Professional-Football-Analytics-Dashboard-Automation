@@ -15,6 +15,7 @@ export const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
+  const [manuallyToggled, setManuallyToggled] = useState<string | null>(null);
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const location = useLocation();
   const { profile } = useUserProfile();
@@ -86,13 +87,32 @@ export const DashboardSidebar = () => {
     const activeParent = getActiveParentMenu(location.pathname);
     console.log('Current pathname:', location.pathname);
     console.log('Active parent menu:', activeParent);
-    if (activeParent) {
+    
+    // Only auto-open if it's not the currently manually toggled item
+    if (activeParent && manuallyToggled !== activeParent) {
       setOpenSubMenu(activeParent);
     }
-  }, [location.pathname, filteredNavigationItems]);
+    
+    // Reset manual toggle state when navigating to a different parent
+    if (activeParent !== manuallyToggled) {
+      setManuallyToggled(null);
+    }
+  }, [location.pathname, filteredNavigationItems, manuallyToggled]);
 
   const toggleSubMenu = (name: string) => {
-    setOpenSubMenu(openSubMenu === name ? null : name);
+    const activeParent = getActiveParentMenu(location.pathname);
+    
+    if (openSubMenu === name) {
+      // If we're closing the currently active parent menu, mark it as manually toggled
+      if (name === activeParent) {
+        setManuallyToggled(name);
+      }
+      setOpenSubMenu(null);
+    } else {
+      // Opening a submenu - clear manual toggle state
+      setManuallyToggled(null);
+      setOpenSubMenu(name);
+    }
   };
 
   const toggleMobileMenu = () => {
