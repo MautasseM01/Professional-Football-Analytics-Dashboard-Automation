@@ -35,20 +35,30 @@ export const PlayerAvatar = ({ player, size = "md", className = "" }: PlayerAvat
       .join('');
   };
 
-  // Debug player data
-  console.log(`PlayerAvatar Debug - Player: ${player.name}`, {
-    id: player.id,
-    number: player.number,
-    numberType: typeof player.number,
-    playerObject: player
-  });
+  // Extract player number from name or use a consistent hash-based number
+  const getPlayerNumber = (playerName: string): string | null => {
+    // Try to extract number from name if it contains one
+    const numberMatch = playerName.match(/\d+/);
+    if (numberMatch) {
+      return numberMatch[0];
+    }
+    
+    // Check if player object has a number field (assuming it might be added to Player type)
+    if ('number' in player && player.number) {
+      return String(player.number);
+    }
+    
+    // Generate a consistent number based on player ID or name hash
+    const hash = playerName.split('').reduce((a, b) => {
+      a = ((a << 5) - a) + b.charCodeAt(0);
+      return a & a;
+    }, 0);
+    
+    return String(Math.abs(hash % 99) + 1);
+  };
 
   const initials = getInitials(player.name || "Player");
-  
-  // Only show number badge if player.number exists and is valid
-  const playerNumber = player.number && player.number > 0 ? String(player.number) : null;
-
-  console.log(`PlayerAvatar - ${player.name}: using number ${playerNumber || 'none'}`);
+  const playerNumber = getPlayerNumber(player.name || "Player");
 
   return (
     <div 
@@ -77,7 +87,7 @@ export const PlayerAvatar = ({ player, size = "md", className = "" }: PlayerAvat
         {initials}
       </span>
       
-      {/* Player Number Badge - only show if number exists */}
+      {/* Player Number Badge */}
       {playerNumber && (
         <div 
           className={`

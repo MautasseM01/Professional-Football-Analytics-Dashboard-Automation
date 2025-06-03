@@ -28,12 +28,6 @@ export const usePlayerData = () => {
       console.log("Players data received:", data);
       
       if (data && data.length > 0) {
-        // Debug each player's number field
-        console.log("Player numbers debug:");
-        data.forEach(player => {
-          console.log(`${player.name}: number = ${player.number} (type: ${typeof player.number})`);
-        });
-        
         // Log the first player to see its structure
         console.log("First player structure:", data[0]);
         
@@ -83,7 +77,6 @@ export const usePlayerData = () => {
   const selectPlayer = (id: number) => {
     const player = players.find(p => p.id === id);
     if (player) {
-      console.log(`Selected player: ${player.name}, number: ${player.number}`);
       setSelectedPlayer(player);
     }
   };
