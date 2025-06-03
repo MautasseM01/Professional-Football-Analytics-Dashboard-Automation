@@ -81,12 +81,15 @@ export const DashboardSidebar = () => {
     return null;
   };
 
+  // Set the active parent menu when location changes and keep it open
   useEffect(() => {
     const activeParent = getActiveParentMenu(location.pathname);
+    console.log('Current pathname:', location.pathname);
+    console.log('Active parent menu:', activeParent);
     if (activeParent) {
       setOpenSubMenu(activeParent);
     }
-  }, [location.pathname]);
+  }, [location.pathname, filteredNavigationItems]);
 
   const toggleSubMenu = (name: string) => {
     setOpenSubMenu(openSubMenu === name ? null : name);
