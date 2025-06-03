@@ -28,10 +28,10 @@ export const usePlayerData = () => {
       console.log("Players data received:", data);
       
       if (data && data.length > 0) {
-        // Log the first player to see its structure
+        // Log the first player to see its structure and verify number field
         console.log("First player structure:", data[0]);
+        console.log("Player numbers in database:", data.map(p => ({ name: p.name, id: p.id, number: p.number })));
         
-        // IMPORTANT: Always use the data from Supabase, no hardcoded override
         setPlayers(data as Player[]);
         
         // Set the first player as selected by default
@@ -77,6 +77,7 @@ export const usePlayerData = () => {
   const selectPlayer = (id: number) => {
     const player = players.find(p => p.id === id);
     if (player) {
+      console.log(`Selected player: ${player.name}, Number: ${player.number}`);
       setSelectedPlayer(player);
     }
   };

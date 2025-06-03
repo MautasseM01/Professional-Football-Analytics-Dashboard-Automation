@@ -252,6 +252,7 @@ export type Database = {
           matches: number | null
           maxSpeed: number | null
           name: string | null
+          number: number | null
           passCompletionPct: number | null
           passes_attempted: number | null
           passes_completed: number | null
@@ -270,6 +271,7 @@ export type Database = {
           matches?: number | null
           maxSpeed?: number | null
           name?: string | null
+          number?: number | null
           passCompletionPct?: number | null
           passes_attempted?: number | null
           passes_completed?: number | null
@@ -288,6 +290,7 @@ export type Database = {
           matches?: number | null
           maxSpeed?: number | null
           name?: string | null
+          number?: number | null
           passCompletionPct?: number | null
           passes_attempted?: number | null
           passes_completed?: number | null

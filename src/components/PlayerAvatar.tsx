@@ -35,30 +35,13 @@ export const PlayerAvatar = ({ player, size = "md", className = "" }: PlayerAvat
       .join('');
   };
 
-  // Extract player number from name or use a consistent hash-based number
-  const getPlayerNumber = (playerName: string): string | null => {
-    // Try to extract number from name if it contains one
-    const numberMatch = playerName.match(/\d+/);
-    if (numberMatch) {
-      return numberMatch[0];
-    }
-    
-    // Check if player object has a number field (assuming it might be added to Player type)
-    if ('number' in player && player.number) {
-      return String(player.number);
-    }
-    
-    // Generate a consistent number based on player ID or name hash
-    const hash = playerName.split('').reduce((a, b) => {
-      a = ((a << 5) - a) + b.charCodeAt(0);
-      return a & a;
-    }, 0);
-    
-    return String(Math.abs(hash % 99) + 1);
-  };
-
   const initials = getInitials(player.name || "Player");
-  const playerNumber = getPlayerNumber(player.name || "Player");
+  
+  // Debug logging to verify player data
+  console.log(`PlayerAvatar Debug - Player: ${player.name}, ID: ${player.id}, Number: ${player.number}`);
+  
+  // Read player number directly from database field with fallback
+  const playerNumber = player.number || null;
 
   return (
     <div 
@@ -87,8 +70,8 @@ export const PlayerAvatar = ({ player, size = "md", className = "" }: PlayerAvat
         {initials}
       </span>
       
-      {/* Player Number Badge */}
-      {playerNumber && (
+      {/* Player Number Badge - only show if number exists and is valid */}
+      {playerNumber && playerNumber > 0 && (
         <div 
           className={`
             ${numberBadgeSizes[size]}
