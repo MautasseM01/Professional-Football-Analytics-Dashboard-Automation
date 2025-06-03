@@ -1,4 +1,3 @@
-
 import { Player } from "@/types";
 import { StatCard } from "./StatCard";
 import { 
@@ -59,7 +58,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
                 <PlayerAvatar 
                   player={player}
                   size="lg"
-                  className="rounded-xl border-2 border-club-gold/30"
+                  className="ring-2 ring-club-gold/50"
                 />
               </div>
               

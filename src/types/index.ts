@@ -13,7 +13,8 @@ export interface Player {
   tackles_won: number;
   heatmapUrl: string;
   reportUrl: string;
-  maxSpeed?: number; // Added maxSpeed property as optional
+  maxSpeed?: number;
+  number?: number; // Added player number field
 }
 
 export interface AuthUser {
