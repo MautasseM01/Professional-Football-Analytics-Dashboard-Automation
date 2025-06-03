@@ -12,7 +12,7 @@ export const PlayerPerformanceSection = ({ player }: PlayerPerformanceSectionPro
     <section className="space-y-4">
       <header className="flex items-center gap-2">
         <LineChart className="w-5 h-5 text-club-gold flex-shrink-0" />
-        <h2 className="text-lg sm:text-xl lg:text-2xl font-semibold text-club-gold">
+        <h2 className="heading-tertiary mb-0">
           Performance Trends
         </h2>
       </header>
