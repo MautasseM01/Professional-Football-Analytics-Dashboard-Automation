@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Player } from "@/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -11,7 +10,7 @@ import {
   CardTitle 
 } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ImageOff } from "lucide-react";
+import { ImageOff, ZoomIn } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getGoogleDriveThumbnailUrl } from "@/lib/image-utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -41,12 +40,10 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   // Reset state when player changes to ensure image corresponds to current player
   useEffect(() => {
     console.log(`Player in HeatmapCard: ${player.name}, Setting image URL to: ${player.heatmapUrl}`);
-    // Reset the image error state when player changes
     setImageError(false);
     setImageLoaded(false);
-    // Set the image URL directly from the player data
     setImageUrl(player.heatmapUrl);
-  }, [player.id]); // Using player.id ensures this runs only when the selected player changes
+  }, [player.id]);
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.error("Error loading heatmap image:", e);
@@ -66,7 +63,6 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   };
 
   const tryAlternativeUrl = () => {
-    // Try using an image proxy service or thumbnail
     const thumbnailUrl = getGoogleDriveThumbnailUrl(player.heatmapUrl);
     if (thumbnailUrl) {
       console.log(`Trying thumbnail URL for ${player.name}:`, thumbnailUrl);
@@ -83,20 +79,17 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
     setImageLoaded(false);
   };
 
-  // Handle period change
   const handlePeriodChange = (period: string) => {
     setSelectedPeriod(period as MatchPeriod);
-    // In a real app, this would trigger loading a different heatmap based on the period
     console.log(`Selected period changed to: ${period}`);
-    // For demonstration, we simulate changing the image - in a real app you'd fetch different data
     toast({
       title: "Period Changed",
       description: `Heatmap updated to show ${period} data`,
     });
   };
 
-  // Show football pitch overlay only when there's no image or when there's an error
-  const showPitchOverlay = !player.heatmapUrl || imageError || !imageLoaded;
+  // Only show football pitch overlay when there's no image or when there's an error
+  const showPitchOverlay = !player.heatmapUrl || imageError;
 
   return (
     <Card className="border-club-gold/20 bg-club-dark-gray w-full h-full flex flex-col">
@@ -118,7 +111,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
             <Select onValueChange={handlePeriodChange} value={selectedPeriod}>
               <SelectTrigger className={`bg-club-black text-white border-club-gold/30 focus:ring-club-gold/50 ${
                 isMobile 
-                  ? 'w-full h-9 text-sm' 
+                  ? 'w-full h-11 text-sm min-h-[44px]' 
                   : 'w-full sm:w-[160px] lg:w-[180px] h-10'
               }`}>
                 <SelectValue placeholder="Select Period" />
@@ -137,11 +130,13 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
         {player.heatmapUrl ? (
           <div className="space-y-3 sm:space-y-4 flex-1 flex flex-col">
             <div 
-              className="relative w-full rounded-lg overflow-hidden bg-green-800/20 border border-green-700/30 flex-1"
+              className={`relative w-full rounded-lg overflow-hidden bg-green-800/20 border border-green-700/30 flex-1 ${
+                isMobile ? 'touch-pan-x touch-pan-y' : ''
+              }`}
               style={{ 
                 aspectRatio: isMobile ? '4/3' : '16/10',
                 minHeight: isMobile ? '200px' : '300px',
-                maxHeight: isMobile ? '300px' : '500px'
+                maxHeight: isMobile ? '350px' : '500px'
               }}
             >
               {/* Football pitch SVG overlay - only show when no image or error */}
@@ -196,7 +191,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                       variant="outline" 
                       onClick={resetImageError}
                       className={`border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold flex-1 ${
-                        isMobile ? 'text-xs h-8' : 'text-xs sm:text-sm h-9'
+                        isMobile ? 'text-xs h-11 min-h-[44px]' : 'text-xs sm:text-sm h-9'
                       }`}
                       size="sm"
                     >
@@ -206,7 +201,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                       variant="outline" 
                       onClick={tryAlternativeUrl}
                       className={`border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold flex-1 ${
-                        isMobile ? 'text-xs h-8' : 'text-xs sm:text-sm h-9'
+                        isMobile ? 'text-xs h-11 min-h-[44px]' : 'text-xs sm:text-sm h-9'
                       }`}
                       size="sm"
                     >
@@ -225,18 +220,29 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                   <img 
                     src={imageUrl || player.heatmapUrl} 
                     alt={`${player.name} heatmap`}
-                    className="absolute inset-0 w-full h-full object-cover"
+                    className={`absolute inset-0 w-full h-full object-cover ${
+                      isMobile ? 'touch-manipulation' : ''
+                    }`}
                     crossOrigin="anonymous"
                     onError={handleImageError}
                     onLoad={handleImageLoad}
                     referrerPolicy="no-referrer"
+                    style={isMobile ? { touchAction: 'pan-x pan-y pinch-zoom' } : {}}
                   />
                   {imageLoaded && (
-                    <div className={`absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-club-black/80 text-club-light-gray px-2 sm:px-3 py-1 sm:py-1.5 rounded-md z-20 font-medium ${
-                      isMobile ? 'text-xs' : 'text-xs'
-                    }`}>
-                      {player.name}'s Heatmap • {selectedPeriod}
-                    </div>
+                    <>
+                      <div className={`absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-club-black/80 text-club-light-gray px-2 sm:px-3 py-1 sm:py-1.5 rounded-md z-20 font-medium ${
+                        isMobile ? 'text-xs' : 'text-xs'
+                      }`}>
+                        {player.name}'s Heatmap • {selectedPeriod}
+                      </div>
+                      {isMobile && (
+                        <div className="absolute top-2 right-2 bg-club-black/80 text-club-light-gray px-2 py-1 rounded-md z-20 flex items-center gap-1">
+                          <ZoomIn className="w-3 h-3" />
+                          <span className="text-xs">Pinch to zoom</span>
+                        </div>
+                      )}
+                    </>
                   )}
                 </>
               )}

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -25,22 +24,25 @@ export const DashboardSidebar = () => {
   useEffect(() => {
     if (isMobile) {
       setCollapsed(true);
-      setMobileOpen(false);
     }
   }, [isMobile]);
 
-  // Close mobile menu on route change
+  // Keep sidebar open on page changes for better navigation awareness
+  // Only close mobile overlay when navigating
   useEffect(() => {
-    if (isMobile) {
-      setMobileOpen(false);
+    if (isMobile && mobileOpen) {
+      // Close mobile overlay after a delay to allow user to see the navigation
+      const timer = setTimeout(() => {
+        setMobileOpen(false);
+      }, 300);
+      return () => clearTimeout(timer);
     }
-  }, [location.pathname, isMobile]);
+  }, [location.pathname, isMobile, mobileOpen]);
 
   // Debug: Log the current user role and navigation filtering
   console.log('Current user role:', profile?.role);
   console.log('All navigation items:', navigationItems);
 
-  // Filter navigation items based on user role
   const filteredNavigationItems = navigationItems.filter(item => {
     const hasItemAccess = hasAccess(profile?.role, item.allowedRoles);
     console.log(`Item "${item.name}" - Role: ${profile?.role}, Has Access: ${hasItemAccess}`, item.allowedRoles);
@@ -60,7 +62,6 @@ export const DashboardSidebar = () => {
 
   console.log('Filtered navigation items:', filteredNavigationItems);
 
-  // Function to determine which parent menu should be open based on current route
   const getActiveParentMenu = (pathname: string) => {
     for (const item of filteredNavigationItems) {
       if (item.subItems) {
@@ -75,7 +76,6 @@ export const DashboardSidebar = () => {
     return null;
   };
 
-  // Update open submenu based on current route
   useEffect(() => {
     const activeParent = getActiveParentMenu(location.pathname);
     if (activeParent) {
@@ -91,18 +91,18 @@ export const DashboardSidebar = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  // Mobile overlay
+  // Mobile overlay with smooth animations
   if (isMobile && mobileOpen) {
     return (
       <>
-        {/* Mobile overlay */}
+        {/* Mobile overlay with transition */}
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300"
           onClick={() => setMobileOpen(false)}
         />
         
-        {/* Mobile sidebar */}
-        <div className="fixed inset-y-0 left-0 z-50 w-64 bg-club-black border-r border-club-gold/20 lg:hidden">
+        {/* Mobile sidebar with slide animation */}
+        <div className="fixed inset-y-0 left-0 z-50 w-72 bg-club-black border-r border-club-gold/20 lg:hidden transform transition-transform duration-300 ease-in-out">
           <TooltipProvider delayDuration={200}>
             <div className="h-full flex flex-col">
               <div className="flex items-center justify-between px-4 py-5 border-b border-club-gold/20">
@@ -118,7 +118,7 @@ export const DashboardSidebar = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => setMobileOpen(false)}
-                  className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10"
+                  className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
                   aria-label="Close sidebar"
                 >
                   <X size={20} />
@@ -154,13 +154,13 @@ export const DashboardSidebar = () => {
 
   return (
     <>
-      {/* Mobile hamburger button */}
+      {/* Mobile hamburger button - touch-friendly */}
       {isMobile && (
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleMobileMenu}
-          className="fixed top-4 left-4 z-30 text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 bg-club-black/80 backdrop-blur-sm lg:hidden"
+          className="fixed top-4 left-4 z-30 text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 bg-club-black/80 backdrop-blur-sm lg:hidden min-h-[44px] min-w-[44px]"
           aria-label="Open navigation menu"
         >
           <Menu size={20} />
@@ -189,7 +189,7 @@ export const DashboardSidebar = () => {
               variant="ghost"
               size="icon"
               onClick={() => setCollapsed(!collapsed)}
-              className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10"
+              className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <Menu size={20} />
