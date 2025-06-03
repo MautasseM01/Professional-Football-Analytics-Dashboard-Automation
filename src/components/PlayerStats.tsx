@@ -20,8 +20,7 @@ import {
 } from "@/components/ui/tooltip";
 import { PerformanceTrendsCard } from "./PerformanceTrendsCard";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { getGoogleDriveThumbnailUrl } from "@/lib/image-utils";
+import { PlayerAvatar } from "./PlayerAvatar";
 
 interface PlayerStatsProps {
   player: Player | null;
@@ -49,15 +48,6 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
     ? ((player.shots_on_target / player.shots_total) * 100).toFixed(1)
     : "0";
 
-  // Generate player avatar initials from name
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase())
-      .slice(0, 2)
-      .join('');
-  };
-
   return (
     <TooltipProvider>
       <div className="w-full max-w-7xl mx-auto space-y-6 px-4 sm:px-6 lg:px-8">
@@ -66,19 +56,11 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           <CardContent className="p-4 sm:p-6">
             <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-start sm:gap-6">
               <div className="flex-shrink-0">
-                <Avatar className="h-20 w-20 sm:h-24 sm:w-24 lg:h-28 lg:w-28 rounded-xl border-2 border-club-gold/30">
-                  {player.heatmapUrl ? (
-                    <AvatarImage 
-                      src={getGoogleDriveThumbnailUrl(player.heatmapUrl) || player.heatmapUrl} 
-                      alt={player.name} 
-                      className="object-cover"
-                    />
-                  ) : (
-                    <AvatarFallback className="text-xl sm:text-2xl lg:text-3xl bg-club-gold/20 text-club-gold rounded-xl">
-                      {getInitials(player.name || "Player Name")}
-                    </AvatarFallback>
-                  )}
-                </Avatar>
+                <PlayerAvatar 
+                  player={player}
+                  size="lg"
+                  className="rounded-xl border-2 border-club-gold/30"
+                />
               </div>
               
               <div className="text-center sm:text-left flex-1 min-w-0">

@@ -10,7 +10,7 @@ import { Player } from "@/types";
 import { ChartContainer, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from "recharts";
 import { MultiPlayerSelect } from "@/components/MultiPlayerSelect";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { Badge } from "@/components/ui/badge";
 import { UserRound } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
@@ -78,16 +78,6 @@ export default function PlayerComparison() {
     
   const highestTacklesWon = useMemo(() => 
     getHighestValuesInRow(player => player.tackles_won), [selectedPlayers]);
-
-  // Generate initials from player name for avatar fallback
-  const getPlayerInitials = (name: string): string => {
-    return name
-      .split(' ')
-      .map(part => part.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
 
   // Prepare data for radar chart
   const prepareRadarData = () => {
@@ -195,12 +185,10 @@ export default function PlayerComparison() {
                         {selectedPlayers.map((player) => (
                           <TableHead key={player.id} className="text-center">
                             <div className="flex items-center justify-center gap-2">
-                              <Avatar className="h-8 w-8">
-                                <AvatarImage src={`https://i.pravatar.cc/100?u=${player.id}`} alt={player.name} />
-                                <AvatarFallback className="bg-club-dark-gray text-club-gold">
-                                  {getPlayerInitials(player.name)}
-                                </AvatarFallback>
-                              </Avatar>
+                              <PlayerAvatar 
+                                player={player}
+                                size="sm"
+                              />
                               <span>{player.name}</span>
                             </div>
                           </TableHead>

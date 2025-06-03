@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { Check, ChevronsUpDown, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ import {
 } from "@/components/ui/popover";
 import { Badge } from "@/components/ui/badge";
 import { Player } from "@/types";
+import { PlayerAvatar } from "./PlayerAvatar";
 
 interface MultiPlayerSelectProps {
   players: Player[];
@@ -124,13 +126,16 @@ export function MultiPlayerSelect({
                         }`}
                       />
                       <div className="flex flex-1 items-center justify-between">
-                        <div>
-                          <span>{player.name}</span>
-                          {player.position && (
-                            <span className="ml-2 text-xs text-muted-foreground">
-                              ({player.position})
-                            </span>
-                          )}
+                        <div className="flex items-center gap-2">
+                          <PlayerAvatar player={player} size="sm" />
+                          <div>
+                            <span>{player.name}</span>
+                            {player.position && (
+                              <span className="ml-2 text-xs text-muted-foreground">
+                                ({player.position})
+                              </span>
+                            )}
+                          </div>
                         </div>
                         {isDisabled && (
                           <span className="text-xs text-muted-foreground">
@@ -151,7 +156,8 @@ export function MultiPlayerSelect({
       {selectedPlayerIds.length > 0 && (
         <div className="flex flex-wrap gap-2 mt-2">
           {Array.from(selectedPlayersMap.values()).map(player => (
-            <Badge key={player.id} variant="secondary" className="px-3 py-1.5">
+            <Badge key={player.id} variant="secondary" className="px-3 py-1.5 flex items-center gap-2">
+              <PlayerAvatar player={player} size="sm" />
               {player.name}
               <Button
                 variant="ghost"
