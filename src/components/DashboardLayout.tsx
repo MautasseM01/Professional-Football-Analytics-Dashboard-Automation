@@ -1,17 +1,23 @@
 
 import React from "react";
 import { DashboardSidebar } from "./DashboardSidebar";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
 export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+  const isMobile = useIsMobile();
+
   return (
-    <div className="flex h-screen bg-club-black text-white">
+    <div className="flex h-screen bg-club-black text-white overflow-hidden">
       <DashboardSidebar />
-      <main className="flex-1 overflow-auto">
-        <div className="w-full max-w-7xl mx-auto transition-all duration-300 ease-in-out">
+      <main className={cn(
+        "flex-1 overflow-auto transition-all duration-300 ease-in-out",
+        isMobile && "pt-16" // Add top padding for mobile hamburger button
+      )}>
+        <div className="w-full max-w-7xl mx-auto">
           {children}
         </div>
       </main>

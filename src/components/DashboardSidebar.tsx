@@ -20,42 +20,36 @@ export const DashboardSidebar = () => {
   const { profile } = useUserProfile();
   const isMobile = useIsMobile();
 
-  // Auto-collapse sidebar on mobile
+  // Auto-collapse sidebar on mobile and set initial desktop state
   useEffect(() => {
     if (isMobile) {
       setCollapsed(true);
+      setMobileOpen(false);
+    } else {
+      // On desktop, start expanded for better UX
+      setCollapsed(false);
     }
   }, [isMobile]);
 
-  // Keep sidebar open and expanded for navigation awareness
-  // Only close mobile overlay when navigating, but keep desktop sidebar open
+  // Close mobile sidebar when route changes
   useEffect(() => {
     if (isMobile && mobileOpen) {
-      // Close mobile overlay after a delay to allow user to see the navigation
       const timer = setTimeout(() => {
         setMobileOpen(false);
-      }, 300);
+      }, 150);
       return () => clearTimeout(timer);
     }
-    
-    // For desktop: keep sidebar expanded and don't auto-collapse when navigating
-    if (!isMobile && collapsed) {
-      setCollapsed(false);
-    }
-  }, [location.pathname, isMobile, mobileOpen, collapsed]);
+  }, [location.pathname, isMobile, mobileOpen]);
 
   // Debug: Log the current user role and navigation filtering
   console.log('Current user role:', profile?.role);
-  console.log('All navigation items:', navigationItems);
 
   const filteredNavigationItems = navigationItems.filter(item => {
     const hasItemAccess = hasAccess(profile?.role, item.allowedRoles);
-    console.log(`Item "${item.name}" - Role: ${profile?.role}, Has Access: ${hasItemAccess}`, item.allowedRoles);
     return hasItemAccess;
   }).map(item => {
     const filteredSubItems = item.subItems?.filter(subItem => {
       const hasSubItemAccess = hasAccess(profile?.role, subItem.allowedRoles);
-      console.log(`SubItem "${subItem.name}" - Role: ${profile?.role}, Has Access: ${hasSubItemAccess}`, subItem.allowedRoles);
       return hasSubItemAccess;
     });
     
@@ -64,8 +58,6 @@ export const DashboardSidebar = () => {
       subItems: filteredSubItems
     };
   });
-
-  console.log('Filtered navigation items:', filteredNavigationItems);
 
   const getActiveParentMenu = (pathname: string) => {
     for (const item of filteredNavigationItems) {
@@ -84,8 +76,6 @@ export const DashboardSidebar = () => {
   // Always keep the active parent menu open
   useEffect(() => {
     const activeParent = getActiveParentMenu(location.pathname);
-    console.log('Current pathname:', location.pathname);
-    console.log('Active parent menu:', activeParent);
     
     if (activeParent) {
       setOpenSubMenus(prev => new Set([...prev, activeParent]));
@@ -108,18 +98,22 @@ export const DashboardSidebar = () => {
     setMobileOpen(!mobileOpen);
   };
 
-  // Mobile overlay with smooth animations
+  const toggleDesktopSidebar = () => {
+    setCollapsed(!collapsed);
+  };
+
+  // Mobile overlay with improved animations
   if (isMobile && mobileOpen) {
     return (
       <>
-        {/* Mobile overlay with transition */}
+        {/* Mobile backdrop */}
         <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-black/60 z-40 lg:hidden transition-opacity duration-300 ease-out"
           onClick={() => setMobileOpen(false)}
         />
         
-        {/* Mobile sidebar with slide animation */}
-        <div className="fixed inset-y-0 left-0 z-50 w-72 bg-club-black border-r border-club-gold/20 lg:hidden transform transition-transform duration-300 ease-in-out">
+        {/* Mobile sidebar with improved slide animation */}
+        <div className="fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] bg-club-black border-r border-club-gold/20 lg:hidden transform transition-transform duration-300 ease-out">
           <TooltipProvider delayDuration={200}>
             <div className="h-full flex flex-col">
               <div className="flex items-center justify-between px-4 py-5 border-b border-club-gold/20">
@@ -135,15 +129,15 @@ export const DashboardSidebar = () => {
                   variant="ghost"
                   size="icon"
                   onClick={() => setMobileOpen(false)}
-                  className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
+                  className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[48px] min-w-[48px] touch-manipulation"
                   aria-label="Close sidebar"
                 >
-                  <X size={20} />
+                  <X size={24} />
                 </Button>
               </div>
 
               <div className="flex-1 overflow-y-auto py-4">
-                <nav className="px-2 space-y-1">
+                <nav className="px-3 space-y-2">
                   {filteredNavigationItems.map((item) => (
                     <SidebarNavItem 
                       key={item.name}
@@ -171,33 +165,33 @@ export const DashboardSidebar = () => {
 
   return (
     <>
-      {/* Mobile hamburger button - touch-friendly */}
+      {/* Mobile hamburger button with improved touch target */}
       {isMobile && (
         <Button
           variant="ghost"
           size="icon"
           onClick={toggleMobileMenu}
-          className="fixed top-4 left-4 z-30 text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 bg-club-black/80 backdrop-blur-sm lg:hidden min-h-[44px] min-w-[44px]"
+          className="fixed top-4 left-4 z-30 text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 bg-club-black/90 backdrop-blur-sm lg:hidden min-h-[48px] min-w-[48px] touch-manipulation shadow-lg"
           aria-label="Open navigation menu"
         >
-          <Menu size={20} />
+          <Menu size={24} />
         </Button>
       )}
 
-      {/* Desktop sidebar - keep expanded for navigation awareness */}
+      {/* Desktop sidebar with improved responsive behavior */}
       <TooltipProvider delayDuration={200}>
         <div
           className={`transition-all duration-300 ease-in-out h-screen flex flex-col border-r border-club-gold/20 bg-club-black ${
-            collapsed ? "w-16" : "w-64"
+            collapsed ? "w-20" : "w-72"
           } ${isMobile ? "hidden" : ""}`}
         >
-          <div className="flex items-center justify-between px-4 py-5 border-b border-club-gold/20">
+          <div className="flex items-center justify-between px-4 py-5 border-b border-club-gold/20 min-h-[73px]">
             {!collapsed && (
-              <div className="flex items-center">
+              <div className="flex items-center overflow-hidden">
                 <img
                   src="/lovable-uploads/eb223be6-87a6-402c-a270-20313a00080c.png"
                   alt="Club Logo"
-                  className="w-8 h-8 mr-2 rounded-lg"
+                  className="w-8 h-8 mr-3 rounded-lg flex-shrink-0"
                 />
                 <span className="text-lg font-semibold text-club-gold truncate">SMH Analytics</span>
               </div>
@@ -205,8 +199,8 @@ export const DashboardSidebar = () => {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setCollapsed(!collapsed)}
-              className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
+              onClick={toggleDesktopSidebar}
+              className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[44px] min-w-[44px] flex-shrink-0"
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
             >
               <Menu size={20} />
@@ -214,7 +208,7 @@ export const DashboardSidebar = () => {
           </div>
 
           <div className="flex-1 overflow-y-auto py-4">
-            <nav className="px-2 space-y-1">
+            <nav className={`${collapsed ? 'px-2' : 'px-3'} space-y-1`}>
               {filteredNavigationItems.map((item) => (
                 <SidebarNavItem 
                   key={item.name}
