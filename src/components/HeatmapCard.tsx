@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ImageOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getGoogleDriveThumbnailUrl } from "@/lib/image-utils";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface HeatmapCardProps {
   player: Player;
@@ -34,6 +35,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<MatchPeriod>('Full Match');
+  const isMobile = useIsMobile();
   
   // Reset state when player changes to ensure image corresponds to current player
   useEffect(() => {
@@ -85,19 +87,27 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
 
   return (
     <Card className="border-club-gold/20 bg-club-dark-gray w-full h-full flex flex-col">
-      <CardHeader className="p-4 sm:p-6 pb-3 sm:pb-4 flex-shrink-0">
-        <div className="flex flex-col space-y-3 sm:space-y-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
+      <CardHeader className={`flex-shrink-0 ${isMobile ? 'p-3 pb-2' : 'p-4 sm:p-6 pb-3 sm:pb-4'}`}>
+        <div className={`flex flex-col ${isMobile ? 'space-y-2' : 'space-y-3 sm:space-y-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4'}`}>
           <div className="min-w-0 flex-1">
-            <CardTitle className="text-club-gold text-lg sm:text-xl lg:text-2xl font-semibold">
+            <CardTitle className={`text-club-gold font-semibold ${
+              isMobile ? 'text-base' : 'text-lg sm:text-xl lg:text-2xl'
+            }`}>
               Performance Heatmap
             </CardTitle>
-            <CardDescription className="text-sm sm:text-base text-club-light-gray/70 mt-1">
+            <CardDescription className={`text-club-light-gray/70 mt-1 ${
+              isMobile ? 'text-xs' : 'text-sm sm:text-base'
+            }`}>
               Player's match positioning and movement patterns
             </CardDescription>
           </div>
           <div className="flex-shrink-0 w-full sm:w-auto">
             <Select onValueChange={handlePeriodChange} value={selectedPeriod}>
-              <SelectTrigger className="w-full sm:w-[160px] lg:w-[180px] bg-club-black text-white border-club-gold/30 h-10 focus:ring-club-gold/50">
+              <SelectTrigger className={`bg-club-black text-white border-club-gold/30 focus:ring-club-gold/50 ${
+                isMobile 
+                  ? 'w-full h-9 text-sm' 
+                  : 'w-full sm:w-[160px] lg:w-[180px] h-10'
+              }`}>
                 <SelectValue placeholder="Select Period" />
               </SelectTrigger>
               <SelectContent className="bg-club-dark-gray text-white border-club-gold/30 z-50">
@@ -110,15 +120,15 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
         </div>
       </CardHeader>
       
-      <CardContent className="p-4 sm:p-6 pt-0 flex-1 flex flex-col min-h-0">
+      <CardContent className={`flex-1 flex flex-col min-h-0 ${isMobile ? 'p-3 pt-0' : 'p-4 sm:p-6 pt-0'}`}>
         {player.heatmapUrl ? (
-          <div className="space-y-4 flex-1 flex flex-col">
+          <div className="space-y-3 sm:space-y-4 flex-1 flex flex-col">
             <div 
               className="relative w-full rounded-lg overflow-hidden bg-green-800/20 border border-green-700/30 flex-1"
               style={{ 
-                aspectRatio: '16/10',
-                minHeight: '300px',
-                maxHeight: '500px'
+                aspectRatio: isMobile ? '4/3' : '16/10',
+                minHeight: isMobile ? '200px' : '300px',
+                maxHeight: isMobile ? '300px' : '500px'
               }}
             >
               {/* Football pitch SVG overlay */}
@@ -159,16 +169,20 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               </svg>
               
               {imageError ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-club-black/60 p-4 z-20">
-                  <ImageOff className="text-club-gold mb-3 w-8 h-8 sm:w-10 sm:h-10" />
-                  <p className="text-center text-club-gold mb-3 text-sm sm:text-base font-medium">
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-club-black/60 p-3 sm:p-4 z-20">
+                  <ImageOff className={`text-club-gold mb-2 sm:mb-3 ${isMobile ? 'w-6 h-6' : 'w-8 h-8 sm:w-10 sm:h-10'}`} />
+                  <p className={`text-center text-club-gold mb-2 sm:mb-3 font-medium ${
+                    isMobile ? 'text-xs' : 'text-sm sm:text-base'
+                  }`}>
                     Unable to load heatmap image
                   </p>
-                  <div className="flex flex-col sm:flex-row gap-2 w-full max-w-xs">
+                  <div className={`flex gap-2 w-full ${isMobile ? 'flex-col max-w-48' : 'flex-col sm:flex-row max-w-xs'}`}>
                     <Button 
                       variant="outline" 
                       onClick={resetImageError}
-                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold text-xs sm:text-sm h-9 flex-1"
+                      className={`border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold flex-1 ${
+                        isMobile ? 'text-xs h-8' : 'text-xs sm:text-sm h-9'
+                      }`}
                       size="sm"
                     >
                       Retry Original
@@ -176,13 +190,17 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                     <Button 
                       variant="outline" 
                       onClick={tryAlternativeUrl}
-                      className="border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold text-xs sm:text-sm h-9 flex-1"
+                      className={`border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold flex-1 ${
+                        isMobile ? 'text-xs h-8' : 'text-xs sm:text-sm h-9'
+                      }`}
                       size="sm"
                     >
                       Try Thumbnail
                     </Button>
                   </div>
-                  <p className="text-xs text-club-light-gray/60 mt-3 text-center max-w-sm leading-relaxed">
+                  <p className={`text-club-light-gray/60 mt-2 sm:mt-3 text-center max-w-sm leading-relaxed ${
+                    isMobile ? 'text-xs' : 'text-xs'
+                  }`}>
                     The image cannot be loaded due to CORS restrictions from Google Drive. 
                     Try uploading the image to a CORS-enabled image hosting service.
                   </p>
@@ -197,7 +215,9 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                     onError={handleImageError}
                     referrerPolicy="no-referrer"
                   />
-                  <div className="absolute bottom-2 right-2 bg-club-black/80 text-club-light-gray text-xs px-3 py-1.5 rounded-md z-20 font-medium">
+                  <div className={`absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-club-black/80 text-club-light-gray px-2 sm:px-3 py-1 sm:py-1.5 rounded-md z-20 font-medium ${
+                    isMobile ? 'text-xs' : 'text-xs'
+                  }`}>
                     {player.name}'s Heatmap • {selectedPeriod}
                   </div>
                 </>
@@ -205,26 +225,30 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
             </div>
             
             {/* Heatmap Color Legend */}
-            <div className="space-y-2 flex-shrink-0">
-              <p className="text-sm font-medium text-club-light-gray">Activity Intensity Scale:</p>
+            <div className="space-y-1.5 sm:space-y-2 flex-shrink-0">
+              <p className={`font-medium text-club-light-gray ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                Activity Intensity Scale:
+              </p>
               <div className="flex items-center gap-2">
                 <div 
-                  className="h-3 flex-1 rounded-md shadow-sm" 
+                  className={`flex-1 rounded-md shadow-sm ${isMobile ? 'h-2' : 'h-3'}`}
                   style={{
                     background: `linear-gradient(to right, ${colorScaleStops.map(s => s.color).join(', ')})`
                   }}
                 />
               </div>
-              <div className="flex justify-between text-xs text-club-light-gray/80">
+              <div className="flex justify-between text-club-light-gray/80">
                 {colorScaleStops.filter(stop => stop.label).map((stop, i) => (
-                  <span key={i} className="font-medium">{stop.label}</span>
+                  <span key={i} className={`font-medium ${isMobile ? 'text-xs' : 'text-xs'}`}>
+                    {stop.label}
+                  </span>
                 ))}
               </div>
             </div>
           </div>
         ) : (
           <Alert className="bg-club-gold/10 border-club-gold/30 flex-1 flex items-center">
-            <AlertDescription className="text-club-light-gray">
+            <AlertDescription className={`text-club-light-gray ${isMobile ? 'text-sm' : ''}`}>
               Heatmap visualization not available for this player
             </AlertDescription>
           </Alert>
