@@ -2,6 +2,7 @@
 import { Player } from "@/types";
 import { StatCard } from "./StatCard";
 import { DisciplinaryCard } from "./DisciplinaryCard";
+import { ResponsiveGrid } from "./ResponsiveLayout";
 import { 
   BarChart, 
   PieChart, 
@@ -15,12 +16,15 @@ import {
   TooltipProvider, 
   TooltipTrigger 
 } from "@/components/ui/tooltip";
+import { useResponsiveBreakpoint } from "@/hooks/use-orientation";
 
 interface PlayerStatCardsProps {
   player: Player;
 }
 
 export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
+  const breakpoint = useResponsiveBreakpoint();
+  
   const passCompletionRate = player.passes_attempted > 0
     ? ((player.passes_completed / player.passes_attempted) * 100).toFixed(1)
     : "0";
@@ -29,22 +33,39 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
     ? ((player.shots_on_target / player.shots_total) * 100).toFixed(1)
     : "0";
 
+  // Intelligent grid configuration based on breakpoint
+  const getGridConfig = () => {
+    switch (breakpoint) {
+      case 'mobile':
+        return { minWidth: '100%', className: 'grid-cols-1' };
+      case 'tablet-portrait':
+        return { minWidth: '280px', className: 'grid-cols-1 xs:grid-cols-2' };
+      case 'tablet-landscape':
+        return { minWidth: '240px', className: 'grid-cols-2 md:grid-cols-3' };
+      case 'desktop':
+        return { minWidth: '220px', className: 'grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' };
+      case 'large':
+      default:
+        return { minWidth: '200px', className: 'grid-cols-5' };
+    }
+  };
+
+  const gridConfig = getGridConfig();
+
   return (
     <TooltipProvider>
-      <div className="w-full">
-        {/* Responsive grid with intelligent breakpoints */}
-        <div className="grid gap-3 xs:gap-3 sm:gap-4 lg:gap-4 xl:gap-6
-          grid-cols-1 
-          xs:grid-cols-1 
-          sm:grid-cols-2 
-          md:grid-cols-2 
-          lg:grid-cols-3 
-          xl:grid-cols-5
-          auto-rows-fr">
-          
+      <div className="w-full transition-all duration-300 ease-in-out">
+        <ResponsiveGrid 
+          minCardWidth={gridConfig.minWidth}
+          className={`
+            ${gridConfig.className}
+            auto-rows-fr
+            transition-all duration-300 ease-in-out
+          `}
+        >
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full h-full min-w-0">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -64,7 +85,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full h-full min-w-0">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -85,7 +106,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full h-full min-w-0">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -106,7 +127,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full h-full min-w-0">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -127,7 +148,11 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full h-full min-w-0 sm:col-span-2 md:col-span-2 lg:col-span-1 xl:col-span-1">
+              <div className={`
+                w-full h-full min-w-0 transition-all duration-300 ease-in-out
+                ${breakpoint === 'tablet-portrait' ? 'col-span-2' : ''}
+                ${breakpoint === 'tablet-landscape' ? 'col-span-1' : ''}
+              `}>
                 <DisciplinaryCard playerId={player.id} />
               </div>
             </TooltipTrigger>
@@ -135,7 +160,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
               <p>Player's disciplinary record including yellow and red cards. Risk levels: SAFE (0-3), AT RISK (4), CRITICAL (5+).</p>
             </TooltipContent>
           </Tooltip>
-        </div>
+        </ResponsiveGrid>
       </div>
     </TooltipProvider>
   );

@@ -280,4 +280,189 @@
     @apply overflow-x-auto -webkit-overflow-scrolling-touch;
     scroll-snap-type: x mandatory;
   }
+
+  /* Responsive Layout Components */
+  .responsive-container {
+    @apply transition-all duration-300 ease-in-out;
+  }
+
+  .responsive-grid {
+    @apply transition-all duration-300 ease-in-out;
+    container-type: inline-size;
+  }
+
+  .responsive-stack {
+    @apply transition-all duration-300 ease-in-out;
+    container-type: inline-size;
+  }
+
+  /* Container Queries for modern browsers */
+  @container (min-width: 320px) {
+    .responsive-grid {
+      @apply gap-3;
+    }
+  }
+
+  @container (min-width: 640px) {
+    .responsive-grid {
+      @apply gap-4;
+    }
+  }
+
+  @container (min-width: 1024px) {
+    .responsive-grid {
+      @apply gap-6;
+    }
+  }
+
+  /* Layout transition animations */
+  .layout-horizontal {
+    @apply flex-row transition-all duration-300 ease-in-out;
+  }
+
+  .layout-vertical {
+    @apply flex-col transition-all duration-300 ease-in-out;
+  }
+
+  .layout-grid-1 {
+    @apply grid-cols-1 transition-all duration-300 ease-in-out;
+  }
+
+  .layout-grid-2 {
+    @apply grid-cols-2 transition-all duration-300 ease-in-out;
+  }
+
+  .layout-grid-3 {
+    @apply grid-cols-3 transition-all duration-300 ease-in-out;
+  }
+
+  .layout-grid-4 {
+    @apply grid-cols-4 transition-all duration-300 ease-in-out;
+  }
+
+  .layout-grid-5 {
+    @apply grid-cols-5 transition-all duration-300 ease-in-out;
+  }
+
+  /* Responsive text scaling */
+  .text-responsive-xs {
+    @apply text-xs transition-all duration-300 ease-in-out;
+  }
+
+  .text-responsive-sm {
+    @apply text-sm transition-all duration-300 ease-in-out;
+  }
+
+  .text-responsive-base {
+    @apply text-base transition-all duration-300 ease-in-out;
+  }
+
+  .text-responsive-lg {
+    @apply text-lg transition-all duration-300 ease-in-out;
+  }
+
+  .text-responsive-xl {
+    @apply text-xl transition-all duration-300 ease-in-out;
+  }
+
+  /* Orientation-specific styles */
+  @media (orientation: landscape) and (max-width: 767px) {
+    .mobile-landscape-compact {
+      @apply space-y-1 p-2;
+    }
+    
+    .mobile-landscape-horizontal {
+      @apply flex-row items-center;
+    }
+  }
+
+  @media (orientation: portrait) and (max-width: 767px) {
+    .mobile-portrait-spacious {
+      @apply space-y-3 p-3;
+    }
+    
+    .mobile-portrait-vertical {
+      @apply flex-col;
+    }
+  }
+
+  /* Smooth scaling animations for layout changes */
+  .scale-enter {
+    @apply transition-all duration-300 ease-in-out;
+    animation: scale-in 0.3s ease-out;
+  }
+
+  .scale-exit {
+    @apply transition-all duration-300 ease-in-out;
+    animation: scale-out 0.3s ease-out;
+  }
+
+  /* Grid animation transitions */
+  .grid-transition {
+    @apply transition-all duration-300 ease-in-out;
+    grid-template-columns: repeat(var(--grid-cols, 1), minmax(0, 1fr));
+  }
+}
+
+/* Additional keyframes for layout transitions */
+@keyframes layout-shift {
+  0% {
+    transform: scale(0.98);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes grid-reflow {
+  0% {
+    transform: translateY(10px);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Animation classes */
+.animate-layout-shift {
+  animation: layout-shift 0.3s ease-out;
+}
+
+.animate-grid-reflow {
+  animation: grid-reflow 0.2s ease-out;
+}
+
+/* Responsive utilities with transitions */
+@media (max-width: 639px) {
+  .responsive-mobile {
+    @apply transition-all duration-300 ease-in-out;
+  }
+}
+
+@media (min-width: 640px) and (max-width: 767px) {
+  .responsive-tablet-portrait {
+    @apply transition-all duration-300 ease-in-out;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+  .responsive-tablet-landscape {
+    @apply transition-all duration-300 ease-in-out;
+  }
+}
+
+@media (min-width: 1024px) and (max-width: 1199px) {
+  .responsive-desktop {
+    @apply transition-all duration-300 ease-in-out;
+  }
+}
+
+@media (min-width: 1200px) {
+  .responsive-large {
+    @apply transition-all duration-300 ease-in-out;
+  }
 }
