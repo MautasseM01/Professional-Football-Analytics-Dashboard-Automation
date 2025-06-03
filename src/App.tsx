@@ -12,6 +12,8 @@ import { RoleProtectedRoute } from "./components/RoleProtectedRoute";
 import Dashboard from "./pages/Dashboard";
 import PlayerComparison from "./pages/PlayerComparison";
 import PlayerStats from "./pages/PlayerStats";
+import PlayerDevelopment from "./pages/PlayerDevelopment";
+import TeamOverview from "./pages/TeamOverview";
 import ShotMap from "./pages/ShotMap";
 import TeamTacticalAnalysis from "./pages/TeamTacticalAnalysis";
 import Login from "./pages/Login";
@@ -85,8 +87,8 @@ const App = () => (
                   path="/player-analysis/development" 
                   element={
                     <ProtectedRoute>
-                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst', 'coach']}>
-                        <PlayerStats />
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']}>
+                        <PlayerDevelopment />
                       </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
@@ -110,7 +112,7 @@ const App = () => (
                   element={
                     <ProtectedRoute>
                       <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'coach']}>
-                        <TeamTacticalAnalysis />
+                        <TeamOverview />
                       </RoleProtectedRoute>
                     </ProtectedRoute>
                   } 
@@ -133,7 +135,7 @@ const App = () => (
                   path="/reports" 
                   element={
                     <ProtectedRoute>
-                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'performance_director', 'analyst']}>
+                      <RoleProtectedRoute allowedRoles={['admin', 'management', 'analyst']}>
                         <Dashboard />
                       </RoleProtectedRoute>
                     </ProtectedRoute>

@@ -44,9 +44,9 @@ export const canAccessRoute = (route: string, userRole: UserRole | undefined): b
     '/player-analysis': ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player'],
     '/player-analysis/stats': ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player'],
     '/player-analysis/comparison': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
-    '/player-analysis/development': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
+    '/player-analysis/development': ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player'],
     '/player-analysis/shot-map': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
-    '/team-performance': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
+    '/team-performance': ['admin', 'management', 'coach', 'performance_director'],
     '/team-performance/tactical-analysis': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
     '/reports': ['admin', 'management', 'analyst'],
     '/settings': ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player']

@@ -41,7 +41,7 @@ export const navigationItems: AccessibleNavigationItem[] = [
         name: "Player Development", 
         href: "/player-analysis/development", 
         translationKey: "nav.playerDevelopment",
-        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
+        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']
       },
       { 
         name: "Shot Map", 
