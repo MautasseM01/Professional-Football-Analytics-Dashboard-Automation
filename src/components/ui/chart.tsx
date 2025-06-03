@@ -39,10 +39,35 @@ const ChartContainer = React.forwardRef<
     children: React.ComponentProps<
       typeof RechartsPrimitive.ResponsiveContainer
     >["children"]
+    aspectRatio?: number
+    minHeight?: number
   }
->(({ id, className, children, config, ...props }, ref) => {
+>(({ id, className, children, config, aspectRatio, minHeight, ...props }, ref) => {
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
+
+  // Responsive aspect ratio based on screen size
+  const getAspectRatio = () => {
+    if (typeof window === 'undefined') return aspectRatio || (16/9);
+    
+    const width = window.innerWidth;
+    if (width < 480) return aspectRatio || (4/3); // More square on very small screens
+    if (width < 768) return aspectRatio || (3/2); // Slightly taller on mobile
+    if (width < 1024) return aspectRatio || (16/10); // Balanced on tablet
+    return aspectRatio || (16/9); // Widescreen on desktop
+  };
+
+  // Responsive min height based on screen size
+  const getMinHeight = () => {
+    if (minHeight) return minHeight;
+    if (typeof window === 'undefined') return 200;
+    
+    const width = window.innerWidth;
+    if (width < 480) return 180; // Compact on very small screens
+    if (width < 768) return 220; // Reasonable on mobile
+    if (width < 1024) return 280; // Good size on tablet
+    return 320; // Full size on desktop
+  };
 
   return (
     <ChartContext.Provider value={{ config }}>
@@ -50,13 +75,21 @@ const ChartContainer = React.forwardRef<
         data-chart={chartId}
         ref={ref}
         className={cn(
-          "flex aspect-video justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
+          "flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
+          // Responsive container classes
+          "w-full transition-all duration-300 ease-in-out",
+          "container-type-inline-size", // Enable container queries
           className
         )}
+        style={{
+          aspectRatio: getAspectRatio(),
+          minHeight: `${getMinHeight()}px`,
+          maxWidth: '100%'
+        }}
         {...props}
       >
         <ChartStyle id={chartId} config={config} />
-        <RechartsPrimitive.ResponsiveContainer>
+        <RechartsPrimitive.ResponsiveContainer width="100%" height="100%">
           {children}
         </RechartsPrimitive.ResponsiveContainer>
       </div>
@@ -178,6 +211,9 @@ const ChartTooltipContent = React.forwardRef<
         ref={ref}
         className={cn(
           "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
+          // Responsive tooltip sizing
+          "max-w-[200px] sm:max-w-[250px] lg:max-w-[300px]",
+          "text-xs sm:text-sm",
           className
         )}
       >
@@ -280,6 +316,10 @@ const ChartLegendContent = React.forwardRef<
         className={cn(
           "flex items-center justify-center gap-4",
           verticalAlign === "top" ? "pb-3" : "pt-3",
+          // Responsive legend spacing
+          "gap-2 sm:gap-3 lg:gap-4",
+          "text-xs sm:text-sm",
+          "flex-wrap", // Allow wrapping on small screens
           className
         )}
       >
@@ -291,20 +331,24 @@ const ChartLegendContent = React.forwardRef<
             <div
               key={item.value}
               className={cn(
-                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground"
+                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
+                // Responsive icon sizing
+                "[&>svg]:h-2 [&>svg]:w-2 sm:[&>svg]:h-3 sm:[&>svg]:w-3"
               )}
             >
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
               ) : (
                 <div
-                  className="h-2 w-2 shrink-0 rounded-[2px]"
+                  className="h-2 w-2 shrink-0 rounded-[2px] sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor: item.color,
                   }}
                 />
               )}
-              {itemConfig?.label}
+              <span className="text-xs sm:text-sm truncate">
+                {itemConfig?.label}
+              </span>
             </div>
           )
         })}
