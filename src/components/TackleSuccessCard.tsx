@@ -26,12 +26,12 @@ export const TackleSuccessCard = ({ player }: TackleSuccessCardProps) => {
   };
 
   return (
-    <Card className="border-club-gold/20 bg-club-dark-gray">
-      <CardHeader>
-        <CardTitle className="text-club-gold">Tackle Success</CardTitle>
-        <CardDescription>Defensive performance breakdown</CardDescription>
+    <Card className="border-club-gold/20 bg-club-dark-gray h-full">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base sm:text-lg text-club-gold">Tackle Success</CardTitle>
+        <CardDescription className="text-xs sm:text-sm">Defensive performance breakdown</CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-4 sm:space-y-6">
         <div className="space-y-2">
           <div className="flex justify-between items-center text-sm">
             <span className="text-club-light-gray/70">Success Rate</span>
@@ -39,7 +39,7 @@ export const TackleSuccessCard = ({ player }: TackleSuccessCardProps) => {
           </div>
           <div className="w-full bg-club-black rounded-full h-2">
             <div 
-              className="bg-club-gold h-2 rounded-full" 
+              className="bg-club-gold h-2 rounded-full transition-all duration-300 ease-in-out" 
               style={{ width: `${tackleSuccessRate}%` }}
             ></div>
           </div>
@@ -53,9 +53,10 @@ export const TackleSuccessCard = ({ player }: TackleSuccessCardProps) => {
           <Button 
             onClick={handleReportDownload}
             variant="outline"
-            className="w-full border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold"
+            size="sm"
+            className="w-full border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold text-xs sm:text-sm"
           >
-            <Download size={16} className="mr-2" />
+            <Download size={14} className="mr-2" />
             Download Full Report
           </Button>
         )}

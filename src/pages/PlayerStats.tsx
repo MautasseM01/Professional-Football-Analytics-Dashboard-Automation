@@ -19,9 +19,9 @@ const PlayerStatsPage = () => {
   return (
     <div className="flex min-h-screen bg-club-dark-bg text-club-light-gray">
       <DashboardSidebar />
-      <main className={`flex-1 p-4 sm:p-6 lg:p-8 ${isMobile ? 'pt-16' : ''}`}>
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-6">
+      <main className={`flex-1 transition-all duration-300 ease-in-out ${isMobile ? 'pt-16' : ''}`}>
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+          <div className="mb-4 sm:mb-6">
             <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold mb-2">
               Player Analysis
             </h1>
@@ -35,7 +35,7 @@ const PlayerStatsPage = () => {
 
           {/* Mobile landscape orientation message */}
           {isMobile && (
-            <Alert className="mb-6 bg-blue-500/10 border-blue-500/30">
+            <Alert className="bg-blue-500/10 border-blue-500/30">
               <RotateCcw className="h-4 w-4" />
               <AlertDescription className="text-club-light-gray text-sm">
                 For better chart viewing, try rotating your device to landscape mode.
@@ -45,7 +45,7 @@ const PlayerStatsPage = () => {
 
           {/* Role-based access information */}
           <RoleBasedContent allowedRoles={['player']}>
-            <Alert className="mb-6 bg-club-gold/10 border-club-gold/30">
+            <Alert className="bg-club-gold/10 border-club-gold/30">
               <Info className="h-4 w-4" />
               <AlertDescription className="text-club-light-gray text-sm sm:text-base">
                 You can only view your own player statistics and performance data.
@@ -58,14 +58,12 @@ const PlayerStatsPage = () => {
             allowedRoles={['admin', 'management', 'coach', 'analyst', 'performance_director']}
             fallback={null}
           >
-            <div className="mb-6">
-              <PlayerSelector
-                players={players}
-                selectedPlayer={selectedPlayer}
-                onPlayerSelect={selectPlayer}
-                loading={loading}
-              />
-            </div>
+            <PlayerSelector
+              players={players}
+              selectedPlayer={selectedPlayer}
+              onPlayerSelect={selectPlayer}
+              loading={loading}
+            />
           </RoleBasedContent>
 
           {/* Player Stats Component */}

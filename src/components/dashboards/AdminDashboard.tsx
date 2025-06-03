@@ -8,6 +8,7 @@ import { PlayersAtRiskSection } from "./admin/PlayersAtRiskSection";
 import { UserManagementCard } from "./admin/UserManagementCard";
 import { SystemAdministrationCard } from "./admin/SystemAdministrationCard";
 import { DataPipelineCard } from "./admin/DataPipelineCard";
+import { ResponsiveGrid } from "../ResponsiveLayout";
 
 interface AdminDashboardProps {
   profile: UserProfile;
@@ -18,8 +19,8 @@ export const AdminDashboard = ({ profile }: AdminDashboardProps) => {
   const { data: playersAtRisk, isLoading: playersLoading } = usePlayersAtRisk();
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-club-gold">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+      <h1 className="text-xl sm:text-2xl font-bold text-club-gold">
         Welcome back, {profile.full_name || "Administrator"}
       </h1>
 
@@ -41,16 +42,15 @@ export const AdminDashboard = ({ profile }: AdminDashboardProps) => {
         isLoading={playersLoading} 
       />
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* User Management */}
+      {/* Administrative Cards with Responsive Grid */}
+      <ResponsiveGrid 
+        minCardWidth="300px"
+        className="grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+      >
         <UserManagementCard />
-
-        {/* System Settings & Audit Trail */}
         <SystemAdministrationCard />
-
-        {/* Data Import/Export & System Status */}
         <DataPipelineCard />
-      </div>
+      </ResponsiveGrid>
     </div>
   );
 };

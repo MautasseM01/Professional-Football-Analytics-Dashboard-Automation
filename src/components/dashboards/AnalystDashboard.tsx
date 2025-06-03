@@ -6,6 +6,7 @@ import { PlayerSelector } from "@/components/PlayerSelector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart3, PieChart, TrendingUp, FileText, Download } from "lucide-react";
+import { ResponsiveGrid } from "../ResponsiveLayout";
 
 interface AnalystDashboardProps {
   profile: UserProfile;
@@ -15,18 +16,21 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
   const { players, selectedPlayer, selectPlayer, loading } = usePlayerData();
 
   return (
-    <div className="space-y-6 p-4 sm:p-6">
-      <div className="mb-6">
-        <h1 className="text-2xl sm:text-3xl font-bold text-club-gold mb-2">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+      <div className="mb-4 sm:mb-6">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold mb-2">
           Analytics Dashboard
         </h1>
-        <p className="text-club-light-gray/70">
+        <p className="text-sm sm:text-base text-club-light-gray/70">
           Deep dive into player and team performance analytics
         </p>
       </div>
 
-      {/* Analytics Overview Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      {/* Analytics Overview Cards with Responsive Grid */}
+      <ResponsiveGrid 
+        minCardWidth="200px"
+        className="grid-cols-2 md:grid-cols-4"
+      >
         <Card className="bg-club-dark-gray border-club-gold/20">
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center text-club-gold text-sm">
@@ -35,7 +39,7 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-club-light-gray">15.2K</div>
+            <div className="text-xl sm:text-2xl font-bold text-club-light-gray">15.2K</div>
             <p className="text-xs text-club-light-gray/70">This Season</p>
           </CardContent>
         </Card>
@@ -48,7 +52,7 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-club-light-gray">47</div>
+            <div className="text-xl sm:text-2xl font-bold text-club-light-gray">47</div>
             <p className="text-xs text-club-light-gray/70">Active KPIs</p>
           </CardContent>
         </Card>
@@ -61,7 +65,7 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-club-light-gray">8</div>
+            <div className="text-xl sm:text-2xl font-bold text-club-light-gray">8</div>
             <p className="text-xs text-club-light-gray/70">Predictive Models</p>
           </CardContent>
         </Card>
@@ -74,14 +78,14 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-club-light-gray">23</div>
+            <div className="text-xl sm:text-2xl font-bold text-club-light-gray">23</div>
             <p className="text-xs text-club-light-gray/70">This Month</p>
           </CardContent>
         </Card>
-      </div>
+      </ResponsiveGrid>
 
       {/* Advanced Analytics Tools */}
-      <Card className="bg-club-dark-gray border-club-gold/20 mb-6">
+      <Card className="bg-club-dark-gray border-club-gold/20">
         <CardHeader>
           <CardTitle className="text-club-gold">Advanced Analytics Tools</CardTitle>
           <CardDescription className="text-club-light-gray/70">
@@ -89,24 +93,27 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 flex items-center gap-2">
+          <ResponsiveGrid 
+            minCardWidth="250px"
+            className="grid-cols-1 sm:grid-cols-2"
+          >
+            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 flex items-center gap-2 justify-start">
               <Download className="h-4 w-4" />
               Export Player Data
             </Button>
-            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 flex items-center gap-2">
+            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 flex items-center gap-2 justify-start">
               <FileText className="h-4 w-4" />
               Generate Team Report
             </Button>
-            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 flex items-center gap-2">
+            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 flex items-center gap-2 justify-start">
               <BarChart3 className="h-4 w-4" />
               Performance Trends
             </Button>
-            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 flex items-center gap-2">
+            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 flex items-center gap-2 justify-start">
               <TrendingUp className="h-4 w-4" />
               Predictive Analysis
             </Button>
-          </div>
+          </ResponsiveGrid>
         </CardContent>
       </Card>
 
