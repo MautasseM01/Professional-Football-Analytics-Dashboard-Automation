@@ -1,128 +1,129 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { usePlayerData } from "@/hooks/use-player-data";
 import { UserProfile } from "@/types";
-import { CalendarDays, Target, BarChart } from "lucide-react";
+import { PlayerStats } from "@/components/PlayerStats";
+import { PlayerSelector } from "@/components/PlayerSelector";
+import { RoleBasedContent } from "@/components/RoleBasedContent";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { User, Target, TrendingUp } from "lucide-react";
 
 interface PlayerDashboardProps {
   profile: UserProfile;
 }
 
 export const PlayerDashboard = ({ profile }: PlayerDashboardProps) => {
-  const fixtures = [
-    { opponent: "FC Barcelona", date: "May 25, 2025", location: "Away" },
-    { opponent: "Real Madrid", date: "June 2, 2025", location: "Home" }
-  ];
-
-  const developmentTargets = [
-    { target: "Improve passing accuracy to 85%", progress: 78 },
-    { target: "Increase defensive actions per game", progress: 65 }
-  ];
-
-  const recentPerformance = {
-    match: "vs. Atletico Madrid (May 18, 2025)",
-    minutesPlayed: 87,
-    passAccuracy: 81,
-    distanceCovered: 10.7,
-    sprints: 18
-  };
+  const { players, selectedPlayer, selectPlayer, loading } = usePlayerData();
 
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-club-gold">
-        Welcome back, {profile.full_name || "Player"}
-      </h1>
-      
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Upcoming Fixtures */}
-        <Card className="bg-club-dark-gray border-club-gold/20 col-span-1">
+    <div className="space-y-6 p-4 sm:p-6">
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-club-gold mb-2">
+          Player Dashboard
+        </h1>
+        <p className="text-club-light-gray/70">
+          View your performance statistics and development progress
+        </p>
+      </div>
+
+      {/* Player Performance Overview Cards - Player specific */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <Card className="bg-club-dark-gray border-club-gold/20">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold">
-              <CalendarDays className="mr-2 h-5 w-5" />
-              My Upcoming Fixtures
+            <CardTitle className="flex items-center text-club-gold text-sm">
+              <User className="mr-2 h-4 w-4" />
+              Personal Stats
             </CardTitle>
-            <CardDescription className="text-club-light-gray/70">
-              Your next matches
-            </CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-4">
-              {fixtures.map((fixture, index) => (
-                <li key={index} className="bg-club-black/40 p-3 rounded-md">
-                  <p className="font-medium text-club-light-gray">{fixture.opponent}</p>
-                  <div className="flex justify-between text-sm text-club-light-gray/70">
-                    <span>{fixture.date}</span>
-                    <span>{fixture.location}</span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="text-2xl font-bold text-club-light-gray">
+              {selectedPlayer?.matches || 0}
+            </div>
+            <p className="text-xs text-club-light-gray/70">Matches Played</p>
           </CardContent>
         </Card>
 
-        {/* Development Targets */}
-        <Card className="bg-club-dark-gray border-club-gold/20 col-span-1">
+        <Card className="bg-club-dark-gray border-club-gold/20">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold">
-              <Target className="mr-2 h-5 w-5" />
-              My Development Targets
+            <CardTitle className="flex items-center text-club-gold text-sm">
+              <Target className="mr-2 h-4 w-4" />
+              Goals This Season
             </CardTitle>
-            <CardDescription className="text-club-light-gray/70">
-              Areas of focus from coaching staff
-            </CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-4">
-              {developmentTargets.map((target, index) => (
-                <li key={index} className="space-y-2">
-                  <div className="flex justify-between text-sm">
-                    <span className="text-club-light-gray">{target.target}</span>
-                    <span className="text-club-gold">{target.progress}%</span>
-                  </div>
-                  <div className="w-full bg-club-black/60 rounded-full h-2">
-                    <div 
-                      className="bg-club-gold h-2 rounded-full" 
-                      style={{ width: `${target.progress}%` }}
-                    ></div>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            <div className="text-2xl font-bold text-club-light-gray">
+              {selectedPlayer?.shots_on_target || 0}
+            </div>
+            <p className="text-xs text-club-light-gray/70">Shots on Target</p>
           </CardContent>
         </Card>
 
-        {/* Recent Performance */}
-        <Card className="bg-club-dark-gray border-club-gold/20 col-span-1">
+        <Card className="bg-club-dark-gray border-club-gold/20">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold">
-              <BarChart className="mr-2 h-5 w-5" />
-              Recent Performance
+            <CardTitle className="flex items-center text-club-gold text-sm">
+              <TrendingUp className="mr-2 h-4 w-4" />
+              Performance Rating
             </CardTitle>
-            <CardDescription className="text-club-light-gray/70">
-              {recentPerformance.match}
-            </CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-2 text-club-light-gray">
-              <li className="flex justify-between py-1 border-b border-club-gold/10">
-                <span>Minutes Played:</span>
-                <span className="font-medium">{recentPerformance.minutesPlayed}</span>
-              </li>
-              <li className="flex justify-between py-1 border-b border-club-gold/10">
-                <span>Pass Accuracy:</span>
-                <span className="font-medium">{recentPerformance.passAccuracy}%</span>
-              </li>
-              <li className="flex justify-between py-1 border-b border-club-gold/10">
-                <span>Distance Covered:</span>
-                <span className="font-medium">{recentPerformance.distanceCovered} km</span>
-              </li>
-              <li className="flex justify-between py-1">
-                <span>Sprints:</span>
-                <span className="font-medium">{recentPerformance.sprints}</span>
-              </li>
-            </ul>
+            <div className="text-2xl font-bold text-club-light-gray">8.2</div>
+            <p className="text-xs text-club-light-gray/70">Average Rating</p>
           </CardContent>
         </Card>
       </div>
+
+      {/* Player Selector - Hidden for player role */}
+      <RoleBasedContent allowedRoles={['admin', 'management', 'coach', 'analyst', 'performance_director']}>
+        <PlayerSelector
+          players={players}
+          selectedPlayer={selectedPlayer}
+          onPlayerSelect={selectPlayer}
+          loading={loading}
+        />
+      </RoleBasedContent>
+
+      {/* Development Targets - Player specific */}
+      <Card className="bg-club-dark-gray border-club-gold/20 mb-6">
+        <CardHeader>
+          <CardTitle className="text-club-gold">Development Targets</CardTitle>
+          <CardDescription className="text-club-light-gray/70">
+            Your current development goals and progress
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="flex justify-between items-center p-3 bg-club-black/40 rounded">
+              <span className="text-club-light-gray">Improve Pass Completion</span>
+              <div className="flex items-center gap-2">
+                <div className="w-20 bg-club-black rounded-full h-2">
+                  <div className="bg-club-gold h-2 rounded-full" style={{ width: '75%' }}></div>
+                </div>
+                <span className="text-club-gold text-sm">75%</span>
+              </div>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-club-black/40 rounded">
+              <span className="text-club-light-gray">Increase Sprint Distance</span>
+              <div className="flex items-center gap-2">
+                <div className="w-20 bg-club-black rounded-full h-2">
+                  <div className="bg-club-gold h-2 rounded-full" style={{ width: '60%' }}></div>
+                </div>
+                <span className="text-club-gold text-sm">60%</span>
+              </div>
+            </div>
+            <div className="flex justify-between items-center p-3 bg-club-black/40 rounded">
+              <span className="text-club-light-gray">Defensive Positioning</span>
+              <div className="flex items-center gap-2">
+                <div className="w-20 bg-club-black rounded-full h-2">
+                  <div className="bg-club-gold h-2 rounded-full" style={{ width: '85%' }}></div>
+                </div>
+                <span className="text-club-gold text-sm">85%</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Player Stats Component */}
+      {selectedPlayer && <PlayerStats player={selectedPlayer} />}
     </div>
   );
 };

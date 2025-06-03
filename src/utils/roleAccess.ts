@@ -46,9 +46,9 @@ export const canAccessRoute = (route: string, userRole: UserRole | undefined): b
     '/player-analysis/comparison': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
     '/player-analysis/development': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
     '/player-analysis/shot-map': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
-    '/team-performance': ['admin', 'management'],
-    '/team-performance/tactical-analysis': ['admin', 'management'],
-    '/reports': ['admin', 'management'],
+    '/team-performance': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
+    '/team-performance/tactical-analysis': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
+    '/reports': ['admin', 'management', 'analyst'],
     '/settings': ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player']
   };
 
@@ -59,4 +59,33 @@ export const canAccessRoute = (route: string, userRole: UserRole | undefined): b
 export const getDefaultRouteForRole = (userRole: UserRole | undefined): string => {
   // All roles should go to dashboard as their default route
   return '/dashboard';
+};
+
+// New helper functions for role-based features
+export const canAccessPlayerComparison = (userRole: UserRole | undefined): boolean => {
+  return hasAccess(userRole, ['admin', 'management', 'coach', 'analyst', 'performance_director']);
+};
+
+export const canAccessTeamAnalytics = (userRole: UserRole | undefined): boolean => {
+  return hasAccess(userRole, ['admin', 'management', 'coach', 'analyst', 'performance_director']);
+};
+
+export const canAccessUserManagement = (userRole: UserRole | undefined): boolean => {
+  return hasAccess(userRole, ['admin']);
+};
+
+export const canAccessAdvancedAnalytics = (userRole: UserRole | undefined): boolean => {
+  return hasAccess(userRole, ['admin', 'management', 'analyst']);
+};
+
+export const canSeeAllPlayers = (userRole: UserRole | undefined): boolean => {
+  return hasAccess(userRole, ['admin', 'management', 'coach', 'analyst', 'performance_director']);
+};
+
+export const canSeeOwnDataOnly = (userRole: UserRole | undefined): boolean => {
+  return userRole === 'player';
+};
+
+export const canAccessComplianceFeatures = (userRole: UserRole | undefined): boolean => {
+  return hasAccess(userRole, ['admin', 'management', 'coach']);
 };

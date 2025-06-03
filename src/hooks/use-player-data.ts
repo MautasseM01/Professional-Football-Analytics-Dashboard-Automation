@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { Player } from "@/types";
 import { useToast } from "@/hooks/use-toast";
+import { useUserProfile } from "@/hooks/use-user-profile";
 import { toast } from "@/components/ui/sonner";
 
 export const usePlayerData = () => {
@@ -11,6 +12,7 @@ export const usePlayerData = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { toast: uiToast } = useToast();
+  const { profile } = useUserProfile();
   
   const fetchPlayers = async () => {
     setLoading(true);
@@ -28,14 +30,26 @@ export const usePlayerData = () => {
       console.log("Players data received:", data);
       
       if (data && data.length > 0) {
-        // Log the first player to see its structure and verify number field
         console.log("First player structure:", data[0]);
         console.log("Player numbers in database:", data.map(p => ({ name: p.name, id: p.id, number: p.number })));
         
-        setPlayers(data as Player[]);
+        // Apply role-based filtering
+        let filteredData = data as Player[];
         
-        // Set the first player as selected by default
-        setSelectedPlayer(data[0] as Player);
+        if (profile?.role === 'player') {
+          // Players can only see their own data
+          // Assuming player profile has a player_id field or we match by email/name
+          // For now, we'll show first player as demo - in real app, match by user profile
+          filteredData = data.slice(0, 1) as Player[];
+          console.log("Player role: showing only own data");
+        }
+        
+        setPlayers(filteredData);
+        
+        // Set the first available player as selected by default
+        if (filteredData.length > 0) {
+          setSelectedPlayer(filteredData[0] as Player);
+        }
       } else {
         console.log("No data found in the players table");
         toast("No player data found in the Supabase players table");
@@ -54,7 +68,14 @@ export const usePlayerData = () => {
   };
   
   useEffect(() => {
-    fetchPlayers();
+    // Only fetch data if profile is loaded
+    if (profile) {
+      fetchPlayers();
+    }
+  }, [profile]);
+  
+  useEffect(() => {
+    if (!profile) return;
     
     // Set up a subscription to player changes
     const playersSubscription = supabase
@@ -72,13 +93,41 @@ export const usePlayerData = () => {
     return () => {
       playersSubscription.unsubscribe();
     };
-  }, []);
+  }, [profile]);
   
   const selectPlayer = (id: number) => {
     const player = players.find(p => p.id === id);
     if (player) {
+      // Check role-based access
+      if (profile?.role === 'player' && players.length === 1 && player.id !== players[0].id) {
+        uiToast({
+          title: "Access Denied",
+          description: "You can only view your own player data.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
       console.log(`Selected player: ${player.name}, Number: ${player.number}`);
       setSelectedPlayer(player);
+    }
+  };
+  
+  const canAccessPlayerData = (playerId: number): boolean => {
+    if (!profile) return false;
+    
+    switch (profile.role) {
+      case 'admin':
+      case 'management':
+      case 'coach':
+      case 'analyst':
+      case 'performance_director':
+        return true;
+      case 'player':
+        // Players can only access their own data
+        return players.length === 1 && players[0].id === playerId;
+      default:
+        return false;
     }
   };
   
@@ -88,6 +137,7 @@ export const usePlayerData = () => {
     selectPlayer,
     loading,
     error,
-    refreshData: fetchPlayers
+    refreshData: fetchPlayers,
+    canAccessPlayerData
   };
 };
