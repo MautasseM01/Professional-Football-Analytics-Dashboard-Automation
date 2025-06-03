@@ -35,6 +35,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   const [imageError, setImageError] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<MatchPeriod>('Full Match');
+  const [imageLoaded, setImageLoaded] = useState(false);
   const isMobile = useIsMobile();
   
   // Reset state when player changes to ensure image corresponds to current player
@@ -42,6 +43,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
     console.log(`Player in HeatmapCard: ${player.name}, Setting image URL to: ${player.heatmapUrl}`);
     // Reset the image error state when player changes
     setImageError(false);
+    setImageLoaded(false);
     // Set the image URL directly from the player data
     setImageUrl(player.heatmapUrl);
   }, [player.id]); // Using player.id ensures this runs only when the selected player changes
@@ -50,11 +52,17 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
     console.error("Error loading heatmap image:", e);
     console.log("Failed URL:", imageUrl);
     setImageError(true);
+    setImageLoaded(false);
     toast({
       title: "Image loading error",
       description: "Could not load the player heatmap image",
       variant: "destructive"
     });
+  };
+
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    setImageError(false);
   };
 
   const tryAlternativeUrl = () => {
@@ -64,6 +72,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
       console.log(`Trying thumbnail URL for ${player.name}:`, thumbnailUrl);
       setImageUrl(thumbnailUrl);
       setImageError(false);
+      setImageLoaded(false);
     }
   };
 
@@ -71,6 +80,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
     console.log(`Resetting to original URL for ${player.name}:`, player.heatmapUrl);
     setImageUrl(player.heatmapUrl);
     setImageError(false);
+    setImageLoaded(false);
   };
 
   // Handle period change
@@ -84,6 +94,9 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
       description: `Heatmap updated to show ${period} data`,
     });
   };
+
+  // Show football pitch overlay only when there's no image or when there's an error
+  const showPitchOverlay = !player.heatmapUrl || imageError || !imageLoaded;
 
   return (
     <Card className="border-club-gold/20 bg-club-dark-gray w-full h-full flex flex-col">
@@ -131,42 +144,44 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                 maxHeight: isMobile ? '300px' : '500px'
               }}
             >
-              {/* Football pitch SVG overlay */}
-              <svg 
-                className="absolute inset-0 w-full h-full z-10 pointer-events-none" 
-                viewBox="0 0 1050 680" 
-                fill="none" 
-                xmlns="http://www.w3.org/2000/svg"
-                preserveAspectRatio="xMidYMid meet"
-              >
-                {/* Pitch outline */}
-                <rect x="50" y="50" width="950" height="580" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-                
-                {/* Center line */}
-                <line x1="525" y1="50" x2="525" y2="630" stroke="#FFFFFF" strokeWidth="2" />
-                
-                {/* Center circle */}
-                <circle cx="525" cy="340" r="91.5" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-                <circle cx="525" cy="340" r="2" fill="#FFFFFF" />
-                
-                {/* Penalty areas */}
-                <rect x="50" y="195" width="165" height="290" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-                <rect x="835" y="195" width="165" height="290" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-                
-                {/* Goal areas */}
-                <rect x="50" y="265" width="55" height="150" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-                <rect x="945" y="265" width="55" height="150" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-                
-                {/* Penalty spots */}
-                <circle cx="165" cy="340" r="2" fill="#FFFFFF" />
-                <circle cx="885" cy="340" r="2" fill="#FFFFFF" />
-                
-                {/* Corner arcs */}
-                <path d="M60 60 A 10 10 0 0 1 50 50" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-                <path d="M990 60 A 10 10 0 0 0 1000 50" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-                <path d="M60 620 A 10 10 0 0 0 50 630" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-                <path d="M990 620 A 10 10 0 0 1 1000 630" stroke="#FFFFFF" strokeWidth="2" fill="none" />
-              </svg>
+              {/* Football pitch SVG overlay - only show when no image or error */}
+              {showPitchOverlay && (
+                <svg 
+                  className="absolute inset-0 w-full h-full z-10 pointer-events-none" 
+                  viewBox="0 0 1050 680" 
+                  fill="none" 
+                  xmlns="http://www.w3.org/2000/svg"
+                  preserveAspectRatio="xMidYMid meet"
+                >
+                  {/* Pitch outline */}
+                  <rect x="50" y="50" width="950" height="580" stroke="#FFFFFF" strokeWidth="2" fill="none" />
+                  
+                  {/* Center line */}
+                  <line x1="525" y1="50" x2="525" y2="630" stroke="#FFFFFF" strokeWidth="2" />
+                  
+                  {/* Center circle */}
+                  <circle cx="525" cy="340" r="91.5" stroke="#FFFFFF" strokeWidth="2" fill="none" />
+                  <circle cx="525" cy="340" r="2" fill="#FFFFFF" />
+                  
+                  {/* Penalty areas */}
+                  <rect x="50" y="195" width="165" height="290" stroke="#FFFFFF" strokeWidth="2" fill="none" />
+                  <rect x="835" y="195" width="165" height="290" stroke="#FFFFFF" strokeWidth="2" fill="none" />
+                  
+                  {/* Goal areas */}
+                  <rect x="50" y="265" width="55" height="150" stroke="#FFFFFF" strokeWidth="2" fill="none" />
+                  <rect x="945" y="265" width="55" height="150" stroke="#FFFFFF" strokeWidth="2" fill="none" />
+                  
+                  {/* Penalty spots */}
+                  <circle cx="165" cy="340" r="2" fill="#FFFFFF" />
+                  <circle cx="885" cy="340" r="2" fill="#FFFFFF" />
+                  
+                  {/* Corner arcs */}
+                  <path d="M60 60 A 10 10 0 0 1 50 50" stroke="#FFFFFF" strokeWidth="2" fill="none" />
+                  <path d="M990 60 A 10 10 0 0 0 1000 50" stroke="#FFFFFF" strokeWidth="2" fill="none" />
+                  <path d="M60 620 A 10 10 0 0 0 50 630" stroke="#FFFFFF" strokeWidth="2" fill="none" />
+                  <path d="M990 620 A 10 10 0 0 1 1000 630" stroke="#FFFFFF" strokeWidth="2" fill="none" />
+                </svg>
+              )}
               
               {imageError ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-club-black/60 p-3 sm:p-4 z-20">
@@ -210,41 +225,46 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                   <img 
                     src={imageUrl || player.heatmapUrl} 
                     alt={`${player.name} heatmap`}
-                    className="absolute inset-0 w-full h-full object-cover opacity-80"
+                    className="absolute inset-0 w-full h-full object-cover"
                     crossOrigin="anonymous"
                     onError={handleImageError}
+                    onLoad={handleImageLoad}
                     referrerPolicy="no-referrer"
                   />
-                  <div className={`absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-club-black/80 text-club-light-gray px-2 sm:px-3 py-1 sm:py-1.5 rounded-md z-20 font-medium ${
-                    isMobile ? 'text-xs' : 'text-xs'
-                  }`}>
-                    {player.name}'s Heatmap • {selectedPeriod}
-                  </div>
+                  {imageLoaded && (
+                    <div className={`absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-club-black/80 text-club-light-gray px-2 sm:px-3 py-1 sm:py-1.5 rounded-md z-20 font-medium ${
+                      isMobile ? 'text-xs' : 'text-xs'
+                    }`}>
+                      {player.name}'s Heatmap • {selectedPeriod}
+                    </div>
+                  )}
                 </>
               )}
             </div>
             
-            {/* Heatmap Color Legend */}
-            <div className="space-y-1.5 sm:space-y-2 flex-shrink-0">
-              <p className={`font-medium text-club-light-gray ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                Activity Intensity Scale:
-              </p>
-              <div className="flex items-center gap-2">
-                <div 
-                  className={`flex-1 rounded-md shadow-sm ${isMobile ? 'h-2' : 'h-3'}`}
-                  style={{
-                    background: `linear-gradient(to right, ${colorScaleStops.map(s => s.color).join(', ')})`
-                  }}
-                />
+            {/* Heatmap Color Legend - only show when image is loaded */}
+            {imageLoaded && (
+              <div className="space-y-1.5 sm:space-y-2 flex-shrink-0">
+                <p className={`font-medium text-club-light-gray ${isMobile ? 'text-xs' : 'text-sm'}`}>
+                  Activity Intensity Scale:
+                </p>
+                <div className="flex items-center gap-2">
+                  <div 
+                    className={`flex-1 rounded-md shadow-sm ${isMobile ? 'h-2' : 'h-3'}`}
+                    style={{
+                      background: `linear-gradient(to right, ${colorScaleStops.map(s => s.color).join(', ')})`
+                    }}
+                  />
+                </div>
+                <div className="flex justify-between text-club-light-gray/80">
+                  {colorScaleStops.filter(stop => stop.label).map((stop, i) => (
+                    <span key={i} className={`font-medium ${isMobile ? 'text-xs' : 'text-xs'}`}>
+                      {stop.label}
+                    </span>
+                  ))}
+                </div>
               </div>
-              <div className="flex justify-between text-club-light-gray/80">
-                {colorScaleStops.filter(stop => stop.label).map((stop, i) => (
-                  <span key={i} className={`font-medium ${isMobile ? 'text-xs' : 'text-xs'}`}>
-                    {stop.label}
-                  </span>
-                ))}
-              </div>
-            </div>
+            )}
           </div>
         ) : (
           <Alert className="bg-club-gold/10 border-club-gold/30 flex-1 flex items-center">
