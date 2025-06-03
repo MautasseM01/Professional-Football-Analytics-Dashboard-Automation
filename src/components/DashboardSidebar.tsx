@@ -27,8 +27,8 @@ export const DashboardSidebar = () => {
     }
   }, [isMobile]);
 
-  // Keep sidebar open on page changes for better navigation awareness
-  // Only close mobile overlay when navigating
+  // Keep sidebar open and expanded for navigation awareness
+  // Only close mobile overlay when navigating, but keep desktop sidebar open
   useEffect(() => {
     if (isMobile && mobileOpen) {
       // Close mobile overlay after a delay to allow user to see the navigation
@@ -37,7 +37,12 @@ export const DashboardSidebar = () => {
       }, 300);
       return () => clearTimeout(timer);
     }
-  }, [location.pathname, isMobile, mobileOpen]);
+    
+    // For desktop: keep sidebar expanded and don't auto-collapse when navigating
+    if (!isMobile && collapsed) {
+      setCollapsed(false);
+    }
+  }, [location.pathname, isMobile, mobileOpen, collapsed]);
 
   // Debug: Log the current user role and navigation filtering
   console.log('Current user role:', profile?.role);
@@ -167,7 +172,7 @@ export const DashboardSidebar = () => {
         </Button>
       )}
 
-      {/* Desktop sidebar */}
+      {/* Desktop sidebar - keep expanded for navigation awareness */}
       <TooltipProvider delayDuration={200}>
         <div
           className={`transition-all duration-300 ease-in-out h-screen flex flex-col border-r border-club-gold/20 bg-club-black ${
