@@ -2,6 +2,7 @@
 import React from "react";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
