@@ -4,6 +4,7 @@ import { supabase } from "@/lib/supabase";
 import { Player } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { useRoleAccess } from "@/hooks/use-role-access";
 import { toast } from "@/components/ui/sonner";
 
 export const usePlayerData = () => {
@@ -13,6 +14,7 @@ export const usePlayerData = () => {
   const [error, setError] = useState<string | null>(null);
   const { toast: uiToast } = useToast();
   const { profile } = useUserProfile();
+  const { canViewAllPlayers, canViewOwnDataOnly } = useRoleAccess();
   
   const fetchPlayers = async () => {
     setLoading(true);
@@ -36,12 +38,20 @@ export const usePlayerData = () => {
         // Apply role-based filtering
         let filteredData = data as Player[];
         
-        if (profile?.role === 'player') {
+        if (canViewOwnDataOnly()) {
           // Players can only see their own data
-          // Assuming player profile has a player_id field or we match by email/name
-          // For now, we'll show first player as demo - in real app, match by user profile
+          // For demo purposes, we'll show only the first player
+          // In a real app, you'd match by user profile or a player_user_id field
           filteredData = data.slice(0, 1) as Player[];
           console.log("Player role: showing only own data");
+        } else if (canViewAllPlayers()) {
+          // Staff roles can see all players
+          filteredData = data as Player[];
+          console.log("Staff role: showing all players");
+        } else {
+          // Unassigned or restricted roles see no players
+          filteredData = [];
+          console.log("Restricted role: no player access");
         }
         
         setPlayers(filteredData);
@@ -99,7 +109,7 @@ export const usePlayerData = () => {
     const player = players.find(p => p.id === id);
     if (player) {
       // Check role-based access
-      if (profile?.role === 'player' && players.length === 1 && player.id !== players[0].id) {
+      if (canViewOwnDataOnly() && players.length === 1 && player.id !== players[0].id) {
         uiToast({
           title: "Access Denied",
           description: "You can only view your own player data.",
@@ -116,19 +126,14 @@ export const usePlayerData = () => {
   const canAccessPlayerData = (playerId: number): boolean => {
     if (!profile) return false;
     
-    switch (profile.role) {
-      case 'admin':
-      case 'management':
-      case 'coach':
-      case 'analyst':
-      case 'performance_director':
-        return true;
-      case 'player':
-        // Players can only access their own data
-        return players.length === 1 && players[0].id === playerId;
-      default:
-        return false;
+    if (canViewAllPlayers()) {
+      return true;
+    } else if (canViewOwnDataOnly()) {
+      // Players can only access their own data
+      return players.length === 1 && players[0].id === playerId;
     }
+    
+    return false;
   };
   
   return {
