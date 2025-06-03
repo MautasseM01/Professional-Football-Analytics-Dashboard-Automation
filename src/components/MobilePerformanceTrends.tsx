@@ -64,23 +64,23 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
   };
 
   return (
-    <Card className="border-club-gold/20 bg-club-dark-gray w-full">
-      <CardHeader className="p-4 pb-2">
+    <Card className="border-club-gold/20 bg-club-dark-gray w-full max-w-full overflow-hidden">
+      <CardHeader className="p-3 xs:p-4 pb-2">
         <div className="flex items-center justify-between">
           <div className="min-w-0 flex-1">
-            <CardTitle className="text-base sm:text-lg text-club-gold font-semibold">
+            <CardTitle className="text-sm xs:text-base sm:text-lg text-club-gold font-semibold">
               Performance Trends
             </CardTitle>
             <CardDescription className="text-xs text-club-light-gray/70 mt-1">
               {currentChartData.description}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1 xs:gap-2">
             <Button
               variant="ghost"
               size="icon"
               onClick={prevChart}
-              className="h-11 w-11 text-club-gold hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
+              className="h-9 w-9 xs:h-11 xs:w-11 text-club-gold hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -88,7 +88,7 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
               variant="ghost"
               size="icon"
               onClick={nextChart}
-              className="h-11 w-11 text-club-gold hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
+              className="h-9 w-9 xs:h-11 xs:w-11 text-club-gold hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -108,51 +108,62 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
         </div>
       </CardHeader>
 
-      <CardContent className="p-4 pt-0">
-        <div className="space-y-4">
-          {/* Horizontal scroll message */}
-          <Alert className="bg-blue-500/10 border-blue-500/30">
-            <ArrowLeft className="h-4 w-4" />
-            <AlertDescription className="text-xs text-club-light-gray flex items-center gap-2">
-              Scroll horizontally to view full chart
-              <ArrowRight className="h-4 w-4" />
-            </AlertDescription>
-          </Alert>
-
-          {/* Chart with horizontal scroll */}
-          <div className="w-full overflow-x-auto">
-            <div className="min-w-[600px] h-48">
+      <CardContent className="p-3 xs:p-4 pt-0">
+        <div className="space-y-3 xs:space-y-4">
+          {/* Responsive chart container */}
+          <div className="w-full">
+            <div 
+              className="w-full h-[200px] xs:h-[250px] sm:h-[300px] md:h-[350px]"
+              style={{ maxWidth: '100%' }}
+            >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={performanceData} margin={{ top: 5, right: 20, left: 5, bottom: 5 }}>
+                <LineChart 
+                  data={performanceData} 
+                  margin={{ 
+                    top: 5, 
+                    right: window.innerWidth < 480 ? 10 : 20, 
+                    left: window.innerWidth < 480 ? 5 : 10, 
+                    bottom: 5 
+                  }}
+                >
                   <XAxis 
                     dataKey="match" 
                     stroke="#F5F5F5" 
-                    fontSize={10}
+                    fontSize={window.innerWidth < 480 ? 8 : 10}
                     tickLine={false}
                     axisLine={false}
+                    interval={window.innerWidth < 480 ? 1 : 0}
                   />
                   <YAxis 
                     stroke="#F5F5F5" 
-                    fontSize={10}
+                    fontSize={window.innerWidth < 480 ? 8 : 10}
                     tickLine={false}
                     axisLine={false}
-                    width={30}
+                    width={window.innerWidth < 480 ? 25 : 30}
                   />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: '#1A1A1A', 
                       border: '1px solid #D4AF37', 
                       borderRadius: '8px',
-                      fontSize: '12px'
+                      fontSize: window.innerWidth < 480 ? '10px' : '12px'
                     }}
                   />
                   <Line 
                     type="monotone" 
                     dataKey={currentChartData.dataKey}
                     stroke={currentChartData.color}
-                    strokeWidth={2}
-                    dot={{ fill: currentChartData.color, strokeWidth: 2, r: 4 }}
-                    activeDot={{ r: 6, stroke: currentChartData.color, strokeWidth: 2 }}
+                    strokeWidth={window.innerWidth < 480 ? 1.5 : 2}
+                    dot={{ 
+                      fill: currentChartData.color, 
+                      strokeWidth: window.innerWidth < 480 ? 1.5 : 2, 
+                      r: window.innerWidth < 480 ? 3 : 4 
+                    }}
+                    activeDot={{ 
+                      r: window.innerWidth < 480 ? 5 : 6, 
+                      stroke: currentChartData.color, 
+                      strokeWidth: 2 
+                    }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -161,7 +172,7 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
 
           {/* Chart title and navigation info */}
           <div className="text-center space-y-2">
-            <h3 className="text-sm font-medium text-club-light-gray">
+            <h3 className="text-xs xs:text-sm font-medium text-club-light-gray">
               {currentChartData.title}
             </h3>
             <p className="text-xs text-club-light-gray/60">
@@ -169,13 +180,15 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
             </p>
           </div>
 
-          {/* Landscape mode suggestion */}
-          <Alert className="bg-amber-500/10 border-amber-500/30">
-            <TrendingUp className="h-4 w-4" />
-            <AlertDescription className="text-xs text-club-light-gray">
-              Rotate to landscape mode for better chart viewing experience
-            </AlertDescription>
-          </Alert>
+          {/* Landscape mode suggestion - only show on very small screens */}
+          {window.innerWidth < 480 && (
+            <Alert className="bg-amber-500/10 border-amber-500/30">
+              <TrendingUp className="h-4 w-4" />
+              <AlertDescription className="text-xs text-club-light-gray">
+                Rotate to landscape mode for better chart viewing experience
+              </AlertDescription>
+            </Alert>
+          )}
         </div>
       </CardContent>
     </Card>

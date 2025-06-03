@@ -20,10 +20,10 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
     return (
       <div className="flex items-center justify-center min-h-[50vh] text-center px-4">
         <div className="space-y-2">
-          <p className={`text-club-light-gray ${isMobile ? 'text-base' : 'text-lg'}`}>
+          <p className="text-club-light-gray text-sm xs:text-base lg:text-lg">
             No player selected
           </p>
-          <p className={`text-club-light-gray/60 ${isMobile ? 'text-sm' : 'text-sm'}`}>
+          <p className="text-club-light-gray/60 text-xs xs:text-sm">
             Please select a player to view their statistics
           </p>
         </div>
@@ -32,9 +32,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
   }
 
   return (
-    <div className={`w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 ${
-      isMobile ? 'px-0' : 'px-4 sm:px-6 lg:px-8'
-    }`}>
+    <div className="w-full max-w-7xl mx-auto space-y-3 xs:space-y-4 sm:space-y-6 px-3 xs:px-4 sm:px-6 lg:px-8">
       {/* Player Profile Card */}
       <PlayerProfileCard player={player} />
 
