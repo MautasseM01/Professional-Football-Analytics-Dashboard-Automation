@@ -133,6 +133,74 @@
   .light-theme .hover\:bg-club-gold\/10:hover {
     @apply bg-yellow-600/20;
   }
+
+  /* Global scrollbar hiding while maintaining functionality */
+  * {
+    /* Firefox */
+    scrollbar-width: none;
+    /* Internet Explorer and Edge */
+    -ms-overflow-style: none;
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge Chromium) */
+  *::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-track {
+    display: none;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    display: none;
+  }
+
+  *::-webkit-scrollbar-corner {
+    display: none;
+  }
+
+  /* Ensure scroll functionality is maintained */
+  html,
+  body {
+    overflow: auto;
+  }
+
+  /* Specific targeting for common scroll containers */
+  .overflow-auto,
+  .overflow-x-auto,
+  .overflow-y-auto,
+  .overflow-scroll,
+  .overflow-x-scroll,
+  .overflow-y-scroll {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .overflow-auto::-webkit-scrollbar,
+  .overflow-x-auto::-webkit-scrollbar,
+  .overflow-y-auto::-webkit-scrollbar,
+  .overflow-scroll::-webkit-scrollbar,
+  .overflow-x-scroll::-webkit-scrollbar,
+  .overflow-y-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Chart containers and recharts components */
+  .recharts-wrapper,
+  .recharts-surface,
+  .recharts-responsive-container {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .recharts-wrapper::-webkit-scrollbar,
+  .recharts-surface::-webkit-scrollbar,
+  .recharts-responsive-container::-webkit-scrollbar {
+    display: none;
+  }
 }
 
 @layer components {
