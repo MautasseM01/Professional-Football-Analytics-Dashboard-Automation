@@ -6,13 +6,14 @@ interface StatCardProps {
   value: string | number;
   subValue?: string;
   icon?: React.ReactNode;
+  className?: string;
 }
 
-export const StatCard = ({ title, value, subValue, icon }: StatCardProps) => {
+export const StatCard = ({ title, value, subValue, icon, className = "" }: StatCardProps) => {
   return (
-    <Card className="border-club-gold/20 bg-club-dark-gray h-full w-full transition-all duration-200 hover:border-club-gold/40 hover:shadow-lg group">
-      <CardContent className="p-4 sm:p-5 lg:p-6 h-full">
-        <div className="flex items-start justify-between h-full">
+    <Card className={`border-club-gold/20 bg-club-dark-gray transition-all duration-200 hover:border-club-gold/40 hover:shadow-lg group ${className}`}>
+      <CardContent className="p-4 sm:p-5 lg:p-6 h-full min-h-[120px] flex flex-col justify-between">
+        <div className="flex items-start justify-between">
           <div className="min-w-0 flex-1 space-y-2 sm:space-y-3">
             <div className="text-xs sm:text-sm text-club-light-gray/70 font-medium leading-tight">
               {title}

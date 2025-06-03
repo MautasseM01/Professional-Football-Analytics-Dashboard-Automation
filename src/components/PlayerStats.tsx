@@ -1,3 +1,4 @@
+
 import { Player } from "@/types";
 import { StatCard } from "./StatCard";
 import { 
@@ -97,11 +98,11 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           </CardContent>
         </Card>
 
-        {/* Stats Cards Grid - Responsive */}
+        {/* Stats Cards Grid - Responsive with consistent sizing */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 lg:gap-6">
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full">
+              <div className="w-full h-full">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -121,7 +122,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full">
+              <div className="w-full h-full">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -142,7 +143,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full">
+              <div className="w-full h-full">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -163,7 +164,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full">
+              <div className="w-full h-full">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -184,7 +185,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full">
+              <div className="w-full h-full">
                 <DisciplinaryCard playerId={player.id} />
               </div>
             </TooltipTrigger>
