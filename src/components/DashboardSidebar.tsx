@@ -14,8 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 export const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [openSubMenu, setOpenSubMenu] = useState<string | null>(null);
-  const [manuallyToggled, setManuallyToggled] = useState<string | null>(null);
+  const [openSubMenus, setOpenSubMenus] = useState<Set<string>>(new Set());
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const location = useLocation();
   const { profile } = useUserProfile();
@@ -82,37 +81,27 @@ export const DashboardSidebar = () => {
     return null;
   };
 
-  // Set the active parent menu when location changes and keep it open
+  // Always keep the active parent menu open
   useEffect(() => {
     const activeParent = getActiveParentMenu(location.pathname);
     console.log('Current pathname:', location.pathname);
     console.log('Active parent menu:', activeParent);
     
-    // Only auto-open if it's not the currently manually toggled item
-    if (activeParent && manuallyToggled !== activeParent) {
-      setOpenSubMenu(activeParent);
+    if (activeParent) {
+      setOpenSubMenus(prev => new Set([...prev, activeParent]));
     }
-    
-    // Reset manual toggle state when navigating to a different parent
-    if (activeParent !== manuallyToggled) {
-      setManuallyToggled(null);
-    }
-  }, [location.pathname, filteredNavigationItems, manuallyToggled]);
+  }, [location.pathname, filteredNavigationItems]);
 
   const toggleSubMenu = (name: string) => {
-    const activeParent = getActiveParentMenu(location.pathname);
-    
-    if (openSubMenu === name) {
-      // If we're closing the currently active parent menu, mark it as manually toggled
-      if (name === activeParent) {
-        setManuallyToggled(name);
+    setOpenSubMenus(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(name)) {
+        newSet.delete(name);
+      } else {
+        newSet.add(name);
       }
-      setOpenSubMenu(null);
-    } else {
-      // Opening a submenu - clear manual toggle state
-      setManuallyToggled(null);
-      setOpenSubMenu(name);
-    }
+      return newSet;
+    });
   };
 
   const toggleMobileMenu = () => {
@@ -160,7 +149,7 @@ export const DashboardSidebar = () => {
                       key={item.name}
                       item={item}
                       collapsed={false}
-                      openSubMenu={openSubMenu}
+                      openSubMenu={openSubMenus.has(item.name) ? item.name : null}
                       toggleSubMenu={toggleSubMenu}
                     />
                   ))}
@@ -231,7 +220,7 @@ export const DashboardSidebar = () => {
                   key={item.name}
                   item={item}
                   collapsed={collapsed}
-                  openSubMenu={openSubMenu}
+                  openSubMenu={openSubMenus.has(item.name) ? item.name : null}
                   toggleSubMenu={toggleSubMenu}
                 />
               ))}
