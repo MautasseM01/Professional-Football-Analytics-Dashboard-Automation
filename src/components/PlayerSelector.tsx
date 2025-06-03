@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Player } from "@/types";
-import { useRoleAccess } from "@/hooks/use-role-access";
+import { useUserProfile } from "@/hooks/use-user-profile";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { 
   Select,
@@ -10,9 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Users, User, Lock } from "lucide-react";
-import { RoleBadge } from "./RoleBadge";
+import { Users, User } from "lucide-react";
 
 interface PlayerSelectorProps {
   players: Player[];
@@ -27,60 +25,41 @@ export const PlayerSelector = ({
   onPlayerSelect, 
   loading = false 
 }: PlayerSelectorProps) => {
-  const { profile, canViewOwnDataOnly, canViewAllPlayers, currentRole } = useRoleAccess();
+  const { profile } = useUserProfile();
 
-  // Show player-specific view for player role
-  if (canViewOwnDataOnly()) {
+  // Don't show selector if user is a player (they can only see their own data)
+  if (profile?.role === 'player') {
     return (
-      <div className="space-y-4">
-        <Card className="bg-club-dark-bg border-club-gold/20">
-          <CardHeader className="pb-3">
-            <CardTitle className="flex items-center justify-between text-club-gold text-lg">
-              <div className="flex items-center">
-                <User className="mr-2 h-5 w-5" />
-                Your Player Profile
-              </div>
-              <RoleBadge role={currentRole} size="sm" />
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {selectedPlayer ? (
-              <div className="text-club-light-gray">
-                <p className="font-medium">{selectedPlayer.name}</p>
-                <p className="text-sm text-club-light-gray/70">
-                  Position: {selectedPlayer.position}
-                </p>
-                <p className="text-sm text-club-light-gray/70">
-                  Number: #{selectedPlayer.number}
-                </p>
-              </div>
-            ) : (
-              <p className="text-club-light-gray/70">Loading your profile...</p>
-            )}
-          </CardContent>
-        </Card>
-        
-        <Alert className="bg-club-gold/10 border-club-gold/30">
-          <Lock className="h-4 w-4" />
-          <AlertDescription className="text-club-light-gray text-sm">
-            You can only view your own statistics and performance data.
-          </AlertDescription>
-        </Alert>
-      </div>
+      <Card className="bg-club-dark-bg border-club-gold/20">
+        <CardHeader className="pb-3">
+          <CardTitle className="flex items-center text-club-gold text-lg">
+            <User className="mr-2 h-5 w-5" />
+            Your Player Profile
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          {selectedPlayer ? (
+            <div className="text-club-light-gray">
+              <p className="font-medium">{selectedPlayer.name}</p>
+              <p className="text-sm text-club-light-gray/70">
+                Position: {selectedPlayer.position}
+              </p>
+            </div>
+          ) : (
+            <p className="text-club-light-gray/70">Loading your profile...</p>
+          )}
+        </CardContent>
+      </Card>
     );
   }
 
-  // Show loading state
   if (loading) {
     return (
       <Card className="bg-club-dark-bg border-club-gold/20">
         <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between text-club-gold text-lg">
-            <div className="flex items-center">
-              <Users className="mr-2 h-5 w-5" />
-              Select Player
-            </div>
-            <RoleBadge role={currentRole} size="sm" />
+          <CardTitle className="flex items-center text-club-gold text-lg">
+            <Users className="mr-2 h-5 w-5" />
+            Select Player
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -92,41 +71,12 @@ export const PlayerSelector = ({
     );
   }
 
-  // Show access denied for users without proper permissions
-  if (!canViewAllPlayers()) {
-    return (
-      <Card className="bg-club-dark-bg border-red-500/20">
-        <CardHeader className="pb-3">
-          <CardTitle className="flex items-center justify-between text-red-400 text-lg">
-            <div className="flex items-center">
-              <Lock className="mr-2 h-5 w-5" />
-              Access Restricted
-            </div>
-            <RoleBadge role={currentRole} size="sm" />
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Alert className="bg-red-500/10 border-red-500/30">
-            <Lock className="h-4 w-4" />
-            <AlertDescription className="text-club-light-gray text-sm">
-              Your current role ({currentRole}) does not have permission to view player statistics.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Show full selector for authorized roles (admin, management, coach, analyst, performance_director)
   return (
     <Card className="bg-club-dark-bg border-club-gold/20">
       <CardHeader className="pb-3">
-        <CardTitle className="flex items-center justify-between text-club-gold text-lg">
-          <div className="flex items-center">
-            <Users className="mr-2 h-5 w-5" />
-            Select Player
-          </div>
-          <RoleBadge role={currentRole} size="sm" />
+        <CardTitle className="flex items-center text-club-gold text-lg">
+          <Users className="mr-2 h-5 w-5" />
+          Select Player
         </CardTitle>
       </CardHeader>
       <CardContent>
