@@ -110,14 +110,21 @@ export const DashboardSidebar = () => {
     e.stopPropagation();
   };
 
-  // Mobile overlay with improved animations
+  // Prevent auto-close when clicking inside mobile sidebar
+  const handleMobileOverlayClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      closeMobileMenu();
+    }
+  };
+
+  // Mobile overlay with improved animations and better event handling
   if (isMobile && mobileOpen) {
     return (
       <>
         {/* Mobile backdrop */}
         <div 
           className="fixed inset-0 bg-black/60 z-40 lg:hidden transition-opacity duration-300 ease-out"
-          onClick={closeMobileMenu}
+          onClick={handleMobileOverlayClick}
         />
         
         {/* Mobile sidebar */}
@@ -162,14 +169,6 @@ export const DashboardSidebar = () => {
                 </nav>
               </div>
 
-              {/* Mobile controls - only show when screen is very small (320px) */}
-              <div className="sm:hidden border-t border-club-gold/20 p-4">
-                <div className="flex items-center justify-between gap-4">
-                  <LanguageSelector />
-                  <ThemeToggle />
-                </div>
-              </div>
-
               <SidebarFooter 
                 collapsed={false} 
                 onFeedbackClick={() => setFeedbackOpen(true)} 
@@ -198,8 +197,8 @@ export const DashboardSidebar = () => {
         </Button>
       )}
 
-      {/* Top-right navbar - always visible except on very small screens */}
-      <div className="fixed top-4 right-4 z-30 flex items-center gap-2 hidden sm:flex">
+      {/* Top-right navbar - always visible on desktop, hidden on mobile to avoid duplicates */}
+      <div className="fixed top-4 right-4 z-30 hidden lg:flex items-center gap-2">
         <LanguageSelector />
         <ThemeToggle />
       </div>

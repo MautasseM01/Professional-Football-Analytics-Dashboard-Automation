@@ -19,10 +19,13 @@ export const AdminDashboard = ({ profile }: AdminDashboardProps) => {
   const { data: playersAtRisk, isLoading: playersLoading } = usePlayersAtRisk();
 
   return (
-    <div className="space-y-2 xs:space-y-3 sm:space-y-4 md:space-y-5 lg:space-y-6 p-2 xs:p-3 sm:p-4 md:p-5 lg:p-6">
-      <h1 className="text-base xs:text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-club-gold px-1">
-        Welcome back, {profile.full_name || "Administrator"}
-      </h1>
+    <div className="space-y-3 xs:space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
+      {/* Welcome Header */}
+      <div className="flex flex-col gap-2">
+        <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-club-gold px-1">
+          Welcome back, {profile.full_name || "Administrator"}
+        </h1>
+      </div>
 
       {/* Compliance Alert Banner */}
       <ComplianceAlertBanner 
@@ -45,7 +48,7 @@ export const AdminDashboard = ({ profile }: AdminDashboardProps) => {
       {/* Administrative Cards with Responsive Grid */}
       <ResponsiveGrid 
         minCardWidth="280px"
-        className="grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3"
+        className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6"
       >
         <UserManagementCard />
         <SystemAdministrationCard />

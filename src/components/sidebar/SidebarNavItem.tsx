@@ -46,13 +46,15 @@ export const SidebarNavItem = ({
     const SubMenuButton = (
       <Button
         variant="ghost"
-        className={`w-full justify-between text-left h-auto p-3 transition-all duration-200 hover:bg-club-gold/10 hover:text-club-gold group ${
-          collapsed ? 'px-2' : 'px-3'
+        className={`w-full transition-all duration-200 hover:bg-club-gold/10 hover:text-club-gold group ${
+          collapsed 
+            ? 'h-12 w-12 p-0 justify-center items-center mx-auto' 
+            : 'h-auto p-3 justify-between text-left'
         }`}
         onClick={handleSubMenuToggle}
       >
-        <div className="flex items-center gap-3">
-          <item.icon size={collapsed ? 20 : 18} className="flex-shrink-0" />
+        <div className={`flex items-center ${collapsed ? 'justify-center' : 'gap-3'}`}>
+          <item.icon size={20} className="flex-shrink-0" />
           {!collapsed && (
             <span className="font-medium text-sm">{item.name}</span>
           )}
@@ -111,13 +113,13 @@ export const SidebarNavItem = ({
     <Link
       to={item.href || '#'}
       onClick={handleNavigate}
-      className={`flex items-center gap-3 p-3 rounded-md transition-all duration-200 hover:bg-club-gold/10 hover:text-club-gold group ${
+      className={`flex items-center rounded-md transition-all duration-200 hover:bg-club-gold/10 hover:text-club-gold group ${
         item.href && isActive(item.href)
           ? 'bg-club-gold/20 text-club-gold font-medium'
           : 'text-club-light-gray'
-      } ${collapsed ? 'justify-center px-2' : 'px-3'}`}
+      } ${collapsed ? 'h-12 w-12 p-0 justify-center mx-auto' : 'gap-3 p-3'}`}
     >
-      <item.icon size={collapsed ? 20 : 18} className="flex-shrink-0" />
+      <item.icon size={20} className="flex-shrink-0" />
       {!collapsed && (
         <span className="font-medium text-sm">{item.name}</span>
       )}

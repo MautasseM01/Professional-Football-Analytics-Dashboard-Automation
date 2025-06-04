@@ -12,7 +12,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
   const isMobile = useIsMobile();
 
   return (
-    <div className="flex h-screen bg-club-black text-white overflow-hidden">
+    <div className="flex h-screen bg-club-black text-white overflow-hidden w-full">
       <DashboardSidebar />
       <main className={cn(
         "flex-1 overflow-auto transition-all duration-300 ease-in-out",
