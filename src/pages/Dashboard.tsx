@@ -4,6 +4,7 @@ import { usePlayerData } from "@/hooks/use-player-data";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
+import { TestModeIndicator } from "@/components/TestModeIndicator";
 import { PlayerDashboard } from "@/components/dashboards/PlayerDashboard";
 import { CoachDashboard } from "@/components/dashboards/CoachDashboard";
 import { AnalystDashboard } from "@/components/dashboards/AnalystDashboard";
@@ -180,6 +181,11 @@ const Dashboard = () => {
         </header>
         
         <main className="bg-club-black transition-colors duration-300 w-full">
+          {/* Test Mode Indicator - positioned in main content */}
+          <div className="p-4 sm:p-6">
+            <TestModeIndicator />
+          </div>
+          
           {renderDashboardContent()}
         </main>
       </div>

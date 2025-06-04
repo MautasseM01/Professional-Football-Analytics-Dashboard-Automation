@@ -1,10 +1,22 @@
 
-import { useState } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { NavigationItem } from "./navigation-items";
+
+interface NavigationItem {
+  name: string;
+  href?: string;
+  icon: React.ComponentType<{ size?: number; className?: string }>;
+  allowedRoles: string[];
+  subItems?: {
+    name: string;
+    href: string;
+    allowedRoles: string[];
+  }[];
+}
 
 interface SidebarNavItemProps {
   item: NavigationItem;
@@ -12,132 +24,130 @@ interface SidebarNavItemProps {
   openSubMenu: string | null;
   toggleSubMenu: (name: string) => void;
   onNavigate?: () => void;
+  className?: string;
 }
 
-export const SidebarNavItem = ({ 
-  item, 
-  collapsed, 
-  openSubMenu, 
+export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
+  item,
+  collapsed,
+  openSubMenu,
   toggleSubMenu,
-  onNavigate 
-}: SidebarNavItemProps) => {
+  onNavigate,
+  className
+}) => {
   const location = useLocation();
+  const hasSubItems = item.subItems && item.subItems.length > 0;
   const isOpen = openSubMenu === item.name;
-
-  const isActive = (href: string) => {
-    return location.pathname === href || location.pathname.startsWith(href + '/');
+  
+  const isActive = () => {
+    if (item.href) {
+      return location.pathname === item.href || location.pathname.startsWith(item.href + '/');
+    }
+    if (hasSubItems) {
+      return item.subItems!.some(subItem => 
+        location.pathname === subItem.href || location.pathname.startsWith(subItem.href + '/')
+      );
+    }
+    return false;
   };
 
-  const handleNavigate = () => {
-    if (onNavigate) {
+  const handleClick = () => {
+    if (hasSubItems) {
+      toggleSubMenu(item.name);
+    } else if (onNavigate) {
       onNavigate();
     }
   };
 
-  const handleSubMenuToggle = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    toggleSubMenu(item.name);
-  };
+  const iconElement = <item.icon size={20} className="flex-shrink-0" />;
 
-  const hasSubItems = item.subItems && item.subItems.length > 0;
-
-  if (hasSubItems) {
-    const SubMenuButton = (
-      <Button
-        variant="ghost"
-        className={`w-full transition-all duration-200 hover:bg-club-gold/10 hover:text-club-gold group ${
-          collapsed 
-            ? 'h-12 w-12 p-0 flex items-center justify-center mx-auto' 
-            : 'h-auto p-3 justify-between text-left'
-        }`}
-        onClick={handleSubMenuToggle}
-      >
-        <div className={`flex items-center ${collapsed ? 'justify-center w-full' : 'gap-3'}`}>
-          <item.icon size={20} className="flex-shrink-0" />
-          {!collapsed && (
-            <span className="font-medium text-sm">{item.name}</span>
+  const buttonContent = (
+    <Button
+      variant="ghost"
+      className={cn(
+        "w-full justify-start text-club-light-gray hover:text-club-gold hover:bg-club-gold/10 transition-colors",
+        collapsed ? "px-2" : "px-3",
+        isActive() && "bg-club-gold/20 text-club-gold",
+        className
+      )}
+      onClick={handleClick}
+    >
+      {iconElement}
+      {!collapsed && (
+        <>
+          <span className="ml-3 truncate">{item.name}</span>
+          {hasSubItems && (
+            <div className="ml-auto">
+              {isOpen ? (
+                <ChevronDown size={16} className="text-club-light-gray" />
+              ) : (
+                <ChevronRight size={16} className="text-club-light-gray" />
+              )}
+            </div>
           )}
-        </div>
-        {!collapsed && (
-          <div className="flex-shrink-0">
-            {isOpen ? (
-              <ChevronDown size={16} className="transition-transform duration-200" />
-            ) : (
-              <ChevronRight size={16} className="transition-transform duration-200" />
-            )}
-          </div>
-        )}
-      </Button>
-    );
+        </>
+      )}
+    </Button>
+  );
 
-    return (
-      <div className="space-y-1">
-        {collapsed ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              {SubMenuButton}
-            </TooltipTrigger>
-            <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30">
-              <p>{item.name}</p>
-            </TooltipContent>
-          </Tooltip>
-        ) : (
-          SubMenuButton
-        )}
-        
-        {isOpen && !collapsed && (
-          <div className="ml-6 space-y-1">
-            {item.subItems?.map((subItem) => (
+  const mainElement = item.href && !hasSubItems ? (
+    <Link to={item.href} onClick={onNavigate} className="block">
+      {buttonContent}
+    </Link>
+  ) : (
+    buttonContent
+  );
+
+  return (
+    <div className="space-y-1">
+      {collapsed && !hasSubItems ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {item.href ? (
+              <Link to={item.href} onClick={onNavigate}>
+                {buttonContent}
+              </Link>
+            ) : (
+              mainElement
+            )}
+          </TooltipTrigger>
+          <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/20">
+            <p className="text-club-light-gray">{item.name}</p>
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        mainElement
+      )}
+
+      {/* Sub-menu items */}
+      {hasSubItems && isOpen && !collapsed && (
+        <div className="ml-6 space-y-1">
+          {item.subItems!.map((subItem) => {
+            const isSubActive = location.pathname === subItem.href || 
+                              location.pathname.startsWith(subItem.href + '/');
+            return (
               <Link
                 key={subItem.name}
                 to={subItem.href}
-                onClick={handleNavigate}
-                className={`block p-2 text-sm rounded-md transition-all duration-200 hover:bg-club-gold/10 hover:text-club-gold min-h-[44px] flex items-center ${
-                  isActive(subItem.href)
-                    ? 'bg-club-gold/20 text-club-gold font-medium'
-                    : 'text-club-light-gray/80'
-                }`}
+                onClick={onNavigate}
+                className="block"
               >
-                {subItem.name}
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start text-club-light-gray/80 hover:text-club-gold hover:bg-club-gold/10 transition-colors pl-3",
+                    isSubActive && "bg-club-gold/20 text-club-gold",
+                    className && "text-base" // Larger text for mobile
+                  )}
+                >
+                  <span className="truncate">{subItem.name}</span>
+                </Button>
               </Link>
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Single item without sub-items
-  const SingleItem = (
-    <Link
-      to={item.href || '#'}
-      onClick={handleNavigate}
-      className={`flex items-center rounded-md transition-all duration-200 hover:bg-club-gold/10 hover:text-club-gold group min-h-[44px] ${
-        item.href && isActive(item.href)
-          ? 'bg-club-gold/20 text-club-gold font-medium'
-          : 'text-club-light-gray'
-      } ${collapsed ? 'h-12 w-12 p-0 justify-center mx-auto' : 'gap-3 p-3'}`}
-    >
-      <item.icon size={20} className="flex-shrink-0" />
-      {!collapsed && (
-        <span className="font-medium text-sm">{item.name}</span>
+            );
+          })}
+        </div>
       )}
-    </Link>
+    </div>
   );
-
-  if (collapsed) {
-    return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          {SingleItem}
-        </TooltipTrigger>
-        <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30">
-          <p>{item.name}</p>
-        </TooltipContent>
-      </Tooltip>
-    );
-  }
-
-  return SingleItem;
 };
