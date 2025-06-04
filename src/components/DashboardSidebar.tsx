@@ -27,21 +27,21 @@ export const DashboardSidebar = () => {
   useEffect(() => {
     if (isMobile) {
       setCollapsed(true);
-      setMobileOpen(false);
     } else {
       setCollapsed(false);
+      setMobileOpen(false);
     }
   }, [isMobile]);
 
-  // Close mobile sidebar when route changes
+  // Close mobile sidebar when route changes, but with a delay to allow navigation
   useEffect(() => {
     if (isMobile && mobileOpen) {
       const timer = setTimeout(() => {
         setMobileOpen(false);
-      }, 150);
+      }, 300); // Increased delay to ensure navigation completes
       return () => clearTimeout(timer);
     }
-  }, [location.pathname, isMobile, mobileOpen]);
+  }, [location.pathname, isMobile]);
 
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
@@ -105,18 +105,18 @@ export const DashboardSidebar = () => {
     });
   };
 
-  const toggleMobileMenu = (e: React.MouseEvent) => {
+  const toggleMobileMenu = (e: React.MouseEvent | React.TouchEvent) => {
     e.preventDefault();
     e.stopPropagation();
     console.log('Mobile menu toggle clicked, current state:', mobileOpen);
-    setMobileOpen(prev => !prev);
+    setMobileOpen(prev => {
+      const newState = !prev;
+      console.log('Setting mobile menu to:', newState);
+      return newState;
+    });
   };
 
-  const closeMobileMenu = (e?: React.MouseEvent) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const closeMobileMenu = () => {
     console.log('Closing mobile menu');
     setMobileOpen(false);
   };
@@ -125,15 +125,28 @@ export const DashboardSidebar = () => {
     setCollapsed(!collapsed);
   };
 
-  const handleMobileSidebarClick = (e: React.MouseEvent) => {
+  const handleMobileSidebarClick = (e: React.MouseEvent | React.TouchEvent) => {
     e.stopPropagation();
+    console.log('Mobile sidebar clicked, preventing close');
   };
 
   // Handle backdrop click - only close if clicking directly on backdrop
-  const handleBackdropClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleBackdropClick = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     if (e.target === e.currentTarget) {
       console.log('Backdrop clicked, closing mobile menu');
       closeMobileMenu();
+    }
+  };
+
+  // Handle navigation item click - close menu after a short delay
+  const handleNavigate = () => {
+    if (isMobile && mobileOpen) {
+      console.log('Navigation triggered, will close menu after delay');
+      setTimeout(() => {
+        closeMobileMenu();
+      }, 150);
     }
   };
 
@@ -145,14 +158,14 @@ export const DashboardSidebar = () => {
         <div 
           className="fixed inset-0 bg-black/60 z-40 lg:hidden animate-in fade-in-0 duration-300"
           onClick={handleBackdropClick}
-          onTouchEnd={handleBackdropClick}
+          onTouchStart={handleBackdropClick}
         />
         
         {/* Mobile sidebar */}
         <div 
           className="fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] bg-club-black border-r border-club-gold/20 lg:hidden animate-in slide-in-from-left-0 duration-300"
           onClick={handleMobileSidebarClick}
-          onTouchEnd={handleMobileSidebarClick}
+          onTouchStart={handleMobileSidebarClick}
         >
           <TooltipProvider delayDuration={200}>
             <div className="h-full flex flex-col">
@@ -169,7 +182,6 @@ export const DashboardSidebar = () => {
                   variant="ghost"
                   size="icon"
                   onClick={closeMobileMenu}
-                  onTouchEnd={closeMobileMenu}
                   className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[48px] min-w-[48px] touch-manipulation"
                   aria-label="Close sidebar"
                 >
@@ -186,7 +198,7 @@ export const DashboardSidebar = () => {
                       collapsed={false}
                       openSubMenu={openSubMenus.has(item.name) ? item.name : null}
                       toggleSubMenu={toggleSubMenu}
-                      onNavigate={closeMobileMenu}
+                      onNavigate={handleNavigate}
                     />
                   ))}
                 </nav>
@@ -213,11 +225,7 @@ export const DashboardSidebar = () => {
           variant="ghost"
           size="icon"
           onClick={toggleMobileMenu}
-          onTouchEnd={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            toggleMobileMenu(e as any);
-          }}
+          onTouchStart={toggleMobileMenu}
           className="fixed top-4 left-4 z-30 text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 bg-club-black/90 backdrop-blur-sm lg:hidden min-h-[48px] min-w-[48px] touch-manipulation shadow-lg"
           aria-label="Open navigation menu"
         >
