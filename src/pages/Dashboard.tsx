@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { useUserProfile } from "@/hooks/use-user-profile";
@@ -132,11 +131,6 @@ const Dashboard = () => {
             
             {/* Right section - Controls */}
             <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-shrink-0">
-              {/* Role Tester - Only show when profile is loaded */}
-              {!profileLoading && profile && (
-                <RoleTester />
-              )}
-
               {/* User Profile - Hidden on mobile and small tablets */}
               {!profileLoading && profile && (
                 <div className="hidden lg:flex items-center px-2 lg:px-3 py-1.5 bg-club-dark-gray rounded-full border border-club-gold/20 transition-colors duration-300">
@@ -181,10 +175,12 @@ const Dashboard = () => {
         </header>
         
         <main className="bg-club-black transition-colors duration-300 w-full">
-          {/* Test Mode Indicator - positioned in main content */}
-          <div className="p-4 sm:p-6">
-            <TestModeIndicator />
-          </div>
+          {/* TEST MODE indicator moved here as first element */}
+          {!profileLoading && profile && (
+            <div className="p-4 sm:p-6 pb-0">
+              <RoleTester />
+            </div>
+          )}
           
           {renderDashboardContent()}
         </main>
