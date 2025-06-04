@@ -33,16 +33,6 @@ export const DashboardSidebar = () => {
     }
   }, [isMobile]);
 
-  // Close mobile menu when route changes
-  useEffect(() => {
-    if (isMobile && mobileOpen) {
-      const timer = setTimeout(() => {
-        setMobileOpen(false);
-      }, 150);
-      return () => clearTimeout(timer);
-    }
-  }, [location.pathname, isMobile, mobileOpen]);
-
   // Prevent body scroll when mobile menu is open
   useEffect(() => {
     if (isMobile && mobileOpen) {
@@ -114,12 +104,9 @@ export const DashboardSidebar = () => {
     setCollapsed(!collapsed);
   };
 
+  // Remove auto-close on navigation - let user control when to close
   const handleNavigate = () => {
-    if (isMobile && mobileOpen) {
-      setTimeout(() => {
-        closeMobileMenu();
-      }, 100);
-    }
+    // Don't auto-close on mobile - let user decide when to close
   };
 
   // Full-screen mobile overlay menu
@@ -136,7 +123,7 @@ export const DashboardSidebar = () => {
             className="h-full w-full flex flex-col justify-center items-center relative"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Close button */}
+            {/* Close button - larger touch target */}
             <Button
               variant="ghost"
               size="icon"
@@ -157,7 +144,7 @@ export const DashboardSidebar = () => {
               <span className="text-2xl font-bold text-club-gold">SMH Analytics</span>
             </div>
 
-            {/* Navigation items */}
+            {/* Navigation items - ensure minimum 44px touch targets */}
             <div className="flex flex-col items-center space-y-4 w-full max-w-sm px-8">
               {filteredNavigationItems.map(item => (
                 <div key={item.name} className="w-full">
@@ -167,22 +154,26 @@ export const DashboardSidebar = () => {
                     openSubMenu={openSubMenus.has(item.name) ? item.name : null}
                     toggleSubMenu={toggleSubMenu}
                     onNavigate={handleNavigate}
-                    className="min-h-[48px] text-lg justify-center text-center hover:bg-club-gold/10 rounded-lg"
+                    className="min-h-[48px] text-lg justify-center text-center hover:bg-club-gold/10 rounded-lg touch-manipulation"
                   />
                 </div>
               ))}
             </div>
 
-            {/* Mobile controls */}
+            {/* Mobile controls - larger touch targets */}
             <div className="absolute bottom-8 left-6 right-6">
               <div className="flex justify-center items-center space-x-8">
                 <div className="flex flex-col items-center space-y-2">
                   <span className="text-sm text-club-light-gray">Language</span>
-                  <LanguageSelector />
+                  <div className="touch-manipulation">
+                    <LanguageSelector />
+                  </div>
                 </div>
                 <div className="flex flex-col items-center space-y-2">
                   <span className="text-sm text-club-light-gray">Theme</span>
-                  <ThemeToggle />
+                  <div className="touch-manipulation">
+                    <ThemeToggle />
+                  </div>
                 </div>
               </div>
             </div>
@@ -196,7 +187,7 @@ export const DashboardSidebar = () => {
 
   return (
     <>
-      {/* Mobile hamburger button */}
+      {/* Mobile hamburger button - larger touch target */}
       {isMobile && (
         <Button
           variant="ghost"
