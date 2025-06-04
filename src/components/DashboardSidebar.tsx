@@ -247,16 +247,6 @@ export const DashboardSidebar = () => {
             </nav>
           </div>
 
-          {/* Desktop controls - only show when expanded */}
-          {!collapsed && (
-            <div className="border-t border-club-gold/20 p-4">
-              <div className="flex items-center justify-between gap-4">
-                <LanguageSelector />
-                <ThemeToggle />
-              </div>
-            </div>
-          )}
-
           <SidebarFooter 
             collapsed={collapsed} 
             onFeedbackClick={() => setFeedbackOpen(true)} 
