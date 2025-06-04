@@ -5,18 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-
-interface NavigationItem {
-  name: string;
-  href?: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
-  allowedRoles: string[];
-  subItems?: {
-    name: string;
-    href: string;
-    allowedRoles: string[];
-  }[];
-}
+import { NavigationItem } from "./navigation-items";
 
 interface SidebarNavItemProps {
   item: NavigationItem;
