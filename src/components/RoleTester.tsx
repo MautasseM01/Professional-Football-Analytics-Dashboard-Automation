@@ -30,13 +30,6 @@ export const RoleTester = () => {
   const { profile } = useUserProfile();
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Only show in development mode
-  const isDevelopment = import.meta.env.DEV;
-  
-  if (!isDevelopment) {
-    return null;
-  }
-
   const getCurrentRoleInfo = () => {
     return ROLES.find(role => role.value === profile?.role) || ROLES[6]; // Default to unassigned
   };
@@ -95,7 +88,7 @@ export const RoleTester = () => {
       {/* TEST MODE Warning */}
       <div className="flex items-center gap-1 px-2 py-1 bg-yellow-200 border border-yellow-400 rounded text-xs font-bold text-yellow-800">
         <AlertTriangle size={12} />
-        ⚠️ TEST MODE
+        TEST MODE
       </div>
 
       {/* Current Role Badge */}
