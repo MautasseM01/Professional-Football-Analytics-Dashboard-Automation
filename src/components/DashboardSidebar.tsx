@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -204,6 +203,18 @@ export const DashboardSidebar = () => {
                 </nav>
               </div>
 
+              {/* Mobile controls at bottom of sidebar */}
+              <div className="border-t border-club-gold/20 p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-club-light-gray">Language</span>
+                  <LanguageSelector />
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-club-light-gray">Theme</span>
+                  <ThemeToggle />
+                </div>
+              </div>
+
               <SidebarFooter 
                 collapsed={false} 
                 onFeedbackClick={() => setFeedbackOpen(true)} 
@@ -232,12 +243,6 @@ export const DashboardSidebar = () => {
           <Menu size={24} />
         </Button>
       )}
-
-      {/* Top-right navbar - always visible on desktop, hidden on mobile to avoid duplicates */}
-      <div className="fixed top-4 right-4 z-30 hidden lg:flex items-center gap-2">
-        <LanguageSelector />
-        <ThemeToggle />
-      </div>
 
       {/* Desktop sidebar */}
       <TooltipProvider delayDuration={200}>
