@@ -12,6 +12,19 @@ export const DataPipelineCard = () => {
     { source: "GPS Data Service", status: "error", lastUpdate: "3 days ago" }
   ];
 
+  const getStatusBadgeClass = (status: string) => {
+    switch (status) {
+      case 'operational':
+        return 'bg-green-600/80 text-white border-green-600/80';
+      case 'warning':
+        return 'bg-amber-600/80 text-white border-amber-600/80';
+      case 'error':
+        return 'bg-red-600/80 text-white border-red-600/80';
+      default:
+        return 'bg-gray-600/80 text-white border-gray-600/80';
+    }
+  };
+
   return (
     <Card className="bg-club-dark-gray border-club-gold/20">
       <CardHeader className="pb-2">
@@ -29,16 +42,19 @@ export const DataPipelineCard = () => {
           <h4 className="text-sm font-medium text-club-light-gray mb-2">Data Services</h4>
           <ul className="space-y-2">
             {dataImports.map((service, index) => (
-              <li key={index} className="flex justify-between bg-club-black/40 p-2 rounded">
-                <div>
-                  <p className="text-club-light-gray">{service.source}</p>
+              <li key={index} className="flex justify-between items-center bg-club-black/40 p-3 rounded">
+                <div className="flex-1 min-w-0 mr-3">
+                  <p className="text-club-light-gray truncate">{service.source}</p>
                   <p className="text-xs text-club-light-gray/70">Last update: {service.lastUpdate}</p>
                 </div>
-                <Badge className={
-                  service.status === 'operational' ? 'bg-green-600/80' : 
-                  service.status === 'warning' ? 'bg-amber-600/80' : 
-                  'bg-red-600/80'
-                }>
+                <Badge 
+                  className={`
+                    w-20 h-8 flex items-center justify-center
+                    text-xs font-medium rounded-md
+                    flex-shrink-0
+                    ${getStatusBadgeClass(service.status)}
+                  `}
+                >
                   {service.status}
                 </Badge>
               </li>
