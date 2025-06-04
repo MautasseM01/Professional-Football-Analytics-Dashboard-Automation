@@ -9,7 +9,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 interface NavigationItem {
   name: string;
   href?: string;
-  icon: React.ComponentType<{ size?: number; className?: string }>;
+  icon: React.ElementType;
   allowedRoles: string[];
   subItems?: {
     name: string;

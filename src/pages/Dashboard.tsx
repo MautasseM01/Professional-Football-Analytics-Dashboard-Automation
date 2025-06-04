@@ -181,10 +181,8 @@ const Dashboard = () => {
         </header>
         
         <main className="bg-club-black transition-colors duration-300 w-full">
-          {/* Test Mode Indicator - positioned in main content */}
-          <div className="p-4 sm:p-6">
-            <TestModeIndicator />
-          </div>
+          {/* Test Mode Indicator - positioned as first content in main area */}
+          <TestModeIndicator />
           
           {renderDashboardContent()}
         </main>
