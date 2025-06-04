@@ -162,8 +162,8 @@ export const DashboardSidebar = () => {
                 </nav>
               </div>
 
-              {/* Mobile controls */}
-              <div className="border-t border-club-gold/20 p-4">
+              {/* Mobile controls - only show when screen is very small (320px) */}
+              <div className="sm:hidden border-t border-club-gold/20 p-4">
                 <div className="flex items-center justify-between gap-4">
                   <LanguageSelector />
                   <ThemeToggle />
@@ -185,14 +185,6 @@ export const DashboardSidebar = () => {
 
   return (
     <>
-      {/* Top-right navbar for mobile */}
-      {isMobile && (
-        <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
-          <LanguageSelector />
-          <ThemeToggle />
-        </div>
-      )}
-
       {/* Mobile hamburger button */}
       {isMobile && (
         <Button
@@ -205,6 +197,12 @@ export const DashboardSidebar = () => {
           <Menu size={24} />
         </Button>
       )}
+
+      {/* Top-right navbar - always visible except on very small screens */}
+      <div className="fixed top-4 right-4 z-30 flex items-center gap-2 hidden sm:flex">
+        <LanguageSelector />
+        <ThemeToggle />
+      </div>
 
       {/* Desktop sidebar */}
       <TooltipProvider delayDuration={200}>
@@ -249,7 +247,7 @@ export const DashboardSidebar = () => {
             </nav>
           </div>
 
-          {/* Desktop controls */}
+          {/* Desktop controls - only show when expanded */}
           {!collapsed && (
             <div className="border-t border-club-gold/20 p-4">
               <div className="flex items-center justify-between gap-4">
@@ -267,14 +265,6 @@ export const DashboardSidebar = () => {
           <FeedbackForm open={feedbackOpen} onOpenChange={setFeedbackOpen} />
         </div>
       </TooltipProvider>
-
-      {/* Desktop top-right navbar */}
-      {!isMobile && (
-        <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
-          <LanguageSelector />
-          <ThemeToggle />
-        </div>
-      )}
     </>
   );
 };
