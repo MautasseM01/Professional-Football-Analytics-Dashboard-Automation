@@ -1,7 +1,5 @@
 
 import React from 'react';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Code2 } from 'lucide-react';
 
 export const TestModeIndicator = () => {
   // Only show in development mode
@@ -12,11 +10,8 @@ export const TestModeIndicator = () => {
   }
 
   return (
-    <Alert className="mb-6 bg-orange-50 border-orange-200 text-orange-800 dark:bg-orange-950/20 dark:border-orange-800/30 dark:text-orange-300">
-      <Code2 className="h-4 w-4" />
-      <AlertDescription className="text-sm font-medium">
-        Development Mode - Test environment active
-      </AlertDescription>
-    </Alert>
+    <div className="mb-4 px-4 py-2 bg-yellow-100 border border-yellow-300 rounded-md text-yellow-800 text-sm font-medium w-fit">
+      ⚠️ TEST MODE
+    </div>
   );
 };
