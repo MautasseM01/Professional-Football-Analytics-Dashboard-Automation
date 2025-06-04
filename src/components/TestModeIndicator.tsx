@@ -12,13 +12,11 @@ export const TestModeIndicator = () => {
   }
 
   return (
-    <div className="px-4 sm:px-6 pt-4 sm:pt-6 pb-2">
-      <Alert className="bg-amber-50/50 border-amber-200/30 dark:bg-amber-950/20 dark:border-amber-800/30">
-        <Code2 className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-        <AlertDescription className="text-amber-800 dark:text-amber-200 text-sm">
-          <strong>Development Mode:</strong> This is a test environment for development purposes.
-        </AlertDescription>
-      </Alert>
-    </div>
+    <Alert className="bg-amber-50 border-amber-200 dark:bg-amber-950/50 dark:border-amber-800 mb-4">
+      <Code2 className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+      <AlertDescription className="text-amber-800 dark:text-amber-200 text-sm">
+        <strong>Development Mode:</strong> This is a test environment for development purposes.
+      </AlertDescription>
+    </Alert>
   );
 };
