@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -7,6 +8,8 @@ import { navigationItems } from "./sidebar/navigation-items";
 import { SidebarNavItem } from "./sidebar/SidebarNavItem";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { FeedbackForm } from "./FeedbackForm";
+import { LanguageSelector } from "./LanguageSelector";
+import { ThemeToggle } from "./ThemeToggle";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { hasAccess } from "@/utils/roleAccess";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -26,7 +29,6 @@ export const DashboardSidebar = () => {
       setCollapsed(true);
       setMobileOpen(false);
     } else {
-      // On desktop, start expanded for better UX
       setCollapsed(false);
     }
   }, [isMobile]);
@@ -40,9 +42,6 @@ export const DashboardSidebar = () => {
       return () => clearTimeout(timer);
     }
   }, [location.pathname, isMobile, mobileOpen]);
-
-  // Debug: Log the current user role and navigation filtering
-  console.log('Current user role:', profile?.role);
 
   const filteredNavigationItems = navigationItems.filter(item => {
     const hasItemAccess = hasAccess(profile?.role, item.allowedRoles);
@@ -73,7 +72,6 @@ export const DashboardSidebar = () => {
     return null;
   };
 
-  // Always keep the active parent menu open
   useEffect(() => {
     const activeParent = getActiveParentMenu(location.pathname);
     
@@ -94,12 +92,22 @@ export const DashboardSidebar = () => {
     });
   };
 
-  const toggleMobileMenu = () => {
+  const toggleMobileMenu = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     setMobileOpen(!mobileOpen);
+  };
+
+  const closeMobileMenu = () => {
+    setMobileOpen(false);
   };
 
   const toggleDesktopSidebar = () => {
     setCollapsed(!collapsed);
+  };
+
+  const handleMobileSidebarClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
   };
 
   // Mobile overlay with improved animations
@@ -109,11 +117,14 @@ export const DashboardSidebar = () => {
         {/* Mobile backdrop */}
         <div 
           className="fixed inset-0 bg-black/60 z-40 lg:hidden transition-opacity duration-300 ease-out"
-          onClick={() => setMobileOpen(false)}
+          onClick={closeMobileMenu}
         />
         
-        {/* Mobile sidebar with improved slide animation */}
-        <div className="fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] bg-club-black border-r border-club-gold/20 lg:hidden transform transition-transform duration-300 ease-out">
+        {/* Mobile sidebar */}
+        <div 
+          className="fixed inset-y-0 left-0 z-50 w-80 max-w-[85vw] bg-club-black border-r border-club-gold/20 lg:hidden transform transition-transform duration-300 ease-out"
+          onClick={handleMobileSidebarClick}
+        >
           <TooltipProvider delayDuration={200}>
             <div className="h-full flex flex-col">
               <div className="flex items-center justify-between px-4 py-5 border-b border-club-gold/20">
@@ -128,7 +139,7 @@ export const DashboardSidebar = () => {
                 <Button
                   variant="ghost"
                   size="icon"
-                  onClick={() => setMobileOpen(false)}
+                  onClick={closeMobileMenu}
                   className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[48px] min-w-[48px] touch-manipulation"
                   aria-label="Close sidebar"
                 >
@@ -145,9 +156,18 @@ export const DashboardSidebar = () => {
                       collapsed={false}
                       openSubMenu={openSubMenus.has(item.name) ? item.name : null}
                       toggleSubMenu={toggleSubMenu}
+                      onNavigate={closeMobileMenu}
                     />
                   ))}
                 </nav>
+              </div>
+
+              {/* Mobile controls */}
+              <div className="border-t border-club-gold/20 p-4">
+                <div className="flex items-center justify-between gap-4">
+                  <LanguageSelector />
+                  <ThemeToggle />
+                </div>
               </div>
 
               <SidebarFooter 
@@ -165,7 +185,15 @@ export const DashboardSidebar = () => {
 
   return (
     <>
-      {/* Mobile hamburger button with improved touch target */}
+      {/* Top-right navbar for mobile */}
+      {isMobile && (
+        <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
+          <LanguageSelector />
+          <ThemeToggle />
+        </div>
+      )}
+
+      {/* Mobile hamburger button */}
       {isMobile && (
         <Button
           variant="ghost"
@@ -178,7 +206,7 @@ export const DashboardSidebar = () => {
         </Button>
       )}
 
-      {/* Desktop sidebar with improved responsive behavior */}
+      {/* Desktop sidebar */}
       <TooltipProvider delayDuration={200}>
         <div
           className={`transition-all duration-300 ease-in-out h-screen flex flex-col border-r border-club-gold/20 bg-club-black ${
@@ -221,6 +249,16 @@ export const DashboardSidebar = () => {
             </nav>
           </div>
 
+          {/* Desktop controls */}
+          {!collapsed && (
+            <div className="border-t border-club-gold/20 p-4">
+              <div className="flex items-center justify-between gap-4">
+                <LanguageSelector />
+                <ThemeToggle />
+              </div>
+            </div>
+          )}
+
           <SidebarFooter 
             collapsed={collapsed} 
             onFeedbackClick={() => setFeedbackOpen(true)} 
@@ -229,6 +267,14 @@ export const DashboardSidebar = () => {
           <FeedbackForm open={feedbackOpen} onOpenChange={setFeedbackOpen} />
         </div>
       </TooltipProvider>
+
+      {/* Desktop top-right navbar */}
+      {!isMobile && (
+        <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
+          <LanguageSelector />
+          <ThemeToggle />
+        </div>
+      )}
     </>
   );
 };

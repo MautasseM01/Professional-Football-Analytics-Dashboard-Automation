@@ -1,186 +1,140 @@
-
+import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronDown, ChevronRight, ArrowUpRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
-import { 
-  Collapsible, 
-  CollapsibleContent, 
-  CollapsibleTrigger 
-} from "@/components/ui/collapsible";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { NavigationItem } from "./navigation-items";
-import { useLanguage } from "@/contexts/LanguageContext";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface SidebarNavItemProps {
   item: NavigationItem;
   collapsed: boolean;
   openSubMenu: string | null;
   toggleSubMenu: (name: string) => void;
+  onNavigate?: () => void;
 }
 
-export function SidebarNavItem({ 
+export const SidebarNavItem = ({ 
   item, 
   collapsed, 
   openSubMenu, 
-  toggleSubMenu 
-}: SidebarNavItemProps) {
+  toggleSubMenu,
+  onNavigate 
+}: SidebarNavItemProps) => {
   const location = useLocation();
-  const { t } = useLanguage();
-  const isMobile = useIsMobile();
-  
+  const isOpen = openSubMenu === item.name;
+
   const isActive = (href: string) => {
     return location.pathname === href || location.pathname.startsWith(href + '/');
   };
 
-  const isParentActive = (item: NavigationItem) => {
-    if (!item.subItems) return false;
-    return item.subItems.some(subItem => isActive(subItem.href));
+  const handleNavigate = () => {
+    if (onNavigate) {
+      onNavigate();
+    }
   };
 
-  // Enhanced touch targets for mobile
-  const touchTargetClasses = isMobile ? "min-h-[48px] py-3" : "py-2.5";
-  const iconSize = isMobile ? 24 : 20;
+  const handleSubMenuToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleSubMenu(item.name);
+  };
 
-  if (item.subItems) {
-    const parentIsActive = isParentActive(item);
-    const isOpen = openSubMenu === item.name;
+  const hasSubItems = item.subItems && item.subItems.length > 0;
 
-    return (
-      <Collapsible
-        open={isOpen}
-        onOpenChange={() => {}}
-        className="w-full"
+  if (hasSubItems) {
+    const SubMenuButton = (
+      <Button
+        variant="ghost"
+        className={`w-full justify-between text-left h-auto p-3 transition-all duration-200 hover:bg-club-gold/10 hover:text-club-gold group ${
+          collapsed ? 'px-2' : 'px-3'
+        }`}
+        onClick={handleSubMenuToggle}
       >
-        <div
-          className={cn(
-            "group flex items-center rounded-lg transition-all duration-200",
-            parentIsActive || isActive(item.href)
-              ? "bg-club-gold/20 text-club-gold"
-              : "text-club-light-gray hover:bg-club-gold/10 hover:text-club-gold",
-            collapsed ? "justify-center px-2" : "justify-between px-3",
-            touchTargetClasses
-          )}
-        >
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Link
-                to={item.href}
-                className={cn(
-                  "flex items-center gap-3 flex-1 min-w-0",
-                  collapsed && "justify-center"
-                )}
-              >
-                <item.icon
-                  size={iconSize}
-                  className={cn(
-                    "flex-shrink-0",
-                    parentIsActive || isActive(item.href) ? "text-club-gold" : "text-club-light-gray group-hover:text-club-gold"
-                  )}
-                />
-                {!collapsed && (
-                  <span className="truncate font-medium text-sm">
-                    {t(item.translationKey)}
-                  </span>
-                )}
-              </Link>
-            </TooltipTrigger>
-            {collapsed && (
-              <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
-                {t(item.translationKey)}
-              </TooltipContent>
-            )}
-          </Tooltip>
-          
+        <div className="flex items-center gap-3">
+          <item.icon size={collapsed ? 20 : 18} className="flex-shrink-0" />
           {!collapsed && (
-            <CollapsibleTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "flex-shrink-0 text-club-light-gray hover:text-club-gold hover:bg-transparent",
-                  isMobile ? "h-8 w-8" : "h-6 w-6"
-                )}
-                onClick={() => toggleSubMenu(item.name)}
-              >
-                {isOpen ? (
-                  <ChevronDown size={isMobile ? 20 : 16} />
-                ) : (
-                  <ChevronRight size={isMobile ? 20 : 16} />
-                )}
-              </Button>
-            </CollapsibleTrigger>
+            <span className="font-medium text-sm">{item.name}</span>
           )}
         </div>
-        
         {!collapsed && (
-          <CollapsibleContent className="ml-6 space-y-1 mt-1">
-            {item.subItems.map((subItem) => (
+          <div className="flex-shrink-0">
+            {isOpen ? (
+              <ChevronDown size={16} className="transition-transform duration-200" />
+            ) : (
+              <ChevronRight size={16} className="transition-transform duration-200" />
+            )}
+          </div>
+        )}
+      </Button>
+    );
+
+    return (
+      <div className="space-y-1">
+        {collapsed ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {SubMenuButton}
+            </TooltipTrigger>
+            <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30">
+              <p>{item.name}</p>
+            </TooltipContent>
+          </Tooltip>
+        ) : (
+          SubMenuButton
+        )}
+        
+        {isOpen && !collapsed && (
+          <div className="ml-6 space-y-1">
+            {item.subItems?.map((subItem) => (
               <Link
                 key={subItem.name}
                 to={subItem.href}
-                className={cn(
-                  "group flex items-center rounded-lg transition-all duration-200 px-3",
+                onClick={handleNavigate}
+                className={`block p-2 text-sm rounded-md transition-all duration-200 hover:bg-club-gold/10 hover:text-club-gold ${
                   isActive(subItem.href)
-                    ? "bg-club-gold/20 text-club-gold font-medium"
-                    : "text-club-light-gray hover:bg-club-gold/5 hover:text-club-gold",
-                  touchTargetClasses
-                )}
+                    ? 'bg-club-gold/20 text-club-gold font-medium'
+                    : 'text-club-light-gray/80'
+                }`}
               >
-                <ArrowUpRight 
-                  size={isMobile ? 18 : 16}
-                  className={cn(
-                    "mr-3 flex-shrink-0",
-                    isActive(subItem.href) ? "text-club-gold" : "text-club-light-gray/70"
-                  )} 
-                />
-                <span className="truncate text-sm">{t(subItem.translationKey)}</span>
+                {subItem.name}
               </Link>
             ))}
-          </CollapsibleContent>
+          </div>
         )}
-      </Collapsible>
+      </div>
     );
   }
 
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <Link
-          to={item.href}
-          className={cn(
-            "group flex items-center rounded-lg transition-all duration-200",
-            isActive(item.href)
-              ? "bg-club-gold/20 text-club-gold"
-              : "text-club-light-gray hover:bg-club-gold/10 hover:text-club-gold",
-            collapsed ? "justify-center px-2" : "justify-start px-3",
-            touchTargetClasses
-          )}
-        >
-          <item.icon
-            size={iconSize}
-            className={cn(
-              "flex-shrink-0",
-              isActive(item.href) ? "text-club-gold" : "text-club-light-gray group-hover:text-club-gold"
-            )}
-          />
-          {!collapsed && (
-            <span className="ml-3 truncate font-medium text-sm">
-              {t(item.translationKey)}
-            </span>
-          )}
-        </Link>
-      </TooltipTrigger>
-      {collapsed && (
-        <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
-          {t(item.translationKey)}
-        </TooltipContent>
+  // Single item without sub-items
+  const SingleItem = (
+    <Link
+      to={item.href || '#'}
+      onClick={handleNavigate}
+      className={`flex items-center gap-3 p-3 rounded-md transition-all duration-200 hover:bg-club-gold/10 hover:text-club-gold group ${
+        item.href && isActive(item.href)
+          ? 'bg-club-gold/20 text-club-gold font-medium'
+          : 'text-club-light-gray'
+      } ${collapsed ? 'justify-center px-2' : 'px-3'}`}
+    >
+      <item.icon size={collapsed ? 20 : 18} className="flex-shrink-0" />
+      {!collapsed && (
+        <span className="font-medium text-sm">{item.name}</span>
       )}
-    </Tooltip>
+    </Link>
   );
-}
+
+  if (collapsed) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>
+          {SingleItem}
+        </TooltipTrigger>
+        <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30">
+          <p>{item.name}</p>
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return SingleItem;
+};
