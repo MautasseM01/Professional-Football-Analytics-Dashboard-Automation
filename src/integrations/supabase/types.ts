@@ -9,6 +9,38 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      audit_logs: {
+        Row: {
+          action: string
+          created_at: string | null
+          details: string | null
+          id: number
+          user_id: string | null
+        }
+        Insert: {
+          action: string
+          created_at?: string | null
+          details?: string | null
+          id?: number
+          user_id?: string | null
+        }
+        Update: {
+          action?: string
+          created_at?: string | null
+          details?: string | null
+          id?: number
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "audit_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_passes: {
         Row: {
           created_at: string | null
@@ -82,6 +114,27 @@ export type Database = {
           location?: string
           opponent?: string
           result?: string
+        }
+        Relationships: []
+      }
+      pipeline_status: {
+        Row: {
+          id: number
+          last_update: string | null
+          service_name: string
+          status: string | null
+        }
+        Insert: {
+          id?: number
+          last_update?: string | null
+          service_name: string
+          status?: string | null
+        }
+        Update: {
+          id?: number
+          last_update?: string | null
+          service_name?: string
+          status?: string | null
         }
         Relationships: []
       }
