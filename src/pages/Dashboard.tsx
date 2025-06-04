@@ -18,7 +18,8 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { BackToTopButton } from "@/components/BackToTopButton";
 import { RoleTester } from "@/components/RoleTester";
-import { Menu, RefreshCw, UserIcon } from "lucide-react";
+import { Menu, RefreshCw } from "lucide-react";
+
 const Dashboard = () => {
   const {
     loading: playerDataLoading,
@@ -114,14 +115,6 @@ const Dashboard = () => {
             
             {/* Right section - Controls */}
             <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-shrink-0">
-              {/* User Profile - Hidden on mobile and small tablets */}
-              {!profileLoading && profile && <div className="hidden lg:flex items-center px-2 lg:px-3 py-1.5 bg-club-dark-gray rounded-full border border-club-gold/20 transition-colors duration-300">
-                  <UserIcon size={14} className="text-club-gold mr-1.5 lg:mr-2" />
-                  <span className="text-club-light-gray text-xs lg:text-sm truncate max-w-20 lg:max-w-none">
-                    {profile.full_name || profile.email || "User"}
-                  </span>
-                </div>}
-              
               {/* Language Selector */}
               <LanguageSelector />
               
@@ -146,7 +139,7 @@ const Dashboard = () => {
         </header>
         
         <main className="bg-club-black transition-colors duration-300 w-full">
-          {/* TEST MODE indicator moved here as first element */}
+          {/* TEST MODE indicator as first element */}
           {!profileLoading && profile && <div className="p-4 sm:p-6 pb-0">
               <RoleTester />
             </div>}

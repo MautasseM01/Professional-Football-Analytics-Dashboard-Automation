@@ -10,9 +10,9 @@ import {
 import { useLanguage } from '@/contexts/LanguageContext';
 
 const languages = [
-  { code: 'fr', name: 'Français', flag: '🇫🇷' },
-  { code: 'en', name: 'English', flag: '🇬🇧' },
   { code: 'ar', name: 'العربية', flag: '🇸🇦' },
+  { code: 'en', name: 'English', flag: '🇬🇧' },
+  { code: 'fr', name: 'Français', flag: '🇫🇷' },
 ];
 
 export const LanguageSelector = () => {
@@ -22,11 +22,10 @@ export const LanguageSelector = () => {
 
   return (
     <Select value={language} onValueChange={setLanguage}>
-      <SelectTrigger className="w-[80px] sm:w-[100px] text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors bg-transparent h-9 sm:h-10">
+      <SelectTrigger className="w-8 sm:w-9 lg:w-10 h-8 sm:h-9 lg:h-10 text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors bg-transparent">
         <SelectValue>
-          <div className="flex items-center gap-1 sm:gap-2">
-            <span className="text-xs sm:text-sm">{currentLanguage?.flag}</span>
-            <span className="text-xs font-medium hidden sm:inline">
+          <div className="flex items-center justify-center">
+            <span className="text-xs font-medium">
               {currentLanguage?.code.toUpperCase()}
             </span>
           </div>
