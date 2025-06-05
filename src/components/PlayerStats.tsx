@@ -20,11 +20,11 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
   if (!player) {
     return (
       <div className="flex items-center justify-center min-h-[50vh] text-center container-responsive">
-        <div className="space-y-2">
-          <p className="text-responsive-lg text-club-light-gray">
+        <div className="space-y-3">
+          <p className="text-lg sm:text-xl text-club-light-gray">
             No player selected
           </p>
-          <p className="text-responsive-sm text-club-light-gray/60">
+          <p className="text-sm text-club-light-gray/60">
             Please select a player to view their statistics
           </p>
         </div>
@@ -33,29 +33,31 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
   }
 
   return (
-    <ResponsiveLayout className="w-full max-w-7xl mx-auto container-responsive space-y-6">
-      {/* Player Profile Card */}
-      <div className="transition-all duration-300 ease-in-out">
-        <PlayerProfileCard player={player} />
-      </div>
+    <ResponsiveLayout className="w-full max-w-7xl mx-auto container-responsive">
+      <div className="space-y-6 sm:space-y-7 lg:space-y-8">
+        {/* Player Profile Card */}
+        <div className="transition-all duration-300 ease-in-out">
+          <PlayerProfileCard player={player} />
+        </div>
 
-      {/* Stats Cards Grid */}
-      <div className="transition-all duration-300 ease-in-out">
-        <PlayerStatCards player={player} />
-      </div>
+        {/* Stats Cards Grid */}
+        <div className="transition-all duration-300 ease-in-out">
+          <PlayerStatCards player={player} />
+        </div>
 
-      {/* Performance Section */}
-      <div className="transition-all duration-300 ease-in-out">
-        {isMobile ? (
-          <MobilePerformanceTrends player={player} />
-        ) : (
-          <PlayerPerformanceSection player={player} />
-        )}
-      </div>
+        {/* Performance Section */}
+        <div className="transition-all duration-300 ease-in-out">
+          {isMobile ? (
+            <MobilePerformanceTrends player={player} />
+          ) : (
+            <PlayerPerformanceSection player={player} />
+          )}
+        </div>
 
-      {/* Heatmap and Tackle Success Cards */}
-      <div className="transition-all duration-300 ease-in-out">
-        <PlayerHeatmapTackleSection player={player} />
+        {/* Heatmap and Tackle Success Cards */}
+        <div className="transition-all duration-300 ease-in-out">
+          <PlayerHeatmapTackleSection player={player} />
+        </div>
       </div>
     </ResponsiveLayout>
   );

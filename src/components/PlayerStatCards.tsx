@@ -60,6 +60,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
           className={`
             ${gridConfig.className}
             auto-rows-fr
+            gap-4 sm:gap-5 lg:gap-6
             transition-all duration-300 ease-in-out
           `}
         >

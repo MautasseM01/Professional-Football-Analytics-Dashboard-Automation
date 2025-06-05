@@ -16,31 +16,33 @@ export const StatCard = ({ title, value, subValue, icon, className = "" }: StatC
       transition-all duration-300 ease-in-out
       hover:border-club-gold/40 hover:shadow-lg 
       hover:scale-[1.02] active:scale-[0.98]
-      group ${className}
+      group h-full ${className}
     `}>
-      <CardContent className="p-responsive-4 min-h-[140px] flex flex-col justify-between">
-        <div className="min-w-0 flex-1 space-y-2">
-          <div className="text-responsive-sm text-club-light-gray/70 font-medium leading-tight">
-            {title}
+      <CardContent className="p-4 sm:p-5 lg:p-6 h-full flex flex-col justify-between min-h-[140px]">
+        <div className="min-w-0 flex-1 space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="text-sm text-club-light-gray/70 font-medium leading-tight min-w-0 flex-1">
+              {title}
+            </div>
+            {icon && (
+              <div className="text-club-gold/30 flex-shrink-0 group-hover:text-club-gold/50 transition-colors duration-300">
+                <div className="w-4 h-4 sm:w-5 sm:h-5">
+                  {icon}
+                </div>
+              </div>
+            )}
           </div>
           <div className="space-y-1">
-            <div className="text-responsive-2xl font-bold text-club-gold break-words leading-tight group-hover:text-club-gold/90 transition-colors duration-300">
+            <div className="text-2xl sm:text-3xl font-bold text-club-gold break-words leading-tight group-hover:text-club-gold/90 transition-colors duration-300">
               {value}
             </div>
             {subValue && (
-              <div className="text-responsive-xs text-club-light-gray/60 break-words leading-tight">
+              <div className="text-xs text-club-light-gray/60 break-words leading-tight">
                 {subValue}
               </div>
             )}
           </div>
         </div>
-        {icon && (
-          <div className="text-club-gold/30 flex-shrink-0 group-hover:text-club-gold/50 transition-colors duration-300 ml-2 flex items-center justify-center">
-            <div className="w-5 h-5 transition-all duration-300 ease-in-out">
-              {icon}
-            </div>
-          </div>
-        )}
       </CardContent>
     </Card>
   );
