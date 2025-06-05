@@ -24,7 +24,7 @@ import {
   Legend,
   Tooltip
 } from "recharts";
-import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useResponsiveBreakpoint } from "@/hooks/use-orientation";
@@ -243,21 +243,21 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                 </div>
               </div>
               
-              {/* Checkbox Row - Hide on very small screens */}
+              {/* Switch Row - Hide on very small screens */}
               {!isMobile && (
-                <div className="flex items-center space-x-2 pt-1">
-                  <Checkbox 
-                    id="movingAverage" 
-                    checked={showMovingAverage}
-                    onCheckedChange={(checked) => setShowMovingAverage(!!checked)}
-                    className="data-[state=checked]:bg-club-gold data-[state=checked]:border-club-gold"
-                  />
+                <div className="flex items-center justify-between pt-1">
                   <Label 
                     htmlFor="movingAverage"
                     className="text-club-light-gray text-xs sm:text-sm cursor-pointer select-none font-medium"
                   >
                     Show 3-Match Moving Average
                   </Label>
+                  <Switch 
+                    id="movingAverage" 
+                    checked={showMovingAverage}
+                    onCheckedChange={setShowMovingAverage}
+                    className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30"
+                  />
                 </div>
               )}
             </div>
