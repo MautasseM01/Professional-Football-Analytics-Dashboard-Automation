@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Player } from "@/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -20,15 +21,6 @@ interface HeatmapCardProps {
 }
 
 type MatchPeriod = 'First Half' | 'Second Half' | 'Full Match';
-
-// Color scale for the heatmap legend
-const colorScaleStops = [
-  { color: "#F2FCE2", label: "Low" },
-  { color: "#FEF7CD", label: "" },
-  { color: "#FEC6A1", label: "" },
-  { color: "#F97316", label: "" },
-  { color: "#ea384c", label: "High" }
-];
 
 export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   const [imageError, setImageError] = useState(false);
@@ -128,7 +120,18 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
       
       <CardContent className={`flex-1 flex flex-col min-h-0 ${isMobile ? 'p-3 pt-0' : 'p-4 sm:p-6 pt-0'}`}>
         {player.heatmapUrl ? (
-          <div className="space-y-3 sm:space-y-4 flex-1 flex flex-col">
+          <div className="flex-1 flex flex-col">
+            {/* Player name and period info - positioned above the heatmap */}
+            {imageLoaded && (
+              <div className={`mb-2 sm:mb-3 text-center bg-club-black/80 rounded-md px-3 py-2 ${
+                isMobile ? 'text-xs' : 'text-sm'
+              }`}>
+                <span className="text-club-gold font-medium">{player.name}'s Heatmap</span>
+                <span className="text-club-light-gray mx-2">•</span>
+                <span className="text-club-light-gray">{selectedPeriod}</span>
+              </div>
+            )}
+            
             <div 
               className={`relative w-full rounded-lg overflow-hidden bg-green-800/20 border border-green-700/30 flex-1 ${
                 isMobile ? 'touch-pan-x touch-pan-y' : ''
@@ -229,48 +232,16 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                     referrerPolicy="no-referrer"
                     style={isMobile ? { touchAction: 'pan-x pan-y pinch-zoom' } : {}}
                   />
-                  {imageLoaded && (
-                    <>
-                      <div className={`absolute bottom-1 sm:bottom-2 right-1 sm:right-2 bg-club-black/80 text-club-light-gray px-2 sm:px-3 py-1 sm:py-1.5 rounded-md z-20 font-medium ${
-                        isMobile ? 'text-xs' : 'text-xs'
-                      }`}>
-                        {player.name}'s Heatmap • {selectedPeriod}
-                      </div>
-                      {isMobile && (
-                        <div className="absolute top-2 right-2 bg-club-black/80 text-club-light-gray px-2 py-1 rounded-md z-20 flex items-center gap-1">
-                          <ZoomIn className="w-3 h-3" />
-                          <span className="text-xs">Pinch to zoom</span>
-                        </div>
-                      )}
-                    </>
+                  {/* Mobile zoom hint - positioned in top corner */}
+                  {imageLoaded && isMobile && (
+                    <div className="absolute top-2 right-2 bg-club-black/80 text-club-light-gray px-2 py-1 rounded-md z-20 flex items-center gap-1">
+                      <ZoomIn className="w-3 h-3" />
+                      <span className="text-xs">Pinch to zoom</span>
+                    </div>
                   )}
                 </>
               )}
             </div>
-            
-            {/* Heatmap Color Legend - only show when image is loaded */}
-            {imageLoaded && (
-              <div className="space-y-1.5 sm:space-y-2 flex-shrink-0">
-                <p className={`font-medium text-club-light-gray ${isMobile ? 'text-xs' : 'text-sm'}`}>
-                  Activity Intensity Scale:
-                </p>
-                <div className="flex items-center gap-2">
-                  <div 
-                    className={`flex-1 rounded-md shadow-sm ${isMobile ? 'h-2' : 'h-3'}`}
-                    style={{
-                      background: `linear-gradient(to right, ${colorScaleStops.map(s => s.color).join(', ')})`
-                    }}
-                  />
-                </div>
-                <div className="flex justify-between text-club-light-gray/80">
-                  {colorScaleStops.filter(stop => stop.label).map((stop, i) => (
-                    <span key={i} className={`font-medium ${isMobile ? 'text-xs' : 'text-xs'}`}>
-                      {stop.label}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            )}
           </div>
         ) : (
           <Alert className="bg-club-gold/10 border-club-gold/30 flex-1 flex items-center">
