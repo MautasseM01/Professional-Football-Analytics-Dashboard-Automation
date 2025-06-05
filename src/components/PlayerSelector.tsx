@@ -92,14 +92,14 @@ export const PlayerSelector = ({
               <SelectItem 
                 key={player.id} 
                 value={player.id.toString()}
-                className="focus:bg-club-gold/20"
+                className="focus:bg-club-gold/20 pl-3"
               >
-                <div className="flex items-center gap-2">
-                  <span className="font-medium">{player.name}</span>
-                  <span className="text-sm text-club-light-gray/70">
-                    #{player.number} - {player.position}
+                <span className="font-medium">{player.name}</span>
+                {player.position && (
+                  <span className="text-club-light-gray/70 ml-2">
+                    - {player.position}
                   </span>
-                </div>
+                )}
               </SelectItem>
             ))}
           </SelectContent>
