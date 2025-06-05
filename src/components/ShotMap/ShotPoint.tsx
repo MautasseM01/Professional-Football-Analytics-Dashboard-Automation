@@ -13,20 +13,31 @@ interface ShotPointProps {
   size?: number;
 }
 
-export const ShotPoint = ({ shot, size = 6 }: ShotPointProps) => {
+export const ShotPoint = ({ shot, size = 8 }: ShotPointProps) => {
+  // Responsive size based on screen
+  const getResponsiveSize = () => {
+    if (typeof window !== 'undefined') {
+      const isMobile = window.innerWidth < 768;
+      return isMobile ? Math.max(size + 2, 10) : size;
+    }
+    return size;
+  };
+
+  const responsiveSize = getResponsiveSize();
+
   // Map outcome to icon and color
   const getShotIcon = () => {
     switch (shot.outcome) {
       case "Goal":
-        return <CircleCheck size={size} className="text-[#F97316] fill-[#F97316] stroke-white" />;
+        return <CircleCheck size={responsiveSize} className="text-[#F97316] fill-[#F97316] stroke-white" />;
       case "Shot on Target":
-        return <Target size={size} className="text-[#0EA5E9] fill-[#0EA5E9] stroke-white" />;
+        return <Target size={responsiveSize} className="text-[#0EA5E9] fill-[#0EA5E9] stroke-white" />;
       case "Shot Off Target":
-        return <CircleX size={size} className="text-[#888888] fill-[#888888] stroke-white" />;
+        return <CircleX size={responsiveSize} className="text-[#888888] fill-[#888888] stroke-white" />;
       case "Blocked Shot":
-        return <Square size={size} className="text-[#555555] fill-[#555555] stroke-white" />;
+        return <Square size={responsiveSize} className="text-[#555555] fill-[#555555] stroke-white" />;
       default:
-        return <Circle size={size} className="text-gray-400" />;
+        return <Circle size={responsiveSize} className="text-gray-400" />;
     }
   };
 
@@ -34,21 +45,24 @@ export const ShotPoint = ({ shot, size = 6 }: ShotPointProps) => {
     <HoverCard>
       <HoverCardTrigger asChild>
         <div
-          className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer"
+          className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer touch-manipulation"
           style={{
             left: `${(shot.x_coordinate / 1050) * 100}%`,
             top: `${(shot.y_coordinate / 680) * 100}%`,
+            // Add larger touch target for mobile
+            padding: '4px',
+            margin: '-4px'
           }}
         >
           {getShotIcon()}
         </div>
       </HoverCardTrigger>
-      <HoverCardContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray w-64">
+      <HoverCardContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray w-60 sm:w-64">
         <div className="space-y-2">
           <div className="border-b border-club-gold/20 pb-2">
-            <span className="font-bold text-club-gold">{shot.player_name}</span>
+            <span className="font-bold text-club-gold text-sm sm:text-base">{shot.player_name}</span>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-sm">
+          <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
             <div className="text-club-light-gray/70">Time:</div>
             <div>{shot.minute}' ({shot.period})</div>
             <div className="text-club-light-gray/70">Outcome:</div>

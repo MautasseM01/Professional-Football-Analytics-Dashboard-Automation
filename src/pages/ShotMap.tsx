@@ -15,17 +15,17 @@ const ShotMap = () => {
   return (
     <div className="flex min-h-screen bg-club-dark-bg text-club-light-gray">
       <DashboardSidebar />
-      <main className="flex-1 p-6 lg:p-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-club-gold mb-2">Shot Map Analysis</h1>
-            <p className="text-club-light-gray/70">
+      <main className="flex-1 p-3 sm:p-4 lg:p-6 xl:p-10">
+        <div className="max-w-7xl mx-auto space-y-4 sm:space-y-6">
+          <div className="space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-bold text-club-gold">Shot Map Analysis</h1>
+            <p className="text-club-light-gray/70 text-sm sm:text-base">
               Visualize and analyze shot patterns and outcomes
             </p>
           </div>
 
           {/* Filters */}
-          <div className="mb-8">
+          <div className="bg-club-dark-gray/50 rounded-lg p-3 sm:p-4">
             <ShotMapFilters 
               players={players}
               matches={matches}
@@ -36,12 +36,12 @@ const ShotMap = () => {
           </div>
 
           {/* Legend */}
-          <div className="mb-4">
+          <div>
             <ShotMapLegend />
           </div>
 
           {/* Visualization */}
-          <div className="mb-8">
+          <div>
             <ShotMapVisualization 
               shots={shots} 
               loading={loading} 
@@ -50,8 +50,8 @@ const ShotMap = () => {
           </div>
 
           {error && (
-            <div className="bg-red-900/30 border border-red-700 text-red-100 p-4 rounded-lg mb-8">
-              <p>{error}</p>
+            <div className="bg-red-900/30 border border-red-700 text-red-100 p-3 sm:p-4 rounded-lg">
+              <p className="text-sm sm:text-base">{error}</p>
             </div>
           )}
         </div>
