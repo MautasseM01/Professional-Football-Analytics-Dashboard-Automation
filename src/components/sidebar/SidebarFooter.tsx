@@ -1,5 +1,5 @@
 
-import { MessageSquare, Settings } from "lucide-react";
+import { MessageSquare, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { 
   Tooltip,
@@ -42,15 +42,15 @@ export function SidebarFooter({ collapsed, onFeedbackClick }: SidebarFooterProps
           </Button>
         </div>
       ) : (
-        <>
+        <div className="space-y-2">
           <Tooltip>
             <TooltipTrigger asChild>
               <Button
                 variant="ghost"
                 onClick={onFeedbackClick}
-                className="w-full flex justify-center text-club-light-gray hover:text-club-gold hover:bg-club-gold/10 mb-2"
+                className="h-12 w-12 p-0 justify-center items-center text-club-light-gray hover:text-club-gold hover:bg-club-gold/10"
               >
-                <MessageSquare size={20} />
+                <MessageSquare size={24} className="h-6 w-6" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
@@ -63,16 +63,16 @@ export function SidebarFooter({ collapsed, onFeedbackClick }: SidebarFooterProps
               <Button
                 variant="ghost"
                 onClick={signOut}
-                className="w-full flex justify-center text-club-light-gray hover:text-club-gold hover:bg-club-gold/10"
+                className="h-12 w-12 p-0 justify-center items-center text-club-light-gray hover:text-club-gold hover:bg-club-gold/10"
               >
-                <Settings size={20} />
+                <LogOut size={24} className="h-6 w-6" />
               </Button>
             </TooltipTrigger>
             <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/30 text-club-light-gray">
               Sign out
             </TooltipContent>
           </Tooltip>
-        </>
+        </div>
       )}
     </div>
   );

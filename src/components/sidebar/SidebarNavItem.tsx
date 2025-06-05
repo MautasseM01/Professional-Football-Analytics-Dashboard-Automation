@@ -48,22 +48,24 @@ export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
     }
   };
 
-  const iconElement = <item.icon size={20} className="flex-shrink-0" />;
+  const iconElement = <item.icon size={24} className="h-6 w-6 flex-shrink-0" />;
 
   const buttonContent = (
     <Button
       variant="ghost"
       className={cn(
-        "w-full justify-start text-club-light-gray hover:text-club-gold hover:bg-club-gold/10 transition-colors",
-        collapsed ? "px-2" : "px-3",
+        "w-full text-club-light-gray hover:text-club-gold hover:bg-club-gold/10 transition-colors",
+        collapsed ? "h-12 w-12 p-0 justify-center items-center" : "justify-start px-3",
         isActive() && "bg-club-gold/20 text-club-gold",
         className
       )}
       onClick={handleClick}
     >
-      {iconElement}
-      {!collapsed && (
+      {collapsed ? (
+        iconElement
+      ) : (
         <>
+          {iconElement}
           <span className="ml-3 truncate">{item.name}</span>
           {hasSubItems && (
             <div className="ml-auto">
