@@ -8,154 +8,163 @@ interface FootballPitchProps {
 }
 
 const FootballPitch: React.FC<FootballPitchProps> = ({ width, height, children }) => {
-  const pitchColor = "#305030"; // Dark green
-  const lineColor = "rgba(255, 255, 255, 0.7)";
-  const lineWidth = 2;
-
-  // Responsive scaling
-  const scaleFactor = Math.min(width, height) / 100;
-
   return (
     <div 
       className="relative overflow-hidden"
       style={{
         width: `${width}px`,
         height: `${height}px`,
-        backgroundColor: pitchColor,
         borderRadius: "8px"
       }}
     >
-      {/* Outer border */}
-      <div
-        style={{
-          position: "absolute",
-          top: `${2 * scaleFactor}px`,
-          left: `${2 * scaleFactor}px`,
-          width: `calc(100% - ${4 * scaleFactor}px)`,
-          height: `calc(100% - ${4 * scaleFactor}px)`,
-          border: `${lineWidth}px solid ${lineColor}`,
-          borderRadius: "4px"
-        }}
-      />
+      <svg
+        viewBox="0 0 1050 680"
+        className="w-full h-full"
+        preserveAspectRatio="xMidYMid meet"
+      >
+        {/* Background */}
+        <rect width="1050" height="680" fill="#2B8A3E" />
 
-      {/* Center circle */}
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: `${30 * scaleFactor}px`,
-          height: `${30 * scaleFactor}px`,
-          border: `${lineWidth}px solid ${lineColor}`,
-          borderRadius: "50%"
-        }}
-      />
-
-      {/* Center spot */}
-      <div
-        style={{
-          position: "absolute",
-          top: "50%",
-          left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: `${2 * scaleFactor}px`,
-          height: `${2 * scaleFactor}px`,
-          backgroundColor: lineColor,
-          borderRadius: "50%"
-        }}
-      />
-
-      {/* Center line */}
-      <div
-        style={{
-          position: "absolute",
-          top: "0",
-          left: "50%",
-          transform: "translateX(-50%)",
-          width: `${lineWidth}px`,
-          height: "100%",
-          backgroundColor: lineColor
-        }}
-      />
-
-      {/* Penalty areas */}
-      {[0, 100].map((pos, i) => (
-        <div
-          key={`penalty-${i}`}
-          style={{
-            position: "absolute",
-            left: i === 0 ? `${2 * scaleFactor}px` : "auto",
-            right: i === 1 ? `${2 * scaleFactor}px` : "auto",
-            top: "50%",
-            transform: "translateY(-50%)",
-            width: `${18 * scaleFactor}px`,
-            height: `${50 * scaleFactor}px`,
-            border: `${lineWidth}px solid ${lineColor}`,
-            borderLeft: i === 0 ? "none" : `${lineWidth}px solid ${lineColor}`,
-            borderRight: i === 1 ? "none" : `${lineWidth}px solid ${lineColor}`,
-          }}
+        {/* Field outline */}
+        <rect
+          x="50"
+          y="50"
+          width="950"
+          height="580"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
         />
-      ))}
 
-      {/* Goal areas */}
-      {[0, 100].map((pos, i) => (
-        <div
-          key={`goal-${i}`}
-          style={{
-            position: "absolute",
-            left: i === 0 ? `${2 * scaleFactor}px` : "auto",
-            right: i === 1 ? `${2 * scaleFactor}px` : "auto",
-            top: "50%",
-            transform: "translateY(-50%)",
-            width: `${6 * scaleFactor}px`,
-            height: `${20 * scaleFactor}px`,
-            border: `${lineWidth}px solid ${lineColor}`,
-            borderLeft: i === 0 ? "none" : `${lineWidth}px solid ${lineColor}`,
-            borderRight: i === 1 ? "none" : `${lineWidth}px solid ${lineColor}`,
-          }}
+        {/* Half-way line */}
+        <line
+          x1="525"
+          y1="50"
+          x2="525"
+          y2="630"
+          stroke="#FFFFFF"
+          strokeWidth="4"
         />
-      ))}
 
-      {/* Penalty spots */}
-      {[0, 100].map((pos, i) => (
-        <div
-          key={`spot-${i}`}
-          style={{
-            position: "absolute",
-            left: i === 0 ? `${12 * scaleFactor}px` : "auto",
-            right: i === 1 ? `${12 * scaleFactor}px` : "auto",
-            top: "50%",
-            transform: "translateY(-50%)",
-            width: `${2 * scaleFactor}px`,
-            height: `${2 * scaleFactor}px`,
-            backgroundColor: lineColor,
-            borderRadius: "50%"
-          }}
+        {/* Center circle */}
+        <circle
+          cx="525"
+          cy="340"
+          r="91.5"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
         />
-      ))}
+        <circle cx="525" cy="340" r="4" fill="#FFFFFF" />
 
-      {/* Corner arcs */}
-      {[[0, 0], [0, 100], [100, 0], [100, 100]].map(([x, y], i) => (
-        <div
-          key={`corner-${i}`}
-          style={{
-            position: "absolute",
-            left: x === 0 ? `${2 * scaleFactor}px` : "auto",
-            right: x === 100 ? `${2 * scaleFactor}px` : "auto",
-            top: y === 0 ? `${2 * scaleFactor}px` : "auto",
-            bottom: y === 100 ? `${2 * scaleFactor}px` : "auto",
-            width: `${5 * scaleFactor}px`,
-            height: `${5 * scaleFactor}px`,
-            border: `${lineWidth}px solid ${lineColor}`,
-            borderRadius: "50%",
-            borderTopLeftRadius: x === 0 && y === 0 ? "0" : "50%",
-            borderTopRightRadius: x === 100 && y === 0 ? "0" : "50%",
-            borderBottomLeftRadius: x === 0 && y === 100 ? "0" : "50%",
-            borderBottomRightRadius: x === 100 && y === 100 ? "0" : "50%",
-          }}
+        {/* Left penalty area */}
+        <rect
+          x="50"
+          y="195"
+          width="165"
+          height="290"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
         />
-      ))}
+        <rect
+          x="50"
+          y="240"
+          width="60"
+          height="200"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
+        />
+        <circle
+          cx="215"
+          cy="340"
+          r="91.5"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
+          strokeDasharray="23 23"
+        />
+        <circle cx="110" cy="340" r="4" fill="#FFFFFF" />
+
+        {/* Right penalty area */}
+        <rect
+          x="835"
+          y="195"
+          width="165"
+          height="290"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
+        />
+        <rect
+          x="940"
+          y="240"
+          width="60"
+          height="200"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
+        />
+        <circle
+          cx="835"
+          cy="340"
+          r="91.5"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
+          strokeDasharray="23 23"
+        />
+        <circle cx="940" cy="340" r="4" fill="#FFFFFF" />
+
+        {/* Left goal */}
+        <rect
+          x="40"
+          y="310"
+          width="10"
+          height="60"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="2"
+        />
+
+        {/* Right goal */}
+        <rect
+          x="1000"
+          y="310"
+          width="10"
+          height="60"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="2"
+        />
+
+        {/* Corner arcs */}
+        <path
+          d="M50,50 Q65,50 65,65"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
+        />
+        <path
+          d="M1000,50 Q985,50 985,65"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
+        />
+        <path
+          d="M50,630 Q65,630 65,615"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
+        />
+        <path
+          d="M1000,630 Q985,630 985,615"
+          fill="none"
+          stroke="#FFFFFF"
+          strokeWidth="4"
+        />
+      </svg>
       
       {/* Children (players, connections, etc.) */}
       {children}
