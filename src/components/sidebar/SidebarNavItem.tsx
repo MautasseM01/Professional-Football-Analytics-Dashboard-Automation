@@ -9,17 +9,10 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-
-interface NavigationItem {
-  name: string;
-  href?: string;
-  icon: any;
-  subItems?: NavigationItem[];
-  allowedRoles?: string[];
-}
+import { AccessibleNavigationItem, AccessibleSubItem } from "@/utils/roleAccess";
 
 interface SidebarNavItemProps {
-  item: NavigationItem;
+  item: AccessibleNavigationItem;
   collapsed: boolean;
   openSubMenu: string | null;
   toggleSubMenu: (name: string) => void;
@@ -127,7 +120,7 @@ export const SidebarNavItem = ({
       {/* Sub-menu items */}
       {hasSubItems && isSubMenuOpen && !collapsed && (
         <div className="ml-6 mt-1 space-y-1">
-          {item.subItems?.map((subItem) => {
+          {item.subItems?.map((subItem: AccessibleSubItem) => {
             const isSubActive = location.pathname === subItem.href;
             return (
               <Link key={subItem.name} to={subItem.href || "#"} onClick={onNavigate}>
@@ -140,7 +133,6 @@ export const SidebarNavItem = ({
                       : "text-club-light-gray/80 hover:text-club-gold hover:bg-club-gold/5"
                   )}
                 >
-                  <subItem.icon className="h-5 w-5 mr-3 flex-shrink-0" />
                   <span className="truncate">{subItem.name}</span>
                 </Button>
               </Link>
