@@ -229,14 +229,15 @@ export const ResponsiveChart = React.forwardRef<
           transition: 'transform 0.2s ease-in-out'
         }}
       >
-        <ChartContainer
-          config={config}
-          aspectRatio={responsiveConfig.aspectRatio}
-          minHeight={responsiveConfig.minHeight}
-          className="w-full"
+        <div 
+          style={{
+            aspectRatio: responsiveConfig.aspectRatio,
+            minHeight: responsiveConfig.minHeight,
+            width: '100%'
+          }}
         >
           {children}
-        </ChartContainer>
+        </div>
       </div>
 
       {/* Mobile zoom hint */}
