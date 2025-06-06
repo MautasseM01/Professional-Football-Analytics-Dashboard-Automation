@@ -5,15 +5,14 @@ import {
 } from "@/components/ui/card";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { Player } from "@/types";
-import { ChartContainer, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from "recharts";
 import { MultiPlayerSelect } from "@/components/MultiPlayerSelect";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { Badge } from "@/components/ui/badge";
-import { UserRound } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { BackToTopButton } from "@/components/BackToTopButton";
 import { ResponsiveTable, ResponsiveTableRow, ResponsiveTableCell, ResponsiveTableHead } from "@/components/ui/responsive-table";
+import { ResponsiveChart } from "@/components/ui/responsive-chart";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 const formatPercentage = (value: number): string => {
@@ -83,10 +82,10 @@ export default function PlayerComparison() {
   // Prepare data for radar chart
   const prepareRadarData = () => {
     const radarData = [
-      { category: "Distance", fullMark: 100 },
-      { category: "Shots on Target", fullMark: 100 },
-      { category: "Passes Completed", fullMark: 100 },
-      { category: "Tackles Won", fullMark: 100 }
+      { category: isMobile ? "Dist" : "Distance", fullMark: 100 },
+      { category: isMobile ? "Shots" : "Shots on Target", fullMark: 100 },
+      { category: isMobile ? "Passes" : "Passes Completed", fullMark: 100 },
+      { category: isMobile ? "Tackles" : "Tackles Won", fullMark: 100 }
     ];
 
     // Find max values to normalize data
@@ -127,7 +126,7 @@ export default function PlayerComparison() {
     "#f39c12"  // Orange
   ];
 
-  const radarData = useMemo(() => prepareRadarData(), [selectedPlayers]);
+  const radarData = useMemo(() => prepareRadarData(), [selectedPlayers, isMobile]);
   const chartConfig = useMemo(() => {
     const config: Record<string, { color: string }> = {};
     
@@ -159,6 +158,38 @@ export default function PlayerComparison() {
       }
     }));
   };
+
+  // Simplified mobile chart view
+  const SimplifiedMobileChart = () => (
+    <div className="space-y-4">
+      {selectedPlayers.map((player, index) => (
+        <div key={player.id} className="bg-card border rounded-lg p-4">
+          <div className="flex items-center gap-2 mb-3">
+            <PlayerAvatar player={player} size="sm" />
+            <span className="font-medium">{player.name}</span>
+          </div>
+          <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="text-center">
+              <div className="text-muted-foreground">Distance</div>
+              <div className="font-semibold">{player.distance?.toFixed(1) || 'N/A'} km</div>
+            </div>
+            <div className="text-center">
+              <div className="text-muted-foreground">Shots</div>
+              <div className="font-semibold">{player.shots_on_target || 'N/A'}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-muted-foreground">Passes</div>
+              <div className="font-semibold">{player.passes_completed || 'N/A'}</div>
+            </div>
+            <div className="text-center">
+              <div className="text-muted-foreground">Tackles</div>
+              <div className="font-semibold">{player.tackles_won || 'N/A'}</div>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 
   return (
     <DashboardLayout>
@@ -305,36 +336,36 @@ export default function PlayerComparison() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="w-full h-[400px] sm:h-[500px]">
-                  <ChartContainer config={chartConfig}>
-                    <>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart data={radarData} className="mx-auto">
-                          <PolarGrid />
-                          <PolarAngleAxis dataKey="category" className="text-xs sm:text-sm" />
-                          
-                          {selectedPlayers.map((player, index) => (
-                            <Radar
-                              key={player.id}
-                              name={player.name}
-                              dataKey={player.name}
-                              stroke={playerColors[index % playerColors.length]}
-                              fill={playerColors[index % playerColors.length]}
-                              fillOpacity={0.2}
-                            />
-                          ))}
-                        </RadarChart>
-                      </ResponsiveContainer>
-                      <ChartLegend>
-                        <ChartLegendContent payload={selectedPlayers.map((player, index) => ({
-                          value: player.name,
-                          color: playerColors[index % playerColors.length],
-                          dataKey: player.name
-                        }))} />
-                      </ChartLegend>
-                    </>
-                  </ChartContainer>
-                </div>
+                <ResponsiveChart
+                  config={chartConfig}
+                  showZoomControls={true}
+                  simplifiedMobileView={<SimplifiedMobileChart />}
+                  aspectRatio={isMobile ? 1 : (4/3)}
+                  minHeight={isMobile ? 300 : 400}
+                >
+                  <ResponsiveContainer width="100%" height="100%">
+                    <RadarChart data={radarData} className="mx-auto">
+                      <PolarGrid />
+                      <PolarAngleAxis 
+                        dataKey="category" 
+                        className="text-xs sm:text-sm" 
+                        tick={{ fontSize: isMobile ? 10 : 12 }}
+                      />
+                      
+                      {selectedPlayers.map((player, index) => (
+                        <Radar
+                          key={player.id}
+                          name={player.name}
+                          dataKey={player.name}
+                          stroke={playerColors[index % playerColors.length]}
+                          fill={playerColors[index % playerColors.length]}
+                          fillOpacity={0.2}
+                          strokeWidth={isMobile ? 1.5 : 2}
+                        />
+                      ))}
+                    </RadarChart>
+                  </ResponsiveContainer>
+                </ResponsiveChart>
               </CardContent>
             </Card>
           </>

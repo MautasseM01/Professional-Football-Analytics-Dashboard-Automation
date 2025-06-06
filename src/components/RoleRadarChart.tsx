@@ -14,7 +14,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { ChartContainer } from "@/components/ui/chart";
+import { ResponsiveChart } from "@/components/ui/responsive-chart";
 import { PlayerAttributes, PositionalAverage } from "@/hooks/use-player-attributes";
 import { Player } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -97,30 +97,29 @@ export const RoleRadarChart = ({
                 positionalAverage.work_rate_attacking) / 5) 
     : 0;
 
-  // Responsive chart configuration
-  const getChartConfig = () => {
-    if (breakpoint === 'mobile') {
-      return {
-        outerRadius: "75%",
-        fontSize: 10,
-        margin: { top: 10, right: 10, bottom: 10, left: 10 }
-      };
-    }
-    if (breakpoint === 'tablet-portrait' || breakpoint === 'tablet-landscape') {
-      return {
-        outerRadius: "80%",
-        fontSize: 11,
-        margin: { top: 15, right: 15, bottom: 15, left: 15 }
-      };
-    }
-    return {
-      outerRadius: "80%",
-      fontSize: 12,
-      margin: { top: 20, right: 20, bottom: 20, left: 20 }
-    };
+  const chartConfig = {
+    player: { color: "#f97316" },
+    average: { color: "#16a34a" }
   };
 
-  const chartConfig = getChartConfig();
+  // Simplified mobile view
+  const SimplifiedMobileView = () => (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        {chartData.map((item, index) => (
+          <div key={index} className="bg-card border rounded-lg p-3">
+            <div className="text-center">
+              <div className="text-xs text-muted-foreground mb-1">{item.attribute}</div>
+              <div className="text-lg font-bold">{item.player}/100</div>
+              {showBenchmark && (
+                <div className="text-xs text-green-600">Avg: {item.average}</div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -200,20 +199,19 @@ export const RoleRadarChart = ({
       <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           <div className="lg:col-span-2">
-            <ChartContainer
-              config={{
-                player: { color: "#f97316" },
-                average: { color: "#16a34a" }
-              }}
+            <ResponsiveChart
+              config={chartConfig}
+              showZoomControls={true}
+              simplifiedMobileView={<SimplifiedMobileView />}
               aspectRatio={isMobile ? 1 : (4/3)}
               minHeight={isMobile ? 250 : 300}
             >
               <RadarChart
                 cx="50%"
                 cy="50%"
-                outerRadius={chartConfig.outerRadius}
+                outerRadius="80%"
                 data={chartData}
-                margin={chartConfig.margin}
+                margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
               >
                 <PolarGrid 
                   stroke="#444" 
@@ -222,15 +220,15 @@ export const RoleRadarChart = ({
                 <PolarAngleAxis 
                   dataKey="attribute" 
                   stroke="#CCC" 
-                  fontSize={chartConfig.fontSize}
-                  tick={{ fontSize: chartConfig.fontSize }}
+                  fontSize={isMobile ? 10 : 12}
+                  tick={{ fontSize: isMobile ? 10 : 12 }}
                 />
                 <PolarRadiusAxis 
                   angle={30} 
                   domain={[0, 100]} 
                   stroke="#666" 
-                  fontSize={chartConfig.fontSize - 1}
-                  tick={{ fontSize: chartConfig.fontSize - 1 }}
+                  fontSize={isMobile ? 9 : 11}
+                  tick={{ fontSize: isMobile ? 9 : 11 }}
                   tickCount={isMobile ? 3 : 5}
                 />
 
@@ -264,7 +262,7 @@ export const RoleRadarChart = ({
                   }}
                 />
               </RadarChart>
-            </ChartContainer>
+            </ResponsiveChart>
           </div>
           <div className="space-y-4">
             <div className="bg-club-black/30 p-3 sm:p-4 rounded-lg">
