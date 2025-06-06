@@ -1,10 +1,8 @@
+
 import { useState, useMemo } from "react";
 import { 
   Card, CardContent, CardDescription, CardHeader, CardTitle 
 } from "@/components/ui/card";
-import { 
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow 
-} from "@/components/ui/table";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { Player } from "@/types";
 import { ChartContainer, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
@@ -15,6 +13,8 @@ import { Badge } from "@/components/ui/badge";
 import { UserRound } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { BackToTopButton } from "@/components/BackToTopButton";
+import { ResponsiveTable, ResponsiveTableRow, ResponsiveTableCell, ResponsiveTableHead } from "@/components/ui/responsive-table";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const formatPercentage = (value: number): string => {
   return `${value.toFixed(1)}%`;
@@ -23,6 +23,7 @@ const formatPercentage = (value: number): string => {
 export default function PlayerComparison() {
   const { players, loading } = usePlayerData();
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<number[]>([]);
+  const isMobile = useIsMobile();
 
   const selectedPlayers = useMemo(() => {
     if (!players?.length || !selectedPlayerIds.length) return [];
@@ -139,20 +140,40 @@ export default function PlayerComparison() {
     return config;
   }, [selectedPlayers]);
 
+  // Prepare table data for mobile cards
+  const prepareTableData = () => {
+    return selectedPlayers.map(player => ({
+      id: player.id,
+      title: player.name,
+      data: {
+        "Total Distance (km)": player.distance ? player.distance.toFixed(1) : "N/A",
+        "Pass Completion %": player.passes_attempted && player.passes_attempted > 0 
+          ? formatPercentage(getPassCompletionPercentage(player)) 
+          : "N/A",
+        "Shots on Target": player.shots_on_target !== null && player.shots_on_target !== undefined 
+          ? player.shots_on_target 
+          : "N/A",
+        "Tackles Won": player.tackles_won !== null && player.tackles_won !== undefined 
+          ? player.tackles_won 
+          : "N/A"
+      }
+    }));
+  };
+
   return (
     <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-6">
+      <div className="container mx-auto py-4 sm:py-6 space-y-4 sm:space-y-6 px-4 sm:px-6">
         <div className="flex flex-col space-y-2">
-          <h1 className="text-3xl font-bold">Player Comparison</h1>
-          <p className="text-muted-foreground">
+          <h1 className="text-2xl sm:text-3xl font-bold">Player Comparison</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Compare stats between multiple players (select 2-4 players)
           </p>
         </div>
 
         <Card>
-          <CardHeader>
-            <CardTitle>Player Selection</CardTitle>
-            <CardDescription>
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg sm:text-xl">Player Selection</CardTitle>
+            <CardDescription className="text-sm">
               Select 2 to 4 players to compare their performance metrics
             </CardDescription>
           </CardHeader>
@@ -170,20 +191,38 @@ export default function PlayerComparison() {
         {selectedPlayers.length > 0 && (
           <>
             <Card>
-              <CardHeader>
-                <CardTitle>Performance Metrics Comparison</CardTitle>
-                <CardDescription>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg sm:text-xl">Performance Metrics Comparison</CardTitle>
+                <CardDescription className="text-sm">
                   Key performance indicators for the selected players
                 </CardDescription>
               </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead>Metric</TableHead>
+              <CardContent className="p-4 sm:p-6">
+                {isMobile ? (
+                  <div className="space-y-4">
+                    {prepareTableData().map((playerData) => (
+                      <ResponsiveTableRow
+                        key={playerData.id}
+                        data={playerData.data}
+                        title={
+                          <div className="flex items-center gap-2">
+                            <PlayerAvatar 
+                              player={selectedPlayers.find(p => p.id === playerData.id)!}
+                              size="sm"
+                            />
+                            <span>{playerData.title}</span>
+                          </div>
+                        }
+                      />
+                    ))}
+                  </div>
+                ) : (
+                  <ResponsiveTable>
+                    <thead>
+                      <tr>
+                        <ResponsiveTableHead>Metric</ResponsiveTableHead>
                         {selectedPlayers.map((player) => (
-                          <TableHead key={player.id} className="text-center">
+                          <ResponsiveTableHead key={player.id} className="text-center">
                             <div className="flex items-center justify-center gap-2">
                               <PlayerAvatar 
                                 player={player}
@@ -191,89 +230,88 @@ export default function PlayerComparison() {
                               />
                               <span>{player.name}</span>
                             </div>
-                          </TableHead>
+                          </ResponsiveTableHead>
                         ))}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell className="font-medium">Total Distance (km)</TableCell>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <ResponsiveTableRow>
+                        <ResponsiveTableCell className="font-medium">Total Distance (km)</ResponsiveTableCell>
                         {selectedPlayers.map((player) => (
-                          <TableCell 
+                          <ResponsiveTableCell 
                             key={`distance-${player.id}`} 
                             className={`text-center ${highestDistance[player.id] ? 'bg-green-100/10' : ''}`}
                           >
                             {player.distance ? 
                               player.distance.toFixed(1) : 
-                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                              <Badge variant="outline" className="bg-muted text-muted-foreground text-xs">N/A</Badge>
                             }
-                          </TableCell>
+                          </ResponsiveTableCell>
                         ))}
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium">Pass Completion %</TableCell>
+                      </ResponsiveTableRow>
+                      <ResponsiveTableRow>
+                        <ResponsiveTableCell className="font-medium">Pass Completion %</ResponsiveTableCell>
                         {selectedPlayers.map((player) => (
-                          <TableCell 
+                          <ResponsiveTableCell 
                             key={`passes-${player.id}`} 
                             className={`text-center ${highestPassCompletion[player.id] ? 'bg-green-100/10' : ''}`}
                           >
                             {player.passes_attempted && player.passes_attempted > 0 ?
                               formatPercentage(getPassCompletionPercentage(player)) :
-                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                              <Badge variant="outline" className="bg-muted text-muted-foreground text-xs">N/A</Badge>
                             }
-                          </TableCell>
+                          </ResponsiveTableCell>
                         ))}
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium">Shots on Target</TableCell>
+                      </ResponsiveTableRow>
+                      <ResponsiveTableRow>
+                        <ResponsiveTableCell className="font-medium">Shots on Target</ResponsiveTableCell>
                         {selectedPlayers.map((player) => (
-                          <TableCell 
+                          <ResponsiveTableCell 
                             key={`shots-${player.id}`} 
                             className={`text-center ${highestShotsOnTarget[player.id] ? 'bg-green-100/10' : ''}`}
                           >
                             {player.shots_on_target !== null && player.shots_on_target !== undefined ?
                               player.shots_on_target :
-                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                              <Badge variant="outline" className="bg-muted text-muted-foreground text-xs">N/A</Badge>
                             }
-                          </TableCell>
+                          </ResponsiveTableCell>
                         ))}
-                      </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium">Tackles Won</TableCell>
+                      </ResponsiveTableRow>
+                      <ResponsiveTableRow>
+                        <ResponsiveTableCell className="font-medium">Tackles Won</ResponsiveTableCell>
                         {selectedPlayers.map((player) => (
-                          <TableCell 
+                          <ResponsiveTableCell 
                             key={`tackles-${player.id}`} 
                             className={`text-center ${highestTacklesWon[player.id] ? 'bg-green-100/10' : ''}`}
                           >
                             {player.tackles_won !== null && player.tackles_won !== undefined ?
                               player.tackles_won :
-                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                              <Badge variant="outline" className="bg-muted text-muted-foreground text-xs">N/A</Badge>
                             }
-                          </TableCell>
+                          </ResponsiveTableCell>
                         ))}
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
+                      </ResponsiveTableRow>
+                    </tbody>
+                  </ResponsiveTable>
+                )}
               </CardContent>
             </Card>
 
             <Card>
-              <CardHeader>
-                <CardTitle>Performance Radar Chart</CardTitle>
-                <CardDescription>
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg sm:text-xl">Performance Radar Chart</CardTitle>
+                <CardDescription className="text-sm">
                   Visual comparison of player attributes across key categories
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="w-full h-[500px]">
+                <div className="w-full h-[400px] sm:h-[500px]">
                   <ChartContainer config={chartConfig}>
-                    {/* Wrap the ResponsiveContainer in a fragment to make it a single child */}
                     <>
                       <ResponsiveContainer width="100%" height="100%">
                         <RadarChart data={radarData} className="mx-auto">
                           <PolarGrid />
-                          <PolarAngleAxis dataKey="category" />
+                          <PolarAngleAxis dataKey="category" className="text-xs sm:text-sm" />
                           
                           {selectedPlayers.map((player, index) => (
                             <Radar
@@ -303,7 +341,6 @@ export default function PlayerComparison() {
         )}
       </div>
 
-      {/* Back to Top Button */}
       <BackToTopButton />
     </DashboardLayout>
   );
