@@ -19,10 +19,10 @@ export const AdminDashboard = ({ profile }: AdminDashboardProps) => {
   const { data: playersAtRisk, isLoading: playersLoading } = usePlayersAtRisk();
 
   return (
-    <div className="space-y-3 xs:space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
+    <div className="space-y-4 sm:space-y-6 lg:space-y-8 p-3 sm:p-4 lg:p-6">
       {/* Welcome Header */}
       <div className="flex flex-col gap-2">
-        <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-club-gold px-1">
+        <h1 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-club-gold px-1">
           Welcome back, {profile.full_name || "Administrator"}
         </h1>
       </div>
@@ -47,8 +47,8 @@ export const AdminDashboard = ({ profile }: AdminDashboardProps) => {
       
       {/* Administrative Cards with Responsive Grid */}
       <ResponsiveGrid 
-        minCardWidth="280px"
-        className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6"
+        mobileCols={1}
+        className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
       >
         <UserManagementCard />
         <SystemAdministrationCard />

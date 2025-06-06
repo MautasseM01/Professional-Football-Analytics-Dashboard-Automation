@@ -8,8 +8,6 @@ interface ResponsiveLayoutProps {
 }
 
 export const ResponsiveLayout = ({ children, className = "" }: ResponsiveLayoutProps) => {
-  const isMobile = useIsMobile();
-  
   return (
     <div className={`responsive-container transition-all duration-300 ease-in-out ${className}`}>
       {children}
@@ -21,23 +19,25 @@ interface ResponsiveGridProps {
   children: ReactNode;
   className?: string;
   minCardWidth?: string;
+  mobileCols?: number;
 }
 
 export const ResponsiveGrid = ({ 
   children, 
   className = "", 
-  minCardWidth = "280px" 
+  minCardWidth = "280px",
+  mobileCols = 1
 }: ResponsiveGridProps) => {
+  const mobileColsClass = mobileCols === 1 ? "grid-cols-1" : `grid-cols-${mobileCols}`;
+  
   return (
     <div className={`
       responsive-grid
-      grid gap-3 xs:gap-3 sm:gap-4 lg:gap-4 xl:gap-6
+      grid ${mobileColsClass} sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
+      gap-3 sm:gap-4 lg:gap-6
       transition-all duration-300 ease-in-out
       ${className}
-    `}
-    style={{
-      gridTemplateColumns: `repeat(auto-fit, minmax(${minCardWidth}, 1fr))`
-    }}>
+    `}>
       {children}
     </div>
   );
@@ -62,14 +62,14 @@ export const ResponsiveStack = ({
         return 'flex-col';
       case 'auto':
       default:
-        return 'flex-col xs:flex-col sm:flex-row lg:flex-row';
+        return 'flex-col sm:flex-row';
     }
   };
 
   return (
     <div className={`
       responsive-stack
-      flex gap-3 xs:gap-4 sm:gap-4 md:gap-6
+      flex gap-3 sm:gap-4 lg:gap-6
       ${getDirectionClasses()}
       transition-all duration-300 ease-in-out
       ${className}

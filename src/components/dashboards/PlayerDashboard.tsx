@@ -16,30 +16,27 @@ export const PlayerDashboard = ({ profile }: PlayerDashboardProps) => {
   const { players, selectedPlayer, selectPlayer, loading } = usePlayerData();
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+    <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
       <div className="mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold mb-2">
+        <h1 className="text-lg sm:text-xl lg:text-2xl xl:text-3xl font-bold text-club-gold mb-2">
           Player Dashboard
         </h1>
-        <p className="text-sm sm:text-base text-club-light-gray/70">
+        <p className="text-xs sm:text-sm lg:text-base text-club-light-gray/70">
           View your performance statistics and development progress
         </p>
       </div>
 
       {/* Player Performance Overview Cards with Responsive Grid */}
-      <ResponsiveGrid 
-        minCardWidth="200px"
-        className="grid-cols-1 sm:grid-cols-2 md:grid-cols-3"
-      >
+      <ResponsiveGrid mobileCols={1} className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         <Card className="bg-club-dark-gray border-club-gold/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold text-sm">
-              <User className="mr-2 h-4 w-4" />
+          <CardHeader className="pb-2 p-3 sm:p-4">
+            <CardTitle className="flex items-center text-club-gold text-xs sm:text-sm">
+              <User className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
               Personal Stats
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-club-light-gray">
+          <CardContent className="p-3 sm:p-4 pt-0">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-club-light-gray">
               {selectedPlayer?.matches || 0}
             </div>
             <p className="text-xs text-club-light-gray/70">Matches Played</p>
@@ -47,14 +44,14 @@ export const PlayerDashboard = ({ profile }: PlayerDashboardProps) => {
         </Card>
 
         <Card className="bg-club-dark-gray border-club-gold/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold text-sm">
-              <Target className="mr-2 h-4 w-4" />
+          <CardHeader className="pb-2 p-3 sm:p-4">
+            <CardTitle className="flex items-center text-club-gold text-xs sm:text-sm">
+              <Target className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
               Goals This Season
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-club-light-gray">
+          <CardContent className="p-3 sm:p-4 pt-0">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-club-light-gray">
               {selectedPlayer?.shots_on_target || 0}
             </div>
             <p className="text-xs text-club-light-gray/70">Shots on Target</p>
@@ -62,14 +59,14 @@ export const PlayerDashboard = ({ profile }: PlayerDashboardProps) => {
         </Card>
 
         <Card className="bg-club-dark-gray border-club-gold/20">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold text-sm">
-              <TrendingUp className="mr-2 h-4 w-4" />
+          <CardHeader className="pb-2 p-3 sm:p-4">
+            <CardTitle className="flex items-center text-club-gold text-xs sm:text-sm">
+              <TrendingUp className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
               Performance Rating
             </CardTitle>
           </CardHeader>
-          <CardContent>
-            <div className="text-xl sm:text-2xl font-bold text-club-light-gray">8.2</div>
+          <CardContent className="p-3 sm:p-4 pt-0">
+            <div className="text-lg sm:text-xl lg:text-2xl font-bold text-club-light-gray">8.2</div>
             <p className="text-xs text-club-light-gray/70">Average Rating</p>
           </CardContent>
         </Card>
@@ -87,39 +84,39 @@ export const PlayerDashboard = ({ profile }: PlayerDashboardProps) => {
 
       {/* Development Targets - Player specific */}
       <Card className="bg-club-dark-gray border-club-gold/20">
-        <CardHeader>
-          <CardTitle className="text-club-gold">Development Targets</CardTitle>
-          <CardDescription className="text-club-light-gray/70">
+        <CardHeader className="p-3 sm:p-4">
+          <CardTitle className="text-club-gold text-sm sm:text-base">Development Targets</CardTitle>
+          <CardDescription className="text-club-light-gray/70 text-xs sm:text-sm">
             Your current development goals and progress
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 bg-club-black/40 rounded">
-              <span className="text-club-light-gray">Improve Pass Completion</span>
+        <CardContent className="p-3 sm:p-4 pt-0">
+          <div className="space-y-3 sm:space-y-4">
+            <div className="flex flex-col gap-2 p-3 bg-club-black/40 rounded">
+              <span className="text-club-light-gray text-sm sm:text-base">Improve Pass Completion</span>
               <div className="flex items-center gap-2">
-                <div className="w-20 bg-club-black rounded-full h-2">
+                <div className="flex-1 bg-club-black rounded-full h-2">
                   <div className="bg-club-gold h-2 rounded-full" style={{ width: '75%' }}></div>
                 </div>
-                <span className="text-club-gold text-sm min-w-[3rem]">75%</span>
+                <span className="text-club-gold text-xs sm:text-sm min-w-[3rem]">75%</span>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 bg-club-black/40 rounded">
-              <span className="text-club-light-gray">Increase Sprint Distance</span>
+            <div className="flex flex-col gap-2 p-3 bg-club-black/40 rounded">
+              <span className="text-club-light-gray text-sm sm:text-base">Increase Sprint Distance</span>
               <div className="flex items-center gap-2">
-                <div className="w-20 bg-club-black rounded-full h-2">
+                <div className="flex-1 bg-club-black rounded-full h-2">
                   <div className="bg-club-gold h-2 rounded-full" style={{ width: '60%' }}></div>
                 </div>
-                <span className="text-club-gold text-sm min-w-[3rem]">60%</span>
+                <span className="text-club-gold text-xs sm:text-sm min-w-[3rem]">60%</span>
               </div>
             </div>
-            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-2 p-3 bg-club-black/40 rounded">
-              <span className="text-club-light-gray">Defensive Positioning</span>
+            <div className="flex flex-col gap-2 p-3 bg-club-black/40 rounded">
+              <span className="text-club-light-gray text-sm sm:text-base">Defensive Positioning</span>
               <div className="flex items-center gap-2">
-                <div className="w-20 bg-club-black rounded-full h-2">
+                <div className="flex-1 bg-club-black rounded-full h-2">
                   <div className="bg-club-gold h-2 rounded-full" style={{ width: '85%' }}></div>
                 </div>
-                <span className="text-club-gold text-sm min-w-[3rem]">85%</span>
+                <span className="text-club-gold text-xs sm:text-sm min-w-[3rem]">85%</span>
               </div>
             </div>
           </div>

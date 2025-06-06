@@ -42,21 +42,21 @@ const Dashboard = () => {
   // Render appropriate content based on user role
   const renderDashboardContent = () => {
     if (profileLoading) {
-      return <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+      return <div className="space-y-4 sm:space-y-6 p-3 sm:p-4 lg:p-6">
           <Skeleton className="h-6 sm:h-8 w-48 sm:w-64 bg-club-gold/10" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            <Skeleton className="h-60 sm:h-80 w-full bg-club-gold/10" />
-            <Skeleton className="h-60 sm:h-80 w-full bg-club-gold/10" />
-            <Skeleton className="h-60 sm:h-80 w-full bg-club-gold/10" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 lg:gap-6">
+            <Skeleton className="h-40 sm:h-60 lg:h-80 w-full bg-club-gold/10" />
+            <Skeleton className="h-40 sm:h-60 lg:h-80 w-full bg-club-gold/10" />
+            <Skeleton className="h-40 sm:h-60 lg:h-80 w-full bg-club-gold/10" />
           </div>
         </div>;
     }
     if (error) {
-      return <div className="p-4 sm:p-6">
+      return <div className="p-3 sm:p-4 lg:p-6">
           <Alert className="bg-club-gold/10 border-club-gold/30">
             <AlertDescription className="flex flex-col gap-4">
-              <p>Error loading user profile: {error}</p>
-              <Button variant="outline" className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold" onClick={handleRefresh}>
+              <p className="text-sm sm:text-base">Error loading user profile: {error}</p>
+              <Button variant="outline" className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold min-h-[44px]" onClick={handleRefresh}>
                 <RefreshCw size={16} className="mr-2" />
                 Retry Loading Data
               </Button>
@@ -65,11 +65,11 @@ const Dashboard = () => {
         </div>;
     }
     if (!profile) {
-      return <div className="p-4 sm:p-6">
+      return <div className="p-3 sm:p-4 lg:p-6">
           <Alert className="bg-club-gold/10 border-club-gold/30">
             <AlertDescription className="flex flex-col gap-4">
-              <p>User profile not found. Please try refreshing the page or contact an administrator.</p>
-              <Button variant="outline" className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold" onClick={handleRefresh}>
+              <p className="text-sm sm:text-base">User profile not found. Please try refreshing the page or contact an administrator.</p>
+              <Button variant="outline" className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold min-h-[44px]" onClick={handleRefresh}>
                 <RefreshCw size={16} className="mr-2" />
                 Retry Loading Data
               </Button>
@@ -102,14 +102,14 @@ const Dashboard = () => {
       
       <div className="flex-1 overflow-auto min-w-0">
         <header className="border-b border-club-gold/20 bg-club-black sticky top-0 z-20 transition-colors duration-300">
-          <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 gap-2 sm:gap-4 sm:py-[20px]">
+          <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 gap-2 sm:gap-4">
             {/* Left section - Title and page info */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-base sm:text-lg lg:text-xl font-bold text-club-gold truncate">
+              <h1 className="text-sm sm:text-base lg:text-lg xl:text-xl font-bold text-club-gold truncate">
                 {t('header.title')}
               </h1>
               <p className="text-xs sm:text-sm text-club-light-gray/70 truncate">
-                {profileLoading ? <Skeleton className="h-3 sm:h-4 w-24 sm:w-32 lg:w-40 bg-club-gold/10 inline-block" /> : profile?.role ? `${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} ${t('header.dashboard')}` : t('header.dashboard')}
+                {profileLoading ? <Skeleton className="h-3 sm:h-4 w-20 sm:w-24 lg:w-32 bg-club-gold/10 inline-block" /> : profile?.role ? `${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} ${t('header.dashboard')}` : t('header.dashboard')}
               </p>
             </div>
             
@@ -122,17 +122,15 @@ const Dashboard = () => {
               <ThemeToggle />
               
               {/* Refresh Button */}
-              <Button variant="outline" size="icon" className="text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10" onClick={handleRefresh} title="Refresh data">
-                <RefreshCw size={14} className="sm:hidden" />
-                <RefreshCw size={16} className="hidden sm:block lg:hidden" />
-                <RefreshCw size={18} className="hidden lg:block" />
+              <Button variant="outline" size="icon" className="text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold h-9 w-9 sm:h-10 sm:w-10" onClick={handleRefresh} title="Refresh data">
+                <RefreshCw size={16} className="sm:hidden" />
+                <RefreshCw size={18} className="hidden sm:block" />
               </Button>
               
               {/* Menu Toggle */}
-              <button onClick={() => setShowSidebar(!showSidebar)} className="p-1.5 sm:p-2 rounded-md text-club-light-gray hover:bg-club-gold/10 hover:text-club-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center" title="Toggle sidebar">
+              <button onClick={() => setShowSidebar(!showSidebar)} className="p-2 rounded-md text-club-light-gray hover:bg-club-gold/10 hover:text-club-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center" title="Toggle sidebar">
                 <Menu size={16} className="sm:hidden" />
-                <Menu size={18} className="hidden sm:block lg:hidden" />
-                <Menu size={20} className="hidden lg:block" />
+                <Menu size={18} className="hidden sm:block" />
               </button>
             </div>
           </div>
@@ -140,7 +138,7 @@ const Dashboard = () => {
         
         <main className="bg-club-black transition-colors duration-300 w-full">
           {/* TEST MODE indicator as first element */}
-          {!profileLoading && profile && <div className="p-4 sm:p-6 pb-0">
+          {!profileLoading && profile && <div className="p-3 sm:p-4 lg:p-6 pb-0">
               <RoleTester />
             </div>}
           
