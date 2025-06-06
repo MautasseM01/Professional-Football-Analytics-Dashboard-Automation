@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -54,7 +53,7 @@ const ResponsiveTable = React.forwardRef<
 ResponsiveTable.displayName = "ResponsiveTable";
 
 interface ResponsiveTableRowProps {
-  children: React.ReactNode;
+  children?: React.ReactNode; // Made optional for card layout
   className?: string;
   data?: Record<string, React.ReactNode>; // For card layout
   title?: React.ReactNode; // Changed from string to ReactNode
