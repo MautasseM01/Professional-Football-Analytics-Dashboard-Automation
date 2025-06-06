@@ -57,7 +57,7 @@ interface ResponsiveTableRowProps {
   children: React.ReactNode;
   className?: string;
   data?: Record<string, React.ReactNode>; // For card layout
-  title?: string;
+  title?: React.ReactNode; // Changed from string to ReactNode
 }
 
 const ResponsiveTableRow = React.forwardRef<
