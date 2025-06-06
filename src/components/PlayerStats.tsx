@@ -19,12 +19,12 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
   
   if (!player) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh] text-center px-4">
-        <div className="space-y-3">
-          <p className="text-base sm:text-lg lg:text-xl text-club-light-gray">
+      <div className="flex items-center justify-center min-h-[50vh] text-center px-2 sm:px-4">
+        <div className="space-y-2 sm:space-y-3">
+          <p className={`text-club-light-gray ${isMobile ? 'text-base' : 'text-base sm:text-lg lg:text-xl'}`}>
             No player selected
           </p>
-          <p className="text-sm text-club-light-gray/60">
+          <p className={`text-club-light-gray/60 ${isMobile ? 'text-sm' : 'text-sm'}`}>
             Please select a player to view their statistics
           </p>
         </div>
@@ -33,8 +33,8 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
   }
 
   return (
-    <ResponsiveLayout className="w-full max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
-      <div className="space-y-4 sm:space-y-6 lg:space-y-8">
+    <ResponsiveLayout className={`w-full max-w-7xl mx-auto ${isMobile ? 'px-0' : 'px-3 sm:px-4 lg:px-6'}`}>
+      <div className="space-y-3 sm:space-y-4 lg:space-y-6">
         {/* Player Profile Card */}
         <div className="transition-all duration-300 ease-in-out">
           <PlayerProfileCard player={player} />

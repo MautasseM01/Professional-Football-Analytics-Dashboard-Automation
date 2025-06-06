@@ -8,8 +8,10 @@ interface ResponsiveLayoutProps {
 }
 
 export const ResponsiveLayout = ({ children, className = "" }: ResponsiveLayoutProps) => {
+  const isMobile = useIsMobile();
+  
   return (
-    <div className={`responsive-container transition-all duration-300 ease-in-out ${className}`}>
+    <div className={`responsive-container transition-all duration-300 ease-in-out ${isMobile ? 'px-2' : 'px-3 sm:px-4 lg:px-6'} ${className}`}>
       {children}
     </div>
   );
@@ -28,14 +30,19 @@ export const ResponsiveGrid = ({
   minCardWidth = "280px",
   mobileCols = 1
 }: ResponsiveGridProps) => {
-  const mobileColsClass = mobileCols === 1 ? "grid-cols-1" : `grid-cols-${mobileCols}`;
+  const isMobile = useIsMobile();
+  
+  // Force single column on mobile for better UX
+  const mobileColsClass = isMobile ? "grid-cols-1" : 
+    mobileCols === 1 ? "grid-cols-1" : `grid-cols-${mobileCols}`;
   
   return (
     <div className={`
       responsive-grid
       grid ${mobileColsClass} sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4
-      gap-3 sm:gap-4 lg:gap-6
+      gap-2 sm:gap-3 lg:gap-4 xl:gap-6
       transition-all duration-300 ease-in-out
+      w-full
       ${className}
     `}>
       {children}
@@ -54,7 +61,11 @@ export const ResponsiveStack = ({
   direction = 'auto', 
   className = "" 
 }: ResponsiveStackProps) => {
+  const isMobile = useIsMobile();
+  
   const getDirectionClasses = () => {
+    if (isMobile) return 'flex-col'; // Always stack vertically on mobile
+    
     switch (direction) {
       case 'horizontal':
         return 'flex-row';
@@ -69,9 +80,10 @@ export const ResponsiveStack = ({
   return (
     <div className={`
       responsive-stack
-      flex gap-3 sm:gap-4 lg:gap-6
+      flex gap-2 sm:gap-3 lg:gap-4 xl:gap-6
       ${getDirectionClasses()}
       transition-all duration-300 ease-in-out
+      w-full
       ${className}
     `}>
       {children}

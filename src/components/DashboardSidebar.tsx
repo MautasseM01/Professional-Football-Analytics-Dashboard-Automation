@@ -27,7 +27,6 @@ export const DashboardSidebar = () => {
   useEffect(() => {
     if (isMobile) {
       setCollapsed(true);
-      // Close mobile menu when screen becomes mobile
       setMobileOpen(false);
     } else {
       setCollapsed(false);
@@ -113,7 +112,6 @@ export const DashboardSidebar = () => {
     setCollapsed(!collapsed);
   };
 
-  // Auto-close mobile menu when navigation item is clicked
   const handleNavigate = () => {
     if (isMobile) {
       setMobileOpen(false);
@@ -121,138 +119,136 @@ export const DashboardSidebar = () => {
   };
 
   // Mobile overlay menu with slide animation
-  if (isMobile && mobileOpen) {
+  if (isMobile) {
     return (
       <>
-        {/* Mobile backdrop */}
-        <div 
-          className="fixed inset-0 bg-club-black/80 backdrop-blur-sm z-50 lg:hidden transition-opacity duration-300"
-          onClick={closeMobileMenu}
+        {/* Mobile hamburger button - fixed position */}
+        <Button 
+          variant="ghost" 
+          size="icon"
+          onClick={toggleMobileMenu}
+          className="fixed top-2 left-2 z-50 text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 bg-club-black/90 backdrop-blur-sm min-h-[44px] min-w-[44px] shadow-lg touch-manipulation"
+          aria-label="Open navigation menu"
         >
-          {/* Mobile sidebar that slides in from left */}
+          <Menu size={20} />
+        </Button>
+
+        {/* Mobile backdrop and sidebar */}
+        {mobileOpen && (
           <div 
-            className="fixed inset-y-0 left-0 w-80 max-w-[85vw] bg-club-black border-r border-club-gold/20 transform transition-transform duration-300 ease-in-out translate-x-0"
-            onClick={e => e.stopPropagation()}
+            className="fixed inset-0 bg-club-black/80 backdrop-blur-sm z-40 transition-opacity duration-300"
+            onClick={closeMobileMenu}
           >
-            {/* Mobile header */}
-            <div className="flex items-center justify-between p-4 border-b border-club-gold/20 min-h-[73px]">
-              <div className="flex items-center">
-                <img 
-                  src="/lovable-uploads/eb223be6-87a6-402c-a270-20313a00080c.png" 
-                  alt="Club Logo" 
-                  className="w-8 h-8 mr-3 rounded-lg flex-shrink-0" 
-                />
-                <span className="text-lg font-semibold text-club-gold">SMH Analytics</span>
-              </div>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                onClick={closeMobileMenu}
-                className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
-                aria-label="Close menu"
-              >
-                <X size={24} />
-              </Button>
-            </div>
-
-            {/* Mobile navigation */}
-            <div className="flex-1 overflow-y-auto py-4">
-              <nav className="px-3 space-y-1">
-                {filteredNavigationItems.map(item => (
-                  <SidebarNavItem 
-                    key={item.name}
-                    item={item}
-                    collapsed={false}
-                    openSubMenu={openSubMenus.has(item.name) ? item.name : null}
-                    toggleSubMenu={toggleSubMenu}
-                    onNavigate={handleNavigate}
-                    className="min-h-[48px] touch-manipulation"
+            {/* Mobile sidebar that slides in from left */}
+            <div 
+              className="fixed inset-y-0 left-0 w-72 max-w-[85vw] bg-club-black border-r border-club-gold/20 transform transition-transform duration-300 ease-in-out translate-x-0 overflow-y-auto"
+              onClick={e => e.stopPropagation()}
+            >
+              {/* Mobile header */}
+              <div className="flex items-center justify-between p-3 border-b border-club-gold/20 min-h-[56px]">
+                <div className="flex items-center">
+                  <img 
+                    src="/lovable-uploads/eb223be6-87a6-402c-a270-20313a00080c.png" 
+                    alt="Club Logo" 
+                    className="w-6 h-6 mr-2 rounded-lg flex-shrink-0" 
                   />
-                ))}
-              </nav>
-            </div>
-
-            {/* Mobile controls */}
-            <div className="border-t border-club-gold/20 p-4">
-              <div className="flex items-center gap-3 mb-4">
-                <LanguageSelector />
-                <ThemeToggle />
+                  <span className="text-sm font-semibold text-club-gold truncate">SMH Analytics</span>
+                </div>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={closeMobileMenu}
+                  className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
+                  aria-label="Close menu"
+                >
+                  <X size={20} />
+                </Button>
               </div>
-              <SidebarFooter 
-                collapsed={false} 
-                onFeedbackClick={() => setFeedbackOpen(true)} 
-              />
+
+              {/* Mobile navigation */}
+              <div className="flex-1 py-2">
+                <nav className="px-2 space-y-1">
+                  {filteredNavigationItems.map(item => (
+                    <SidebarNavItem 
+                      key={item.name}
+                      item={item}
+                      collapsed={false}
+                      openSubMenu={openSubMenus.has(item.name) ? item.name : null}
+                      toggleSubMenu={toggleSubMenu}
+                      onNavigate={handleNavigate}
+                      className="min-h-[44px] touch-manipulation text-sm"
+                    />
+                  ))}
+                </nav>
+              </div>
+
+              {/* Mobile controls */}
+              <div className="border-t border-club-gold/20 p-3">
+                <div className="flex items-center gap-2 mb-3">
+                  <LanguageSelector />
+                  <ThemeToggle />
+                </div>
+                <SidebarFooter 
+                  collapsed={false} 
+                  onFeedbackClick={() => setFeedbackOpen(true)} 
+                />
+              </div>
             </div>
           </div>
-        </div>
+        )}
         
         <FeedbackForm open={feedbackOpen} onOpenChange={setFeedbackOpen} />
       </>
     );
   }
 
+  // Desktop sidebar
   return (
-    <>
-      {/* Mobile hamburger button - fixed position */}
-      {isMobile && (
-        <Button 
-          variant="ghost" 
-          size="icon"
-          onClick={toggleMobileMenu}
-          className="fixed top-4 left-4 z-40 text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 bg-club-black/90 backdrop-blur-sm lg:hidden min-h-[44px] min-w-[44px] shadow-lg touch-manipulation"
-          aria-label="Open navigation menu"
-        >
-          <Menu size={24} />
-        </Button>
-      )}
-
-      {/* Desktop sidebar */}
-      <TooltipProvider delayDuration={200}>
-        <div className={`transition-all duration-300 ease-in-out h-screen flex flex-col border-r border-club-gold/20 bg-club-black ${collapsed ? "w-20" : "w-72"} ${isMobile ? "hidden" : ""}`}>
-          <div className="flex items-center justify-between px-4 border-b border-club-gold/20 min-h-[73px] py-[23px]">
-            {!collapsed && (
-              <div className="flex items-center overflow-hidden">
-                <img 
-                  src="/lovable-uploads/eb223be6-87a6-402c-a270-20313a00080c.png" 
-                  alt="Club Logo" 
-                  className="w-8 h-8 mr-3 rounded-lg flex-shrink-0" 
-                />
-                <span className="text-lg font-semibold text-club-gold truncate">SMH Analytics</span>
-              </div>
-            )}
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={toggleDesktopSidebar}
-              className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[44px] min-w-[44px] flex-shrink-0"
-              aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-            >
-              <Menu size={20} />
-            </Button>
-          </div>
-
-          <div className="flex-1 overflow-y-auto py-4">
-            <nav className={`${collapsed ? 'px-2' : 'px-3'} space-y-1`}>
-              {filteredNavigationItems.map(item => (
-                <SidebarNavItem 
-                  key={item.name}
-                  item={item}
-                  collapsed={collapsed}
-                  openSubMenu={openSubMenus.has(item.name) ? item.name : null}
-                  toggleSubMenu={toggleSubMenu}
-                />
-              ))}
-            </nav>
-          </div>
-
-          <SidebarFooter 
-            collapsed={collapsed} 
-            onFeedbackClick={() => setFeedbackOpen(true)} 
-          />
-          
-          <FeedbackForm open={feedbackOpen} onOpenChange={setFeedbackOpen} />
+    <TooltipProvider delayDuration={200}>
+      <div className={`transition-all duration-300 ease-in-out h-screen flex flex-col border-r border-club-gold/20 bg-club-black ${collapsed ? "w-16" : "w-64"}`}>
+        <div className="flex items-center justify-between px-3 border-b border-club-gold/20 min-h-[56px] py-2">
+          {!collapsed && (
+            <div className="flex items-center overflow-hidden">
+              <img 
+                src="/lovable-uploads/eb223be6-87a6-402c-a270-20313a00080c.png" 
+                alt="Club Logo" 
+                className="w-6 h-6 mr-2 rounded-lg flex-shrink-0" 
+              />
+              <span className="text-sm font-semibold text-club-gold truncate">SMH Analytics</span>
+            </div>
+          )}
+          <Button 
+            variant="ghost" 
+            size="icon"
+            onClick={toggleDesktopSidebar}
+            className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[44px] min-w-[44px] flex-shrink-0"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            <Menu size={18} />
+          </Button>
         </div>
-      </TooltipProvider>
-    </>
+
+        <div className="flex-1 overflow-y-auto py-2">
+          <nav className={`${collapsed ? 'px-1' : 'px-2'} space-y-1`}>
+            {filteredNavigationItems.map(item => (
+              <SidebarNavItem 
+                key={item.name}
+                item={item}
+                collapsed={collapsed}
+                openSubMenu={openSubMenus.has(item.name) ? item.name : null}
+                toggleSubMenu={toggleSubMenu}
+              />
+            ))}
+          </nav>
+        </div>
+
+        <SidebarFooter 
+          collapsed={collapsed} 
+          onFeedbackClick={() => setFeedbackOpen(true)} 
+        />
+        
+        <FeedbackForm open={feedbackOpen} onOpenChange={setFeedbackOpen} />
+      </div>
+    </TooltipProvider>
   );
 };
