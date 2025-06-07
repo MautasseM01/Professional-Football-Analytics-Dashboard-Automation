@@ -2,9 +2,10 @@
 import { useState } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { SwipeableContainer } from "@/components/ui/swipeable-container";
+import { LongPressMenu } from "@/components/ui/long-press-menu";
 import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, Area, AreaChart } from "recharts";
+import { Download, Share, MoreHorizontal } from "lucide-react";
 
 interface MobilePerformanceTrendsProps {
   player: Player;
@@ -61,67 +62,44 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
     }
   ];
 
-  const currentChartData = charts[currentChart];
+  const contextMenuItems = [
+    {
+      label: "Download Chart",
+      icon: <Download className="w-4 h-4" />,
+      action: () => console.log("Download chart")
+    },
+    {
+      label: "Share",
+      icon: <Share className="w-4 h-4" />,
+      action: () => console.log("Share chart")
+    },
+    {
+      label: "View Details",
+      icon: <MoreHorizontal className="w-4 h-4" />,
+      action: () => console.log("View details")
+    }
+  ];
 
-  const nextChart = () => {
-    setCurrentChart((prev) => (prev + 1) % charts.length);
-  };
-
-  const prevChart = () => {
-    setCurrentChart((prev) => (prev - 1 + charts.length) % charts.length);
-  };
-
-  return (
-    <Card className="border-[#F2F2F7]/20 bg-[#F2F2F7]/5 backdrop-blur-sm w-full max-w-full overflow-hidden">
+  const chartComponents = charts.map((chartData, index) => (
+    <Card key={index} className="border-[#F2F2F7]/20 bg-[#F2F2F7]/5 backdrop-blur-sm w-full max-w-full overflow-hidden">
       <CardHeader className="p-3 xs:p-4 pb-2">
         <div className="flex items-center justify-between">
           <div className="min-w-0 flex-1">
             <CardTitle className="text-sm xs:text-base sm:text-lg text-[#007AFF] font-semibold">
-              Performance Trends
+              {chartData.title}
             </CardTitle>
             <CardDescription className="text-xs text-[#8E8E93] mt-1">
-              {currentChartData.description}
+              {chartData.description}
             </CardDescription>
           </div>
-          <div className="flex items-center gap-1 xs:gap-2">
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={prevChart}
-              className="h-9 w-9 xs:h-11 xs:w-11 text-[#007AFF] hover:bg-[#007AFF]/10 min-h-[44px] min-w-[44px] rounded-xl"
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={nextChart}
-              className="h-9 w-9 xs:h-11 xs:w-11 text-[#007AFF] hover:bg-[#007AFF]/10 min-h-[44px] min-w-[44px] rounded-xl"
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-        
-        {/* Chart indicator dots */}
-        <div className="flex justify-center gap-1.5 mt-3">
-          {charts.map((_, index) => (
-            <div
-              key={index}
-              className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                index === currentChart ? 'bg-[#007AFF] scale-125' : 'bg-[#F2F2F7]/40'
-              }`}
-            />
-          ))}
         </div>
       </CardHeader>
 
       <CardContent className="p-3 xs:p-4 pt-0">
-        <div className="space-y-3 xs:space-y-4">
-          {/* Responsive chart container */}
+        <LongPressMenu items={contextMenuItems}>
           <div className="w-full">
             <div 
-              className="w-full h-[200px] xs:h-[250px] sm:h-[300px] md:h-[350px] bg-[#F2F2F7]/10 rounded-2xl p-2"
+              className="w-full h-[200px] xs:h-[250px] sm:h-[300px] md:h-[350px] bg-[#F2F2F7]/10 rounded-2xl p-2 ios-selection"
               style={{ maxWidth: '100%' }}
             >
               <ResponsiveContainer width="100%" height="100%">
@@ -135,9 +113,9 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
                   }}
                 >
                   <defs>
-                    <linearGradient id={`gradient-${currentChart}`} x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="0%" stopColor={currentChartData.color} stopOpacity={0.3}/>
-                      <stop offset="100%" stopColor={currentChartData.color} stopOpacity={0.05}/>
+                    <linearGradient id={`gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={chartData.color} stopOpacity={0.3}/>
+                      <stop offset="100%" stopColor={chartData.color} stopOpacity={0.05}/>
                     </linearGradient>
                   </defs>
                   <XAxis 
@@ -170,12 +148,12 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
                   />
                   <Area 
                     type="monotone" 
-                    dataKey={currentChartData.dataKey}
-                    stroke={currentChartData.color}
-                    strokeWidth={window.innerWidth < 480 ? 1 : 1.5}
-                    fill={`url(#gradient-${currentChart})`}
+                    dataKey={chartData.dataKey}
+                    stroke={chartData.color}
+                    strokeWidth={1}
+                    fill={`url(#gradient-${index})`}
                     dot={{ 
-                      fill: currentChartData.color, 
+                      fill: chartData.color, 
                       strokeWidth: 0, 
                       r: window.innerWidth < 480 ? 2 : 3 
                     }}
@@ -183,7 +161,7 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
                       r: window.innerWidth < 480 ? 4 : 5, 
                       stroke: "#fff",
                       strokeWidth: 2,
-                      fill: currentChartData.color,
+                      fill: chartData.color,
                       style: { filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))' }
                     }}
                   />
@@ -191,18 +169,21 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
               </ResponsiveContainer>
             </div>
           </div>
-
-          {/* Chart title and navigation info */}
-          <div className="text-center space-y-2">
-            <h3 className="text-xs xs:text-sm font-semibold text-[#007AFF]">
-              {currentChartData.title}
-            </h3>
-            <p className="text-xs text-[#8E8E93]">
-              Swipe or use arrows to view other metrics
-            </p>
-          </div>
-        </div>
+        </LongPressMenu>
       </CardContent>
     </Card>
+  ));
+
+  return (
+    <div className="w-full">
+      <SwipeableContainer 
+        onSwipe={(direction, index) => {
+          setCurrentChart(index);
+        }}
+        initialIndex={currentChart}
+      >
+        {chartComponents}
+      </SwipeableContainer>
+    </div>
   );
 };
