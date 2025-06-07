@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,10 +20,7 @@ import {
   YAxis, 
   ResponsiveContainer, 
   Area,
-  AreaChart,
-  defs,
-  linearGradient,
-  stop
+  AreaChart
 } from "recharts";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -326,7 +322,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                 axisLine={false}
                 width={30}
               />
-              <Tooltip 
+              <ChartTooltip 
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     return (
