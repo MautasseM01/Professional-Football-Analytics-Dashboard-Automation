@@ -2,14 +2,22 @@
 import { useState } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, ChevronRight, TrendingUp, ArrowLeft, ArrowRight } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip } from "recharts";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, Area, AreaChart, defs, linearGradient, stop } from "recharts";
 
 interface MobilePerformanceTrendsProps {
   player: Player;
 }
+
+// iOS-style color palette
+const iOS_COLORS = {
+  primary: "#007AFF",
+  secondary: "#34C759",
+  tertiary: "#FF9500",
+  gray: "#8E8E93",
+  lightGray: "#F2F2F7"
+};
 
 export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps) => {
   const [currentChart, setCurrentChart] = useState(0);
@@ -30,25 +38,25 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
     {
       title: "Goals per Match",
       dataKey: "goals",
-      color: "#D4AF37",
+      color: iOS_COLORS.primary,
       description: "Goals scored in recent matches"
     },
     {
       title: "Assists per Match", 
       dataKey: "assists",
-      color: "#10B981",
+      color: iOS_COLORS.secondary,
       description: "Assists provided in recent matches"
     },
     {
       title: "Pass Completion",
       dataKey: "passes", 
-      color: "#3B82F6",
+      color: iOS_COLORS.tertiary,
       description: "Successful passes per match"
     },
     {
       title: "Distance Covered",
       dataKey: "distance",
-      color: "#F59E0B", 
+      color: "#FF3B30", 
       description: "Kilometers covered per match"
     }
   ];
@@ -64,14 +72,14 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
   };
 
   return (
-    <Card className="border-club-gold/20 bg-club-dark-gray w-full max-w-full overflow-hidden">
+    <Card className="border-[#F2F2F7]/20 bg-[#F2F2F7]/5 backdrop-blur-sm w-full max-w-full overflow-hidden">
       <CardHeader className="p-3 xs:p-4 pb-2">
         <div className="flex items-center justify-between">
           <div className="min-w-0 flex-1">
-            <CardTitle className="text-sm xs:text-base sm:text-lg text-club-gold font-semibold">
+            <CardTitle className="text-sm xs:text-base sm:text-lg text-[#007AFF] font-semibold">
               Performance Trends
             </CardTitle>
-            <CardDescription className="text-xs text-club-light-gray/70 mt-1">
+            <CardDescription className="text-xs text-[#8E8E93] mt-1">
               {currentChartData.description}
             </CardDescription>
           </div>
@@ -80,7 +88,7 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
               variant="ghost"
               size="icon"
               onClick={prevChart}
-              className="h-9 w-9 xs:h-11 xs:w-11 text-club-gold hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
+              className="h-9 w-9 xs:h-11 xs:w-11 text-[#007AFF] hover:bg-[#007AFF]/10 min-h-[44px] min-w-[44px] rounded-xl"
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
@@ -88,7 +96,7 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
               variant="ghost"
               size="icon"
               onClick={nextChart}
-              className="h-9 w-9 xs:h-11 xs:w-11 text-club-gold hover:bg-club-gold/10 min-h-[44px] min-w-[44px]"
+              className="h-9 w-9 xs:h-11 xs:w-11 text-[#007AFF] hover:bg-[#007AFF]/10 min-h-[44px] min-w-[44px] rounded-xl"
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
@@ -96,12 +104,12 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
         </div>
         
         {/* Chart indicator dots */}
-        <div className="flex justify-center gap-1 mt-2">
+        <div className="flex justify-center gap-1.5 mt-3">
           {charts.map((_, index) => (
             <div
               key={index}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                index === currentChart ? 'bg-club-gold' : 'bg-club-gold/30'
+              className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                index === currentChart ? 'bg-[#007AFF] scale-125' : 'bg-[#F2F2F7]/40'
               }`}
             />
           ))}
@@ -113,82 +121,86 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
           {/* Responsive chart container */}
           <div className="w-full">
             <div 
-              className="w-full h-[200px] xs:h-[250px] sm:h-[300px] md:h-[350px]"
+              className="w-full h-[200px] xs:h-[250px] sm:h-[300px] md:h-[350px] bg-[#F2F2F7]/10 rounded-2xl p-2"
               style={{ maxWidth: '100%' }}
             >
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart 
+                <AreaChart 
                   data={performanceData} 
                   margin={{ 
-                    top: 5, 
+                    top: 10, 
                     right: window.innerWidth < 480 ? 10 : 20, 
                     left: window.innerWidth < 480 ? 5 : 10, 
-                    bottom: 5 
+                    bottom: 10 
                   }}
                 >
+                  <defs>
+                    <linearGradient id={`gradient-${currentChart}`} x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stopColor={currentChartData.color} stopOpacity={0.3}/>
+                      <stop offset="100%" stopColor={currentChartData.color} stopOpacity={0.05}/>
+                    </linearGradient>
+                  </defs>
                   <XAxis 
                     dataKey="match" 
-                    stroke="#F5F5F5" 
-                    fontSize={window.innerWidth < 480 ? 8 : 10}
+                    stroke="transparent"
+                    fontSize={window.innerWidth < 480 ? 9 : 10}
                     tickLine={false}
                     axisLine={false}
+                    tick={{ fill: iOS_COLORS.gray }}
                     interval={window.innerWidth < 480 ? 1 : 0}
                   />
                   <YAxis 
-                    stroke="#F5F5F5" 
-                    fontSize={window.innerWidth < 480 ? 8 : 10}
+                    stroke="transparent"
+                    fontSize={window.innerWidth < 480 ? 9 : 10}
                     tickLine={false}
                     axisLine={false}
+                    tick={{ fill: iOS_COLORS.gray }}
                     width={window.innerWidth < 480 ? 25 : 30}
                   />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: '#1A1A1A', 
-                      border: '1px solid #D4AF37', 
-                      borderRadius: '8px',
-                      fontSize: window.innerWidth < 480 ? '10px' : '12px'
+                      backgroundColor: 'rgba(255,255,255,0.95)', 
+                      backdropFilter: 'blur(20px)',
+                      border: 'none', 
+                      borderRadius: '12px',
+                      fontSize: window.innerWidth < 480 ? '10px' : '12px',
+                      color: '#1D1D1F',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
                     }}
                   />
-                  <Line 
+                  <Area 
                     type="monotone" 
                     dataKey={currentChartData.dataKey}
                     stroke={currentChartData.color}
-                    strokeWidth={window.innerWidth < 480 ? 1.5 : 2}
+                    strokeWidth={window.innerWidth < 480 ? 1 : 1.5}
+                    fill={`url(#gradient-${currentChart})`}
                     dot={{ 
                       fill: currentChartData.color, 
-                      strokeWidth: window.innerWidth < 480 ? 1.5 : 2, 
-                      r: window.innerWidth < 480 ? 3 : 4 
+                      strokeWidth: 0, 
+                      r: window.innerWidth < 480 ? 2 : 3 
                     }}
                     activeDot={{ 
-                      r: window.innerWidth < 480 ? 5 : 6, 
-                      stroke: currentChartData.color, 
-                      strokeWidth: 2 
+                      r: window.innerWidth < 480 ? 4 : 5, 
+                      stroke: "#fff",
+                      strokeWidth: 2,
+                      fill: currentChartData.color,
+                      style: { filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))' }
                     }}
                   />
-                </LineChart>
+                </AreaChart>
               </ResponsiveContainer>
             </div>
           </div>
 
           {/* Chart title and navigation info */}
           <div className="text-center space-y-2">
-            <h3 className="text-xs xs:text-sm font-medium text-club-light-gray">
+            <h3 className="text-xs xs:text-sm font-semibold text-[#007AFF]">
               {currentChartData.title}
             </h3>
-            <p className="text-xs text-club-light-gray/60">
+            <p className="text-xs text-[#8E8E93]">
               Swipe or use arrows to view other metrics
             </p>
           </div>
-
-          {/* Landscape mode suggestion - only show on very small screens */}
-          {window.innerWidth < 480 && (
-            <Alert className="bg-amber-500/10 border-amber-500/30">
-              <TrendingUp className="h-4 w-4" />
-              <AlertDescription className="text-xs text-club-light-gray">
-                Rotate to landscape mode for better chart viewing experience
-              </AlertDescription>
-            </Alert>
-          )}
         </div>
       </CardContent>
     </Card>

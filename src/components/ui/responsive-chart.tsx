@@ -6,7 +6,6 @@ import { useResponsiveBreakpoint } from "@/hooks/use-orientation";
 import { ChartContainer } from "@/components/ui/chart";
 import { Button } from "@/components/ui/button";
 import { ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface ResponsiveChartProps {
   children: React.ReactNode;
@@ -18,6 +17,14 @@ interface ResponsiveChartProps {
   aspectRatio?: number;
   minHeight?: number;
 }
+
+// iOS-style color palette
+const iOS_COLORS = {
+  primary: "#007AFF",
+  secondary: "#34C759",
+  background: "#F2F2F7",
+  gray: "#8E8E93"
+};
 
 export const ResponsiveChart = React.forwardRef<
   HTMLDivElement,
@@ -54,7 +61,7 @@ export const ResponsiveChart = React.forwardRef<
     if (breakpoint === 'tablet-portrait') {
       return {
         aspectRatio: aspectRatio || (3/2),
-        minHeight: minHeight || 250,
+        minHeight: minHeight || 280,
         margin: { top: 15, right: 15, bottom: 15, left: 15 },
         fontSize: 11,
         showLegend: true,
@@ -64,7 +71,7 @@ export const ResponsiveChart = React.forwardRef<
     if (breakpoint === 'tablet-landscape') {
       return {
         aspectRatio: aspectRatio || (16/10),
-        minHeight: minHeight || 300,
+        minHeight: minHeight || 320,
         margin: { top: 20, right: 20, bottom: 20, left: 20 },
         fontSize: 12,
         showLegend: true,
@@ -143,13 +150,13 @@ export const ResponsiveChart = React.forwardRef<
   if (isMobile && simplifiedMobileView && showSimplified) {
     return (
       <div ref={ref} className={cn("w-full", className)} {...props}>
-        <div className="flex items-center justify-between mb-2">
-          {title && <h3 className="text-sm font-medium">{title}</h3>}
+        <div className="flex items-center justify-between mb-3">
+          {title && <h3 className="text-sm font-medium text-[#007AFF]">{title}</h3>}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowSimplified(false)}
-            className="text-xs"
+            className="text-xs text-[#007AFF] hover:bg-[#007AFF]/10 rounded-xl min-h-[44px]"
           >
             Show Full Chart
           </Button>
@@ -160,49 +167,39 @@ export const ResponsiveChart = React.forwardRef<
   }
 
   return (
-    <div ref={ref} className={cn("w-full space-y-2", className)} {...props}>
-      {/* Mobile orientation suggestion */}
-      {isMobile && (
-        <Alert className="bg-blue-500/10 border-blue-500/30">
-          <RotateCcw className="h-4 w-4" />
-          <AlertDescription className="text-xs">
-            For better viewing, try rotating your device to landscape mode
-          </AlertDescription>
-        </Alert>
-      )}
-
+    <div ref={ref} className={cn("w-full space-y-3", className)} {...props}>
       {/* Controls */}
       <div className="flex items-center justify-between">
-        {title && <h3 className="text-sm sm:text-base font-medium">{title}</h3>}
+        {title && <h3 className="text-sm sm:text-base font-medium text-[#007AFF]">{title}</h3>}
         <div className="flex items-center gap-2">
           {isMobile && simplifiedMobileView && (
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowSimplified(true)}
-              className="text-xs min-h-[44px]"
+              className="text-xs min-h-[44px] text-[#007AFF] hover:bg-[#007AFF]/10 rounded-xl"
             >
               Simplified View
             </Button>
           )}
           {showZoomControls && (
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 bg-[#F2F2F7]/10 rounded-xl p-1">
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleZoomOut}
                 disabled={zoomLevel <= 0.5}
-                className="h-9 w-9 min-h-[44px] min-w-[44px]"
+                className="h-9 w-9 min-h-[44px] min-w-[44px] text-[#007AFF] hover:bg-[#007AFF]/10 rounded-lg"
               >
                 <ZoomOut className="h-4 w-4" />
               </Button>
-              <span className="text-xs px-2">{Math.round(zoomLevel * 100)}%</span>
+              <span className="text-xs px-2 text-[#8E8E93] font-medium">{Math.round(zoomLevel * 100)}%</span>
               <Button
                 variant="ghost"
                 size="icon"
                 onClick={handleZoomIn}
                 disabled={zoomLevel >= 3}
-                className="h-9 w-9 min-h-[44px] min-w-[44px]"
+                className="h-9 w-9 min-h-[44px] min-w-[44px] text-[#007AFF] hover:bg-[#007AFF]/10 rounded-lg"
               >
                 <ZoomIn className="h-4 w-4" />
               </Button>
@@ -210,7 +207,7 @@ export const ResponsiveChart = React.forwardRef<
                 variant="ghost"
                 size="icon"
                 onClick={handleResetZoom}
-                className="h-9 w-9 min-h-[44px] min-w-[44px]"
+                className="h-9 w-9 min-h-[44px] min-w-[44px] text-[#007AFF] hover:bg-[#007AFF]/10 rounded-lg"
               >
                 <RotateCcw className="h-4 w-4" />
               </Button>
@@ -222,11 +219,11 @@ export const ResponsiveChart = React.forwardRef<
       {/* Chart container */}
       <div 
         ref={containerRef}
-        className="w-full overflow-auto touch-pan-x touch-pan-y"
+        className="w-full overflow-auto touch-pan-x touch-pan-y bg-[#F2F2F7]/5 rounded-2xl backdrop-blur-sm"
         style={{
           transform: `scale(${zoomLevel})`,
           transformOrigin: 'top left',
-          transition: 'transform 0.2s ease-in-out'
+          transition: 'transform 0.3s ease-out'
         }}
       >
         <div 
@@ -242,7 +239,7 @@ export const ResponsiveChart = React.forwardRef<
 
       {/* Mobile zoom hint */}
       {isMobile && !showZoomControls && (
-        <p className="text-xs text-muted-foreground text-center">
+        <p className="text-xs text-[#8E8E93] text-center">
           Pinch to zoom • Drag to pan
         </p>
       )}

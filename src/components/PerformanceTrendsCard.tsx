@@ -19,10 +19,12 @@ import {
   Line, 
   XAxis, 
   YAxis, 
-  CartesianGrid, 
   ResponsiveContainer, 
-  Legend,
-  Tooltip
+  Area,
+  AreaChart,
+  defs,
+  linearGradient,
+  stop
 } from "recharts";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
@@ -49,6 +51,16 @@ const TIME_PERIOD_OPTIONS = [
   { value: "last10", label: "Last 10 Matches" },
   { value: "season", label: "Season to Date" }
 ];
+
+// iOS-style color palette
+const iOS_COLORS = {
+  primary: "#007AFF",
+  secondary: "#34C759",
+  tertiary: "#FF9500",
+  background: "#F2F2F7",
+  gray: "#8E8E93",
+  lightGray: "#F2F2F7"
+};
 
 // Helper function to generate mock match data based on a player stat
 const generateMatchData = (player: Player, kpi: string, numMatches: number) => {
@@ -131,45 +143,45 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
       : rawData;
   }, [player, selectedKPI, selectedTimePeriod, showMovingAverage]);
 
-  // Responsive chart configuration
+  // Responsive chart configuration with iOS styling
   const getChartConfig = () => {
     if (breakpoint === 'mobile') {
       return {
-        height: 220,
-        fontSize: 9,
-        strokeWidth: 1.5,
+        height: 200,
+        fontSize: 10,
+        strokeWidth: 1,
         dotRadius: 2,
-        activeDotRadius: 3,
-        margin: { top: 10, right: 15, left: 10, bottom: 30 }
+        activeDotRadius: 4,
+        margin: { top: 20, right: 20, left: 10, bottom: 30 }
       };
     }
     if (breakpoint === 'tablet-portrait') {
       return {
-        height: 280,
-        fontSize: 10,
-        strokeWidth: 2,
+        height: 260,
+        fontSize: 11,
+        strokeWidth: 1.5,
         dotRadius: 2.5,
-        activeDotRadius: 4,
-        margin: { top: 15, right: 20, left: 15, bottom: 40 }
+        activeDotRadius: 5,
+        margin: { top: 25, right: 25, left: 15, bottom: 40 }
       };
     }
     if (breakpoint === 'tablet-landscape') {
       return {
-        height: 320,
-        fontSize: 11,
-        strokeWidth: 2,
+        height: 300,
+        fontSize: 12,
+        strokeWidth: 1.5,
         dotRadius: 3,
         activeDotRadius: 5,
-        margin: { top: 20, right: 25, left: 20, bottom: 50 }
+        margin: { top: 30, right: 30, left: 20, bottom: 50 }
       };
     }
     return {
-      height: 380,
+      height: 350,
       fontSize: 12,
-      strokeWidth: 2.5,
+      strokeWidth: 2,
       dotRadius: 3,
       activeDotRadius: 6,
-      margin: { top: 25, right: 30, left: 25, bottom: 60 }
+      margin: { top: 35, right: 35, left: 25, bottom: 60 }
     };
   };
 
@@ -201,9 +213,16 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
     <Card className="bg-club-dark-bg border-club-gold/20 w-full">
       <CardHeader className="p-3 sm:p-4 lg:p-6 pb-2 sm:pb-3">
         <div className="space-y-3 sm:space-y-4">
-          <CardTitle className="text-club-light-gray text-sm sm:text-base lg:text-lg xl:text-xl font-semibold">
-            {player.name}'s Performance Trend
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-club-light-gray text-sm sm:text-base lg:text-lg xl:text-xl font-medium">
+              {player.name}'s Performance
+            </CardTitle>
+            {!isMobile && (
+              <div className="text-xs text-[#8E8E93] bg-[#F2F2F7]/10 px-2 py-1 rounded-full">
+                {selectedKPILabel}
+              </div>
+            )}
+          </div>
           
           <div className="space-y-3 sm:space-y-4">
             {/* Controls Container */}
@@ -211,14 +230,14 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
               {/* Dropdowns Row */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 <div className="space-y-1">
-                  <Label className="text-xs text-club-light-gray/80 font-medium">Performance Metric</Label>
+                  <Label className="text-xs text-club-light-gray/80 font-medium">Metric</Label>
                   <Select value={selectedKPI} onValueChange={setSelectedKPI}>
-                    <SelectTrigger className="w-full bg-club-black border-club-gold/30 text-club-light-gray h-8 sm:h-9 lg:h-10 text-xs sm:text-sm focus:ring-club-gold/50">
+                    <SelectTrigger className="w-full bg-[#F2F2F7]/5 border-[#F2F2F7]/20 text-club-light-gray h-8 sm:h-9 lg:h-10 text-xs sm:text-sm focus:ring-[#007AFF]/50 rounded-xl">
                       <SelectValue placeholder="Select KPI" />
                     </SelectTrigger>
-                    <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray z-50 max-h-60">
+                    <SelectContent className="bg-club-black border-[#F2F2F7]/20 text-club-light-gray z-50 max-h-60 rounded-xl">
                       {KPI_OPTIONS.map(option => (
-                        <SelectItem key={option.value} value={option.value} className="focus:bg-club-gold/20 text-xs sm:text-sm">
+                        <SelectItem key={option.value} value={option.value} className="focus:bg-[#007AFF]/20 text-xs sm:text-sm rounded-lg">
                           {option.label}
                         </SelectItem>
                       ))}
@@ -227,14 +246,14 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                 </div>
                 
                 <div className="space-y-1">
-                  <Label className="text-xs text-club-light-gray/80 font-medium">Time Period</Label>
+                  <Label className="text-xs text-club-light-gray/80 font-medium">Period</Label>
                   <Select value={selectedTimePeriod} onValueChange={setSelectedTimePeriod}>
-                    <SelectTrigger className="w-full bg-club-black border-club-gold/30 text-club-light-gray h-8 sm:h-9 lg:h-10 text-xs sm:text-sm focus:ring-club-gold/50">
+                    <SelectTrigger className="w-full bg-[#F2F2F7]/5 border-[#F2F2F7]/20 text-club-light-gray h-8 sm:h-9 lg:h-10 text-xs sm:text-sm focus:ring-[#007AFF]/50 rounded-xl">
                       <SelectValue placeholder="Time Period" />
                     </SelectTrigger>
-                    <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray z-50">
+                    <SelectContent className="bg-club-black border-[#F2F2F7]/20 text-club-light-gray z-50 rounded-xl">
                       {TIME_PERIOD_OPTIONS.map(option => (
-                        <SelectItem key={option.value} value={option.value} className="focus:bg-club-gold/20 text-xs sm:text-sm">
+                        <SelectItem key={option.value} value={option.value} className="focus:bg-[#007AFF]/20 text-xs sm:text-sm rounded-lg">
                           {option.label}
                         </SelectItem>
                       ))}
@@ -250,13 +269,13 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                     htmlFor="movingAverage"
                     className="text-club-light-gray text-xs sm:text-sm cursor-pointer select-none font-medium"
                   >
-                    Show 3-Match Moving Average
+                    3-Match Average
                   </Label>
                   <Switch 
                     id="movingAverage" 
                     checked={showMovingAverage}
                     onCheckedChange={setShowMovingAverage}
-                    className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30"
+                    className="data-[state=checked]:bg-[#007AFF] data-[state=unchecked]:bg-[#F2F2F7]/20"
                   />
                 </div>
               )}
@@ -266,55 +285,57 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
       </CardHeader>
       
       <CardContent className="p-3 sm:p-4 lg:p-6 pt-1 sm:pt-2">
-        <div className="w-full rounded-lg bg-club-black/30 p-2 sm:p-3 lg:p-4">
+        <div className="w-full rounded-2xl bg-[#F2F2F7]/5 p-2 sm:p-3 lg:p-4 backdrop-blur-sm">
           <ChartContainer 
             config={{
-              value: { color: "#D4AF37" },
-              average: { color: "#9CA3AF" }
+              value: { color: iOS_COLORS.primary },
+              average: { color: iOS_COLORS.gray }
             }}
             aspectRatio={breakpoint === 'mobile' ? (4/3) : (16/10)}
             minHeight={chartConfig.height}
           >
-            <RechartsLineChart
+            <AreaChart
               data={matchData}
               margin={chartConfig.margin}
             >
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" opacity={0.3} />
+              <defs>
+                <linearGradient id="valueGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={iOS_COLORS.primary} stopOpacity={0.3}/>
+                  <stop offset="100%" stopColor={iOS_COLORS.primary} stopOpacity={0.05}/>
+                </linearGradient>
+                <linearGradient id="averageGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor={iOS_COLORS.gray} stopOpacity={0.2}/>
+                  <stop offset="100%" stopColor={iOS_COLORS.gray} stopOpacity={0.05}/>
+                </linearGradient>
+              </defs>
               <XAxis 
                 dataKey="match" 
-                stroke="#9CA3AF"
-                tick={{ fill: '#9CA3AF', fontSize: chartConfig.fontSize }}
-                tickLine={{ stroke: '#9CA3AF' }}
-                axisLine={{ stroke: '#9CA3AF' }}
+                stroke="transparent"
+                tick={{ fill: iOS_COLORS.gray, fontSize: chartConfig.fontSize }}
+                tickLine={false}
+                axisLine={false}
                 angle={-45}
                 textAnchor="end"
                 height={chartConfig.margin.bottom}
                 interval={breakpoint === 'mobile' ? 'preserveStartEnd' : 0}
               />
               <YAxis 
-                stroke="#9CA3AF"
-                tick={{ fill: '#9CA3AF', fontSize: chartConfig.fontSize }}
-                tickLine={{ stroke: '#9CA3AF' }}
-                axisLine={{ stroke: '#9CA3AF' }}
-                label={!isMobile ? { 
-                  value: selectedKPILabel, 
-                  angle: -90, 
-                  position: 'insideLeft', 
-                  style: { textAnchor: 'middle' }, 
-                  fill: '#9CA3AF',
-                  fontSize: chartConfig.fontSize
-                } : undefined}
+                stroke="transparent"
+                tick={{ fill: iOS_COLORS.gray, fontSize: chartConfig.fontSize }}
+                tickLine={false}
+                axisLine={false}
+                width={30}
               />
               <Tooltip 
                 content={({ active, payload }) => {
                   if (active && payload && payload.length) {
                     return (
-                      <div className="bg-club-black/95 p-2 sm:p-3 border border-club-gold/30 rounded-lg shadow-lg text-club-light-gray backdrop-blur-sm max-w-[200px]">
-                        <p className="font-semibold text-club-gold text-xs sm:text-sm">{payload[0].payload.match}</p>
-                        <p className="text-club-light-gray/80 text-xs mb-1">{payload[0].payload.date}</p>
-                        <p className="text-club-gold font-medium text-xs sm:text-sm">{selectedKPILabel}: {payload[0].value}</p>
+                      <div className="bg-white/95 backdrop-blur-md p-3 border-0 rounded-2xl shadow-2xl text-gray-800 max-w-[200px]">
+                        <p className="font-semibold text-[#007AFF] text-sm">{payload[0].payload.match}</p>
+                        <p className="text-[#8E8E93] text-xs mb-2">{payload[0].payload.date}</p>
+                        <p className="text-gray-800 font-medium text-sm">{selectedKPILabel}: {payload[0].value}</p>
                         {showMovingAverage && payload[0].payload.movingAvg !== null && (
-                          <p className="text-gray-400 text-xs">3-Match Avg: {payload[0].payload.movingAvg}</p>
+                          <p className="text-[#8E8E93] text-xs">3-Match Avg: {payload[0].payload.movingAvg}</p>
                         )}
                       </div>
                     );
@@ -322,36 +343,33 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                   return null;
                 }}
               />
-              {!isMobile && (
-                <Legend 
-                  verticalAlign="top" 
-                  height={36} 
-                  formatter={(value) => (
-                    <span style={{ color: "#9CA3AF", fontSize: `${chartConfig.fontSize}px` }}>{value}</span>
-                  )}
-                />
-              )}
-              <Line
+              <Area
                 type="monotone"
                 dataKey="value"
-                name={selectedKPILabel}
-                stroke="#D4AF37"
+                stroke={iOS_COLORS.primary}
                 strokeWidth={chartConfig.strokeWidth}
-                dot={{ r: chartConfig.dotRadius, strokeWidth: 2, fill: "#D4AF37" }}
-                activeDot={{ r: chartConfig.activeDotRadius, strokeWidth: 2, fill: "#D4AF37" }}
+                fill="url(#valueGradient)"
+                dot={{ r: chartConfig.dotRadius, strokeWidth: 0, fill: iOS_COLORS.primary }}
+                activeDot={{ 
+                  r: chartConfig.activeDotRadius, 
+                  strokeWidth: 2, 
+                  stroke: "#fff",
+                  fill: iOS_COLORS.primary,
+                  style: { filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))' }
+                }}
               />
               {showMovingAverage && !isMobile && (
-                <Line
+                <Area
                   type="monotone"
                   dataKey="movingAvg"
-                  name="3-Match Average"
-                  stroke="#9CA3AF"
-                  strokeDasharray="5 5"
+                  stroke={iOS_COLORS.gray}
+                  strokeDasharray="3 3"
                   strokeWidth={chartConfig.strokeWidth}
+                  fill="url(#averageGradient)"
                   dot={false}
                 />
               )}
-            </RechartsLineChart>
+            </AreaChart>
           </ChartContainer>
         </div>
       </CardContent>

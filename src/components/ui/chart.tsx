@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 
@@ -46,7 +47,7 @@ const ChartContainer = React.forwardRef<
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
 
-  // Enhanced responsive aspect ratio based on screen size
+  // Enhanced responsive aspect ratio based on screen size with iOS styling
   const getAspectRatio = () => {
     if (typeof window === 'undefined') return aspectRatio || (16/9);
     
@@ -63,10 +64,10 @@ const ChartContainer = React.forwardRef<
     if (typeof window === 'undefined') return 200;
     
     const width = window.innerWidth;
-    if (width < 480) return 180; // Compact on very small screens
-    if (width < 768) return 220; // Reasonable on mobile
-    if (width < 1024) return 280; // Good size on tablet
-    return 320; // Full size on desktop
+    if (width < 480) return 200; // Compact on very small screens
+    if (width < 768) return 260; // Reasonable on mobile
+    if (width < 1024) return 300; // Good size on tablet
+    return 350; // Full size on desktop
   };
 
   return (
@@ -76,12 +77,15 @@ const ChartContainer = React.forwardRef<
         ref={ref}
         className={cn(
           "flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
-          // Enhanced responsive container classes
-          "w-full transition-all duration-300 ease-in-out",
+          // Enhanced responsive container classes with iOS styling
+          "w-full transition-all duration-300 ease-out",
           "container-type-inline-size", // Enable container queries
           // Touch-friendly adjustments
           "[&_.recharts-dot]:cursor-pointer [&_.recharts-dot]:min-w-[44px] [&_.recharts-dot]:min-h-[44px]",
           "[&_.recharts-legend-item]:cursor-pointer [&_.recharts-legend-item]:min-h-[44px]",
+          // iOS-style styling
+          "bg-gradient-to-br from-[#F2F2F7]/5 to-transparent rounded-2xl backdrop-blur-sm",
+          "border border-[#F2F2F7]/10",
           className
         )}
         style={{
@@ -182,7 +186,7 @@ const ChartTooltipContent = React.forwardRef<
 
       if (labelFormatter) {
         return (
-          <div className={cn("font-medium", labelClassName)}>
+          <div className={cn("font-medium text-[#1D1D1F]", labelClassName)}>
             {labelFormatter(value, payload)}
           </div>
         )
@@ -192,7 +196,7 @@ const ChartTooltipContent = React.forwardRef<
         return null
       }
 
-      return <div className={cn("font-medium", labelClassName)}>{value}</div>
+      return <div className={cn("font-medium text-[#1D1D1F]", labelClassName)}>{value}</div>
     }, [
       label,
       labelFormatter,
@@ -213,11 +217,12 @@ const ChartTooltipContent = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
-          // Enhanced responsive tooltip sizing with touch-friendly dimensions
+          "grid min-w-[8rem] items-start gap-1.5 rounded-2xl border-0 bg-white/95 backdrop-blur-md px-3 py-2 text-xs shadow-2xl",
+          // Enhanced responsive tooltip sizing with touch-friendly dimensions and iOS styling
           "max-w-[200px] sm:max-w-[250px] lg:max-w-[300px]",
           "text-xs sm:text-sm",
           "min-h-[44px] touch-manipulation", // Touch-friendly minimum height
+          "text-[#1D1D1F]", // iOS text color
           className
         )}
       >
@@ -232,7 +237,7 @@ const ChartTooltipContent = React.forwardRef<
               <div
                 key={item.dataKey}
                 className={cn(
-                  "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground",
+                  "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-[#8E8E93]",
                   indicator === "dot" && "items-center",
                   "min-h-[44px] touch-manipulation" // Touch-friendly row height
                 )}
@@ -247,7 +252,7 @@ const ChartTooltipContent = React.forwardRef<
                       !hideIndicator && (
                         <div
                           className={cn(
-                            "shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]",
+                            "shrink-0 rounded-full border-[--color-border] bg-[--color-bg]",
                             {
                               "h-2.5 w-2.5": indicator === "dot",
                               "w-1": indicator === "line",
@@ -273,12 +278,12 @@ const ChartTooltipContent = React.forwardRef<
                     >
                       <div className="grid gap-1.5">
                         {nestLabel ? tooltipLabel : null}
-                        <span className="text-muted-foreground">
+                        <span className="text-[#8E8E93] font-medium">
                           {itemConfig?.label || item.name}
                         </span>
                       </div>
                       {item.value && (
-                        <span className="font-mono font-medium tabular-nums text-foreground">
+                        <span className="font-mono font-semibold tabular-nums text-[#1D1D1F]">
                           {item.value.toLocaleString()}
                         </span>
                       )}
@@ -321,7 +326,7 @@ const ChartLegendContent = React.forwardRef<
         className={cn(
           "flex items-center justify-center gap-4",
           verticalAlign === "top" ? "pb-3" : "pt-3",
-          // Enhanced responsive legend spacing with touch-friendly sizing
+          // Enhanced responsive legend spacing with touch-friendly sizing and iOS styling
           "gap-2 sm:gap-3 lg:gap-4",
           "text-xs sm:text-sm",
           "flex-wrap", // Allow wrapping on small screens
@@ -337,23 +342,24 @@ const ChartLegendContent = React.forwardRef<
             <div
               key={item.value}
               className={cn(
-                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
-                // Enhanced responsive icon sizing with touch-friendly dimensions
+                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-[#8E8E93]",
+                // Enhanced responsive icon sizing with touch-friendly dimensions and iOS styling
                 "[&>svg]:h-2 [&>svg]:w-2 sm:[&>svg]:h-3 sm:[&>svg]:w-3",
-                "min-h-[44px] touch-manipulation cursor-pointer" // Touch-friendly item
+                "min-h-[44px] touch-manipulation cursor-pointer hover:opacity-80 transition-opacity", // Touch-friendly item with iOS hover
+                "bg-[#F2F2F7]/10 px-3 py-2 rounded-xl" // iOS-style background
               )}
             >
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
               ) : (
                 <div
-                  className="h-2 w-2 shrink-0 rounded-[2px] sm:h-2.5 sm:w-2.5"
+                  className="h-2 w-2 shrink-0 rounded-full sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor: item.color,
                   }}
                 />
               )}
-              <span className="text-xs sm:text-sm truncate">
+              <span className="text-xs sm:text-sm truncate text-[#1D1D1F] font-medium">
                 {itemConfig?.label}
               </span>
             </div>
