@@ -1,7 +1,8 @@
+
 import React, { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { MultiSelect } from "@/components/ui/multi-select";
+import { MultiPlayerSelect } from "@/components/MultiPlayerSelect";
 import { Player } from "@/types";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { ResponsiveChart } from "@/components/ui/responsive-chart";
@@ -10,9 +11,8 @@ import { ResponsiveTable, ResponsiveTableRow, ResponsiveTableCell, ResponsiveTab
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PlayerComparisonData {
-  name: string;
   metric: string;
-  value: number;
+  [playerName: string]: string | number;
 }
 
 const colors = ['#D4AF37', '#C0C0C0', '#CD7F32', '#B8860B'];
@@ -42,52 +42,14 @@ const chartConfig = {
 
 export const PlayerComparison = () => {
   const { players } = usePlayerData();
-  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
+  const [selectedPlayerIds, setSelectedPlayerIds] = useState<number[]>([]);
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    console.log("Selected Players:", selectedPlayers);
-  }, [selectedPlayers]);
+    console.log("Selected Player IDs:", selectedPlayerIds);
+  }, [selectedPlayerIds]);
 
-  const MultiPlayerSelect = ({
-    players,
-    selectedPlayers,
-    onSelectionChange,
-    maxSelection,
-  }: {
-    players: Player[];
-    selectedPlayers: Player[];
-    onSelectionChange: (players: Player[]) => void;
-    maxSelection: number;
-  }) => {
-    const options = players.map((player) => ({
-      label: player.name,
-      value: player.id,
-    }));
-  
-    const selectedValues = selectedPlayers.map((player) => player.id);
-  
-    const handleChange = (values: string[]) => {
-      if (values.length <= maxSelection) {
-        const newSelectedPlayers = players.filter((player) =>
-          values.includes(player.id)
-        );
-        onSelectionChange(newSelectedPlayers);
-      } else {
-        // Optionally, provide feedback to the user that they've reached the limit
-        alert(`You can only select up to ${maxSelection} players.`);
-      }
-    };
-  
-    return (
-      <MultiSelect
-        options={options}
-        value={selectedValues}
-        onChange={handleChange}
-        placeholder="Select players"
-      />
-    );
-  };
+  const selectedPlayers = players.filter(player => selectedPlayerIds.includes(player.id));
 
   const radarData: PlayerComparisonData[] = selectedPlayers.length > 0 ? [
     {
@@ -95,30 +57,30 @@ export const PlayerComparison = () => {
       ...selectedPlayers.reduce((acc, player) => {
         acc[player.name] = player.distance;
         return acc;
-      }, {}),
+      }, {} as Record<string, number>),
     },
     {
       metric: "Pass Completion",
       ...selectedPlayers.reduce((acc, player) => {
-        // Use passCompletionPct if available, otherwise calculate it
-        const passCompletion = player.passCompletionPct ? parseFloat(player.passCompletionPct) : (player.passes_attempted > 0 ? (player.passes_completed / player.passes_attempted) * 100 : 0);
-        acc[player.name] = passCompletion;
+        // Calculate pass completion percentage
+        const passCompletion = player.passes_attempted > 0 ? (player.passes_completed / player.passes_attempted) * 100 : 0;
+        acc[player.name] = Math.round(passCompletion * 10) / 10; // Round to 1 decimal
         return acc;
-      }, {}),
+      }, {} as Record<string, number>),
     },
     {
       metric: "Shots on Target",
       ...selectedPlayers.reduce((acc, player) => {
         acc[player.name] = player.shots_on_target;
         return acc;
-      }, {}),
+      }, {} as Record<string, number>),
     },
     {
       metric: "Tackles Won",
       ...selectedPlayers.reduce((acc, player) => {
         acc[player.name] = player.tackles_won;
         return acc;
-      }, {}),
+      }, {} as Record<string, number>),
     },
   ] : [];
 
@@ -148,9 +110,9 @@ export const PlayerComparison = () => {
           <CardContent className={`pt-0 ${isMobile ? 'p-3' : 'p-3 sm:p-4'}`}>
             <MultiPlayerSelect
               players={players}
-              selectedPlayers={selectedPlayers}
-              onSelectionChange={setSelectedPlayers}
-              maxSelection={4}
+              selectedPlayerIds={selectedPlayerIds}
+              onChange={setSelectedPlayerIds}
+              maxSelections={4}
             />
           </CardContent>
         </Card>
@@ -235,7 +197,7 @@ export const PlayerComparison = () => {
                           }
                           data={{
                             "Total Distance (km)": `${player.distance} km`,
-                            "Pass Completion %": player.passCompletionPct ? `${player.passCompletionPct}%` : `${((player.passes_completed / player.passes_attempted) * 100).toFixed(1)}%`,
+                            "Pass Completion %": `${((player.passes_completed / player.passes_attempted) * 100).toFixed(1)}%`,
                             "Shots on Target": player.shots_on_target,
                             "Tackles Won": player.tackles_won
                           }}
@@ -273,10 +235,7 @@ export const PlayerComparison = () => {
                             <ResponsiveTableCell>{player.position}</ResponsiveTableCell>
                             <ResponsiveTableCell>{player.distance} km</ResponsiveTableCell>
                             <ResponsiveTableCell>
-                              {player.passCompletionPct ? 
-                                `${player.passCompletionPct}%` : 
-                                `${((player.passes_completed / player.passes_attempted) * 100).toFixed(1)}%`
-                              }
+                              {((player.passes_completed / player.passes_attempted) * 100).toFixed(1)}%
                             </ResponsiveTableCell>
                             <ResponsiveTableCell>{player.shots_on_target}</ResponsiveTableCell>
                             <ResponsiveTableCell>{player.tackles_won}</ResponsiveTableCell>
@@ -302,3 +261,5 @@ export const PlayerComparison = () => {
     </DashboardLayout>
   );
 };
+
+export default PlayerComparison;
