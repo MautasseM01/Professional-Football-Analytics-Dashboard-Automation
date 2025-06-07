@@ -1,6 +1,7 @@
 
 import React from "react";
 import { DashboardSidebar } from "./DashboardSidebar";
+import { MobileBottomNav } from "./MobileBottomNav";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "./LanguageSelector";
@@ -20,7 +21,7 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
       {/* Main content area */}
       <main className={cn(
         "flex-1 overflow-auto transition-all duration-300 ease-in-out flex flex-col",
-        isMobile && "pt-16" // Add top padding for mobile hamburger button
+        isMobile && "pt-16 pb-20" // Add top padding for mobile hamburger button and bottom padding for bottom nav
       )}>
         {/* Header bar aligned with sidebar */}
         <div className="border-b border-club-gold/20 bg-club-black px-4 py-4 flex items-center justify-between min-h-[73px] flex-shrink-0">
@@ -40,6 +41,9 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) =>
           </div>
         </div>
       </main>
+
+      {/* Mobile bottom navigation */}
+      {isMobile && <MobileBottomNav />}
     </div>
   );
 };
