@@ -17,6 +17,17 @@ export const PlayerStats = () => {
   console.log("First player structure:", players[0]);
   console.log("Player numbers in database:", players.map(p => ({ name: p.name, id: p.id, number: p.number })));
 
+  const handlePlayerSelect = (player: Player) => {
+    setSelectedPlayer(player);
+  };
+
+  const handlePlayerSelectById = (playerId: number) => {
+    const player = players.find(p => p.id === playerId);
+    if (player) {
+      setSelectedPlayer(player);
+    }
+  };
+
   return (
     <DashboardLayout>
       <div className={`w-full max-w-7xl mx-auto ${isMobile ? 'p-2' : 'p-3 sm:p-4 lg:p-6'} space-y-4 sm:space-y-6`}>
@@ -45,13 +56,13 @@ export const PlayerStats = () => {
               <MobilePlayerSelector
                 players={players}
                 selectedPlayer={selectedPlayer}
-                onPlayerSelect={setSelectedPlayer}
+                onPlayerSelect={handlePlayerSelect}
               />
             ) : (
               <PlayerSelector
                 players={players}
                 selectedPlayer={selectedPlayer}
-                onPlayerSelect={setSelectedPlayer}
+                onPlayerSelect={handlePlayerSelectById}
               />
             )}
           </CardContent>

@@ -4,31 +4,32 @@ import { Home, BarChart3, Users, Settings } from "lucide-react";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { hasAccess } from "@/utils/roleAccess";
 import { cn } from "@/lib/utils";
+import { UserRole } from "@/types";
 
 const bottomNavItems = [
   {
     name: "Dashboard",
     href: "/dashboard",
     icon: Home,
-    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player', 'unassigned']
+    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player', 'unassigned'] as UserRole[]
   },
   {
     name: "Player Stats",
     href: "/player-analysis",
     icon: BarChart3,
-    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']
+    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player'] as UserRole[]
   },
   {
     name: "Team",
     href: "/team-performance",
     icon: Users,
-    allowedRoles: ['admin', 'management', 'performance_director', 'coach']
+    allowedRoles: ['admin', 'management', 'performance_director', 'coach'] as UserRole[]
   },
   {
     name: "Settings",
     href: "/settings",
     icon: Settings,
-    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']
+    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player'] as UserRole[]
   }
 ];
 
