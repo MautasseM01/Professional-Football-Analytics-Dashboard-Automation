@@ -1,4 +1,3 @@
-
 import { useMemo, useState } from "react";
 import {
   Radar,
@@ -110,15 +109,15 @@ export const RoleRadarChart = ({
     average: { color: iOS_COLORS.secondary }
   };
 
-  // Simplified mobile view with iOS styling
+  // Simplified mobile view with iOS weather app-style cards
   const SimplifiedMobileView = () => (
     <div className="space-y-4">
       <div className="grid grid-cols-2 gap-3">
         {chartData.map((item, index) => (
-          <div key={index} className="bg-[#F2F2F7]/10 border border-[#F2F2F7]/20 rounded-2xl p-4 backdrop-blur-sm">
+          <div key={index} className="bg-white/80 dark:bg-[#1C1C1E]/80 backdrop-blur-xl border border-white/20 dark:border-[#1C1C1E]/30 rounded-2xl p-4 shadow-lg shadow-black/5">
             <div className="text-center">
-              <div className="text-xs text-[#8E8E93] mb-2 font-medium">{item.attribute}</div>
-              <div className="text-xl font-semibold text-[#007AFF] mb-1">{item.player}</div>
+              <div className="text-[length:clamp(10px,2.5vw,12px)] text-[#8E8E93] mb-2 font-medium">{item.attribute}</div>
+              <div className="text-[length:clamp(20px,6vw,28px)] font-bold text-[#007AFF] mb-1">{item.player}</div>
               <div className="w-full bg-[#F2F2F7]/20 rounded-full h-1.5 mb-2">
                 <div 
                   className="bg-[#007AFF] h-1.5 rounded-full transition-all duration-500 ease-out" 
@@ -126,7 +125,7 @@ export const RoleRadarChart = ({
                 />
               </div>
               {showBenchmark && (
-                <div className="text-xs text-[#34C759] font-medium">Avg: {item.average}</div>
+                <div className="text-[length:clamp(9px,2vw,11px)] text-[#34C759] font-medium">Avg: {item.average}</div>
               )}
             </div>
           </div>
@@ -135,22 +134,14 @@ export const RoleRadarChart = ({
     </div>
   );
 
-  // Responsive chart height
-  const getChartHeight = () => {
-    if (breakpoint === 'mobile') return 200;
-    if (breakpoint === 'tablet-portrait') return 280;
-    if (breakpoint === 'tablet-landscape') return 320;
-    return 350;
-  };
-
   if (loading) {
     return (
-      <Card className="border-[#F2F2F7]/20 bg-[#F2F2F7]/5 backdrop-blur-sm">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-[#007AFF] text-sm sm:text-base lg:text-lg font-medium">
+          <CardTitle className="text-[#007AFF] text-[length:clamp(14px,4vw,18px)] font-medium">
             Player Role Suitability: Striker
           </CardTitle>
-          <CardDescription className="text-xs sm:text-sm text-[#8E8E93]">
+          <CardDescription className="text-[length:clamp(10px,2.5vw,12px)] text-[#8E8E93]">
             Loading player attributes...
           </CardDescription>
         </CardHeader>
@@ -160,15 +151,15 @@ export const RoleRadarChart = ({
 
   if (error) {
     return (
-      <Card className="border-[#F2F2F7]/20 bg-[#F2F2F7]/5 backdrop-blur-sm">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-[#007AFF] text-sm sm:text-base lg:text-lg font-medium">
+          <CardTitle className="text-[#007AFF] text-[length:clamp(14px,4vw,18px)] font-medium">
             Player Role Suitability: Striker
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Alert variant="destructive" className="bg-red-500/10 border-red-500/30 rounded-xl">
-            <AlertDescription className="text-xs sm:text-sm">{error}</AlertDescription>
+            <AlertDescription className="text-[length:clamp(10px,2.5vw,12px)]">{error}</AlertDescription>
           </Alert>
         </CardContent>
       </Card>
@@ -177,15 +168,15 @@ export const RoleRadarChart = ({
 
   if (!attributes) {
     return (
-      <Card className="border-[#F2F2F7]/20 bg-[#F2F2F7]/5 backdrop-blur-sm">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-[#007AFF] text-sm sm:text-base lg:text-lg font-medium">
+          <CardTitle className="text-[#007AFF] text-[length:clamp(14px,4vw,18px)] font-medium">
             Player Role Suitability: Striker
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Alert className="bg-[#FF9500]/10 border-[#FF9500]/30 rounded-xl">
-            <AlertDescription className="text-xs sm:text-sm text-[#8E8E93]">
+            <AlertDescription className="text-[length:clamp(10px,2.5vw,12px)] text-[#8E8E93]">
               No attribute data available for {player?.name || 'this player'}
             </AlertDescription>
           </Alert>
@@ -195,14 +186,14 @@ export const RoleRadarChart = ({
   }
 
   return (
-    <Card className="border-[#F2F2F7]/20 bg-[#F2F2F7]/5 backdrop-blur-sm">
+    <Card>
       <CardHeader className="pb-2 p-3 sm:p-4 lg:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="min-w-0">
-            <CardTitle className="text-[#007AFF] text-sm sm:text-base lg:text-lg font-medium">
+            <CardTitle className="text-[#007AFF] text-[length:clamp(14px,4vw,18px)] font-medium">
               Player Role Suitability: Striker
             </CardTitle>
-            <CardDescription className="text-xs sm:text-sm text-[#8E8E93]">
+            <CardDescription className="text-[length:clamp(10px,2.5vw,12px)] text-[#8E8E93]">
               Performance metrics for striker position
             </CardDescription>
           </div>
@@ -213,7 +204,7 @@ export const RoleRadarChart = ({
               onCheckedChange={setShowBenchmark}
               className="data-[state=checked]:bg-[#34C759] data-[state=unchecked]:bg-[#F2F2F7]/20"
             />
-            <Label htmlFor="show-benchmark" className="text-xs sm:text-sm whitespace-nowrap text-[#8E8E93] font-medium">
+            <Label htmlFor="show-benchmark" className="text-[length:clamp(10px,2.5vw,12px)] whitespace-nowrap text-[#8E8E93] font-medium">
               Show Average
             </Label>
           </div>
@@ -227,7 +218,7 @@ export const RoleRadarChart = ({
               showZoomControls={false}
               simplifiedMobileView={<SimplifiedMobileView />}
               aspectRatio={isMobile ? 1 : (4/3)}
-              minHeight={getChartHeight()}
+              isLoading={loading}
             >
               <RadarChart
                 cx="50%"
@@ -244,15 +235,20 @@ export const RoleRadarChart = ({
                 <PolarAngleAxis 
                   dataKey="attribute" 
                   stroke={iOS_COLORS.gray}
-                  fontSize={isMobile ? 10 : 12}
-                  tick={{ fontSize: isMobile ? 10 : 12, fill: iOS_COLORS.gray, fontWeight: 500 }}
+                  tick={{ 
+                    fontSize: 'clamp(10px, 2.5vw, 12px)', 
+                    fill: iOS_COLORS.gray, 
+                    fontWeight: 500 
+                  }}
                 />
                 <PolarRadiusAxis 
                   angle={30} 
                   domain={[0, 100]} 
                   stroke="transparent"
-                  fontSize={isMobile ? 9 : 11}
-                  tick={{ fontSize: isMobile ? 9 : 11, fill: iOS_COLORS.gray }}
+                  tick={{ 
+                    fontSize: 'clamp(9px, 2vw, 11px)', 
+                    fill: iOS_COLORS.gray 
+                  }}
                   tickCount={isMobile ? 3 : 4}
                 />
 
@@ -285,7 +281,7 @@ export const RoleRadarChart = ({
                     backdropFilter: 'blur(20px)',
                     border: 'none',
                     borderRadius: '16px',
-                    fontSize: isMobile ? '10px' : '12px',
+                    fontSize: 'clamp(10px, 3vw, 12px)',
                     color: '#1D1D1F',
                     boxShadow: '0 10px 30px rgba(0,0,0,0.1)'
                   }}
@@ -293,14 +289,15 @@ export const RoleRadarChart = ({
               </RadarChart>
             </ResponsiveChart>
           </div>
+          
           <div className="space-y-4">
-            <div className="bg-[#F2F2F7]/10 p-3 sm:p-4 rounded-2xl backdrop-blur-sm">
-              <h3 className="text-[#007AFF] text-sm sm:text-base lg:text-lg font-semibold mb-3">
+            <div className="bg-white/80 dark:bg-[#1C1C1E]/80 backdrop-blur-xl p-3 sm:p-4 rounded-2xl border border-white/20 dark:border-[#1C1C1E]/30 shadow-lg">
+              <h3 className="text-[#007AFF] text-[length:clamp(14px,4vw,18px)] font-semibold mb-3">
                 Role Fit Score
               </h3>
               <div className="space-y-3 sm:space-y-4">
                 <div>
-                  <div className="flex justify-between text-xs sm:text-sm mb-2">
+                  <div className="flex justify-between text-[length:clamp(10px,2.5vw,12px)] mb-2">
                     <span className="truncate pr-2 text-[#8E8E93] font-medium">{player?.name || "Player"}</span>
                     <span className="font-bold flex-shrink-0 text-[#007AFF]">{playerScore}/100</span>
                   </div>
@@ -313,7 +310,7 @@ export const RoleRadarChart = ({
                 </div>
                 {showBenchmark && (
                   <div>
-                    <div className="flex justify-between text-xs sm:text-sm mb-2">
+                    <div className="flex justify-between text-[length:clamp(10px,2.5vw,12px)] mb-2">
                       <span className="text-[#8E8E93] font-medium">Position Average</span>
                       <span className="font-bold text-[#34C759]">{averageScore}/100</span>
                     </div>
@@ -327,10 +324,10 @@ export const RoleRadarChart = ({
                 )}
               </div>
               <div className="mt-4 pt-3 border-t border-[#F2F2F7]/20">
-                <h4 className="text-[#007AFF] font-semibold mb-2 text-xs sm:text-sm">
+                <h4 className="text-[#007AFF] font-semibold mb-2 text-[length:clamp(10px,2.5vw,12px)]">
                   Key Strengths
                 </h4>
-                <ul className="text-xs space-y-2">
+                <ul className="text-[length:clamp(9px,2vw,11px)] space-y-2">
                   {chartData
                     .filter(item => item.player > (showBenchmark ? item.average : 70))
                     .slice(0, 3)
@@ -344,7 +341,7 @@ export const RoleRadarChart = ({
                     ))
                   }
                   {chartData.filter(item => item.player > (showBenchmark ? item.average : 70)).length === 0 && (
-                    <li className="text-[#8E8E93] text-xs">
+                    <li className="text-[#8E8E93] text-[length:clamp(9px,2vw,11px)]">
                       No significant strengths identified
                     </li>
                   )}
