@@ -1,13 +1,13 @@
+
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ResponsiveTableProps {
   children: React.ReactNode;
   className?: string;
-  cardLayout?: boolean; // Force card layout even on desktop
+  cardLayout?: boolean;
 }
 
 const ResponsiveTable = React.forwardRef<
@@ -21,7 +21,7 @@ const ResponsiveTable = React.forwardRef<
     return (
       <div
         ref={ref}
-        className={cn("space-y-3", className)}
+        className={cn("space-y-4", className)}
         {...props}
       >
         {children}
@@ -53,10 +53,10 @@ const ResponsiveTable = React.forwardRef<
 ResponsiveTable.displayName = "ResponsiveTable";
 
 interface ResponsiveTableRowProps {
-  children?: React.ReactNode; // Made optional for card layout
+  children?: React.ReactNode;
   className?: string;
-  data?: Record<string, React.ReactNode>; // For card layout
-  title?: React.ReactNode; // Changed from string to ReactNode
+  data?: Record<string, React.ReactNode>;
+  title?: React.ReactNode;
 }
 
 const ResponsiveTableRow = React.forwardRef<
@@ -68,21 +68,21 @@ const ResponsiveTableRow = React.forwardRef<
   if (isMobile && data) {
     return (
       <div className={cn(
-        "bg-card border rounded-lg p-4 space-y-2 min-h-[44px] touch-manipulation",
+        "bg-card border rounded-lg p-4 space-y-3 min-h-[80px] touch-manipulation shadow-sm",
         className
       )}>
         {title && (
-          <h3 className="font-medium text-base text-card-foreground mb-3">
+          <h3 className="font-semibold text-base text-card-foreground mb-3 leading-tight">
             {title}
           </h3>
         )}
-        <div className="grid grid-cols-1 gap-2">
+        <div className="grid grid-cols-1 gap-3">
           {Object.entries(data).map(([key, value]) => (
-            <div key={key} className="flex justify-between items-center py-1">
+            <div key={key} className="flex justify-between items-center py-1.5 min-h-[32px]">
               <span className="text-sm text-muted-foreground font-medium">
                 {key}
               </span>
-              <span className="text-sm font-medium text-right">
+              <span className="text-sm font-semibold text-right flex-shrink-0 ml-4">
                 {value}
               </span>
             </div>
@@ -96,7 +96,7 @@ const ResponsiveTableRow = React.forwardRef<
     <tr
       ref={ref}
       className={cn(
-        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted min-h-[56px]",
         className
       )}
       {...props}
@@ -114,7 +114,7 @@ const ResponsiveTableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      "p-4 align-middle min-h-[44px] touch-manipulation [&:has([role=checkbox])]:pr-0",
+      "p-4 align-middle min-h-[56px] touch-manipulation [&:has([role=checkbox])]:pr-0",
       className
     )}
     {...props}
@@ -131,7 +131,7 @@ const ResponsiveTableHead = React.forwardRef<
   <th
     ref={ref}
     className={cn(
-      "h-12 px-4 text-left align-middle font-medium text-muted-foreground min-h-[44px] touch-manipulation [&:has([role=checkbox])]:pr-0",
+      "h-14 px-4 text-left align-middle font-semibold text-muted-foreground min-h-[56px] touch-manipulation [&:has([role=checkbox])]:pr-0",
       className
     )}
     {...props}
