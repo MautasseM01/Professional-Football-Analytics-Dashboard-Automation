@@ -28,6 +28,21 @@ const iOS_COLORS = {
   gray: "#8E8E93"
 };
 
+// Type for responsive config
+interface ResponsiveConfig {
+  fontSize: {
+    title: string;
+    axis: string;
+    tooltip: string;
+    legend: string;
+  };
+  aspectRatio: number;
+  margin: { top: number; right: number; bottom: number; left: number };
+  maxWidth: string;
+  minHeight: number;
+  hideSecondaryData?: boolean;
+}
+
 // iOS-style skeleton loader for charts
 const ChartSkeleton = ({ height }: { height: number }) => (
   <div className="w-full rounded-2xl bg-[#F2F2F7]/5 p-4 backdrop-blur-sm">
@@ -89,8 +104,8 @@ export const ResponsiveChart = React.forwardRef<
   const containerRef = React.useRef<HTMLDivElement>(null);
 
   // Dynamic sizing configuration based on iOS weather app principles
-  const getResponsiveConfig = () => {
-    const baseConfig = {
+  const getResponsiveConfig = (): ResponsiveConfig => {
+    const baseConfig: ResponsiveConfig = {
       // Use CSS clamp for responsive text sizing
       fontSize: {
         title: 'clamp(14px, 4vw, 18px)',
@@ -107,7 +122,8 @@ export const ResponsiveChart = React.forwardRef<
       // Container constraints
       maxWidth: isMobile ? '100%' : '800px',
       // Minimum heights that scale with viewport
-      minHeight: minHeight || (isMobile ? 220 : 300)
+      minHeight: minHeight || (isMobile ? 220 : 300),
+      hideSecondaryData: false
     };
 
     // Graceful degradation for very small screens
@@ -188,6 +204,18 @@ export const ResponsiveChart = React.forwardRef<
       container.removeEventListener('touchmove', handleTouchMove);
     };
   }, [isMobile, zoomLevel]);
+
+  const handleZoomIn = () => {
+    setZoomLevel(prev => Math.min(prev + 0.25, 3));
+  };
+
+  const handleZoomOut = () => {
+    setZoomLevel(prev => Math.max(prev - 0.25, 0.5));
+  };
+
+  const handleResetZoom = () => {
+    setZoomLevel(1);
+  };
 
   // Show loading state
   if (isLoading) {
