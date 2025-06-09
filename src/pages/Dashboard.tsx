@@ -18,8 +18,10 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { BackToTopButton } from "@/components/BackToTopButton";
 import { RoleTester } from "@/components/RoleTester";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { RefreshCw } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useHapticFeedback } from "@/hooks/use-haptic-feedback";
 
 const Dashboard = () => {
   const {
@@ -35,10 +37,12 @@ const Dashboard = () => {
     t
   } = useLanguage();
   const isMobile = useIsMobile();
+  const { triggerHaptic } = useHapticFeedback();
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     console.log("Manual refresh triggered");
-    refreshData();
+    triggerHaptic('medium');
+    await refreshData();
   };
 
   // Render appropriate content based on user role
@@ -108,7 +112,7 @@ const Dashboard = () => {
       {/* Mobile sidebar - handled within DashboardSidebar component */}
       {isMobile && <DashboardSidebar />}
       
-      <div className={`flex-1 overflow-auto min-w-0 ${isMobile ? 'pt-12' : ''}`}>
+      <div className={`flex-1 overflow-hidden min-w-0 ${isMobile ? 'pt-12' : ''}`}>
         <header className="border-b border-club-gold/20 bg-club-black sticky top-0 z-20 transition-colors duration-300">
           <div className={`flex justify-between items-center py-2 gap-2 ${isMobile ? 'px-14 pr-2' : 'px-3 sm:px-4 lg:px-6'}`}>
             {/* Left section - Title and page info */}
@@ -137,14 +141,16 @@ const Dashboard = () => {
           </div>
         </header>
         
-        <main className="bg-club-black transition-colors duration-300 w-full">
-          {/* TEST MODE indicator as first element */}
-          {!profileLoading && profile && <div className="p-2 sm:p-3 lg:p-6 pb-0">
-              <RoleTester />
-            </div>}
-          
-          {renderDashboardContent()}
-        </main>
+        <PullToRefresh onRefresh={handleRefresh} className="h-full">
+          <main className="bg-club-black transition-colors duration-300 w-full">
+            {/* TEST MODE indicator as first element */}
+            {!profileLoading && profile && <div className="p-2 sm:p-3 lg:p-6 pb-0">
+                <RoleTester />
+              </div>}
+            
+            {renderDashboardContent()}
+          </main>
+        </PullToRefresh>
       </div>
 
       {/* Back to Top Button */}

@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import * as RechartsPrimitive from "recharts"
 
@@ -46,27 +47,32 @@ const ChartContainer = React.forwardRef<
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
 
-  // Enhanced responsive aspect ratio based on screen size
+  // iOS weather app-style responsive aspect ratio
   const getAspectRatio = () => {
-    if (typeof window === 'undefined') return aspectRatio || (16/9);
+    if (aspectRatio) return aspectRatio;
+    if (typeof window === 'undefined') return 16/9;
     
     const width = window.innerWidth;
-    if (width < 480) return aspectRatio || (4/3); // More square on very small screens
-    if (width < 768) return aspectRatio || (3/2); // Slightly taller on mobile
-    if (width < 1024) return aspectRatio || (16/10); // Balanced on tablet
-    return aspectRatio || (16/9); // Widescreen on desktop
+    // More square ratios on mobile like iOS weather
+    if (width < 400) return 1.1; // Almost square on very small screens
+    if (width < 768) return 1.3; // Slightly wider on mobile
+    if (width < 1024) return 1.6; // Balanced on tablet
+    return 1.8; // Wider on desktop
   };
 
-  // Enhanced responsive min height based on screen size
+  // iOS weather app-style responsive min height
   const getMinHeight = () => {
     if (minHeight) return minHeight;
-    if (typeof window === 'undefined') return 200;
+    if (typeof window === 'undefined') return 220;
     
     const width = window.innerWidth;
-    if (width < 480) return 180; // Compact on very small screens
-    if (width < 768) return 220; // Reasonable on mobile
-    if (width < 1024) return 280; // Good size on tablet
-    return 320; // Full size on desktop
+    const height = window.innerHeight;
+    
+    // Scale based on viewport like iOS weather
+    if (width < 400) return Math.max(180, height * 0.25); // 25% of viewport on small screens
+    if (width < 768) return Math.max(220, height * 0.3); // 30% on mobile
+    if (width < 1024) return Math.max(280, height * 0.35); // 35% on tablet
+    return Math.max(320, height * 0.4); // 40% on desktop, but capped
   };
 
   return (
@@ -75,13 +81,31 @@ const ChartContainer = React.forwardRef<
         data-chart={chartId}
         ref={ref}
         className={cn(
-          "flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
-          // Enhanced responsive container classes
-          "w-full transition-all duration-300 ease-in-out",
-          "container-type-inline-size", // Enable container queries
-          // Touch-friendly adjustments
+          "flex justify-center text-xs",
+          // iOS weather app-style responsive styling
+          "[&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground",
+          "[&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50",
+          "[&_.recharts-curve.recharts-tooltip-cursor]:stroke-border",
+          "[&_.recharts-dot[stroke='#fff']]:stroke-transparent",
+          "[&_.recharts-layer]:outline-none",
+          "[&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border",
+          "[&_.recharts-radial-bar-background-sector]:fill-muted",
+          "[&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted",
+          "[&_.recharts-reference-line_[stroke='#ccc']]:stroke-border",
+          "[&_.recharts-sector[stroke='#fff']]:stroke-transparent",
+          "[&_.recharts-sector]:outline-none",
+          "[&_.recharts-surface]:outline-none",
+          // Enhanced responsive container
+          "w-full transition-all duration-300 ease-out",
+          // Touch-friendly adjustments for iOS-style interaction
           "[&_.recharts-dot]:cursor-pointer [&_.recharts-dot]:min-w-[44px] [&_.recharts-dot]:min-h-[44px]",
           "[&_.recharts-legend-item]:cursor-pointer [&_.recharts-legend-item]:min-h-[44px]",
+          // iOS weather app glassmorphism effect
+          "relative overflow-hidden",
+          // Dynamic text sizing using CSS clamp
+          "[&_.recharts-text]:text-[length:clamp(10px,2.5vw,12px)]",
+          "[&_.recharts-cartesian-axis-tick_text]:text-[length:clamp(9px,2vw,11px)]",
+          "[&_.recharts-tooltip-label]:text-[length:clamp(11px,3vw,14px)]",
           className
         )}
         style={{
@@ -182,7 +206,7 @@ const ChartTooltipContent = React.forwardRef<
 
       if (labelFormatter) {
         return (
-          <div className={cn("font-medium", labelClassName)}>
+          <div className={cn("font-medium text-[#1D1D1F]", labelClassName)}>
             {labelFormatter(value, payload)}
           </div>
         )
@@ -192,7 +216,7 @@ const ChartTooltipContent = React.forwardRef<
         return null
       }
 
-      return <div className={cn("font-medium", labelClassName)}>{value}</div>
+      return <div className={cn("font-medium text-[#1D1D1F]", labelClassName)}>{value}</div>
     }, [
       label,
       labelFormatter,
@@ -213,11 +237,15 @@ const ChartTooltipContent = React.forwardRef<
       <div
         ref={ref}
         className={cn(
-          "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
-          // Enhanced responsive tooltip sizing with touch-friendly dimensions
+          "grid min-w-[8rem] items-start gap-1.5 rounded-2xl border-0",
+          // iOS weather app-style tooltip with glassmorphism
+          "bg-white/95 dark:bg-[#1C1C1E]/95 backdrop-blur-xl",
+          "px-3 py-2 shadow-2xl shadow-black/10 dark:shadow-black/30",
+          // Responsive sizing using CSS clamp
+          "text-[length:clamp(11px,3vw,14px)]",
           "max-w-[200px] sm:max-w-[250px] lg:max-w-[300px]",
-          "text-xs sm:text-sm",
           "min-h-[44px] touch-manipulation", // Touch-friendly minimum height
+          "text-[#1D1D1F] dark:text-[#F2F2F7]", // iOS text colors
           className
         )}
       >
@@ -232,7 +260,7 @@ const ChartTooltipContent = React.forwardRef<
               <div
                 key={item.dataKey}
                 className={cn(
-                  "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground",
+                  "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-[#8E8E93]",
                   indicator === "dot" && "items-center",
                   "min-h-[44px] touch-manipulation" // Touch-friendly row height
                 )}
@@ -247,7 +275,7 @@ const ChartTooltipContent = React.forwardRef<
                       !hideIndicator && (
                         <div
                           className={cn(
-                            "shrink-0 rounded-[2px] border-[--color-border] bg-[--color-bg]",
+                            "shrink-0 rounded-full border-[--color-border] bg-[--color-bg]",
                             {
                               "h-2.5 w-2.5": indicator === "dot",
                               "w-1": indicator === "line",
@@ -273,12 +301,12 @@ const ChartTooltipContent = React.forwardRef<
                     >
                       <div className="grid gap-1.5">
                         {nestLabel ? tooltipLabel : null}
-                        <span className="text-muted-foreground">
+                        <span className="text-[#8E8E93] dark:text-[#8E8E93] font-medium">
                           {itemConfig?.label || item.name}
                         </span>
                       </div>
                       {item.value && (
-                        <span className="font-mono font-medium tabular-nums text-foreground">
+                        <span className="font-mono font-semibold tabular-nums text-[#1D1D1F] dark:text-[#F2F2F7]">
                           {item.value.toLocaleString()}
                         </span>
                       )}
@@ -321,9 +349,9 @@ const ChartLegendContent = React.forwardRef<
         className={cn(
           "flex items-center justify-center gap-4",
           verticalAlign === "top" ? "pb-3" : "pt-3",
-          // Enhanced responsive legend spacing with touch-friendly sizing
+          // iOS weather app-style responsive legend
           "gap-2 sm:gap-3 lg:gap-4",
-          "text-xs sm:text-sm",
+          "text-[length:clamp(10px,2.5vw,12px)]", // Responsive text using clamp
           "flex-wrap", // Allow wrapping on small screens
           "min-h-[44px] touch-manipulation", // Touch-friendly minimum height
           className
@@ -337,23 +365,26 @@ const ChartLegendContent = React.forwardRef<
             <div
               key={item.value}
               className={cn(
-                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
-                // Enhanced responsive icon sizing with touch-friendly dimensions
+                "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-[#8E8E93]",
+                // iOS weather app-style responsive icons
                 "[&>svg]:h-2 [&>svg]:w-2 sm:[&>svg]:h-3 sm:[&>svg]:w-3",
-                "min-h-[44px] touch-manipulation cursor-pointer" // Touch-friendly item
+                "min-h-[44px] touch-manipulation cursor-pointer hover:opacity-80 transition-opacity",
+                // iOS-style background with glassmorphism
+                "bg-white/10 dark:bg-[#1C1C1E]/20 backdrop-blur-sm px-3 py-2 rounded-xl",
+                "border border-white/20 dark:border-[#1C1C1E]/30"
               )}
             >
               {itemConfig?.icon && !hideIcon ? (
                 <itemConfig.icon />
               ) : (
                 <div
-                  className="h-2 w-2 shrink-0 rounded-[2px] sm:h-2.5 sm:w-2.5"
+                  className="h-2 w-2 shrink-0 rounded-full sm:h-2.5 sm:w-2.5"
                   style={{
                     backgroundColor: item.color,
                   }}
                 />
               )}
-              <span className="text-xs sm:text-sm truncate">
+              <span className="truncate text-[#1D1D1F] dark:text-[#F2F2F7] font-medium">
                 {itemConfig?.label}
               </span>
             </div>
