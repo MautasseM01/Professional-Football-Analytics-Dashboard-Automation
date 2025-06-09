@@ -6,7 +6,6 @@ import { PlayerHeatmapTackleSection } from "./PlayerHeatmapTackleSection";
 import { PlayerPerformanceSection } from "./PlayerPerformanceSection";
 import { MobilePerformanceTrends } from "./MobilePerformanceTrends";
 import { ResponsiveLayout } from "./ResponsiveLayout";
-import { SwipeableContainer } from "./ui/swipeable-container";
 import { useIsMobile } from "@/hooks/use-mobile";
 
 interface PlayerStatsProps {
@@ -33,41 +32,33 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
     );
   }
 
-  const sections = [
-    <div key="profile" className="transition-all duration-300 ease-in-out">
-      <PlayerProfileCard player={player} />
-    </div>,
-    <div key="stats" className="transition-all duration-300 ease-in-out">
-      <PlayerStatCards player={player} />
-    </div>,
-    <div key="performance" className="transition-all duration-300 ease-in-out">
-      {isMobile ? (
-        <MobilePerformanceTrends player={player} />
-      ) : (
-        <PlayerPerformanceSection player={player} />
-      )}
-    </div>,
-    <div key="heatmap" className="transition-all duration-300 ease-in-out">
-      <PlayerHeatmapTackleSection player={player} />
-    </div>
-  ];
-
   return (
     <ResponsiveLayout className={`w-full max-w-7xl mx-auto ${isMobile ? 'px-0' : 'px-3 sm:px-4 lg:px-6'}`}>
-      {isMobile ? (
-        <SwipeableContainer 
-          className="space-y-3 sm:space-y-4 lg:space-y-6"
-          onSwipe={(direction, index) => {
-            console.log(`Swiped ${direction} to section ${index}`);
-          }}
-        >
-          {sections}
-        </SwipeableContainer>
-      ) : (
-        <div className="space-y-3 sm:space-y-4 lg:space-y-6">
-          {sections}
+      <div className="space-y-3 sm:space-y-4 lg:space-y-6">
+        {/* Player Profile Card */}
+        <div className="transition-all duration-300 ease-in-out">
+          <PlayerProfileCard player={player} />
         </div>
-      )}
+
+        {/* Stats Cards Grid */}
+        <div className="transition-all duration-300 ease-in-out">
+          <PlayerStatCards player={player} />
+        </div>
+
+        {/* Performance Section */}
+        <div className="transition-all duration-300 ease-in-out">
+          {isMobile ? (
+            <MobilePerformanceTrends player={player} />
+          ) : (
+            <PlayerPerformanceSection player={player} />
+          )}
+        </div>
+
+        {/* Heatmap and Tackle Success Cards */}
+        <div className="transition-all duration-300 ease-in-out">
+          <PlayerHeatmapTackleSection player={player} />
+        </div>
+      </div>
     </ResponsiveLayout>
   );
 };
