@@ -1,4 +1,3 @@
-
 import { useEffect, useState, useRef } from "react";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import FootballPitch from "./FootballPitch";
@@ -79,7 +78,7 @@ export const PassingNetwork = ({
                 <div className="w-2 h-2 rounded-full bg-primary" />
                 <div>
                   <p className="text-sm font-medium">{player.name}</p>
-                  <p className="text-xs text-muted-foreground">#{player.jersey_number}</p>
+                  <p className="text-xs text-muted-foreground">#{player.number}</p>
                 </div>
               </div>
               <div className="text-right">

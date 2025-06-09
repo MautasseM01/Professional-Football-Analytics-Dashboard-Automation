@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { FootballPitch } from "./FootballPitch";
 import { ShotPoint } from "./ShotPoint";
@@ -37,10 +36,10 @@ export const ShotMapVisualization = ({ shots, loading, filterLoading }: ShotMapV
 
     const shotStats = {
       total: shots.length,
-      onTarget: shots.filter(s => s.outcome === 'on_target').length,
-      goals: shots.filter(s => s.outcome === 'goal').length,
-      blocked: shots.filter(s => s.outcome === 'blocked').length,
-      missed: shots.filter(s => s.outcome === 'missed').length
+      onTarget: shots.filter(s => s.outcome === 'Shot on Target').length,
+      goals: shots.filter(s => s.outcome === 'Goal').length,
+      blocked: shots.filter(s => s.outcome === 'Blocked Shot').length,
+      missed: shots.filter(s => s.outcome === 'Shot Off Target').length
     };
 
     const accuracy = shotStats.total > 0 ? Math.round((shotStats.onTarget / shotStats.total) * 100) : 0;
