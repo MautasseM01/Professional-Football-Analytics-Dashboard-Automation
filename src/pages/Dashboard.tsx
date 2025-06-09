@@ -13,12 +13,14 @@ import { AdminDashboard } from "@/components/dashboards/AdminDashboard";
 import { UnassignedRoleDashboard } from "@/components/dashboards/UnassignedRoleDashboard";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
+import { EnhancedButton } from "@/components/ui/enhanced-button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { BackToTopButton } from "@/components/BackToTopButton";
 import { RoleTester } from "@/components/RoleTester";
 import { PullToRefresh } from "@/components/ui/pull-to-refresh";
+import { MobileBottomNav } from "@/components/ui/mobile-bottom-nav";
+import { LoadingState } from "@/components/ui/loading-state";
 import { RefreshCw } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -85,40 +87,53 @@ const Dashboard = () => {
   // Render appropriate content based on user role
   const renderDashboardContent = () => {
     if (profileLoading) {
-      return <div className="space-y-3 sm:space-y-4 lg:space-y-6 p-2 sm:p-3 lg:p-6">
-          <Skeleton className="h-6 sm:h-8 w-32 sm:w-48 lg:w-64 bg-club-gold/10" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-6">
-            <Skeleton className="h-32 sm:h-48 lg:h-60 w-full bg-club-gold/10" />
-            <Skeleton className="h-32 sm:h-48 lg:h-60 w-full bg-club-gold/10" />
-            <Skeleton className="h-32 sm:h-48 lg:h-60 w-full bg-club-gold/10" />
-          </div>
-        </div>;
+      return (
+        <div className="p-2 sm:p-3 lg:p-6">
+          <LoadingState variant="dashboard" />
+        </div>
+      );
     }
+    
     if (error) {
-      return <div className="p-2 sm:p-3 lg:p-6">
+      return (
+        <div className="p-2 sm:p-3 lg:p-6">
           <Alert className="bg-club-gold/10 border-club-gold/30">
             <AlertDescription className="flex flex-col gap-3">
               <p className="text-sm">Error loading user profile: {error}</p>
-              <Button variant="outline" className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold min-h-[44px]" onClick={handleRefresh}>
+              <EnhancedButton 
+                variant="outline" 
+                className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold min-h-[44px]" 
+                onClick={handleRefresh}
+                hapticType="medium"
+              >
                 <RefreshCw size={16} className="mr-2" />
                 Retry Loading Data
-              </Button>
+              </EnhancedButton>
             </AlertDescription>
           </Alert>
-        </div>;
+        </div>
+      );
     }
+    
     if (!profile) {
-      return <div className="p-2 sm:p-3 lg:p-6">
+      return (
+        <div className="p-2 sm:p-3 lg:p-6">
           <Alert className="bg-club-gold/10 border-club-gold/30">
             <AlertDescription className="flex flex-col gap-3">
               <p className="text-sm">User profile not found. Please try refreshing the page or contact an administrator.</p>
-              <Button variant="outline" className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold min-h-[44px]" onClick={handleRefresh}>
+              <EnhancedButton 
+                variant="outline" 
+                className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold min-h-[44px]" 
+                onClick={handleRefresh}
+                hapticType="medium"
+              >
                 <RefreshCw size={16} className="mr-2" />
                 Retry Loading Data
-              </Button>
+              </EnhancedButton>
             </AlertDescription>
           </Alert>
-        </div>;
+        </div>
+      );
     }
 
     // Return the appropriate dashboard based on user role
@@ -149,7 +164,7 @@ const Dashboard = () => {
       {/* Mobile sidebar - handled within DashboardSidebar component */}
       {isMobile && <DashboardSidebar />}
       
-      <div className={`flex-1 overflow-auto min-w-0 ${isMobile ? 'pt-12' : ''}`}>
+      <div className={`flex-1 overflow-auto min-w-0 ${isMobile ? 'pt-12 pb-20' : ''}`}>
         <header className="border-b border-club-gold/20 bg-club-black sticky top-0 z-20 transition-colors duration-300">
           <div className={`flex justify-between items-center py-2 gap-2 ${isMobile ? 'px-14 pr-2' : 'px-3 sm:px-4 lg:px-6'}`}>
             {/* Left section - Title and page info */}
@@ -171,9 +186,16 @@ const Dashboard = () => {
               <ThemeToggle />
               
               {/* Refresh Button */}
-              <Button variant="outline" size="icon" className="text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold h-9 w-9 min-h-[44px] min-w-[44px]" onClick={handleRefresh} title="Refresh data">
+              <EnhancedButton 
+                variant="outline" 
+                size="icon" 
+                className="text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold h-9 w-9 min-h-[44px] min-w-[44px]" 
+                onClick={handleRefresh} 
+                title="Refresh data"
+                hapticType="light"
+              >
                 <RefreshCw size={16} />
-              </Button>
+              </EnhancedButton>
             </div>
           </div>
         </header>
@@ -182,14 +204,19 @@ const Dashboard = () => {
           {/* Pull to refresh wrapper */}
           <PullToRefresh onRefresh={handleRefresh} enabled={isMobile}>
             {/* TEST MODE indicator as first element */}
-            {!profileLoading && profile && <div className="p-2 sm:p-3 lg:p-6 pb-0">
+            {!profileLoading && profile && (
+              <div className="p-2 sm:p-3 lg:p-6 pb-0">
                 <RoleTester />
-              </div>}
+              </div>
+            )}
             
             {renderDashboardContent()}
           </PullToRefresh>
         </main>
       </div>
+
+      {/* Mobile Bottom Navigation */}
+      {isMobile && <MobileBottomNav />}
 
       {/* Back to Top Button */}
       <BackToTopButton />
