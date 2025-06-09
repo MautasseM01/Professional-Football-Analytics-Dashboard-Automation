@@ -1,4 +1,3 @@
-
 import * as React from "react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -204,18 +203,6 @@ export const ResponsiveChart = React.forwardRef<
       container.removeEventListener('touchmove', handleTouchMove);
     };
   }, [isMobile, zoomLevel]);
-
-  const handleZoomIn = () => {
-    setZoomLevel(prev => Math.min(prev + 0.25, 3));
-  };
-
-  const handleZoomOut = () => {
-    setZoomLevel(prev => Math.max(prev - 0.25, 0.5));
-  };
-
-  const handleResetZoom = () => {
-    setZoomLevel(1);
-  };
 
   // Show loading state
   if (isLoading) {
