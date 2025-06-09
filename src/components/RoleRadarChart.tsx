@@ -14,11 +14,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { ResponsiveChart } from "@/components/ui/responsive-chart";
 import { PlayerAttributes, PositionalAverage } from "@/hooks/use-player-attributes";
 import { Player } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useResponsiveBreakpoint } from "@/hooks/use-orientation";
+import { Button } from "@/components/ui/button";
+import { BarChart3, Radar as RadarIcon } from "lucide-react";
 
 interface RoleRadarChartProps {
   player: Player | null;
@@ -36,6 +37,7 @@ export const RoleRadarChart = ({
   error
 }: RoleRadarChartProps) => {
   const [showBenchmark, setShowBenchmark] = useState(true);
+  const [showSimplified, setShowSimplified] = useState(false);
   const isMobile = useIsMobile();
   const breakpoint = useResponsiveBreakpoint();
 
@@ -97,24 +99,43 @@ export const RoleRadarChart = ({
                 positionalAverage.work_rate_attacking) / 5) 
     : 0;
 
-  const chartConfig = {
-    player: { color: "#f97316" },
-    average: { color: "#16a34a" }
-  };
-
   // Simplified mobile view
-  const SimplifiedMobileView = () => (
+  const SimplifiedRadarView = () => (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
+      <div className="flex items-center justify-between">
+        <h3 className="text-sm font-medium flex items-center gap-2">
+          <BarChart3 className="h-4 w-4" />
+          Attribute Breakdown
+        </h3>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => setShowSimplified(false)}
+          className="text-xs"
+        >
+          Show Radar
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 gap-3">
         {chartData.map((item, index) => (
           <div key={index} className="bg-card border rounded-lg p-3">
-            <div className="text-center">
-              <div className="text-xs text-muted-foreground mb-1">{item.attribute}</div>
-              <div className="text-lg font-bold">{item.player}/100</div>
-              {showBenchmark && (
-                <div className="text-xs text-green-600">Avg: {item.average}</div>
-              )}
+            <div className="flex justify-between items-center mb-2">
+              <span className="text-sm font-medium">{item.attribute}</span>
+              <span className="text-lg font-bold text-primary">{item.player}</span>
             </div>
+            <div className="w-full bg-muted rounded-full h-2 mb-1">
+              <div 
+                className="bg-primary h-2 rounded-full transition-all duration-300" 
+                style={{ width: `${item.player}%` }}
+              />
+            </div>
+            {showBenchmark && (
+              <div className="flex justify-between text-xs text-muted-foreground">
+                <span>Average: {item.average}</span>
+                <span>{item.player > item.average ? `+${item.player - item.average}` : item.player - item.average}</span>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -172,6 +193,16 @@ export const RoleRadarChart = ({
     );
   }
 
+  if (isMobile && showSimplified) {
+    return (
+      <Card className="border-club-gold/20 bg-club-dark-gray">
+        <CardContent className="p-4">
+          <SimplifiedRadarView />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <Card className="border-club-gold/20 bg-club-dark-gray">
       <CardHeader className="pb-2 p-3 sm:p-4 lg:p-6">
@@ -184,87 +215,108 @@ export const RoleRadarChart = ({
               Performance metrics for striker position
             </CardDescription>
           </div>
-          <div className="flex items-center space-x-2 flex-shrink-0">
-            <Switch 
-              id="show-benchmark" 
-              checked={showBenchmark} 
-              onCheckedChange={setShowBenchmark} 
-            />
-            <Label htmlFor="show-benchmark" className="text-xs sm:text-sm whitespace-nowrap">
-              Show Average
-            </Label>
+          <div className="flex items-center justify-between gap-3">
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setShowSimplified(true)}
+                className="text-xs flex items-center gap-2"
+              >
+                <BarChart3 className="h-4 w-4" />
+                List View
+              </Button>
+            )}
+            <div className="flex items-center space-x-2 flex-shrink-0">
+              <Switch 
+                id="show-benchmark" 
+                checked={showBenchmark} 
+                onCheckedChange={setShowBenchmark} 
+              />
+              <Label htmlFor="show-benchmark" className="text-xs sm:text-sm whitespace-nowrap">
+                Show Average
+              </Label>
+            </div>
           </div>
         </div>
       </CardHeader>
       <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-          <div className="lg:col-span-2">
-            <ResponsiveChart
-              config={chartConfig}
-              showZoomControls={true}
-              simplifiedMobileView={<SimplifiedMobileView />}
-              aspectRatio={isMobile ? 1 : (4/3)}
-              minHeight={isMobile ? 250 : 300}
+        <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-3'}`}>
+          <div className={isMobile ? 'order-2' : 'lg:col-span-2'}>
+            <div 
+              className="w-full rounded-lg bg-club-black/30 p-2 sm:p-3 lg:p-4"
+              style={{
+                height: isMobile ? '300px' : '350px',
+                minHeight: isMobile ? '250px' : '300px'
+              }}
             >
-              <RadarChart
-                cx="50%"
-                cy="50%"
-                outerRadius="80%"
-                data={chartData}
-                margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-              >
-                <PolarGrid 
-                  stroke="#444" 
-                  strokeWidth={isMobile ? 0.5 : 1}
-                />
-                <PolarAngleAxis 
-                  dataKey="attribute" 
-                  stroke="#CCC" 
-                  fontSize={isMobile ? 10 : 12}
-                  tick={{ fontSize: isMobile ? 10 : 12 }}
-                />
-                <PolarRadiusAxis 
-                  angle={30} 
-                  domain={[0, 100]} 
-                  stroke="#666" 
-                  fontSize={isMobile ? 9 : 11}
-                  tick={{ fontSize: isMobile ? 9 : 11 }}
-                  tickCount={isMobile ? 3 : 5}
-                />
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart
+                  cx="50%"
+                  cy="50%"
+                  outerRadius="75%"
+                  data={chartData}
+                  margin={{ 
+                    top: isMobile ? 10 : 20, 
+                    right: isMobile ? 10 : 20, 
+                    bottom: isMobile ? 10 : 20, 
+                    left: isMobile ? 10 : 20 
+                  }}
+                >
+                  <PolarGrid 
+                    stroke="#444" 
+                    strokeWidth={isMobile ? 0.5 : 1}
+                  />
+                  <PolarAngleAxis 
+                    dataKey="attribute" 
+                    stroke="#CCC" 
+                    fontSize={isMobile ? 10 : 12}
+                    tick={{ fontSize: isMobile ? 10 : 12 }}
+                  />
+                  <PolarRadiusAxis 
+                    angle={30} 
+                    domain={[0, 100]} 
+                    stroke="#666" 
+                    fontSize={isMobile ? 9 : 11}
+                    tick={{ fontSize: isMobile ? 9 : 11 }}
+                    tickCount={isMobile ? 3 : 5}
+                  />
 
-                <Radar
-                  name={player?.name || "Player"}
-                  dataKey="player"
-                  stroke="#f97316"
-                  fill="#f97316"
-                  fillOpacity={0.5}
-                  strokeWidth={isMobile ? 1.5 : 2}
-                />
-
-                {showBenchmark && positionalAverage && (
                   <Radar
-                    name="Position Average"
-                    dataKey="average"
-                    stroke="#16a34a"
-                    fill="#16a34a"
-                    fillOpacity={0.3}
+                    name={player?.name || "Player"}
+                    dataKey="player"
+                    stroke="#f97316"
+                    fill="#f97316"
+                    fillOpacity={0.5}
                     strokeWidth={isMobile ? 1.5 : 2}
                   />
-                )}
 
-                {!isMobile && <Legend />}
-                <Tooltip 
-                  contentStyle={{
-                    backgroundColor: '#1A1A1A',
-                    border: '1px solid #D4AF37',
-                    borderRadius: '8px',
-                    fontSize: isMobile ? '10px' : '12px'
-                  }}
-                />
-              </RadarChart>
-            </ResponsiveChart>
+                  {showBenchmark && positionalAverage && (
+                    <Radar
+                      name="Position Average"
+                      dataKey="average"
+                      stroke="#16a34a"
+                      fill="#16a34a"
+                      fillOpacity={0.3}
+                      strokeWidth={isMobile ? 1.5 : 2}
+                    />
+                  )}
+
+                  {!isMobile && <Legend />}
+                  <Tooltip 
+                    contentStyle={{
+                      backgroundColor: '#1A1A1A',
+                      border: '1px solid #D4AF37',
+                      borderRadius: '8px',
+                      fontSize: isMobile ? '10px' : '12px'
+                    }}
+                  />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="space-y-4">
+          
+          <div className={`space-y-4 ${isMobile ? 'order-1' : ''}`}>
             <div className="bg-club-black/30 p-3 sm:p-4 rounded-lg">
               <h3 className="text-club-gold text-sm sm:text-base lg:text-lg font-bold mb-3">
                 Role Fit Score

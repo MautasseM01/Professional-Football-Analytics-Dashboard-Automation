@@ -1,11 +1,14 @@
 
-import React from "react";
+import React, { useState } from "react";
 import { FootballPitch } from "./FootballPitch";
 import { ShotPoint } from "./ShotPoint";
 import { Shot } from "@/types/shot";
 import { LoadingOverlay } from "../LoadingOverlay";
-import { Loader } from "lucide-react";
+import { Loader, BarChart3, Target } from "lucide-react";
 import { ResponsivePitch } from "@/components/ui/responsive-pitch";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
 
 interface ShotMapVisualizationProps {
   shots: Shot[];
@@ -14,6 +17,9 @@ interface ShotMapVisualizationProps {
 }
 
 export const ShotMapVisualization = ({ shots, loading, filterLoading }: ShotMapVisualizationProps) => {
+  const isMobile = useIsMobile();
+  const [showSimplified, setShowSimplified] = useState(false);
+
   if (loading) {
     return (
       <div className="w-full bg-club-dark-gray rounded-lg relative min-h-[300px] flex items-center justify-center">
@@ -25,11 +31,104 @@ export const ShotMapVisualization = ({ shots, loading, filterLoading }: ShotMapV
     );
   }
 
+  // Simplified mobile view for shot map
+  const SimplifiedShotView = () => {
+    if (shots.length === 0) return null;
+
+    const shotStats = {
+      total: shots.length,
+      onTarget: shots.filter(s => s.outcome === 'on_target').length,
+      goals: shots.filter(s => s.outcome === 'goal').length,
+      blocked: shots.filter(s => s.outcome === 'blocked').length,
+      missed: shots.filter(s => s.outcome === 'missed').length
+    };
+
+    const accuracy = shotStats.total > 0 ? Math.round((shotStats.onTarget / shotStats.total) * 100) : 0;
+    const conversionRate = shotStats.total > 0 ? Math.round((shotStats.goals / shotStats.total) * 100) : 0;
+
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-medium flex items-center gap-2">
+            <Target className="h-4 w-4" />
+            Shot Statistics
+          </h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowSimplified(false)}
+            className="text-xs"
+          >
+            Show Map
+          </Button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div className="bg-card p-3 rounded-lg border text-center">
+            <p className="text-2xl font-bold text-primary">{shotStats.total}</p>
+            <p className="text-xs text-muted-foreground">Total Shots</p>
+          </div>
+          <div className="bg-card p-3 rounded-lg border text-center">
+            <p className="text-2xl font-bold text-green-600">{shotStats.goals}</p>
+            <p className="text-xs text-muted-foreground">Goals</p>
+          </div>
+          <div className="bg-card p-3 rounded-lg border text-center">
+            <p className="text-2xl font-bold text-blue-600">{accuracy}%</p>
+            <p className="text-xs text-muted-foreground">Accuracy</p>
+          </div>
+          <div className="bg-card p-3 rounded-lg border text-center">
+            <p className="text-2xl font-bold text-orange-600">{conversionRate}%</p>
+            <p className="text-xs text-muted-foreground">Conversion</p>
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <div className="flex justify-between items-center">
+            <span className="text-sm">On Target</span>
+            <span className="text-sm font-medium">{shotStats.onTarget}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm">Blocked</span>
+            <span className="text-sm font-medium">{shotStats.blocked}</span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-sm">Missed</span>
+            <span className="text-sm font-medium">{shotStats.missed}</span>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  if (isMobile && showSimplified) {
+    return (
+      <Card className="bg-club-dark-gray">
+        <CardContent className="p-4">
+          <SimplifiedShotView />
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-3">
+      {isMobile && shots.length > 0 && (
+        <div className="flex justify-end">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setShowSimplified(true)}
+            className="text-xs flex items-center gap-2"
+          >
+            <BarChart3 className="h-4 w-4" />
+            Stats View
+          </Button>
+        </div>
+      )}
+
       <ResponsivePitch 
         className="bg-club-dark-gray"
-        showZoomControls={true}
+        showZoomControls={!isMobile}
         aspectRatio={3/2}
       >
         <LoadingOverlay isLoading={filterLoading} />
