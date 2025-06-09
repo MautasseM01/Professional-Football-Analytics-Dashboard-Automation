@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { useLanguage } from "@/contexts/LanguageContext";
@@ -18,6 +18,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { BackToTopButton } from "@/components/BackToTopButton";
 import { RoleTester } from "@/components/RoleTester";
+import { PullToRefresh } from "@/components/ui/pull-to-refresh";
 import { RefreshCw } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
@@ -36,9 +37,49 @@ const Dashboard = () => {
   } = useLanguage();
   const isMobile = useIsMobile();
 
-  const handleRefresh = () => {
+  // PWA installation
+  useEffect(() => {
+    // Register service worker
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('/sw.js')
+        .then((registration) => {
+          console.log('SW registered: ', registration);
+        })
+        .catch((registrationError) => {
+          console.log('SW registration failed: ', registrationError);
+        });
+    }
+
+    // Add manifest link if not present
+    if (!document.querySelector('link[rel="manifest"]')) {
+      const manifestLink = document.createElement('link');
+      manifestLink.rel = 'manifest';
+      manifestLink.href = '/manifest.json';
+      document.head.appendChild(manifestLink);
+    }
+
+    // Add meta tags for mobile
+    const viewport = document.querySelector('meta[name="viewport"]');
+    if (!viewport) {
+      const viewportMeta = document.createElement('meta');
+      viewportMeta.name = 'viewport';
+      viewportMeta.content = 'width=device-width, initial-scale=1.0, viewport-fit=cover';
+      document.head.appendChild(viewportMeta);
+    }
+
+    // Add theme color
+    const themeColor = document.querySelector('meta[name="theme-color"]');
+    if (!themeColor) {
+      const themeColorMeta = document.createElement('meta');
+      themeColorMeta.name = 'theme-color';
+      themeColorMeta.content = '#d4af37';
+      document.head.appendChild(themeColorMeta);
+    }
+  }, []);
+
+  const handleRefresh = async () => {
     console.log("Manual refresh triggered");
-    refreshData();
+    await refreshData();
   };
 
   // Render appropriate content based on user role
@@ -138,12 +179,15 @@ const Dashboard = () => {
         </header>
         
         <main className="bg-club-black transition-colors duration-300 w-full">
-          {/* TEST MODE indicator as first element */}
-          {!profileLoading && profile && <div className="p-2 sm:p-3 lg:p-6 pb-0">
-              <RoleTester />
-            </div>}
-          
-          {renderDashboardContent()}
+          {/* Pull to refresh wrapper */}
+          <PullToRefresh onRefresh={handleRefresh} enabled={isMobile}>
+            {/* TEST MODE indicator as first element */}
+            {!profileLoading && profile && <div className="p-2 sm:p-3 lg:p-6 pb-0">
+                <RoleTester />
+              </div>}
+            
+            {renderDashboardContent()}
+          </PullToRefresh>
         </main>
       </div>
 
