@@ -3,8 +3,6 @@ import { Player } from "@/types";
 import { PlayerProfileCard } from "./PlayerProfileCard";
 import { PlayerStatCards } from "./PlayerStatCards";
 import { PlayerHeatmapTackleSection } from "./PlayerHeatmapTackleSection";
-import { PlayerPerformanceSection } from "./PlayerPerformanceSection";
-import { MobilePerformanceTrends } from "./MobilePerformanceTrends";
 import { IOSHeatmapVisualization } from "./IOSHeatmapVisualization";
 import { IOSPerformanceTrends } from "./IOSPerformanceTrends";
 import { IOSFormationViewer } from "./IOSFormationViewer";
@@ -40,16 +38,6 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
     x: Math.random(),
     y: Math.random(),
     intensity: Math.random()
-  }));
-
-  const mockPerformanceData = Array.from({ length: 10 }, (_, i) => ({
-    match: i + 1,
-    date: `Game ${i + 1}`,
-    goals: Math.floor(Math.random() * 3),
-    assists: Math.floor(Math.random() * 3),
-    passes: Math.floor(Math.random() * 50) + 30,
-    distance: Math.round((Math.random() * 3 + 7) * 10) / 10,
-    rating: Math.round((Math.random() * 3 + 6) * 10) / 10
   }));
 
   const mockFormations = [
@@ -104,12 +92,12 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           <PlayerStatCards player={player} />
         </div>
 
-        {/* iOS-Style Performance Trends */}
+        {/* Enhanced iOS-Style Performance Trends with all original functionality */}
         <div className="transition-all duration-300 ease-in-out">
           <IOSPerformanceTrends
             playerId={player.id.toString()}
             playerName={player.name}
-            performanceData={mockPerformanceData}
+            player={player}
           />
         </div>
 
@@ -128,13 +116,6 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
             formations={mockFormations}
           />
         </div>
-
-        {/* Legacy Performance Section for Desktop */}
-        {!isMobile && (
-          <div className="transition-all duration-300 ease-in-out">
-            <PlayerPerformanceSection player={player} />
-          </div>
-        )}
 
         {/* Heatmap and Tackle Success Cards */}
         <div className="transition-all duration-300 ease-in-out">
