@@ -1,13 +1,13 @@
-
 import { Player } from "@/types";
 import { PlayerProfileCard } from "./PlayerProfileCard";
 import { PlayerStatCards } from "./PlayerStatCards";
 import { PlayerHeatmapTackleSection } from "./PlayerHeatmapTackleSection";
-import { IOSHeatmapVisualization } from "./IOSHeatmapVisualization";
 import { IOSPerformanceTrends } from "./IOSPerformanceTrends";
 import { IOSFormationViewer } from "./IOSFormationViewer";
+import { EnhancedPlayerHeatmap } from "./HeatmapVisualization";
 import { ResponsiveLayout } from "./ResponsiveLayout";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { usePlayerData } from "@/hooks/use-player-data";
 
 interface PlayerStatsProps {
   player: Player | null;
@@ -15,6 +15,7 @@ interface PlayerStatsProps {
 
 export const PlayerStats = ({ player }: PlayerStatsProps) => {
   const isMobile = useIsMobile();
+  const { players } = usePlayerData();
   
   console.log("PlayerStats component received player:", player);
   
@@ -33,13 +34,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
     );
   }
 
-  // Mock data for the new iOS-style components
-  const mockHeatmapData = Array.from({ length: 15 }, (_, i) => ({
-    x: Math.random(),
-    y: Math.random(),
-    intensity: Math.random()
-  }));
-
+  // Mock formations data
   const mockFormations = [
     {
       id: '1',
@@ -92,7 +87,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           <PlayerStatCards player={player} />
         </div>
 
-        {/* Enhanced iOS-Style Performance Trends with all original functionality */}
+        {/* Enhanced iOS-Style Performance Trends */}
         <div className="transition-all duration-300 ease-in-out">
           <IOSPerformanceTrends
             playerId={player.id.toString()}
@@ -101,12 +96,15 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           />
         </div>
 
-        {/* iOS-Style Heatmap */}
+        {/* Enhanced Player Heatmap with full data integration */}
         <div className="transition-all duration-300 ease-in-out">
-          <IOSHeatmapVisualization
-            playerId={player.id.toString()}
-            playerName={player.name}
-            heatmapData={mockHeatmapData}
+          <EnhancedPlayerHeatmap
+            players={players}
+            selectedPlayer={player}
+            onPlayerChange={(newPlayer) => {
+              // This would typically update the parent component's selected player
+              console.log('Player changed to:', newPlayer.name);
+            }}
           />
         </div>
 
@@ -117,7 +115,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           />
         </div>
 
-        {/* Heatmap and Tackle Success Cards */}
+        {/* Heatmap and Tackle Success Cards - keeping for backward compatibility */}
         <div className="transition-all duration-300 ease-in-out">
           <PlayerHeatmapTackleSection player={player} />
         </div>
