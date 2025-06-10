@@ -204,6 +204,7 @@ export const PassingNetwork = ({
 
       {/* Main visualization container */}
       <div 
+        ref={containerRef}
         className="w-full h-full relative overflow-hidden touch-manipulation"
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
@@ -251,8 +252,8 @@ export const PassingNetwork = ({
                   player={player}
                   x={player.x * dimensions.width}
                   y={player.y * dimensions.height}
-                  onSelect={() => handlePlayerSelect(player.id)}
-                  isSelected={selectedPlayer === player.id}
+                  onSelect={() => handlePlayerSelect(String(player.id))}
+                  isSelected={selectedPlayer === String(player.id)}
                   detailLevel={detailLevel}
                 />
               ))}
@@ -281,13 +282,13 @@ export const PassingNetwork = ({
             <div className="flex justify-between items-start">
               <div>
                 <h3 className="font-semibold text-lg">
-                  {players.find(p => p.id === selectedPlayer)?.name}
+                  {players.find(p => String(p.id) === selectedPlayer)?.name}
                 </h3>
                 <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {players.find(p => p.id === selectedPlayer)?.position}
+                  {players.find(p => String(p.id) === selectedPlayer)?.position}
                 </p>
                 <p className="text-sm font-medium mt-1">
-                  {players.find(p => p.id === selectedPlayer)?.totalPasses} passes
+                  {players.find(p => String(p.id) === selectedPlayer)?.totalPasses} passes
                 </p>
               </div>
               <Button
