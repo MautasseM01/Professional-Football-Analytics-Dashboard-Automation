@@ -107,7 +107,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
         {/* iOS-Style Performance Trends */}
         <div className="transition-all duration-300 ease-in-out">
           <IOSPerformanceTrends
-            playerId={player.id}
+            playerId={player.id.toString()}
             playerName={player.name}
             performanceData={mockPerformanceData}
           />
@@ -116,7 +116,7 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
         {/* iOS-Style Heatmap */}
         <div className="transition-all duration-300 ease-in-out">
           <IOSHeatmapVisualization
-            playerId={player.id}
+            playerId={player.id.toString()}
             playerName={player.name}
             heatmapData={mockHeatmapData}
           />
