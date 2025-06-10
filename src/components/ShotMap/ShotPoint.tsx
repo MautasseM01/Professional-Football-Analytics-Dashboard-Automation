@@ -2,100 +2,79 @@
 import React from "react";
 import { Shot } from "@/types/shot";
 import { Circle, CircleCheck, CircleX, Target, Square } from "lucide-react";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@/components/ui/hover-card";
+import { useHapticFeedback } from "@/hooks/use-haptic-feedback";
 
 interface ShotPointProps {
   shot: Shot;
   size?: number;
+  onSelect?: () => void;
+  isSelected?: boolean;
 }
 
-export const ShotPoint = ({ shot, size = 8 }: ShotPointProps) => {
-  // Responsive size based on screen
-  const getResponsiveSize = () => {
-    if (typeof window !== 'undefined') {
-      const isMobile = window.innerWidth < 768;
-      return isMobile ? Math.max(size + 2, 10) : size;
-    }
-    return size;
-  };
+export const ShotPoint = ({ shot, size = 12, onSelect, isSelected = false }: ShotPointProps) => {
+  const { triggerHaptic } = useHapticFeedback();
 
-  const responsiveSize = getResponsiveSize();
+  // Ensure minimum touch target size (44px iOS standard)
+  const touchTargetSize = Math.max(44, size * 2.5);
+  const iconSize = Math.max(size, 16);
 
-  // Map outcome to icon and color
+  // Map outcome to icon and color with iOS-style gradients
   const getShotIcon = () => {
+    const baseProps = {
+      size: iconSize,
+      className: "drop-shadow-lg transition-all duration-200",
+      style: { filter: isSelected ? 'brightness(1.2) scale(1.1)' : 'brightness(1)' }
+    };
+
     switch (shot.outcome) {
       case "Goal":
-        return <CircleCheck size={responsiveSize} className="text-[#F97316] fill-[#F97316] stroke-white" />;
+        return <CircleCheck {...baseProps} className={`${baseProps.className} text-orange-500 fill-orange-500 stroke-white stroke-2`} />;
       case "Shot on Target":
-        return <Target size={responsiveSize} className="text-[#0EA5E9] fill-[#0EA5E9] stroke-white" />;
+        return <Target {...baseProps} className={`${baseProps.className} text-blue-500 fill-blue-500 stroke-white stroke-2`} />;
       case "Shot Off Target":
-        return <CircleX size={responsiveSize} className="text-[#888888] fill-[#888888] stroke-white" />;
+        return <CircleX {...baseProps} className={`${baseProps.className} text-gray-500 fill-gray-500 stroke-white stroke-2`} />;
       case "Blocked Shot":
-        return <Square size={responsiveSize} className="text-[#555555] fill-[#555555] stroke-white" />;
+        return <Square {...baseProps} className={`${baseProps.className} text-gray-600 fill-gray-600 stroke-white stroke-2`} />;
       default:
-        return <Circle size={responsiveSize} className="text-gray-400" />;
+        return <Circle {...baseProps} className={`${baseProps.className} text-gray-400`} />;
     }
+  };
+
+  const handleClick = () => {
+    triggerHaptic('medium');
+    onSelect?.();
   };
 
   return (
-    <HoverCard>
-      <HoverCardTrigger asChild>
+    <div
+      className="absolute cursor-pointer touch-manipulation transition-all duration-200 hover:scale-110 active:scale-95"
+      style={{
+        left: `${(shot.x_coordinate / 1050) * 100}%`,
+        top: `${(shot.y_coordinate / 680) * 100}%`,
+        transform: 'translate(-50%, -50%)',
+        width: `${touchTargetSize}px`,
+        height: `${touchTargetSize}px`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '50%',
+        backgroundColor: isSelected ? 'rgba(255,255,255,0.2)' : 'transparent',
+        backdropFilter: isSelected ? 'blur(10px)' : 'none',
+        border: isSelected ? '2px solid rgba(255,255,255,0.5)' : 'none',
+        zIndex: isSelected ? 20 : 10,
+      }}
+      onClick={handleClick}
+      title={`${shot.player_name} - ${shot.outcome}`}
+    >
+      {getShotIcon()}
+      
+      {/* Selection ring animation */}
+      {isSelected && (
         <div
-          className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer touch-manipulation"
-          style={{
-            left: `${(shot.x_coordinate / 1050) * 100}%`,
-            top: `${(shot.y_coordinate / 680) * 100}%`,
-            // Add larger touch target for mobile
-            padding: '4px',
-            margin: '-4px'
-          }}
-        >
-          {getShotIcon()}
-        </div>
-      </HoverCardTrigger>
-      <HoverCardContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray w-60 sm:w-64">
-        <div className="space-y-2">
-          <div className="border-b border-club-gold/20 pb-2">
-            <span className="font-bold text-club-gold text-sm sm:text-base">{shot.player_name}</span>
-          </div>
-          <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
-            <div className="text-club-light-gray/70">Time:</div>
-            <div>{shot.minute}' ({shot.period})</div>
-            <div className="text-club-light-gray/70">Outcome:</div>
-            <div className="font-semibold">
-              <span 
-                className={
-                  shot.outcome === "Goal" ? "text-[#F97316]" :
-                  shot.outcome === "Shot on Target" ? "text-[#0EA5E9]" :
-                  "text-gray-300"
-                }
-              >
-                {shot.outcome}
-              </span>
-            </div>
-            {shot.assisted_by && (
-              <>
-                <div className="text-club-light-gray/70">Assisted by:</div>
-                <div>{shot.assisted_by}</div>
-              </>
-            )}
-            {shot.distance && (
-              <>
-                <div className="text-club-light-gray/70">Distance:</div>
-                <div>{shot.distance} meters</div>
-              </>
-            )}
-            <div className="text-club-light-gray/70">Match:</div>
-            <div>{shot.match_name}</div>
-            <div className="text-club-light-gray/70">Date:</div>
-            <div>{new Date(shot.date).toLocaleDateString()}</div>
-          </div>
-        </div>
-      </HoverCardContent>
-    </HoverCard>
+          className="absolute inset-0 rounded-full border-2 border-white/60 animate-ping"
+          style={{ animationDuration: '2s' }}
+        />
+      )}
+    </div>
   );
 };
