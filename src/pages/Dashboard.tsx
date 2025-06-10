@@ -34,6 +34,7 @@ const Dashboard = () => {
     t
   } = useLanguage();
   const [showSidebar, setShowSidebar] = useState(true);
+  
   const handleRefresh = () => {
     console.log("Manual refresh triggered");
     refreshData();
@@ -43,38 +44,48 @@ const Dashboard = () => {
   const renderDashboardContent = () => {
     if (profileLoading) {
       return <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-          <Skeleton className="h-6 sm:h-8 w-48 sm:w-64 bg-club-gold/10" />
+          <div className="h-6 sm:h-8 w-48 sm:w-64 bg-white/20 dark:bg-slate-700/20 rounded-xl animate-pulse" />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            <Skeleton className="h-60 sm:h-80 w-full bg-club-gold/10" />
-            <Skeleton className="h-60 sm:h-80 w-full bg-club-gold/10" />
-            <Skeleton className="h-60 sm:h-80 w-full bg-club-gold/10" />
+            <div className="h-60 sm:h-80 w-full bg-white/20 dark:bg-slate-700/20 rounded-2xl animate-pulse" />
+            <div className="h-60 sm:h-80 w-full bg-white/20 dark:bg-slate-700/20 rounded-2xl animate-pulse" />
+            <div className="h-60 sm:h-80 w-full bg-white/20 dark:bg-slate-700/20 rounded-2xl animate-pulse" />
           </div>
         </div>;
     }
+    
     if (error) {
       return <div className="p-4 sm:p-6">
-          <Alert className="bg-club-gold/10 border-club-gold/30">
-            <AlertDescription className="flex flex-col gap-4">
-              <p>Error loading user profile: {error}</p>
-              <Button variant="outline" className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold" onClick={handleRefresh}>
+          <div className="bg-red-50/90 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-2xl p-6 backdrop-blur-sm">
+            <div className="flex flex-col gap-4">
+              <p className="text-red-800 dark:text-red-200">Error loading user profile: {error}</p>
+              <Button 
+                variant="outline" 
+                className="w-fit bg-white/50 dark:bg-slate-800/50 border-red-200 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-900/20" 
+                onClick={handleRefresh}
+              >
                 <RefreshCw size={16} className="mr-2" />
                 Retry Loading Data
               </Button>
-            </AlertDescription>
-          </Alert>
+            </div>
+          </div>
         </div>;
     }
+    
     if (!profile) {
       return <div className="p-4 sm:p-6">
-          <Alert className="bg-club-gold/10 border-club-gold/30">
-            <AlertDescription className="flex flex-col gap-4">
-              <p>User profile not found. Please try refreshing the page or contact an administrator.</p>
-              <Button variant="outline" className="w-fit border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold" onClick={handleRefresh}>
+          <div className="bg-amber-50/90 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-2xl p-6 backdrop-blur-sm">
+            <div className="flex flex-col gap-4">
+              <p className="text-amber-800 dark:text-amber-200">User profile not found. Please try refreshing the page or contact an administrator.</p>
+              <Button 
+                variant="outline" 
+                className="w-fit bg-white/50 dark:bg-slate-800/50 border-amber-200 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20" 
+                onClick={handleRefresh}
+              >
                 <RefreshCw size={16} className="mr-2" />
                 Retry Loading Data
               </Button>
-            </AlertDescription>
-          </Alert>
+            </div>
+          </div>
         </div>;
     }
 
@@ -97,19 +108,20 @@ const Dashboard = () => {
         return <UnassignedRoleDashboard profile={profile} />;
     }
   };
-  return <div className="flex h-screen bg-club-black text-club-light-gray transition-colors duration-300">
+
+  return <div className="flex h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
       {showSidebar && <DashboardSidebar />}
       
       <div className="flex-1 overflow-auto min-w-0">
-        <header className="border-b border-club-gold/20 bg-club-black sticky top-0 z-20 transition-colors duration-300">
+        <header className="border-b border-white/20 dark:border-slate-700/20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
           <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 gap-2 sm:gap-4 sm:py-[20px]">
             {/* Left section - Title and page info */}
             <div className="flex-1 min-w-0">
-              <h1 className="text-base sm:text-lg lg:text-xl font-bold text-club-gold truncate">
+              <h1 className="text-base sm:text-lg lg:text-xl font-bold text-blue-600 dark:text-blue-400 truncate">
                 {t('header.title')}
               </h1>
-              <p className="text-xs sm:text-sm text-club-light-gray/70 truncate">
-                {profileLoading ? <Skeleton className="h-3 sm:h-4 w-24 sm:w-32 lg:w-40 bg-club-gold/10 inline-block" /> : profile?.role ? `${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} ${t('header.dashboard')}` : t('header.dashboard')}
+              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
+                {profileLoading ? <div className="h-3 sm:h-4 w-24 sm:w-32 lg:w-40 bg-gray-200 dark:bg-slate-700 rounded-lg animate-pulse inline-block" /> : profile?.role ? `${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} ${t('header.dashboard')}` : t('header.dashboard')}
               </p>
             </div>
             
@@ -122,14 +134,24 @@ const Dashboard = () => {
               <ThemeToggle />
               
               {/* Refresh Button */}
-              <Button variant="outline" size="icon" className="text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10" onClick={handleRefresh} title="Refresh data">
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className="bg-white/50 dark:bg-slate-800/50 border-white/30 dark:border-slate-600/30 hover:bg-white/70 dark:hover:bg-slate-700/50 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" 
+                onClick={handleRefresh} 
+                title="Refresh data"
+              >
                 <RefreshCw size={14} className="sm:hidden" />
                 <RefreshCw size={16} className="hidden sm:block lg:hidden" />
                 <RefreshCw size={18} className="hidden lg:block" />
               </Button>
               
               {/* Menu Toggle */}
-              <button onClick={() => setShowSidebar(!showSidebar)} className="p-1.5 sm:p-2 rounded-md text-club-light-gray hover:bg-club-gold/10 hover:text-club-gold transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center" title="Toggle sidebar">
+              <button 
+                onClick={() => setShowSidebar(!showSidebar)} 
+                className="p-1.5 sm:p-2 rounded-xl bg-white/50 dark:bg-slate-800/50 border border-white/30 dark:border-slate-600/30 hover:bg-white/70 dark:hover:bg-slate-700/50 transition-all duration-200 min-h-[44px] min-w-[44px] flex items-center justify-center backdrop-blur-sm" 
+                title="Toggle sidebar"
+              >
                 <Menu size={16} className="sm:hidden" />
                 <Menu size={18} className="hidden sm:block lg:hidden" />
                 <Menu size={20} className="hidden lg:block" />
@@ -138,7 +160,7 @@ const Dashboard = () => {
           </div>
         </header>
         
-        <main className="bg-club-black transition-colors duration-300 w-full">
+        <main className="bg-transparent transition-colors duration-300 w-full">
           {/* TEST MODE indicator as first element */}
           {!profileLoading && profile && <div className="p-4 sm:p-6 pb-0">
               <RoleTester />
@@ -152,4 +174,5 @@ const Dashboard = () => {
       <BackToTopButton />
     </div>;
 };
+
 export default Dashboard;
