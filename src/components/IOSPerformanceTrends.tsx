@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TouchFeedbackButton } from './TouchFeedbackButton';
@@ -103,13 +102,14 @@ const generateMatchData = (player: Player, kpi: string, numMatches: number): Per
 };
 
 // Calculate moving average for a dataset
-const calculateMovingAverage = (data: PerformanceDataPoint[], windowSize: number) => {
+const calculateMovingAverage = (data: PerformanceDataPoint[], windowSize: number, metric: string) => {
   return data.map((point, index, array) => {
     if (index < windowSize - 1) return { ...point, movingAvg: null };
     
     let sum = 0;
     for (let i = 0; i < windowSize; i++) {
-      sum += array[index - i][point.match as keyof PerformanceDataPoint] as number;
+      const value = array[index - i][metric as keyof PerformanceDataPoint] as number;
+      sum += value || 0;
     }
     
     return {
@@ -169,7 +169,7 @@ export const IOSPerformanceTrends = ({
       const rawData = generateMatchData(player, activeMetric, numMatches);
       
       return showMovingAverage 
-        ? calculateMovingAverage(rawData, 3)
+        ? calculateMovingAverage(rawData, 3, activeMetric)
         : rawData;
     } catch (err) {
       console.error('Error generating performance data:', err);
