@@ -1,11 +1,12 @@
+
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { TouchFeedbackButton } from './TouchFeedbackButton';
 import { useSwipeGestures } from '@/hooks/use-swipe-gestures';
 import { useHapticFeedback } from '@/hooks/use-haptic-feedback';
 import { cn } from '@/lib/utils';
-import { ChevronLeft, ChevronRight, TrendingUp, Users, Calendar, Monitor } from 'lucide-react';
-import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, Area, AreaChart, ReferenceLine } from 'recharts';
+import { ChevronLeft, ChevronRight, TrendingUp, Users, Calendar, Monitor, Filter, RefreshCw } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, ResponsiveContainer, Tooltip, Area, AreaChart, ReferenceLine, Legend } from 'recharts';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { 
@@ -18,6 +19,7 @@ import {
 import { Player } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useResponsiveBreakpoint } from "@/hooks/use-orientation";
+import { IOSLoadingState } from './IOSLoadingState';
 
 interface PerformanceDataPoint {
   match: number;
@@ -31,6 +33,8 @@ interface PerformanceDataPoint {
   shots_on_target?: number;
   tackles_won?: number;
   movingAvg?: number | null;
+  opponent?: string;
+  result?: string;
 }
 
 interface IOSPerformanceTrendsProps {
@@ -43,28 +47,51 @@ interface IOSPerformanceTrendsProps {
   className?: string;
 }
 
-// KPI options for the dropdown - complete list from original component
+// Enhanced KPI options with additional metrics
 const KPI_OPTIONS = [
-  { id: 'rating', label: 'Match Rating', color: '#3B82F6', unit: '' },
-  { id: 'goals', label: 'Goals', color: '#D4AF37', unit: '' },
-  { id: 'assists', label: 'Assists', color: '#10B981', unit: '' },
-  { id: 'passes', label: 'Passes Completed', color: '#8B5CF6', unit: '' },
-  { id: 'distance', label: 'Distance', color: '#F59E0B', unit: 'km' },
-  { id: 'sprintDistance', label: 'Sprint Distance', color: '#EF4444', unit: 'km' },
-  { id: 'shots_on_target', label: 'Shots on Target', color: '#06B6D4', unit: '' },
-  { id: 'tackles_won', label: 'Tackles Won', color: '#84CC16', unit: '' }
+  { id: 'rating', label: 'Match Rating', color: '#3B82F6', unit: '', format: (val: number) => val.toFixed(1) },
+  { id: 'goals', label: 'Goals', color: '#D4AF37', unit: '', format: (val: number) => val.toString() },
+  { id: 'assists', label: 'Assists', color: '#10B981', unit: '', format: (val: number) => val.toString() },
+  { id: 'passes', label: 'Passes Completed', color: '#8B5CF6', unit: '', format: (val: number) => val.toString() },
+  { id: 'distance', label: 'Distance', color: '#F59E0B', unit: 'km', format: (val: number) => val.toFixed(1) },
+  { id: 'sprintDistance', label: 'Sprint Distance', color: '#EF4444', unit: 'km', format: (val: number) => val.toFixed(1) },
+  { id: 'shots_on_target', label: 'Shots on Target', color: '#06B6D4', unit: '', format: (val: number) => val.toString() },
+  { id: 'tackles_won', label: 'Tackles Won', color: '#84CC16', unit: '', format: (val: number) => val.toString() }
 ];
 
-// Time period options from original component
+// Enhanced time period options
 const TIME_PERIOD_OPTIONS = [
+  { value: "last3", label: "Last 3 Matches" },
   { value: "last5", label: "Last 5 Matches" },
   { value: "last10", label: "Last 10 Matches" },
-  { value: "season", label: "Season to Date" }
+  { value: "last15", label: "Last 15 Matches" },
+  { value: "season", label: "Season to Date" },
+  { value: "home", label: "Home Matches" },
+  { value: "away", label: "Away Matches" }
 ];
 
-// Helper function to generate mock match data based on a player stat
-const generateMatchData = (player: Player, kpi: string, numMatches: number): PerformanceDataPoint[] => {
+// Date range filter options
+const DATE_RANGE_OPTIONS = [
+  { value: "all", label: "All Time" },
+  { value: "last30", label: "Last 30 Days" },
+  { value: "last60", label: "Last 60 Days" },
+  { value: "last90", label: "Last 90 Days" },
+  { value: "thisMonth", label: "This Month" },
+  { value: "lastMonth", label: "Last Month" }
+];
+
+// Chart view options
+const CHART_VIEW_OPTIONS = [
+  { value: "line", label: "Line Chart" },
+  { value: "area", label: "Area Chart" },
+  { value: "comparison", label: "Comparison View" }
+];
+
+// Helper function to generate comprehensive mock match data
+const generateEnhancedMatchData = (player: Player, kpi: string, numMatches: number, filter?: string): PerformanceDataPoint[] => {
   const baseValue = player[kpi as keyof Player] as number || 0;
+  const opponents = ['Arsenal', 'Chelsea', 'Liverpool', 'Man City', 'Man United', 'Tottenham', 'Leicester', 'West Ham'];
+  const results = ['W', 'L', 'D'];
   
   return Array.from({ length: numMatches }, (_, i) => {
     let variationFactor = 0.2;
@@ -85,6 +112,14 @@ const generateMatchData = (player: Player, kpi: string, numMatches: number): Per
     const matchDate = new Date();
     matchDate.setDate(matchDate.getDate() - (i * 7));
     
+    const isHome = Math.random() > 0.5;
+    const opponent = opponents[Math.floor(Math.random() * opponents.length)];
+    const result = results[Math.floor(Math.random() * results.length)];
+    
+    // Apply filters
+    if (filter === 'home' && !isHome) return null;
+    if (filter === 'away' && isHome) return null;
+    
     return {
       match: numMatches - i,
       date: matchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
@@ -96,12 +131,14 @@ const generateMatchData = (player: Player, kpi: string, numMatches: number): Per
       sprintDistance: Math.round((Math.random() * 1 + 2) * 10) / 10,
       shots_on_target: Math.floor(Math.random() * 4),
       tackles_won: Math.floor(Math.random() * 6),
+      opponent,
+      result,
       [kpi]: roundedValue,
     };
-  }).reverse();
+  }).filter(Boolean).reverse() as PerformanceDataPoint[];
 };
 
-// Calculate moving average for a dataset
+// Calculate moving average for enhanced data analysis
 const calculateMovingAverage = (data: PerformanceDataPoint[], windowSize: number, metric: string) => {
   return data.map((point, index, array) => {
     if (index < windowSize - 1) return { ...point, movingAvg: null };
@@ -119,6 +156,28 @@ const calculateMovingAverage = (data: PerformanceDataPoint[], windowSize: number
   });
 };
 
+// Calculate performance statistics
+const calculateStats = (data: PerformanceDataPoint[], metric: string) => {
+  const values = data.map(d => d[metric as keyof PerformanceDataPoint] as number).filter(v => v !== undefined);
+  if (values.length === 0) return { avg: 0, min: 0, max: 0, trend: 'neutral' };
+  
+  const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  
+  // Calculate trend (last 3 vs previous 3)
+  const recent = values.slice(-3);
+  const previous = values.slice(-6, -3);
+  const recentAvg = recent.reduce((sum, val) => sum + val, 0) / recent.length;
+  const previousAvg = previous.length > 0 ? previous.reduce((sum, val) => sum + val, 0) / previous.length : recentAvg;
+  
+  let trend = 'neutral';
+  if (recentAvg > previousAvg * 1.1) trend = 'up';
+  else if (recentAvg < previousAvg * 0.9) trend = 'down';
+  
+  return { avg, min, max, trend };
+};
+
 export const IOSPerformanceTrends = ({
   playerId,
   playerName,
@@ -130,10 +189,14 @@ export const IOSPerformanceTrends = ({
 }: IOSPerformanceTrendsProps) => {
   const [activeMetric, setActiveMetric] = useState('rating');
   const [selectedTimePeriod, setSelectedTimePeriod] = useState("last5");
+  const [selectedDateRange, setSelectedDateRange] = useState("all");
+  const [chartView, setChartView] = useState("area");
   const [showComparison, setShowComparison] = useState(false);
   const [showMovingAverage, setShowMovingAverage] = useState(false);
+  const [showStats, setShowStats] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
   const chartRef = useRef<HTMLDivElement>(null);
   const { triggerHaptic } = useHapticFeedback();
   const isMobile = useIsMobile();
@@ -147,14 +210,18 @@ export const IOSPerformanceTrends = ({
   // Determine the number of matches based on selected time period
   const getMatchCount = () => {
     switch (selectedTimePeriod) {
+      case "last3": return 3;
       case "last5": return 5;
       case "last10": return 10;
-      case "season": return 15;
+      case "last15": return 15;
+      case "season": return 20;
+      case "home": return 10;
+      case "away": return 10;
       default: return 5;
     }
   };
 
-  // Generate or use provided performance data
+  // Generate or use provided performance data with enhanced filtering
   const performanceData = useMemo(() => {
     if (providedData && providedData.length > 0) {
       return providedData;
@@ -166,7 +233,10 @@ export const IOSPerformanceTrends = ({
 
     try {
       const numMatches = getMatchCount();
-      const rawData = generateMatchData(player, activeMetric, numMatches);
+      const filter = selectedTimePeriod.includes('home') ? 'home' : 
+                   selectedTimePeriod.includes('away') ? 'away' : undefined;
+      
+      const rawData = generateEnhancedMatchData(player, activeMetric, numMatches, filter);
       
       return showMovingAverage 
         ? calculateMovingAverage(rawData, 3, activeMetric)
@@ -176,7 +246,12 @@ export const IOSPerformanceTrends = ({
       setError('Failed to load performance data');
       return [];
     }
-  }, [player, activeMetric, selectedTimePeriod, showMovingAverage, providedData]);
+  }, [player, activeMetric, selectedTimePeriod, selectedDateRange, showMovingAverage, providedData]);
+
+  // Calculate performance statistics
+  const stats = useMemo(() => {
+    return calculateStats(performanceData, activeMetric);
+  }, [performanceData, activeMetric]);
 
   // Swipe gestures for metric switching
   const { swipeProps } = useSwipeGestures({
@@ -196,6 +271,18 @@ export const IOSPerformanceTrends = ({
     },
     threshold: 50
   });
+
+  // Refresh data handler
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    triggerHaptic('light');
+    
+    // Simulate data refresh
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    setRefreshing(false);
+    setError(null);
+  };
 
   // Responsive chart configuration
   const getChartConfig = () => {
@@ -241,7 +328,7 @@ export const IOSPerformanceTrends = ({
 
   const chartConfig = getChartConfig();
 
-  // Custom tooltip component
+  // Enhanced tooltip component
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
@@ -250,13 +337,18 @@ export const IOSPerformanceTrends = ({
           <div className="text-ios-caption2 font-medium text-gray-900 dark:text-white mb-2">
             Match {data.match} • {data.date}
           </div>
+          {data.opponent && (
+            <div className="text-ios-caption text-gray-600 dark:text-gray-400 mb-2">
+              vs {data.opponent} ({data.result})
+            </div>
+          )}
           <div className="space-y-1">
             <div className="flex items-center justify-between gap-4">
               <span className="text-ios-caption text-gray-600 dark:text-gray-400">
                 {currentMetric.label}
               </span>
               <span className="text-ios-caption font-medium text-gray-900 dark:text-white">
-                {data[activeMetric]}{currentMetric.unit}
+                {currentMetric.format(data[activeMetric])}{currentMetric.unit}
               </span>
             </div>
             {showComparison && comparisonData && (
@@ -275,7 +367,7 @@ export const IOSPerformanceTrends = ({
                   3-Match Avg
                 </span>
                 <span className="text-ios-caption font-medium text-gray-400">
-                  {data.movingAvg}
+                  {currentMetric.format(data.movingAvg)}
                 </span>
               </div>
             )}
@@ -286,39 +378,66 @@ export const IOSPerformanceTrends = ({
     return null;
   };
 
-  // Calculate trend direction
-  const getTrendDirection = () => {
-    if (performanceData.length < 2) return 'neutral';
-    const recent = performanceData.slice(-3);
-    const older = performanceData.slice(-6, -3);
-    if (older.length === 0) return 'neutral';
-    
-    const recentAvg = recent.reduce((sum, d) => sum + (d[activeMetric as keyof PerformanceDataPoint] as number), 0) / recent.length;
-    const olderAvg = older.reduce((sum, d) => sum + (d[activeMetric as keyof PerformanceDataPoint] as number), 0) / older.length;
-    
-    if (recentAvg > olderAvg * 1.1) return 'up';
-    if (recentAvg < olderAvg * 0.9) return 'down';
-    return 'neutral';
-  };
-
-  const trendDirection = getTrendDirection();
-
-  // If screen is too small, show message to use larger screen (like original component)
+  // If screen is too small, show optimized mobile view
   if (isVerySmallScreen) {
     return (
       <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-white/20 dark:border-slate-700/20 overflow-hidden">
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex flex-col items-center justify-center text-center space-y-4 min-h-[200px]">
-            <Monitor className="w-10 h-10 sm:w-12 sm:h-12 text-blue-500/60" />
-            <div className="space-y-2">
-              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
-                Screen Too Small
+        <CardContent className="p-4">
+          <div className="space-y-4">
+            <div className="text-center">
+              <h3 className="text-base font-semibold text-gray-900 dark:text-white mb-2">
+                Performance Trends
               </h3>
-              <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 max-w-sm">
-                Please use a larger screen or rotate your device for optimal chart viewing. 
-                The performance trends chart requires at least 480px width for proper display.
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {playerName}
               </p>
             </div>
+            
+            {/* Mobile-optimized metric selector */}
+            <Select value={activeMetric} onValueChange={setActiveMetric}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select metric" />
+              </SelectTrigger>
+              <SelectContent>
+                {KPI_OPTIONS.map(option => (
+                  <SelectItem key={option.id} value={option.id}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Mobile stats cards */}
+            <div className="grid grid-cols-3 gap-2">
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-2 text-center">
+                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                  {currentMetric.format(stats.avg)}
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">Avg</div>
+              </div>
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-2 text-center">
+                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                  {currentMetric.format(stats.max)}
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">Max</div>
+              </div>
+              <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-2 text-center">
+                <div className="text-sm font-medium text-gray-900 dark:text-white">
+                  {currentMetric.format(stats.min)}
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400">Min</div>
+              </div>
+            </div>
+
+            <TouchFeedbackButton
+              variant="outline"
+              size="sm"
+              onClick={() => window.open(`/player-stats?player=${playerId}`, '_blank')}
+              className="w-full"
+            >
+              <Monitor size={16} className="mr-2" />
+              View Full Chart
+            </TouchFeedbackButton>
           </div>
         </CardContent>
       </Card>
@@ -328,48 +447,25 @@ export const IOSPerformanceTrends = ({
   // Loading state
   if (isLoading) {
     return (
-      <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-white/20 dark:border-slate-700/20 overflow-hidden">
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex items-center justify-center min-h-[300px]">
-            <div className="animate-pulse space-y-4 w-full">
-              <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/4"></div>
-              <div className="h-48 bg-gray-300 dark:bg-gray-700 rounded"></div>
-              <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-1/2"></div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <IOSLoadingState 
+        isLoading={true}
+        className="min-h-[400px]"
+        skeletonRows={4}
+      />
     );
   }
 
   // Error state
   if (error) {
     return (
-      <Card className="bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-white/20 dark:border-slate-700/20 overflow-hidden">
-        <CardContent className="p-4 sm:p-6">
-          <div className="flex flex-col items-center justify-center text-center space-y-4 min-h-[200px]">
-            <div className="text-red-500 text-2xl">⚠️</div>
-            <div className="space-y-2">
-              <h3 className="text-base font-semibold text-gray-900 dark:text-white">
-                Error Loading Data
-              </h3>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {error}
-              </p>
-              <TouchFeedbackButton
-                onClick={() => {
-                  setError(null);
-                  setIsLoading(true);
-                  setTimeout(() => setIsLoading(false), 1000);
-                }}
-                className="mt-2"
-              >
-                Retry
-              </TouchFeedbackButton>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      <IOSLoadingState 
+        error={error}
+        onRetry={() => {
+          setError(null);
+          handleRefresh();
+        }}
+        className="min-h-[400px]"
+      />
     );
   }
 
@@ -386,53 +482,66 @@ export const IOSPerformanceTrends = ({
                 <p className="text-ios-caption text-gray-600 dark:text-gray-400">
                   {playerName}
                 </p>
-                {trendDirection !== 'neutral' && (
+                {stats.trend !== 'neutral' && (
                   <div className={cn(
                     "flex items-center gap-1 px-2 py-1 rounded-full",
-                    trendDirection === 'up' 
+                    stats.trend === 'up' 
                       ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
                       : "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
                   )}>
                     <TrendingUp 
                       size={10} 
                       className={cn(
-                        trendDirection === 'down' && "rotate-180"
+                        stats.trend === 'down' && "rotate-180"
                       )} 
                     />
                     <span className="text-ios-caption2 font-medium">
-                      {trendDirection === 'up' ? 'Improving' : 'Declining'}
+                      {stats.trend === 'up' ? 'Improving' : 'Declining'}
                     </span>
                   </div>
                 )}
               </div>
             </div>
 
-            {comparisonData && (
+            <div className="flex items-center gap-2">
+              {comparisonData && (
+                <TouchFeedbackButton
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setShowComparison(!showComparison);
+                    triggerHaptic('light');
+                  }}
+                  className={cn(
+                    "h-8 px-3",
+                    showComparison ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" : ""
+                  )}
+                >
+                  <Users size={14} className="mr-1" />
+                  Compare
+                </TouchFeedbackButton>
+              )}
+              
               <TouchFeedbackButton
                 variant="outline"
                 size="sm"
-                onClick={() => {
-                  setShowComparison(!showComparison);
-                  triggerHaptic('light');
-                }}
-                className={cn(
-                  "h-8 px-3",
-                  showComparison ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400" : ""
-                )}
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="h-8 px-3"
               >
-                <Users size={14} className="mr-1" />
-                Compare
+                <RefreshCw size={14} className={cn("mr-1", refreshing && "animate-spin")} />
+                Refresh
               </TouchFeedbackButton>
-            )}
+            </div>
           </div>
         </CardHeader>
 
         <CardContent className="p-0">
-          {/* Controls from original component */}
+          {/* Enhanced Controls */}
           <div className="px-4 pb-4">
             <div className="space-y-3 sm:space-y-4">
-              {/* Dropdowns Row */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+              {/* Primary Controls Row */}
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3">
                 <div className="space-y-1">
                   <Label className="text-xs text-gray-600 dark:text-gray-400 font-medium">Performance Metric</Label>
                   <Select value={activeMetric} onValueChange={setActiveMetric}>
@@ -464,23 +573,88 @@ export const IOSPerformanceTrends = ({
                     </SelectContent>
                   </Select>
                 </div>
+
+                <div className="space-y-1">
+                  <Label className="text-xs text-gray-600 dark:text-gray-400 font-medium">Chart View</Label>
+                  <Select value={chartView} onValueChange={setChartView}>
+                    <SelectTrigger className="w-full bg-white/50 dark:bg-slate-800/50 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white h-8 sm:h-9 lg:h-10 text-xs sm:text-sm">
+                      <SelectValue placeholder="Chart View" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-white dark:bg-slate-800 border-gray-300 dark:border-slate-600 text-gray-900 dark:text-white z-50">
+                      {CHART_VIEW_OPTIONS.map(option => (
+                        <SelectItem key={option.value} value={option.value} className="focus:bg-blue-100 dark:focus:bg-blue-900/30 text-xs sm:text-sm">
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               
-              {/* Switch Row - Show on larger screens */}
+              {/* Secondary Controls Row */}
               {!isMobile && (
                 <div className="flex items-center justify-between pt-1">
-                  <Label 
-                    htmlFor="movingAverage"
-                    className="text-gray-900 dark:text-white text-xs sm:text-sm cursor-pointer select-none font-medium"
-                  >
-                    Show 3-Match Moving Average
-                  </Label>
-                  <Switch 
-                    id="movingAverage" 
-                    checked={showMovingAverage}
-                    onCheckedChange={setShowMovingAverage}
-                    className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
-                  />
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Label 
+                        htmlFor="movingAverage"
+                        className="text-gray-900 dark:text-white text-xs sm:text-sm cursor-pointer select-none font-medium"
+                      >
+                        3-Match Moving Average
+                      </Label>
+                      <Switch 
+                        id="movingAverage" 
+                        checked={showMovingAverage}
+                        onCheckedChange={setShowMovingAverage}
+                        className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
+                      />
+                    </div>
+                    
+                    <div className="flex items-center gap-2">
+                      <Label 
+                        htmlFor="showStats"
+                        className="text-gray-900 dark:text-white text-xs sm:text-sm cursor-pointer select-none font-medium"
+                      >
+                        Show Statistics
+                      </Label>
+                      <Switch 
+                        id="showStats" 
+                        checked={showStats}
+                        onCheckedChange={setShowStats}
+                        className="data-[state=checked]:bg-blue-500 data-[state=unchecked]:bg-gray-300 dark:data-[state=unchecked]:bg-gray-600"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Performance Statistics */}
+              {showStats && !isMobile && (
+                <div className="grid grid-cols-4 gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl">
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {currentMetric.format(stats.avg)}
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Average</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {currentMetric.format(stats.max)}
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Best</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {currentMetric.format(stats.min)}
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Worst</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-semibold text-gray-900 dark:text-white">
+                      {performanceData.length}
+                    </div>
+                    <div className="text-xs text-gray-600 dark:text-gray-400">Matches</div>
+                  </div>
                 </div>
               )}
             </div>
@@ -494,82 +668,147 @@ export const IOSPerformanceTrends = ({
             {...swipeProps}
           >
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={performanceData} margin={chartConfig.margin}>
-                <defs>
-                  <linearGradient id="metricGradient" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={currentMetric.color} stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor={currentMetric.color} stopOpacity={0.05}/>
-                  </linearGradient>
-                  {showComparison && (
-                    <linearGradient id="comparisonGradient" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#F97316" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="#F97316" stopOpacity={0.05}/>
-                    </linearGradient>
-                  )}
-                </defs>
-                
-                <XAxis 
-                  dataKey="match" 
-                  stroke="#9CA3AF"
-                  fontSize={chartConfig.fontSize}
-                  tickLine={false}
-                  axisLine={false}
-                  angle={-45}
-                  textAnchor="end"
-                  height={chartConfig.margin.bottom}
-                  interval={breakpoint === 'mobile' ? 'preserveStartEnd' : 0}
-                />
-                <YAxis 
-                  stroke="#9CA3AF"
-                  fontSize={chartConfig.fontSize}
-                  tickLine={false}
-                  axisLine={false}
-                  width={30}
-                  label={!isMobile ? { 
-                    value: currentMetric.label, 
-                    angle: -90, 
-                    position: 'insideLeft', 
-                    style: { textAnchor: 'middle' }, 
-                    fill: '#9CA3AF',
-                    fontSize: chartConfig.fontSize
-                  } : undefined}
-                />
-                
-                <Tooltip content={<CustomTooltip />} />
-                
-                <Area
-                  type="monotone"
-                  dataKey={activeMetric}
-                  stroke={currentMetric.color}
-                  strokeWidth={chartConfig.strokeWidth}
-                  fill="url(#metricGradient)"
-                  dot={{ fill: currentMetric.color, strokeWidth: 2, r: chartConfig.dotRadius }}
-                  activeDot={{ r: chartConfig.activeDotRadius, stroke: currentMetric.color, strokeWidth: 2 }}
-                />
-                
-                {showComparison && comparisonData && (
+              {chartView === 'line' ? (
+                <LineChart data={performanceData} margin={chartConfig.margin}>
+                  <XAxis 
+                    dataKey="match" 
+                    stroke="#9CA3AF"
+                    fontSize={chartConfig.fontSize}
+                    tickLine={false}
+                    axisLine={false}
+                    angle={-45}
+                    textAnchor="end"
+                    height={chartConfig.margin.bottom}
+                    interval={breakpoint === 'mobile' ? 'preserveStartEnd' : 0}
+                  />
+                  <YAxis 
+                    stroke="#9CA3AF"
+                    fontSize={chartConfig.fontSize}
+                    tickLine={false}
+                    axisLine={false}
+                    width={30}
+                    label={!isMobile ? { 
+                      value: currentMetric.label, 
+                      angle: -90, 
+                      position: 'insideLeft', 
+                      style: { textAnchor: 'middle' }, 
+                      fill: '#9CA3AF',
+                      fontSize: chartConfig.fontSize
+                    } : undefined}
+                  />
+                  
+                  <Tooltip content={<CustomTooltip />} />
+                  
                   <Line
                     type="monotone"
                     dataKey={activeMetric}
-                    data={comparisonData}
-                    stroke="#F97316"
+                    stroke={currentMetric.color}
                     strokeWidth={chartConfig.strokeWidth}
-                    strokeDasharray="5 5"
-                    dot={{ fill: "#F97316", strokeWidth: 2, r: chartConfig.dotRadius }}
+                    dot={{ fill: currentMetric.color, strokeWidth: 2, r: chartConfig.dotRadius }}
+                    activeDot={{ r: chartConfig.activeDotRadius, stroke: currentMetric.color, strokeWidth: 2 }}
                   />
-                )}
+                  
+                  {showComparison && comparisonData && (
+                    <Line
+                      type="monotone"
+                      dataKey={activeMetric}
+                      data={comparisonData}
+                      stroke="#F97316"
+                      strokeWidth={chartConfig.strokeWidth}
+                      strokeDasharray="5 5"
+                      dot={{ fill: "#F97316", strokeWidth: 2, r: chartConfig.dotRadius }}
+                    />
+                  )}
 
-                {showMovingAverage && !isMobile && (
-                  <Line
-                    type="monotone"
-                    dataKey="movingAvg"
+                  {showMovingAverage && !isMobile && (
+                    <Line
+                      type="monotone"
+                      dataKey="movingAvg"
+                      stroke="#9CA3AF"
+                      strokeDasharray="5 5"
+                      strokeWidth={chartConfig.strokeWidth}
+                      dot={false}
+                    />
+                  )}
+                </LineChart>
+              ) : (
+                <AreaChart data={performanceData} margin={chartConfig.margin}>
+                  <defs>
+                    <linearGradient id="metricGradient" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={currentMetric.color} stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor={currentMetric.color} stopOpacity={0.05}/>
+                    </linearGradient>
+                    {showComparison && (
+                      <linearGradient id="comparisonGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#F97316" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="#F97316" stopOpacity={0.05}/>
+                      </linearGradient>
+                    )}
+                  </defs>
+                  
+                  <XAxis 
+                    dataKey="match" 
                     stroke="#9CA3AF"
-                    strokeDasharray="5 5"
-                    strokeWidth={chartConfig.strokeWidth}
-                    dot={false}
+                    fontSize={chartConfig.fontSize}
+                    tickLine={false}
+                    axisLine={false}
+                    angle={-45}
+                    textAnchor="end"
+                    height={chartConfig.margin.bottom}
+                    interval={breakpoint === 'mobile' ? 'preserveStartEnd' : 0}
                   />
-                )}
-              </AreaChart>
+                  <YAxis 
+                    stroke="#9CA3AF"
+                    fontSize={chartConfig.fontSize}
+                    tickLine={false}
+                    axisLine={false}
+                    width={30}
+                    label={!isMobile ? { 
+                      value: currentMetric.label, 
+                      angle: -90, 
+                      position: 'insideLeft', 
+                      style: { textAnchor: 'middle' }, 
+                      fill: '#9CA3AF',
+                      fontSize: chartConfig.fontSize
+                    } : undefined}
+                  />
+                  
+                  <Tooltip content={<CustomTooltip />} />
+                  
+                  <Area
+                    type="monotone"
+                    dataKey={activeMetric}
+                    stroke={currentMetric.color}
+                    strokeWidth={chartConfig.strokeWidth}
+                    fill="url(#metricGradient)"
+                    dot={{ fill: currentMetric.color, strokeWidth: 2, r: chartConfig.dotRadius }}
+                    activeDot={{ r: chartConfig.activeDotRadius, stroke: currentMetric.color, strokeWidth: 2 }}
+                  />
+                  
+                  {showComparison && comparisonData && (
+                    <Line
+                      type="monotone"
+                      dataKey={activeMetric}
+                      data={comparisonData}
+                      stroke="#F97316"
+                      strokeWidth={chartConfig.strokeWidth}
+                      strokeDasharray="5 5"
+                      dot={{ fill: "#F97316", strokeWidth: 2, r: chartConfig.dotRadius }}
+                    />
+                  )}
+
+                  {showMovingAverage && !isMobile && (
+                    <Line
+                      type="monotone"
+                      dataKey="movingAvg"
+                      stroke="#9CA3AF"
+                      strokeDasharray="5 5"
+                      strokeWidth={chartConfig.strokeWidth}
+                      dot={false}
+                    />
+                  )}
+                </AreaChart>
+              )}
             </ResponsiveContainer>
           </div>
 
