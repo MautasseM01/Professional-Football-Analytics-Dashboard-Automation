@@ -36,7 +36,7 @@ export const ResponsiveHeatmapCanvas = ({
   const [lastPanPoint, setLastPanPoint] = useState({ x: 0, y: 0 });
   const [lastPinchDistance, setLastPinchDistance] = useState(0);
 
-  // Draw football field background
+  // Draw football field background with enhanced contrast
   const drawFootballField = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
     // Clear canvas
     ctx.clearRect(0, 0, width, height);
@@ -53,46 +53,71 @@ export const ResponsiveHeatmapCanvas = ({
     const fieldX = (width - fieldWidth) / 2;
     const fieldY = (height - fieldHeight) / 2;
     
-    // Field background
+    // Enhanced field background with better contrast
     const gradient = ctx.createLinearGradient(fieldX, fieldY, fieldX, fieldY + fieldHeight);
-    gradient.addColorStop(0, '#22c55e');
-    gradient.addColorStop(0.5, '#16a34a');
-    gradient.addColorStop(1, '#15803d');
+    gradient.addColorStop(0, '#166534'); // Darker green for better contrast
+    gradient.addColorStop(0.5, '#15803d');
+    gradient.addColorStop(1, '#14532d'); // Much darker green
     ctx.fillStyle = gradient;
     ctx.fillRect(fieldX, fieldY, fieldWidth, fieldHeight);
     
-    // Field markings
+    // Add field texture pattern for better definition
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+    const stripeWidth = fieldHeight / 20;
+    for (let i = 0; i < fieldHeight; i += stripeWidth * 2) {
+      ctx.fillRect(fieldX, fieldY + i, fieldWidth, stripeWidth);
+    }
+    
+    // Enhanced field markings with better contrast and shadows
     ctx.strokeStyle = '#ffffff';
-    ctx.lineWidth = 3;
+    ctx.lineWidth = 4;
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+    ctx.shadowBlur = 2;
+    ctx.shadowOffsetX = 1;
+    ctx.shadowOffsetY = 1;
     ctx.setLineDash([]);
     
-    // Outer boundary
+    // Outer boundary with double lines for better visibility
     ctx.strokeRect(fieldX, fieldY, fieldWidth, fieldHeight);
+    ctx.lineWidth = 2;
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+    ctx.strokeRect(fieldX - 2, fieldY - 2, fieldWidth + 4, fieldHeight + 4);
     
-    // Center line
+    // Center line with enhanced visibility
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.moveTo(fieldX + fieldWidth / 2, fieldY);
     ctx.lineTo(fieldX + fieldWidth / 2, fieldY + fieldHeight);
     ctx.stroke();
     
-    // Center circle
+    // Center circle with enhanced contrast
     const centerX = fieldX + fieldWidth / 2;
     const centerY = fieldY + fieldHeight / 2;
     const centerRadius = Math.min(fieldWidth, fieldHeight) * 0.08;
+    ctx.lineWidth = 4;
     ctx.beginPath();
     ctx.arc(centerX, centerY, centerRadius, 0, Math.PI * 2);
     ctx.stroke();
     
-    // Center spot
+    // Center spot with better visibility
+    ctx.shadowBlur = 4;
     ctx.beginPath();
-    ctx.arc(centerX, centerY, 3, 0, Math.PI * 2);
+    ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
     ctx.fillStyle = '#ffffff';
     ctx.fill();
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
     
-    // Penalty areas
+    // Penalty areas with enhanced contrast
     const penaltyWidth = fieldWidth * 0.14;
     const penaltyHeight = fieldHeight * 0.35;
     const penaltyY = (fieldHeight - penaltyHeight) / 2 + fieldY;
+    
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 4;
+    ctx.shadowBlur = 2;
     
     // Left penalty area
     ctx.strokeRect(fieldX, penaltyY, penaltyWidth, penaltyHeight);
@@ -100,7 +125,7 @@ export const ResponsiveHeatmapCanvas = ({
     // Right penalty area
     ctx.strokeRect(fieldX + fieldWidth - penaltyWidth, penaltyY, penaltyWidth, penaltyHeight);
     
-    // Goal areas
+    // Goal areas with better definition
     const goalWidth = fieldWidth * 0.05;
     const goalHeight = fieldHeight * 0.18;
     const goalY = (fieldHeight - goalHeight) / 2 + fieldY;
@@ -111,20 +136,33 @@ export const ResponsiveHeatmapCanvas = ({
     // Right goal area
     ctx.strokeRect(fieldX + fieldWidth - goalWidth, goalY, goalWidth, goalHeight);
     
-    // Penalty spots
+    // Enhanced penalty spots with better visibility
     const penaltySpotDistance = fieldWidth * 0.1;
     ctx.fillStyle = '#ffffff';
+    ctx.shadowBlur = 4;
     ctx.beginPath();
-    ctx.arc(fieldX + penaltySpotDistance, centerY, 3, 0, Math.PI * 2);
+    ctx.arc(fieldX + penaltySpotDistance, centerY, 4, 0, Math.PI * 2);
     ctx.fill();
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
     ctx.beginPath();
-    ctx.arc(fieldX + fieldWidth - penaltySpotDistance, centerY, 3, 0, Math.PI * 2);
+    ctx.arc(fieldX + fieldWidth - penaltySpotDistance, centerY, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#ffffff';
     ctx.fill();
+    ctx.stroke();
+    
+    // Reset shadow
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
     
     ctx.restore();
   }, [zoomLevel, panOffset]);
 
-  // Draw heatmap overlay
+  // Draw heatmap overlay with improved contrast and colorblind accessibility
   const drawHeatmap = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
     if (!heatmapData.length) return;
     
@@ -133,35 +171,63 @@ export const ResponsiveHeatmapCanvas = ({
     ctx.scale(zoomLevel, zoomLevel);
     ctx.translate(-width / 2, -height / 2);
     
-    // Create heatmap overlay
+    // Create heatmap overlay with enhanced contrast and colorblind-friendly colors
     heatmapData.forEach(point => {
       const x = point.x * width;
       const y = point.y * height;
-      const radius = Math.max(20, 40 * point.intensity) * zoomLevel;
+      const radius = Math.max(25, 45 * point.intensity) * zoomLevel;
       
-      // Create radial gradient for smooth heat effect
+      // Create radial gradient for smooth heat effect with better contrast
       const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
       
-      // Color based on intensity (blue -> green -> yellow -> red)
+      // Enhanced colorblind-friendly color scheme with better contrast
       if (point.intensity < 0.25) {
-        gradient.addColorStop(0, `rgba(59, 130, 246, ${point.intensity * 0.8})`);
-        gradient.addColorStop(1, 'rgba(59, 130, 246, 0)');
+        // Cool blue for low intensity
+        gradient.addColorStop(0, `rgba(37, 99, 235, ${Math.min(point.intensity * 1.2, 0.9)})`);
+        gradient.addColorStop(0.7, `rgba(37, 99, 235, ${point.intensity * 0.6})`);
+        gradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
       } else if (point.intensity < 0.5) {
-        gradient.addColorStop(0, `rgba(34, 197, 94, ${point.intensity * 0.8})`);
-        gradient.addColorStop(1, 'rgba(34, 197, 94, 0)');
+        // Teal for medium-low intensity
+        gradient.addColorStop(0, `rgba(6, 182, 212, ${Math.min(point.intensity * 1.2, 0.9)})`);
+        gradient.addColorStop(0.7, `rgba(6, 182, 212, ${point.intensity * 0.6})`);
+        gradient.addColorStop(1, 'rgba(6, 182, 212, 0)');
       } else if (point.intensity < 0.75) {
-        gradient.addColorStop(0, `rgba(234, 179, 8, ${point.intensity * 0.8})`);
-        gradient.addColorStop(1, 'rgba(234, 179, 8, 0)');
+        // Orange for medium-high intensity
+        gradient.addColorStop(0, `rgba(251, 146, 60, ${Math.min(point.intensity * 1.2, 0.9)})`);
+        gradient.addColorStop(0.7, `rgba(251, 146, 60, ${point.intensity * 0.6})`);
+        gradient.addColorStop(1, 'rgba(251, 146, 60, 0)');
       } else {
-        gradient.addColorStop(0, `rgba(239, 68, 68, ${point.intensity * 0.8})`);
-        gradient.addColorStop(1, 'rgba(239, 68, 68, 0)');
+        // Red for high intensity
+        gradient.addColorStop(0, `rgba(220, 38, 127, ${Math.min(point.intensity * 1.2, 0.9)})`);
+        gradient.addColorStop(0.7, `rgba(220, 38, 127, ${point.intensity * 0.6})`);
+        gradient.addColorStop(1, 'rgba(220, 38, 127, 0)');
       }
+      
+      // Add subtle shadow for better definition
+      ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
+      ctx.shadowBlur = 3;
       
       ctx.fillStyle = gradient;
       ctx.beginPath();
       ctx.arc(x, y, radius, 0, Math.PI * 2);
       ctx.fill();
+      
+      // Add pattern overlay for colorblind accessibility
+      if (point.intensity > 0.5) {
+        ctx.shadowColor = 'transparent';
+        ctx.strokeStyle = `rgba(255, 255, 255, ${point.intensity * 0.3})`;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.arc(x, y, radius * 0.7, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
     });
+    
+    // Reset shadow
+    ctx.shadowColor = 'transparent';
+    ctx.shadowBlur = 0;
     
     ctx.restore();
   }, [heatmapData, zoomLevel, panOffset]);
@@ -248,7 +314,7 @@ export const ResponsiveHeatmapCanvas = ({
   return (
     <div 
       ref={containerRef}
-      className={`relative bg-gradient-to-br from-green-100 to-emerald-200 dark:from-green-900/30 dark:to-emerald-900/30 border-2 border-green-300/50 dark:border-green-700/50 rounded-2xl overflow-hidden ${className}`}
+      className={`relative bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900 border-2 border-slate-300 dark:border-slate-600 rounded-2xl overflow-hidden shadow-xl ${className}`}
       style={{ 
         aspectRatio: isMobile ? '4/3' : '16/10',
         minHeight: isMobile ? '250px' : '400px',
@@ -269,30 +335,39 @@ export const ResponsiveHeatmapCanvas = ({
         style={{ touchAction: 'none' }}
       />
       
-      {/* Mobile zoom hint */}
+      {/* Enhanced mobile zoom hint with better contrast */}
       {isMobile && (
-        <div className="absolute top-3 right-3 bg-white/95 dark:bg-slate-900/95 text-gray-800 dark:text-gray-200 px-3 py-2 rounded-xl shadow-lg border border-white/30 dark:border-slate-700/30 backdrop-blur-sm">
-          <span className="text-sm font-medium">Pinch to zoom • Drag to pan</span>
+        <div className="absolute top-3 right-3 bg-white/98 dark:bg-slate-900/98 text-slate-900 dark:text-slate-100 px-4 py-3 rounded-xl shadow-lg border-2 border-slate-300 dark:border-slate-600 backdrop-blur-md">
+          <span className="text-sm font-semibold">Pinch to zoom • Drag to pan</span>
         </div>
       )}
       
-      {/* Heat intensity legend */}
-      <div className="absolute bottom-3 left-3 bg-white/95 dark:bg-slate-900/95 rounded-xl p-3 shadow-lg border border-white/30 dark:border-slate-700/30 backdrop-blur-sm">
-        <div className="text-sm font-medium text-gray-900 dark:text-white mb-2">
+      {/* Enhanced heat intensity legend with better contrast and colorblind accessibility */}
+      <div className="absolute bottom-3 left-3 bg-white/98 dark:bg-slate-900/98 rounded-xl p-4 shadow-xl border-2 border-slate-300 dark:border-slate-600 backdrop-blur-md">
+        <div className="text-sm font-bold text-slate-900 dark:text-slate-100 mb-3 flex items-center gap-2">
           Activity Intensity
+          <div className="w-2 h-2 rounded-full bg-slate-400 dark:bg-slate-500"></div>
         </div>
-        <div className="space-y-1">
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-3 bg-gradient-to-r from-blue-500 to-green-500 rounded-sm" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">Low</span>
+        <div className="space-y-2">
+          <div className="flex items-center gap-3">
+            <div className="w-5 h-4 bg-gradient-to-r from-blue-600 to-blue-500 rounded-sm shadow-md border border-blue-300"></div>
+            <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Low</span>
+            <div className="w-3 h-0.5 bg-blue-500 opacity-50"></div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-3 bg-gradient-to-r from-green-500 to-yellow-500 rounded-sm" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">Medium</span>
+          <div className="flex items-center gap-3">
+            <div className="w-5 h-4 bg-gradient-to-r from-cyan-600 to-cyan-500 rounded-sm shadow-md border border-cyan-300"></div>
+            <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Medium</span>
+            <div className="w-3 h-0.5 bg-cyan-500 opacity-50"></div>
           </div>
-          <div className="flex items-center gap-2">
-            <div className="w-4 h-3 bg-gradient-to-r from-orange-500 to-red-500 rounded-sm" />
-            <span className="text-xs text-gray-600 dark:text-gray-400">High</span>
+          <div className="flex items-center gap-3">
+            <div className="w-5 h-4 bg-gradient-to-r from-orange-600 to-orange-500 rounded-sm shadow-md border border-orange-300"></div>
+            <span className="text-xs font-medium text-slate-700 dark:text-slate-300">High</span>
+            <div className="w-3 h-0.5 bg-orange-500 opacity-50"></div>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-5 h-4 bg-gradient-to-r from-pink-600 to-pink-500 rounded-sm shadow-md border border-pink-300"></div>
+            <span className="text-xs font-medium text-slate-700 dark:text-slate-300">Peak</span>
+            <div className="w-3 h-0.5 bg-pink-500 opacity-50 animate-pulse"></div>
           </div>
         </div>
       </div>
