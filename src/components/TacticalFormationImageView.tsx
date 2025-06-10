@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -23,6 +22,8 @@ interface TacticalFormationImageViewProps {
   onImageRetry?: () => void;
   className?: string;
 }
+
+const SUPABASE_URL = "https://qtsrymkdgpzaiobvsobb.supabase.co";
 
 export const TacticalFormationImageView = ({
   matchId,
@@ -104,7 +105,7 @@ export const TacticalFormationImageView = ({
           id: file.name,
           title: `Tactical Analysis ${index + 1}`,
           description: file.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, ' '),
-          imageUrl: `${supabase.supabaseUrl}/storage/v1/object/public/tactical-analysis/match-${matchId}/${file.name}`,
+          imageUrl: `${SUPABASE_URL}/storage/v1/object/public/tactical-analysis/match-${matchId}/${file.name}`,
           type: file.name.includes('formation') ? 'formation' : 
                 file.name.includes('heatmap') ? 'heatmap' : 'analysis',
           timestamp: `${Math.floor(index * 15)}:00`
