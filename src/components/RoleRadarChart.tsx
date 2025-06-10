@@ -14,14 +14,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/ui/button";
+import { ChartContainer } from "@/components/ui/chart";
 import { PlayerAttributes, PositionalAverage } from "@/hooks/use-player-attributes";
 import { Player } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useResponsiveBreakpoint } from "@/hooks/use-orientation";
-import { useHapticFeedback } from "@/hooks/use-haptic-feedback";
-import { BarChart3, Radar as RadarIcon, ChevronLeft, ChevronRight } from "lucide-react";
-import { Skeleton } from "@/components/ui/skeleton";
 
 interface RoleRadarChartProps {
   player: Player | null;
@@ -39,11 +36,8 @@ export const RoleRadarChart = ({
   error
 }: RoleRadarChartProps) => {
   const [showBenchmark, setShowBenchmark] = useState(true);
-  const [showSimplified, setShowSimplified] = useState(false);
-  const [selectedAttribute, setSelectedAttribute] = useState<number | null>(null);
   const isMobile = useIsMobile();
   const breakpoint = useResponsiveBreakpoint();
-  const { triggerHaptic } = useHapticFeedback();
 
   const chartData = useMemo(() => {
     if (!attributes) return [];
@@ -103,114 +97,57 @@ export const RoleRadarChart = ({
                 positionalAverage.work_rate_attacking) / 5) 
     : 0;
 
-  // Enhanced simplified mobile view with swipe navigation
-  const SimplifiedRadarView = () => (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-xl">
-        <h3 className="text-lg font-medium flex items-center gap-2">
-          <BarChart3 className="h-5 w-5" />
-          Player Analysis
-        </h3>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => {
-            triggerHaptic('selection');
-            setShowSimplified(false);
-          }}
-          className="text-sm bg-white/10 backdrop-blur-sm"
-        >
-          Show Radar
-        </Button>
-      </div>
+  // Responsive chart configuration
+  const getChartConfig = () => {
+    if (breakpoint === 'mobile') {
+      return {
+        outerRadius: "75%",
+        fontSize: 10,
+        margin: { top: 10, right: 10, bottom: 10, left: 10 }
+      };
+    }
+    if (breakpoint === 'tablet-portrait' || breakpoint === 'tablet-landscape') {
+      return {
+        outerRadius: "80%",
+        fontSize: 11,
+        margin: { top: 15, right: 15, bottom: 15, left: 15 }
+      };
+    }
+    return {
+      outerRadius: "80%",
+      fontSize: 12,
+      margin: { top: 20, right: 20, bottom: 20, left: 20 }
+    };
+  };
 
-      {/* Swipeable attribute cards */}
-      <div className="space-y-3">
-        {chartData.map((item, index) => (
-          <Card 
-            key={index} 
-            className={`transition-all duration-300 active:scale-95 ${
-              selectedAttribute === index ? 'bg-primary/10 border-primary/40' : 'bg-card/80 border-primary/20'
-            }`}
-            onClick={() => {
-              triggerHaptic('light');
-              setSelectedAttribute(selectedAttribute === index ? null : index);
-            }}
-          >
-            <CardContent className="p-4">
-              <div className="flex justify-between items-center mb-3">
-                <span className="font-medium text-lg">{item.attribute}</span>
-                <span className="text-2xl font-bold text-primary">{item.player}</span>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="w-full bg-muted rounded-full h-3 overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-primary to-primary/80 h-3 rounded-full transition-all duration-500 ease-out" 
-                    style={{ width: `${item.player}%` }}
-                  />
-                </div>
-                
-                {showBenchmark && (
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Avg: {item.average}</span>
-                    <span className={`font-medium ${
-                      item.player > item.average ? 'text-green-600' : 'text-orange-600'
-                    }`}>
-                      {item.player > item.average ? '+' : ''}{item.player - item.average}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Overall score card */}
-      <Card className="bg-gradient-to-r from-primary/10 to-primary/5 border-primary/20">
-        <CardContent className="p-4 text-center">
-          <h4 className="text-lg font-medium mb-2">Overall Score</h4>
-          <div className="text-4xl font-bold text-primary mb-2">{playerScore}/100</div>
-          {showBenchmark && (
-            <p className="text-sm text-muted-foreground">
-              Position average: {averageScore}/100
-            </p>
-          )}
-        </CardContent>
-      </Card>
-    </div>
-  );
+  const chartConfig = getChartConfig();
 
   if (loading) {
     return (
-      <Card className="border-primary/20 bg-gradient-to-br from-background to-background/80">
+      <Card className="border-club-gold/20 bg-club-dark-gray">
         <CardHeader>
-          <Skeleton className="h-6 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
+          <CardTitle className="text-club-gold text-sm sm:text-base lg:text-lg">
+            Player Role Suitability: Striker
+          </CardTitle>
+          <CardDescription className="text-xs sm:text-sm">
+            Loading player attributes...
+          </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
-          <Skeleton className="h-64 w-full rounded-xl" />
-          <div className="grid grid-cols-2 gap-4">
-            <Skeleton className="h-20 rounded-lg" />
-            <Skeleton className="h-20 rounded-lg" />
-          </div>
-        </CardContent>
       </Card>
     );
   }
 
   if (error) {
     return (
-      <Card className="border-primary/20 bg-gradient-to-br from-background to-background/80">
+      <Card className="border-club-gold/20 bg-club-dark-gray">
         <CardHeader>
-          <CardTitle className="text-primary text-lg">
+          <CardTitle className="text-club-gold text-sm sm:text-base lg:text-lg">
             Player Role Suitability: Striker
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Alert variant="destructive" className="bg-destructive/10 border-destructive/20">
-            <AlertDescription>{error}</AlertDescription>
+          <Alert variant="destructive">
+            <AlertDescription className="text-xs sm:text-sm">{error}</AlertDescription>
           </Alert>
         </CardContent>
       </Card>
@@ -219,15 +156,15 @@ export const RoleRadarChart = ({
 
   if (!attributes) {
     return (
-      <Card className="border-primary/20 bg-gradient-to-br from-background to-background/80">
+      <Card className="border-club-gold/20 bg-club-dark-gray">
         <CardHeader>
-          <CardTitle className="text-primary text-lg">
+          <CardTitle className="text-club-gold text-sm sm:text-base lg:text-lg">
             Player Role Suitability: Striker
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Alert className="bg-primary/10 border-primary/20">
-            <AlertDescription>
+          <Alert className="bg-club-gold/10 border-club-gold/30">
+            <AlertDescription className="text-xs sm:text-sm">
               No attribute data available for {player?.name || 'this player'}
             </AlertDescription>
           </Alert>
@@ -236,209 +173,157 @@ export const RoleRadarChart = ({
     );
   }
 
-  if (isMobile && showSimplified) {
-    return (
-      <Card className="border-primary/20 bg-gradient-to-br from-background to-background/80">
-        <CardContent className="p-4">
-          <SimplifiedRadarView />
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
-    <Card className="border-primary/20 bg-gradient-to-br from-background to-background/80 overflow-hidden">
-      <CardHeader className="pb-3 p-4">
+    <Card className="border-club-gold/20 bg-club-dark-gray">
+      <CardHeader className="pb-2 p-3 sm:p-4 lg:p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="min-w-0">
-            <CardTitle className="text-primary text-lg lg:text-xl">
+            <CardTitle className="text-club-gold text-sm sm:text-base lg:text-lg">
               Player Role Suitability: Striker
             </CardTitle>
-            <CardDescription>
+            <CardDescription className="text-xs sm:text-sm">
               Performance metrics for striker position
             </CardDescription>
           </div>
-          <div className="flex items-center justify-between gap-3">
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  triggerHaptic('selection');
-                  setShowSimplified(true);
-                }}
-                className="text-sm flex items-center gap-2 bg-white/10 backdrop-blur-sm"
-              >
-                <BarChart3 className="h-4 w-4" />
-                List View
-              </Button>
-            )}
-            <div className="flex items-center space-x-2">
-              <Switch 
-                id="show-benchmark" 
-                checked={showBenchmark} 
-                onCheckedChange={(checked) => {
-                  triggerHaptic('light');
-                  setShowBenchmark(checked);
-                }}
-              />
-              <Label htmlFor="show-benchmark" className="text-sm whitespace-nowrap">
-                Show Average
-              </Label>
-            </div>
+          <div className="flex items-center space-x-2 flex-shrink-0">
+            <Switch 
+              id="show-benchmark" 
+              checked={showBenchmark} 
+              onCheckedChange={setShowBenchmark} 
+            />
+            <Label htmlFor="show-benchmark" className="text-xs sm:text-sm whitespace-nowrap">
+              Show Average
+            </Label>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
-        <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-3'}`}>
-          <div className={isMobile ? 'order-2' : 'lg:col-span-2'}>
-            <div 
-              className="w-full rounded-xl bg-gradient-to-br from-card/50 to-card/30 backdrop-blur-sm p-4 border border-primary/10"
-              style={{
-                height: isMobile ? '320px' : '380px',
-                minHeight: isMobile ? '280px' : '320px'
+      <CardContent className="p-3 sm:p-4 lg:p-6 pt-0">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+          <div className="lg:col-span-2">
+            <ChartContainer
+              config={{
+                player: { color: "#f97316" },
+                average: { color: "#16a34a" }
               }}
+              aspectRatio={isMobile ? 1 : (4/3)}
+              minHeight={isMobile ? 250 : 300}
             >
-              <ResponsiveContainer width="100%" height="100%">
-                <RadarChart
-                  cx="50%"
-                  cy="50%"
-                  outerRadius="75%"
-                  data={chartData}
-                  margin={{ 
-                    top: isMobile ? 15 : 25, 
-                    right: isMobile ? 15 : 25, 
-                    bottom: isMobile ? 15 : 25, 
-                    left: isMobile ? 15 : 25 
-                  }}
-                >
-                  <PolarGrid 
-                    stroke="rgba(212, 175, 55, 0.2)" 
-                    strokeWidth={1}
-                    radialLines={true}
-                  />
-                  <PolarAngleAxis 
-                    dataKey="attribute" 
-                    stroke="rgba(255, 255, 255, 0.8)" 
-                    fontSize={isMobile ? 11 : 13}
-                    tick={{ 
-                      fontSize: isMobile ? 11 : 13,
-                      fontWeight: 500 
-                    }}
-                  />
-                  <PolarRadiusAxis 
-                    angle={30} 
-                    domain={[0, 100]} 
-                    stroke="rgba(212, 175, 55, 0.3)" 
-                    fontSize={isMobile ? 10 : 12}
-                    tick={{ 
-                      fontSize: isMobile ? 10 : 12,
-                      fill: "rgba(255, 255, 255, 0.6)"
-                    }}
-                    tickCount={isMobile ? 3 : 5}
-                  />
+              <RadarChart
+                cx="50%"
+                cy="50%"
+                outerRadius={chartConfig.outerRadius}
+                data={chartData}
+                margin={chartConfig.margin}
+              >
+                <PolarGrid 
+                  stroke="#444" 
+                  strokeWidth={isMobile ? 0.5 : 1}
+                />
+                <PolarAngleAxis 
+                  dataKey="attribute" 
+                  stroke="#CCC" 
+                  fontSize={chartConfig.fontSize}
+                  tick={{ fontSize: chartConfig.fontSize }}
+                />
+                <PolarRadiusAxis 
+                  angle={30} 
+                  domain={[0, 100]} 
+                  stroke="#666" 
+                  fontSize={chartConfig.fontSize - 1}
+                  tick={{ fontSize: chartConfig.fontSize - 1 }}
+                  tickCount={isMobile ? 3 : 5}
+                />
 
+                <Radar
+                  name={player?.name || "Player"}
+                  dataKey="player"
+                  stroke="#f97316"
+                  fill="#f97316"
+                  fillOpacity={0.5}
+                  strokeWidth={isMobile ? 1.5 : 2}
+                />
+
+                {showBenchmark && positionalAverage && (
                   <Radar
-                    name={player?.name || "Player"}
-                    dataKey="player"
-                    stroke="#D4AF37"
-                    fill="rgba(212, 175, 55, 0.2)"
-                    fillOpacity={0.6}
-                    strokeWidth={2.5}
-                    dot={{ fill: "#D4AF37", strokeWidth: 2, r: 4 }}
+                    name="Position Average"
+                    dataKey="average"
+                    stroke="#16a34a"
+                    fill="#16a34a"
+                    fillOpacity={0.3}
+                    strokeWidth={isMobile ? 1.5 : 2}
                   />
+                )}
 
-                  {showBenchmark && positionalAverage && (
-                    <Radar
-                      name="Position Average"
-                      dataKey="average"
-                      stroke="rgba(59, 130, 246, 0.8)"
-                      fill="rgba(59, 130, 246, 0.1)"
-                      fillOpacity={0.4}
-                      strokeWidth={2}
-                      strokeDasharray="5,5"
-                      dot={{ fill: "rgba(59, 130, 246, 0.8)", strokeWidth: 1, r: 3 }}
-                    />
-                  )}
-
-                  {!isMobile && <Legend wrapperStyle={{ paddingTop: '20px' }} />}
-                  <Tooltip 
-                    contentStyle={{
-                      backgroundColor: 'rgba(0, 0, 0, 0.9)',
-                      border: '1px solid rgba(212, 175, 55, 0.3)',
-                      borderRadius: '12px',
-                      fontSize: isMobile ? '12px' : '14px',
-                      backdropFilter: 'blur(10px)',
-                      boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3)'
-                    }}
-                    labelStyle={{ color: '#D4AF37', fontWeight: 'bold' }}
-                  />
-                </RadarChart>
-              </ResponsiveContainer>
-            </div>
+                {!isMobile && <Legend />}
+                <Tooltip 
+                  contentStyle={{
+                    backgroundColor: '#1A1A1A',
+                    border: '1px solid #D4AF37',
+                    borderRadius: '8px',
+                    fontSize: isMobile ? '10px' : '12px'
+                  }}
+                />
+              </RadarChart>
+            </ChartContainer>
           </div>
-          
-          <div className={`space-y-4 ${isMobile ? 'order-1' : ''}`}>
-            <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
-              <CardContent className="p-4">
-                <h3 className="text-primary text-lg font-bold mb-4">
-                  Role Fit Score
-                </h3>
-                <div className="space-y-4">
+          <div className="space-y-4">
+            <div className="bg-club-black/30 p-3 sm:p-4 rounded-lg">
+              <h3 className="text-club-gold text-sm sm:text-base lg:text-lg font-bold mb-3">
+                Role Fit Score
+              </h3>
+              <div className="space-y-3 sm:space-y-4">
+                <div>
+                  <div className="flex justify-between text-xs sm:text-sm mb-1">
+                    <span className="truncate pr-2">{player?.name || "Player"}</span>
+                    <span className="font-semibold flex-shrink-0">{playerScore}/100</span>
+                  </div>
+                  <div className="w-full bg-club-black/60 rounded-full h-2">
+                    <div 
+                      className="bg-club-gold h-2 rounded-full transition-all duration-300" 
+                      style={{ width: `${playerScore}%` }}
+                    />
+                  </div>
+                </div>
+                {showBenchmark && (
                   <div>
-                    <div className="flex justify-between text-sm mb-2">
-                      <span className="truncate pr-2 font-medium">{player?.name || "Player"}</span>
-                      <span className="font-bold text-lg text-primary">{playerScore}/100</span>
+                    <div className="flex justify-between text-xs sm:text-sm mb-1">
+                      <span>Position Average</span>
+                      <span className="font-semibold">{averageScore}/100</span>
                     </div>
-                    <div className="w-full bg-black/20 rounded-full h-3 overflow-hidden">
+                    <div className="w-full bg-club-black/60 rounded-full h-2">
                       <div 
-                        className="bg-gradient-to-r from-primary to-primary/80 h-3 rounded-full transition-all duration-700 ease-out" 
-                        style={{ width: `${playerScore}%` }}
+                        className="bg-green-600 h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${averageScore}%` }}
                       />
                     </div>
                   </div>
-                  {showBenchmark && (
-                    <div>
-                      <div className="flex justify-between text-sm mb-2">
-                        <span className="font-medium">Position Average</span>
-                        <span className="font-bold text-blue-400">{averageScore}/100</span>
-                      </div>
-                      <div className="w-full bg-black/20 rounded-full h-3 overflow-hidden">
-                        <div 
-                          className="bg-gradient-to-r from-blue-500 to-blue-400 h-3 rounded-full transition-all duration-700 ease-out" 
-                          style={{ width: `${averageScore}%` }}
-                        />
-                      </div>
-                    </div>
-                  )}
-                </div>
-                
-                <div className="mt-6 pt-4 border-t border-primary/20">
-                  <h4 className="text-primary font-semibold mb-3 text-sm">
-                    Key Strengths
-                  </h4>
-                  <ul className="space-y-2">
-                    {chartData
-                      .filter(item => item.player > (showBenchmark ? item.average : 70))
-                      .slice(0, 3)
-                      .map((item, i) => (
-                        <li key={i} className="flex items-center text-sm">
-                          <span className="inline-block w-2 h-2 rounded-full bg-gradient-to-r from-primary to-primary/80 mr-3 flex-shrink-0" />
-                          <span className="truncate">
-                            {item.attribute} ({item.player})
-                          </span>
-                        </li>
-                      ))
-                    }
-                    {chartData.filter(item => item.player > (showBenchmark ? item.average : 70)).length === 0 && (
-                      <li className="text-muted-foreground text-sm">
-                        Focus on skill development
+                )}
+              </div>
+              <div className="mt-4 pt-3 border-t border-club-gold/20">
+                <h4 className="text-club-gold font-semibold mb-2 text-xs sm:text-sm">
+                  Key Strengths
+                </h4>
+                <ul className="text-xs space-y-1">
+                  {chartData
+                    .filter(item => item.player > (showBenchmark ? item.average : 70))
+                    .slice(0, 3)
+                    .map((item, i) => (
+                      <li key={i} className="flex items-center">
+                        <span className="inline-block w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-full bg-club-gold mr-2 flex-shrink-0" />
+                        <span className="truncate">
+                          {item.attribute} ({item.player})
+                        </span>
                       </li>
-                    )}
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
+                    ))
+                  }
+                  {chartData.filter(item => item.player > (showBenchmark ? item.average : 70)).length === 0 && (
+                    <li className="text-club-light-gray/70 text-xs">
+                      No significant strengths identified
+                    </li>
+                  )}
+                </ul>
+              </div>
+            </div>
           </div>
         </div>
       </CardContent>

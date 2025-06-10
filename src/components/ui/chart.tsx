@@ -46,7 +46,7 @@ const ChartContainer = React.forwardRef<
   const uniqueId = React.useId()
   const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
 
-  // Enhanced responsive aspect ratio based on screen size
+  // Responsive aspect ratio based on screen size
   const getAspectRatio = () => {
     if (typeof window === 'undefined') return aspectRatio || (16/9);
     
@@ -57,7 +57,7 @@ const ChartContainer = React.forwardRef<
     return aspectRatio || (16/9); // Widescreen on desktop
   };
 
-  // Enhanced responsive min height based on screen size
+  // Responsive min height based on screen size
   const getMinHeight = () => {
     if (minHeight) return minHeight;
     if (typeof window === 'undefined') return 200;
@@ -76,12 +76,9 @@ const ChartContainer = React.forwardRef<
         ref={ref}
         className={cn(
           "flex justify-center text-xs [&_.recharts-cartesian-axis-tick_text]:fill-muted-foreground [&_.recharts-cartesian-grid_line[stroke='#ccc']]:stroke-border/50 [&_.recharts-curve.recharts-tooltip-cursor]:stroke-border [&_.recharts-dot[stroke='#fff']]:stroke-transparent [&_.recharts-layer]:outline-none [&_.recharts-polar-grid_[stroke='#ccc']]:stroke-border [&_.recharts-radial-bar-background-sector]:fill-muted [&_.recharts-rectangle.recharts-tooltip-cursor]:fill-muted [&_.recharts-reference-line_[stroke='#ccc']]:stroke-border [&_.recharts-sector[stroke='#fff']]:stroke-transparent [&_.recharts-sector]:outline-none [&_.recharts-surface]:outline-none",
-          // Enhanced responsive container classes
+          // Responsive container classes
           "w-full transition-all duration-300 ease-in-out",
           "container-type-inline-size", // Enable container queries
-          // Touch-friendly adjustments
-          "[&_.recharts-dot]:cursor-pointer [&_.recharts-dot]:min-w-[44px] [&_.recharts-dot]:min-h-[44px]",
-          "[&_.recharts-legend-item]:cursor-pointer [&_.recharts-legend-item]:min-h-[44px]",
           className
         )}
         style={{
@@ -214,10 +211,9 @@ const ChartTooltipContent = React.forwardRef<
         ref={ref}
         className={cn(
           "grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg-background px-2.5 py-1.5 text-xs shadow-xl",
-          // Enhanced responsive tooltip sizing with touch-friendly dimensions
+          // Responsive tooltip sizing
           "max-w-[200px] sm:max-w-[250px] lg:max-w-[300px]",
           "text-xs sm:text-sm",
-          "min-h-[44px] touch-manipulation", // Touch-friendly minimum height
           className
         )}
       >
@@ -233,8 +229,7 @@ const ChartTooltipContent = React.forwardRef<
                 key={item.dataKey}
                 className={cn(
                   "flex w-full flex-wrap items-stretch gap-2 [&>svg]:h-2.5 [&>svg]:w-2.5 [&>svg]:text-muted-foreground",
-                  indicator === "dot" && "items-center",
-                  "min-h-[44px] touch-manipulation" // Touch-friendly row height
+                  indicator === "dot" && "items-center"
                 )}
               >
                 {formatter && item?.value !== undefined && item.name ? (
@@ -321,11 +316,10 @@ const ChartLegendContent = React.forwardRef<
         className={cn(
           "flex items-center justify-center gap-4",
           verticalAlign === "top" ? "pb-3" : "pt-3",
-          // Enhanced responsive legend spacing with touch-friendly sizing
+          // Responsive legend spacing
           "gap-2 sm:gap-3 lg:gap-4",
           "text-xs sm:text-sm",
           "flex-wrap", // Allow wrapping on small screens
-          "min-h-[44px] touch-manipulation", // Touch-friendly minimum height
           className
         )}
       >
@@ -338,9 +332,8 @@ const ChartLegendContent = React.forwardRef<
               key={item.value}
               className={cn(
                 "flex items-center gap-1.5 [&>svg]:h-3 [&>svg]:w-3 [&>svg]:text-muted-foreground",
-                // Enhanced responsive icon sizing with touch-friendly dimensions
-                "[&>svg]:h-2 [&>svg]:w-2 sm:[&>svg]:h-3 sm:[&>svg]:w-3",
-                "min-h-[44px] touch-manipulation cursor-pointer" // Touch-friendly item
+                // Responsive icon sizing
+                "[&>svg]:h-2 [&>svg]:w-2 sm:[&>svg]:h-3 sm:[&>svg]:w-3"
               )}
             >
               {itemConfig?.icon && !hideIcon ? (

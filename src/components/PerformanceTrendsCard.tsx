@@ -28,8 +28,7 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useResponsiveBreakpoint } from "@/hooks/use-orientation";
-import { Monitor, TrendingUp, BarChart3 } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Monitor } from "lucide-react";
 
 interface PerformanceTrendsCardProps {
   player: Player;
@@ -75,7 +74,7 @@ const generateMatchData = (player: Player, kpi: string, numMatches: number) => {
     matchDate.setDate(matchDate.getDate() - (i * 7));
     
     return {
-      match: `M${numMatches - i}`,
+      match: `Match ${numMatches - i}`,
       date: matchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
       value: roundedValue,
     };
@@ -103,7 +102,6 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
   const [selectedKPI, setSelectedKPI] = useState("distance");
   const [selectedTimePeriod, setSelectedTimePeriod] = useState("last5");
   const [showMovingAverage, setShowMovingAverage] = useState(false);
-  const [showSimplified, setShowSimplified] = useState(false);
   const isMobile = useIsMobile();
   const breakpoint = useResponsiveBreakpoint();
   
@@ -133,78 +131,11 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
       : rawData;
   }, [player, selectedKPI, selectedTimePeriod, showMovingAverage]);
 
-  // Simplified mobile view
-  const SimplifiedTrendsView = () => {
-    const latest = matchData[matchData.length - 1];
-    const previous = matchData[matchData.length - 2];
-    const trend = latest && previous ? 
-      ((latest.value - previous.value) / previous.value * 100) : 0;
-    
-    const average = matchData.reduce((sum, d) => sum + d.value, 0) / matchData.length;
-    const highest = Math.max(...matchData.map(d => d.value));
-    const lowest = Math.min(...matchData.map(d => d.value));
-
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-sm font-medium flex items-center gap-2">
-            <TrendingUp className="h-4 w-4" />
-            Performance Summary
-          </h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowSimplified(false)}
-            className="text-xs"
-          >
-            Show Chart
-          </Button>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-card p-3 rounded-lg border text-center">
-            <p className="text-lg font-bold text-primary">{latest?.value}</p>
-            <p className="text-xs text-muted-foreground">Latest</p>
-            {trend !== 0 && (
-              <p className={`text-xs ${trend > 0 ? 'text-green-600' : 'text-red-600'}`}>
-                {trend > 0 ? '+' : ''}{trend.toFixed(1)}%
-              </p>
-            )}
-          </div>
-          <div className="bg-card p-3 rounded-lg border text-center">
-            <p className="text-lg font-bold text-blue-600">{average.toFixed(1)}</p>
-            <p className="text-xs text-muted-foreground">Average</p>
-          </div>
-          <div className="bg-card p-3 rounded-lg border text-center">
-            <p className="text-lg font-bold text-green-600">{highest}</p>
-            <p className="text-xs text-muted-foreground">Best</p>
-          </div>
-          <div className="bg-card p-3 rounded-lg border text-center">
-            <p className="text-lg font-bold text-orange-600">{lowest}</p>
-            <p className="text-xs text-muted-foreground">Lowest</p>
-          </div>
-        </div>
-
-        <div className="space-y-2">
-          <Label className="text-xs text-muted-foreground">Recent Matches</Label>
-          <div className="space-y-2">
-            {matchData.slice(-3).reverse().map((match, index) => (
-              <div key={index} className="flex justify-between items-center">
-                <span className="text-sm">{match.match}</span>
-                <span className="text-sm font-medium">{match.value}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
   // Responsive chart configuration
   const getChartConfig = () => {
     if (breakpoint === 'mobile') {
       return {
-        height: showSimplified ? 150 : 220,
+        height: 220,
         fontSize: 9,
         strokeWidth: 1.5,
         dotRadius: 2,
@@ -244,29 +175,20 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
 
   const chartConfig = getChartConfig();
 
-  if (isMobile && showSimplified) {
-    return (
-      <Card className="bg-club-dark-bg border-club-gold/20 w-full">
-        <CardContent className="p-4">
-          <SimplifiedTrendsView />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // If screen is too small, show simplified view by default
+  // If screen is too small, show message to use larger screen
   if (isVerySmallScreen) {
     return (
       <Card className="bg-club-dark-bg border-club-gold/20 w-full">
-        <CardContent className="p-4">
+        <CardContent className="p-4 sm:p-6">
           <div className="flex flex-col items-center justify-center text-center space-y-4 min-h-[200px]">
-            <Monitor className="w-10 h-10 text-club-gold/60" />
+            <Monitor className="w-10 h-10 sm:w-12 sm:h-12 text-club-gold/60" />
             <div className="space-y-2">
-              <h3 className="text-base font-semibold text-club-light-gray">
+              <h3 className="text-base sm:text-lg font-semibold text-club-light-gray">
                 Screen Too Small
               </h3>
-              <p className="text-xs text-club-light-gray/70 max-w-sm">
-                Please use a larger screen or rotate your device for optimal chart viewing.
+              <p className="text-xs sm:text-sm text-club-light-gray/70 max-w-sm">
+                Please use a larger screen or rotate your device for optimal chart viewing. 
+                The performance trends chart requires at least 480px width for proper display.
               </p>
             </div>
           </div>
@@ -279,23 +201,9 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
     <Card className="bg-club-dark-bg border-club-gold/20 w-full">
       <CardHeader className="p-3 sm:p-4 lg:p-6 pb-2 sm:pb-3">
         <div className="space-y-3 sm:space-y-4">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-club-light-gray text-sm sm:text-base lg:text-lg xl:text-xl font-semibold">
-              {player.name}'s Performance Trend
-            </CardTitle>
-            
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setShowSimplified(true)}
-                className="text-xs flex items-center gap-2"
-              >
-                <BarChart3 className="h-4 w-4" />
-                Summary
-              </Button>
-            )}
-          </div>
+          <CardTitle className="text-club-light-gray text-sm sm:text-base lg:text-lg xl:text-xl font-semibold">
+            {player.name}'s Performance Trend
+          </CardTitle>
           
           <div className="space-y-3 sm:space-y-4">
             {/* Controls Container */}
@@ -358,81 +266,93 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
       </CardHeader>
       
       <CardContent className="p-3 sm:p-4 lg:p-6 pt-1 sm:pt-2">
-        <div className="w-full rounded-lg bg-club-black/30 p-2 sm:p-3 lg:p-4 overflow-hidden">
-          <div className="w-full" style={{ height: `${chartConfig.height}px` }}>
-            <ResponsiveContainer width="100%" height="100%">
-              <RechartsLineChart
-                data={matchData}
-                margin={chartConfig.margin}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#333" opacity={0.3} />
-                <XAxis 
-                  dataKey="match" 
-                  stroke="#9CA3AF"
-                  tick={{ fill: '#9CA3AF', fontSize: chartConfig.fontSize }}
-                  tickLine={{ stroke: '#9CA3AF' }}
-                  axisLine={{ stroke: '#9CA3AF' }}
-                  angle={isMobile ? -45 : 0}
-                  textAnchor={isMobile ? "end" : "middle"}
-                  height={chartConfig.margin.bottom}
-                  interval={isMobile ? 'preserveStartEnd' : 0}
+        <div className="w-full rounded-lg bg-club-black/30 p-2 sm:p-3 lg:p-4">
+          <ChartContainer 
+            config={{
+              value: { color: "#D4AF37" },
+              average: { color: "#9CA3AF" }
+            }}
+            aspectRatio={breakpoint === 'mobile' ? (4/3) : (16/10)}
+            minHeight={chartConfig.height}
+          >
+            <RechartsLineChart
+              data={matchData}
+              margin={chartConfig.margin}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#333" opacity={0.3} />
+              <XAxis 
+                dataKey="match" 
+                stroke="#9CA3AF"
+                tick={{ fill: '#9CA3AF', fontSize: chartConfig.fontSize }}
+                tickLine={{ stroke: '#9CA3AF' }}
+                axisLine={{ stroke: '#9CA3AF' }}
+                angle={-45}
+                textAnchor="end"
+                height={chartConfig.margin.bottom}
+                interval={breakpoint === 'mobile' ? 'preserveStartEnd' : 0}
+              />
+              <YAxis 
+                stroke="#9CA3AF"
+                tick={{ fill: '#9CA3AF', fontSize: chartConfig.fontSize }}
+                tickLine={{ stroke: '#9CA3AF' }}
+                axisLine={{ stroke: '#9CA3AF' }}
+                label={!isMobile ? { 
+                  value: selectedKPILabel, 
+                  angle: -90, 
+                  position: 'insideLeft', 
+                  style: { textAnchor: 'middle' }, 
+                  fill: '#9CA3AF',
+                  fontSize: chartConfig.fontSize
+                } : undefined}
+              />
+              <Tooltip 
+                content={({ active, payload }) => {
+                  if (active && payload && payload.length) {
+                    return (
+                      <div className="bg-club-black/95 p-2 sm:p-3 border border-club-gold/30 rounded-lg shadow-lg text-club-light-gray backdrop-blur-sm max-w-[200px]">
+                        <p className="font-semibold text-club-gold text-xs sm:text-sm">{payload[0].payload.match}</p>
+                        <p className="text-club-light-gray/80 text-xs mb-1">{payload[0].payload.date}</p>
+                        <p className="text-club-gold font-medium text-xs sm:text-sm">{selectedKPILabel}: {payload[0].value}</p>
+                        {showMovingAverage && payload[0].payload.movingAvg !== null && (
+                          <p className="text-gray-400 text-xs">3-Match Avg: {payload[0].payload.movingAvg}</p>
+                        )}
+                      </div>
+                    );
+                  }
+                  return null;
+                }}
+              />
+              {!isMobile && (
+                <Legend 
+                  verticalAlign="top" 
+                  height={36} 
+                  formatter={(value) => (
+                    <span style={{ color: "#9CA3AF", fontSize: `${chartConfig.fontSize}px` }}>{value}</span>
+                  )}
                 />
-                <YAxis 
-                  stroke="#9CA3AF"
-                  tick={{ fill: '#9CA3AF', fontSize: chartConfig.fontSize }}
-                  tickLine={{ stroke: '#9CA3AF' }}
-                  axisLine={{ stroke: '#9CA3AF' }}
-                  width={isMobile ? 35 : 50}
-                />
-                <Tooltip 
-                  content={({ active, payload }) => {
-                    if (active && payload && payload.length) {
-                      return (
-                        <div className="bg-club-black/95 p-2 sm:p-3 border border-club-gold/30 rounded-lg shadow-lg text-club-light-gray backdrop-blur-sm max-w-[200px]">
-                          <p className="font-semibold text-club-gold text-xs sm:text-sm">{payload[0].payload.match}</p>
-                          <p className="text-club-light-gray/80 text-xs mb-1">{payload[0].payload.date}</p>
-                          <p className="text-club-gold font-medium text-xs sm:text-sm">{selectedKPILabel}: {payload[0].value}</p>
-                          {showMovingAverage && payload[0].payload.movingAvg !== null && (
-                            <p className="text-gray-400 text-xs">3-Match Avg: {payload[0].payload.movingAvg}</p>
-                          )}
-                        </div>
-                      );
-                    }
-                    return null;
-                  }}
-                />
-                {!isMobile && (
-                  <Legend 
-                    verticalAlign="top" 
-                    height={36} 
-                    formatter={(value) => (
-                      <span style={{ color: "#9CA3AF", fontSize: `${chartConfig.fontSize}px` }}>{value}</span>
-                    )}
-                  />
-                )}
+              )}
+              <Line
+                type="monotone"
+                dataKey="value"
+                name={selectedKPILabel}
+                stroke="#D4AF37"
+                strokeWidth={chartConfig.strokeWidth}
+                dot={{ r: chartConfig.dotRadius, strokeWidth: 2, fill: "#D4AF37" }}
+                activeDot={{ r: chartConfig.activeDotRadius, strokeWidth: 2, fill: "#D4AF37" }}
+              />
+              {showMovingAverage && !isMobile && (
                 <Line
                   type="monotone"
-                  dataKey="value"
-                  name={selectedKPILabel}
-                  stroke="#D4AF37"
+                  dataKey="movingAvg"
+                  name="3-Match Average"
+                  stroke="#9CA3AF"
+                  strokeDasharray="5 5"
                   strokeWidth={chartConfig.strokeWidth}
-                  dot={{ r: chartConfig.dotRadius, strokeWidth: 2, fill: "#D4AF37" }}
-                  activeDot={{ r: chartConfig.activeDotRadius, strokeWidth: 2, fill: "#D4AF37" }}
+                  dot={false}
                 />
-                {showMovingAverage && !isMobile && (
-                  <Line
-                    type="monotone"
-                    dataKey="movingAvg"
-                    name="3-Match Average"
-                    stroke="#9CA3AF"
-                    strokeDasharray="5 5"
-                    strokeWidth={chartConfig.strokeWidth}
-                    dot={false}
-                  />
-                )}
-              </RechartsLineChart>
-            </ResponsiveContainer>
-          </div>
+              )}
+            </RechartsLineChart>
+          </ChartContainer>
         </div>
       </CardContent>
     </Card>

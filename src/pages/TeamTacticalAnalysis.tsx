@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -58,35 +57,34 @@ const TeamTacticalAnalysis = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-4 sm:gap-6 p-3 sm:p-4 lg:p-6">
+      <div className="flex flex-col gap-6 p-6">
         <div className="flex flex-col gap-2">
-          <h1 className="text-2xl sm:text-3xl font-bold text-club-gold">Team Tactical Analysis</h1>
-          <p className="text-club-light-gray text-sm sm:text-base">
+          <h1 className="text-3xl font-bold text-club-gold">Team Tactical Analysis</h1>
+          <p className="text-club-light-gray">
             Analyze team passing networks and tactical patterns
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-4 sm:gap-6">
-          {/* Filters Card - Full width on mobile, 1 column on large screens */}
-          <Card className="lg:col-span-1 order-1 lg:order-1">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg sm:text-xl">Filters</CardTitle>
-              <CardDescription className="text-sm">Select match and filter options</CardDescription>
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+          <Card className="lg:col-span-1">
+            <CardHeader>
+              <CardTitle>Filters</CardTitle>
+              <CardDescription>Select match and filter options</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-4 sm:space-y-6">
+            <CardContent className="space-y-6">
               <div className="space-y-2">
-                <Label htmlFor="match-select" className="text-sm font-medium">Select Match</Label>
+                <Label htmlFor="match-select">Select Match</Label>
                 <Select 
                   value={selectedMatch?.toString() || ''} 
                   onValueChange={(value) => setSelectedMatch(parseInt(value))}
                   disabled={isLoadingMatches}
                 >
-                  <SelectTrigger id="match-select" className="w-full h-10 text-sm">
+                  <SelectTrigger id="match-select" className="w-full">
                     <SelectValue placeholder="Select a match" />
                   </SelectTrigger>
-                  <SelectContent className="max-h-60 z-50">
+                  <SelectContent>
                     {matches?.map(match => (
-                      <SelectItem key={match.id} value={match.id.toString()} className="text-sm">
+                      <SelectItem key={match.id} value={match.id.toString()}>
                         {match.date.substring(0, 10)} - {match.opponent} ({match.result})
                       </SelectItem>
                     ))}
@@ -94,8 +92,8 @@ const TeamTacticalAnalysis = () => {
                 </Select>
               </div>
 
-              <div className="space-y-3">
-                <Label className="flex items-center gap-2 text-sm font-medium">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
                   <Filter size={16} />
                   Pass Direction
                 </Label>
@@ -103,41 +101,17 @@ const TeamTacticalAnalysis = () => {
                   type="single" 
                   value={passDirectionFilter}
                   onValueChange={(value) => value && setPassDirectionFilter(value)}
-                  className="grid grid-cols-2 gap-2 w-full"
+                  className="justify-start"
                 >
-                  <ToggleGroupItem 
-                    value="all" 
-                    aria-label="All directions"
-                    className="h-9 text-xs sm:text-sm px-2 sm:px-3"
-                  >
-                    All
-                  </ToggleGroupItem>
-                  <ToggleGroupItem 
-                    value="forward" 
-                    aria-label="Forward passes"
-                    className="h-9 text-xs sm:text-sm px-2 sm:px-3"
-                  >
-                    Forward
-                  </ToggleGroupItem>
-                  <ToggleGroupItem 
-                    value="backward" 
-                    aria-label="Backward passes"
-                    className="h-9 text-xs sm:text-sm px-2 sm:px-3"
-                  >
-                    Backward
-                  </ToggleGroupItem>
-                  <ToggleGroupItem 
-                    value="sideways" 
-                    aria-label="Sideways passes"
-                    className="h-9 text-xs sm:text-sm px-2 sm:px-3"
-                  >
-                    Sideways
-                  </ToggleGroupItem>
+                  <ToggleGroupItem value="all" aria-label="All directions">All</ToggleGroupItem>
+                  <ToggleGroupItem value="forward" aria-label="Forward passes">Forward</ToggleGroupItem>
+                  <ToggleGroupItem value="backward" aria-label="Backward passes">Backward</ToggleGroupItem>
+                  <ToggleGroupItem value="sideways" aria-label="Sideways passes">Sideways</ToggleGroupItem>
                 </ToggleGroup>
               </div>
 
-              <div className="space-y-3">
-                <Label className="flex items-center gap-2 text-sm font-medium">
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
                   <Filter size={16} />
                   Pass Outcome
                 </Label>
@@ -145,43 +119,24 @@ const TeamTacticalAnalysis = () => {
                   type="single" 
                   value={passOutcomeFilter}
                   onValueChange={(value) => value && setPassOutcomeFilter(value)}
-                  className="grid grid-cols-1 gap-2 w-full"
+                  className="justify-start"
                 >
-                  <ToggleGroupItem 
-                    value="all" 
-                    aria-label="All passes"
-                    className="h-9 text-xs sm:text-sm px-2 sm:px-3"
-                  >
-                    All
-                  </ToggleGroupItem>
-                  <ToggleGroupItem 
-                    value="successful" 
-                    aria-label="Successful passes"
-                    className="h-9 text-xs sm:text-sm px-2 sm:px-3"
-                  >
-                    Successful
-                  </ToggleGroupItem>
-                  <ToggleGroupItem 
-                    value="unsuccessful" 
-                    aria-label="Unsuccessful passes"
-                    className="h-9 text-xs sm:text-sm px-2 sm:px-3"
-                  >
-                    Unsuccessful
-                  </ToggleGroupItem>
+                  <ToggleGroupItem value="all" aria-label="All passes">All</ToggleGroupItem>
+                  <ToggleGroupItem value="successful" aria-label="Successful passes">Successful</ToggleGroupItem>
+                  <ToggleGroupItem value="unsuccessful" aria-label="Unsuccessful passes">Unsuccessful</ToggleGroupItem>
                 </ToggleGroup>
               </div>
             </CardContent>
           </Card>
 
-          {/* Passing Network Card - Full width on mobile, 3 columns on large screens */}
-          <Card className="lg:col-span-3 order-2 lg:order-2 min-h-[400px] sm:min-h-[500px] lg:h-[700px] relative">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-lg sm:text-xl">Passing Network</CardTitle>
-              <CardDescription className="text-sm">
+          <Card className="lg:col-span-3 h-[700px] relative">
+            <CardHeader>
+              <CardTitle>Passing Network</CardTitle>
+              <CardDescription>
                 Player positioning and passing connections
               </CardDescription>
             </CardHeader>
-            <CardContent className="h-[350px] sm:h-[450px] lg:h-[600px] p-2 sm:p-4">
+            <CardContent className="h-[600px]">
               {isLoadingMatches ? (
                 <LoadingOverlay isLoading={true} />
               ) : (
@@ -192,8 +147,8 @@ const TeamTacticalAnalysis = () => {
                     passOutcomeFilter={passOutcomeFilter}
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full text-club-light-gray text-center p-4">
-                    <p className="text-sm sm:text-base">Select a match to view the passing network</p>
+                  <div className="flex items-center justify-center h-full text-club-light-gray">
+                    Select a match to view the passing network
                   </div>
                 )
               )}

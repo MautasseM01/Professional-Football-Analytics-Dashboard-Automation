@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Player } from "@/types";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -14,8 +15,6 @@ import { ImageOff, ZoomIn } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 import { getGoogleDriveThumbnailUrl } from "@/lib/image-utils";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useImageLazyLoading } from "@/hooks/use-lazy-loading";
-import { LoadingSkeleton } from "@/components/ui/loading-skeleton";
 
 interface HeatmapCardProps {
   player: Player;
@@ -25,21 +24,24 @@ type MatchPeriod = 'First Half' | 'Second Half' | 'Full Match';
 
 export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   const [imageError, setImageError] = useState(false);
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
   const [selectedPeriod, setSelectedPeriod] = useState<MatchPeriod>('Full Match');
+  const [imageLoaded, setImageLoaded] = useState(false);
   const isMobile = useIsMobile();
-  
-  const { ref: lazyRef, imageSrc, isLoading: imageLoading, error: lazyError } = useImageLazyLoading(player.heatmapUrl);
   
   // Reset state when player changes to ensure image corresponds to current player
   useEffect(() => {
     console.log(`Player in HeatmapCard: ${player.name}, Setting image URL to: ${player.heatmapUrl}`);
     setImageError(false);
+    setImageLoaded(false);
+    setImageUrl(player.heatmapUrl);
   }, [player.id]);
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
     console.error("Error loading heatmap image:", e);
-    console.log("Failed URL:", imageSrc);
+    console.log("Failed URL:", imageUrl);
     setImageError(true);
+    setImageLoaded(false);
     toast({
       title: "Image loading error",
       description: "Could not load the player heatmap image",
@@ -47,16 +49,26 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
     });
   };
 
+  const handleImageLoad = () => {
+    setImageLoaded(true);
+    setImageError(false);
+  };
+
   const tryAlternativeUrl = () => {
     const thumbnailUrl = getGoogleDriveThumbnailUrl(player.heatmapUrl);
     if (thumbnailUrl) {
       console.log(`Trying thumbnail URL for ${player.name}:`, thumbnailUrl);
-      // This would need additional state management for alternative URLs
-      toast({
-        title: "Trying alternative",
-        description: "Attempting to load thumbnail version",
-      });
+      setImageUrl(thumbnailUrl);
+      setImageError(false);
+      setImageLoaded(false);
     }
+  };
+
+  const resetImageError = () => {
+    console.log(`Resetting to original URL for ${player.name}:`, player.heatmapUrl);
+    setImageUrl(player.heatmapUrl);
+    setImageError(false);
+    setImageLoaded(false);
   };
 
   const handlePeriodChange = (period: string) => {
@@ -68,20 +80,11 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
     });
   };
 
-  // Show loading skeleton while lazy loading
-  if (imageLoading && !imageSrc) {
-    return (
-      <div ref={lazyRef}>
-        <LoadingSkeleton variant="heatmap" />
-      </div>
-    );
-  }
-
   // Only show football pitch overlay when there's no image or when there's an error
-  const showPitchOverlay = !player.heatmapUrl || imageError || lazyError;
+  const showPitchOverlay = !player.heatmapUrl || imageError;
 
   return (
-    <Card ref={lazyRef} className="border-club-gold/20 bg-club-dark-gray w-full h-full flex flex-col">
+    <Card className="border-club-gold/20 bg-club-dark-gray w-full h-full flex flex-col">
       <CardHeader className={`flex-shrink-0 ${isMobile ? 'p-3 pb-2' : 'p-4 sm:p-6 pb-3 sm:pb-4'}`}>
         <div className={`flex flex-col ${isMobile ? 'space-y-2' : 'space-y-3 sm:space-y-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4'}`}>
           <div className="min-w-0 flex-1">
@@ -119,7 +122,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
         {player.heatmapUrl ? (
           <div className="flex-1 flex flex-col">
             {/* Player name and period info - positioned above the heatmap */}
-            {imageSrc && !imageError && !lazyError && (
+            {imageLoaded && (
               <div className={`mb-2 sm:mb-3 text-center bg-club-black/80 rounded-md px-3 py-2 ${
                 isMobile ? 'text-xs' : 'text-sm'
               }`}>
@@ -178,7 +181,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                 </svg>
               )}
               
-              {imageError || lazyError ? (
+              {imageError ? (
                 <div className="absolute inset-0 flex flex-col items-center justify-center bg-club-black/60 p-3 sm:p-4 z-20">
                   <ImageOff className={`text-club-gold mb-2 sm:mb-3 ${isMobile ? 'w-6 h-6' : 'w-8 h-8 sm:w-10 sm:h-10'}`} />
                   <p className={`text-center text-club-gold mb-2 sm:mb-3 font-medium ${
@@ -189,13 +192,23 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                   <div className={`flex gap-2 w-full ${isMobile ? 'flex-col max-w-48' : 'flex-col sm:flex-row max-w-xs'}`}>
                     <Button 
                       variant="outline" 
+                      onClick={resetImageError}
+                      className={`border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold flex-1 ${
+                        isMobile ? 'text-xs h-11 min-h-[44px]' : 'text-xs sm:text-sm h-9'
+                      }`}
+                      size="sm"
+                    >
+                      Retry Original
+                    </Button>
+                    <Button 
+                      variant="outline" 
                       onClick={tryAlternativeUrl}
                       className={`border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold flex-1 ${
                         isMobile ? 'text-xs h-11 min-h-[44px]' : 'text-xs sm:text-sm h-9'
                       }`}
                       size="sm"
                     >
-                      Try Alternative
+                      Try Thumbnail
                     </Button>
                   </div>
                   <p className={`text-club-light-gray/60 mt-2 sm:mt-3 text-center max-w-sm leading-relaxed ${
@@ -205,27 +218,29 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                     Try uploading the image to a CORS-enabled image hosting service.
                   </p>
                 </div>
-              ) : imageSrc ? (
+              ) : (
                 <>
                   <img 
-                    src={imageSrc} 
+                    src={imageUrl || player.heatmapUrl} 
                     alt={`${player.name} heatmap`}
                     className={`absolute inset-0 w-full h-full object-cover ${
                       isMobile ? 'touch-manipulation' : ''
                     }`}
+                    crossOrigin="anonymous"
                     onError={handleImageError}
-                    loading="lazy"
+                    onLoad={handleImageLoad}
+                    referrerPolicy="no-referrer"
                     style={isMobile ? { touchAction: 'pan-x pan-y pinch-zoom' } : {}}
                   />
                   {/* Mobile zoom hint - positioned in top corner */}
-                  {isMobile && (
+                  {imageLoaded && isMobile && (
                     <div className="absolute top-2 right-2 bg-club-black/80 text-club-light-gray px-2 py-1 rounded-md z-20 flex items-center gap-1">
                       <ZoomIn className="w-3 h-3" />
                       <span className="text-xs">Pinch to zoom</span>
                     </div>
                   )}
                 </>
-              ) : null}
+              )}
             </div>
           </div>
         ) : (

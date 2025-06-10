@@ -1,15 +1,11 @@
 
-import { useState } from "react";
+import React from "react";
 import { Link, useLocation } from "react-router-dom";
-import { ChevronDown, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { AccessibleNavigationItem, AccessibleSubItem } from "@/utils/roleAccess";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { AccessibleNavigationItem } from "@/utils/roleAccess";
 
 interface SidebarNavItemProps {
   item: AccessibleNavigationItem;
@@ -20,30 +16,31 @@ interface SidebarNavItemProps {
   className?: string;
 }
 
-export const SidebarNavItem = ({ 
-  item, 
-  collapsed, 
-  openSubMenu, 
-  toggleSubMenu, 
+export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
+  item,
+  collapsed,
+  openSubMenu,
+  toggleSubMenu,
   onNavigate,
-  className 
-}: SidebarNavItemProps) => {
+  className
+}) => {
   const location = useLocation();
-  const [isPressed, setIsPressed] = useState(false);
-  const isActive = location.pathname === item.href;
   const hasSubItems = item.subItems && item.subItems.length > 0;
-  const isSubMenuOpen = openSubMenu === item.name;
-
-  const handleTouchStart = () => {
-    setIsPressed(true);
+  const isOpen = openSubMenu === item.name;
+  
+  const isActive = () => {
+    if (item.href) {
+      return location.pathname === item.href || location.pathname.startsWith(item.href + '/');
+    }
+    if (hasSubItems) {
+      return item.subItems!.some(subItem => 
+        location.pathname === subItem.href || location.pathname.startsWith(subItem.href + '/')
+      );
+    }
+    return false;
   };
 
-  const handleTouchEnd = () => {
-    setIsPressed(false);
-  };
-
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
+  const handleClick = () => {
     if (hasSubItems) {
       toggleSubMenu(item.name);
     } else if (onNavigate) {
@@ -51,111 +48,95 @@ export const SidebarNavItem = ({
     }
   };
 
-  const NavButton = ({ children, ...props }: any) => {
-    const baseClasses = cn(
-      "w-full justify-start items-center touch-manipulation transition-all duration-200",
-      "active:scale-95 select-none",
-      isPressed && "scale-95",
-      isActive 
-        ? "bg-club-gold/10 text-club-gold shadow-sm" 
-        : "text-club-light-gray hover:text-club-gold hover:bg-club-gold/5",
-      className
-    );
+  const iconElement = <item.icon size={24} className="h-6 w-6 flex-shrink-0" />;
 
-    if (collapsed) {
-      return (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="ghost"
-              className={cn(baseClasses, "justify-center p-3 min-h-[44px] min-w-[44px]")}
-              onClick={handleClick}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
-              {...props}
-            >
-              <item.icon className="h-6 w-6 flex-shrink-0" />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/20">
-            <p>{item.name}</p>
-          </TooltipContent>
-        </Tooltip>
-      );
-    }
+  const buttonContent = (
+    <Button
+      variant="ghost"
+      className={cn(
+        "w-full text-club-light-gray hover:text-club-gold hover:bg-club-gold/10 transition-colors",
+        collapsed ? "h-12 w-12 p-0 justify-center items-center" : "justify-start px-3",
+        isActive() && "bg-club-gold/20 text-club-gold",
+        className
+      )}
+      onClick={handleClick}
+    >
+      {collapsed ? (
+        iconElement
+      ) : (
+        <>
+          {iconElement}
+          <span className="ml-3 truncate">{item.name}</span>
+          {hasSubItems && (
+            <div className="ml-auto">
+              {isOpen ? (
+                <ChevronDown size={16} className="text-club-light-gray" />
+              ) : (
+                <ChevronRight size={16} className="text-club-light-gray" />
+              )}
+            </div>
+          )}
+        </>
+      )}
+    </Button>
+  );
 
-    return (
-      <Button
-        variant="ghost"
-        className={cn(baseClasses, "p-3 min-h-[48px]")}
-        onClick={handleClick}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        {...props}
-      >
-        {children}
-      </Button>
-    );
-  };
-
-  if (item.href && !hasSubItems) {
-    return (
-      <Link to={item.href} onClick={onNavigate} className="block">
-        <NavButton>
-          <item.icon className="h-6 w-6 mr-3 flex-shrink-0" />
-          {!collapsed && <span className="truncate font-medium">{item.name}</span>}
-        </NavButton>
-      </Link>
-    );
-  }
+  const mainElement = item.href && !hasSubItems ? (
+    <Link to={item.href} onClick={onNavigate} className="block">
+      {buttonContent}
+    </Link>
+  ) : (
+    buttonContent
+  );
 
   return (
-    <div>
-      <NavButton>
-        <item.icon className="h-6 w-6 mr-3 flex-shrink-0" />
-        {!collapsed && (
-          <>
-            <span className="truncate flex-1 font-medium">{item.name}</span>
-            {hasSubItems && (
-              <span className="ml-auto transition-transform duration-200">
-                {isSubMenuOpen ? (
-                  <ChevronDown className="h-4 w-4" />
-                ) : (
-                  <ChevronRight className="h-4 w-4" />
-                )}
-              </span>
+    <div className="space-y-1">
+      {collapsed && !hasSubItems ? (
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {item.href ? (
+              <Link to={item.href} onClick={onNavigate}>
+                {buttonContent}
+              </Link>
+            ) : (
+              mainElement
             )}
-          </>
-        )}
-      </NavButton>
+          </TooltipTrigger>
+          <TooltipContent side="right" className="bg-club-dark-gray border-club-gold/20">
+            <p className="text-club-light-gray">{item.name}</p>
+          </TooltipContent>
+        </Tooltip>
+      ) : (
+        mainElement
+      )}
 
-      {/* Sub-menu items with smooth animation */}
-      {hasSubItems && !collapsed && (
-        <div className={cn(
-          "overflow-hidden transition-all duration-300 ease-in-out",
-          isSubMenuOpen ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
-        )}>
-          <div className="ml-6 mt-2 space-y-1 border-l border-club-gold/20 pl-4">
-            {item.subItems?.map((subItem: AccessibleSubItem) => {
-              const isSubActive = location.pathname === subItem.href;
-              return (
-                <Link key={subItem.name} to={subItem.href || "#"} onClick={onNavigate} className="block">
-                  <Button
-                    variant="ghost"
-                    className={cn(
-                      "w-full justify-start items-center p-3 min-h-[44px] text-sm touch-manipulation",
-                      "transition-all duration-200 active:scale-95",
-                      isSubActive 
-                        ? "bg-club-gold/10 text-club-gold font-medium" 
-                        : "text-club-light-gray/80 hover:text-club-gold hover:bg-club-gold/5"
-                    )}
-                  >
-                    <span className="truncate">{subItem.name}</span>
-                  </Button>
-                </Link>
-              );
-            })}
-          </div>
+      {/* Sub-menu items */}
+      {hasSubItems && isOpen && !collapsed && (
+        <div className="ml-6 space-y-1">
+          {item.subItems!.map((subItem) => {
+            const isSubActive = location.pathname === subItem.href || 
+                              location.pathname.startsWith(subItem.href + '/');
+            return (
+              <Link
+                key={subItem.name}
+                to={subItem.href}
+                onClick={onNavigate}
+                className="block"
+              >
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "w-full justify-start text-club-light-gray/80 hover:text-club-gold hover:bg-club-gold/10 transition-colors pl-3",
+                    isSubActive && "bg-club-gold/20 text-club-gold",
+                    className && "text-base" // Larger text for mobile
+                  )}
+                >
+                  <span className="truncate">{subItem.name}</span>
+                </Button>
+              </Link>
+            );
+          })}
         </div>
       )}
     </div>

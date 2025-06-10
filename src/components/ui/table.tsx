@@ -1,24 +1,19 @@
-
 import * as React from "react"
-import { useIsMobile } from "@/hooks/use-mobile"
+
 import { cn } from "@/lib/utils"
 
 const Table = React.forwardRef<
   HTMLTableElement,
   React.HTMLAttributes<HTMLTableElement>
->(({ className, ...props }, ref) => {
-  const isMobile = useIsMobile();
-  
-  return (
-    <div className="relative w-full overflow-auto">
-      <table
-        ref={ref}
-        className={cn("w-full caption-bottom text-sm", className)}
-        {...props}
-      />
-    </div>
-  );
-});
+>(({ className, ...props }, ref) => (
+  <div className="relative w-full overflow-auto">
+    <table
+      ref={ref}
+      className={cn("w-full caption-bottom text-sm", className)}
+      {...props}
+    />
+  </div>
+))
 Table.displayName = "Table"
 
 const TableHeader = React.forwardRef<
@@ -59,61 +54,43 @@ TableFooter.displayName = "TableFooter"
 const TableRow = React.forwardRef<
   HTMLTableRowElement,
   React.HTMLAttributes<HTMLTableRowElement>
->(({ className, ...props }, ref) => {
-  const isMobile = useIsMobile();
-  
-  return (
-    <tr
-      ref={ref}
-      className={cn(
-        "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted touch-manipulation",
-        isMobile ? "min-h-[56px]" : "min-h-[44px]",
-        className
-      )}
-      {...props}
-    />
-  );
-});
+>(({ className, ...props }, ref) => (
+  <tr
+    ref={ref}
+    className={cn(
+      "border-b transition-colors hover:bg-muted/50 data-[state=selected]:bg-muted",
+      className
+    )}
+    {...props}
+  />
+))
 TableRow.displayName = "TableRow"
 
 const TableHead = React.forwardRef<
   HTMLTableCellElement,
   React.ThHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => {
-  const isMobile = useIsMobile();
-  
-  return (
-    <th
-      ref={ref}
-      className={cn(
-        "text-left align-middle font-medium text-muted-foreground touch-manipulation [&:has([role=checkbox])]:pr-0",
-        isMobile ? "h-14 px-4 min-h-[56px]" : "h-12 px-4 min-h-[44px]",
-        className
-      )}
-      {...props}
-    />
-  );
-});
+>(({ className, ...props }, ref) => (
+  <th
+    ref={ref}
+    className={cn(
+      "h-12 px-4 text-left align-middle font-medium text-muted-foreground [&:has([role=checkbox])]:pr-0",
+      className
+    )}
+    {...props}
+  />
+))
 TableHead.displayName = "TableHead"
 
 const TableCell = React.forwardRef<
   HTMLTableCellElement,
   React.TdHTMLAttributes<HTMLTableCellElement>
->(({ className, ...props }, ref) => {
-  const isMobile = useIsMobile();
-  
-  return (
-    <td
-      ref={ref}
-      className={cn(
-        "align-middle touch-manipulation [&:has([role=checkbox])]:pr-0",
-        isMobile ? "p-4 min-h-[56px]" : "p-4 min-h-[44px]",
-        className
-      )}
-      {...props}
-    />
-  );
-});
+>(({ className, ...props }, ref) => (
+  <td
+    ref={ref}
+    className={cn("p-4 align-middle [&:has([role=checkbox])]:pr-0", className)}
+    {...props}
+  />
+))
 TableCell.displayName = "TableCell"
 
 const TableCaption = React.forwardRef<

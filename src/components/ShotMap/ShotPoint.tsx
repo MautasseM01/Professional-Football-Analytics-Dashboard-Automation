@@ -11,99 +11,67 @@ import {
 interface ShotPointProps {
   shot: Shot;
   size?: number;
-  onSelect?: () => void;
-  isSelected?: boolean;
-  isMobile?: boolean;
 }
 
-export const ShotPoint = ({ 
-  shot, 
-  size = 8, 
-  onSelect, 
-  isSelected = false, 
-  isMobile = false 
-}: ShotPointProps) => {
-  // Enhanced responsive size with iOS touch standards
+export const ShotPoint = ({ shot, size = 8 }: ShotPointProps) => {
+  // Responsive size based on screen
   const getResponsiveSize = () => {
-    if (isMobile) {
-      return Math.max(size + 8, 16); // Larger for mobile touch
+    if (typeof window !== 'undefined') {
+      const isMobile = window.innerWidth < 768;
+      return isMobile ? Math.max(size + 2, 10) : size;
     }
-    return Math.max(size + 2, 10);
+    return size;
   };
 
   const responsiveSize = getResponsiveSize();
 
-  // Enhanced shot icon with better styling
+  // Map outcome to icon and color
   const getShotIcon = () => {
-    const iconProps = {
-      size: responsiveSize,
-      className: `transition-all duration-200 ${isSelected ? 'scale-125' : 'scale-100'}`,
-      style: {
-        filter: isSelected ? 'drop-shadow(0 0 8px currentColor)' : 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
-      }
-    };
-
     switch (shot.outcome) {
       case "Goal":
-        return <CircleCheck {...iconProps} className={`${iconProps.className} text-[#F97316] fill-[#F97316] stroke-white`} />;
+        return <CircleCheck size={responsiveSize} className="text-[#F97316] fill-[#F97316] stroke-white" />;
       case "Shot on Target":
-        return <Target {...iconProps} className={`${iconProps.className} text-[#0EA5E9] fill-[#0EA5E9] stroke-white`} />;
+        return <Target size={responsiveSize} className="text-[#0EA5E9] fill-[#0EA5E9] stroke-white" />;
       case "Shot Off Target":
-        return <CircleX {...iconProps} className={`${iconProps.className} text-[#888888] fill-[#888888] stroke-white`} />;
+        return <CircleX size={responsiveSize} className="text-[#888888] fill-[#888888] stroke-white" />;
       case "Blocked Shot":
-        return <Square {...iconProps} className={`${iconProps.className} text-[#555555] fill-[#555555] stroke-white`} />;
+        return <Square size={responsiveSize} className="text-[#555555] fill-[#555555] stroke-white" />;
       default:
-        return <Circle {...iconProps} className={`${iconProps.className} text-gray-400`} />;
+        return <Circle size={responsiveSize} className="text-gray-400" />;
     }
   };
 
-  const shotElement = (
-    <div
-      className={`absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer touch-manipulation transition-all duration-200 ${
-        isSelected ? 'z-20' : 'z-10'
-      } ${isMobile ? 'active:scale-90' : 'hover:scale-110'}`}
-      style={{
-        left: `${(shot.x_coordinate / 1050) * 100}%`,
-        top: `${(shot.y_coordinate / 680) * 100}%`,
-        // Enhanced touch target for mobile
-        padding: isMobile ? '8px' : '4px',
-        margin: isMobile ? '-8px' : '-4px',
-        borderRadius: '50%',
-        background: isSelected ? 'rgba(212, 175, 55, 0.2)' : 'transparent',
-        backdropFilter: isSelected ? 'blur(4px)' : 'none',
-      }}
-      onClick={isMobile ? onSelect : undefined}
-    >
-      {getShotIcon()}
-    </div>
-  );
-
-  // For mobile, return just the element with click handler
-  if (isMobile) {
-    return shotElement;
-  }
-
-  // For desktop, wrap with hover card
   return (
     <HoverCard>
       <HoverCardTrigger asChild>
-        {shotElement}
+        <div
+          className="absolute transform -translate-x-1/2 -translate-y-1/2 cursor-pointer touch-manipulation"
+          style={{
+            left: `${(shot.x_coordinate / 1050) * 100}%`,
+            top: `${(shot.y_coordinate / 680) * 100}%`,
+            // Add larger touch target for mobile
+            padding: '4px',
+            margin: '-4px'
+          }}
+        >
+          {getShotIcon()}
+        </div>
       </HoverCardTrigger>
-      <HoverCardContent className="bg-card/95 backdrop-blur-sm border-primary/20 text-foreground w-64 shadow-xl">
-        <div className="space-y-3">
-          <div className="border-b border-primary/20 pb-2">
-            <span className="font-bold text-primary text-base">{shot.player_name}</span>
+      <HoverCardContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray w-60 sm:w-64">
+        <div className="space-y-2">
+          <div className="border-b border-club-gold/20 pb-2">
+            <span className="font-bold text-club-gold text-sm sm:text-base">{shot.player_name}</span>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-sm">
-            <div className="text-muted-foreground">Time:</div>
+          <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
+            <div className="text-club-light-gray/70">Time:</div>
             <div>{shot.minute}' ({shot.period})</div>
-            <div className="text-muted-foreground">Outcome:</div>
+            <div className="text-club-light-gray/70">Outcome:</div>
             <div className="font-semibold">
               <span 
                 className={
                   shot.outcome === "Goal" ? "text-[#F97316]" :
                   shot.outcome === "Shot on Target" ? "text-[#0EA5E9]" :
-                  "text-muted-foreground"
+                  "text-gray-300"
                 }
               >
                 {shot.outcome}
@@ -111,19 +79,19 @@ export const ShotPoint = ({
             </div>
             {shot.assisted_by && (
               <>
-                <div className="text-muted-foreground">Assisted by:</div>
+                <div className="text-club-light-gray/70">Assisted by:</div>
                 <div>{shot.assisted_by}</div>
               </>
             )}
             {shot.distance && (
               <>
-                <div className="text-muted-foreground">Distance:</div>
+                <div className="text-club-light-gray/70">Distance:</div>
                 <div>{shot.distance} meters</div>
               </>
             )}
-            <div className="text-muted-foreground">Match:</div>
-            <div className="truncate">{shot.match_name}</div>
-            <div className="text-muted-foreground">Date:</div>
+            <div className="text-club-light-gray/70">Match:</div>
+            <div>{shot.match_name}</div>
+            <div className="text-club-light-gray/70">Date:</div>
             <div>{new Date(shot.date).toLocaleDateString()}</div>
           </div>
         </div>

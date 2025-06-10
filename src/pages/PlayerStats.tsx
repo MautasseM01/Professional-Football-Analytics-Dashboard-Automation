@@ -1,78 +1,101 @@
 
-import React, { useState } from "react";
-import { DashboardLayout } from "@/components/DashboardLayout";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { PlayerSelector } from "@/components/PlayerSelector";
-import { MobilePlayerSelector } from "@/components/MobilePlayerSelector";
-import { PlayerStats as PlayerStatsComponent } from "@/components/PlayerStats";
-import { Player } from "@/types";
+import { useState } from "react";
+import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { usePlayerData } from "@/hooks/use-player-data";
+import { useUserProfile } from "@/hooks/use-user-profile";
+import { PlayerStats } from "@/components/PlayerStats";
+import { PlayerSelector } from "@/components/PlayerSelector";
+import { RoleBasedContent } from "@/components/RoleBasedContent";
+import { BackToTopButton } from "@/components/BackToTopButton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Info, RotateCcw } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-export const PlayerStats = () => {
-  const { players } = usePlayerData();
-  const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+const PlayerStatsPage = () => {
+  const { players, selectedPlayer, selectPlayer, loading, canAccessPlayerData } = usePlayerData();
+  const { profile } = useUserProfile();
   const isMobile = useIsMobile();
 
-  console.log("First player structure:", players[0]);
-  console.log("Player numbers in database:", players.map(p => ({ name: p.name, id: p.id, number: p.number })));
-
-  const handlePlayerSelect = (player: Player) => {
-    setSelectedPlayer(player);
-  };
-
-  const handlePlayerSelectById = (playerId: number) => {
-    const player = players.find(p => p.id === playerId);
-    if (player) {
-      setSelectedPlayer(player);
-    }
-  };
-
   return (
-    <DashboardLayout>
-      <div className={`w-full max-w-7xl mx-auto ${isMobile ? 'p-2' : 'p-3 sm:p-4 lg:p-6'} space-y-4 sm:space-y-6`}>
-        {/* Header */}
-        <div className="flex flex-col gap-2">
-          <h1 className={`font-bold text-club-gold ${isMobile ? 'text-lg' : 'text-lg sm:text-xl lg:text-2xl xl:text-3xl'}`}>
-            Player Analysis
-          </h1>
-          <p className={`text-club-light-gray/70 ${isMobile ? 'text-sm' : 'text-xs sm:text-sm lg:text-base'}`}>
-            Individual player performance and statistics
-          </p>
+    <div className="flex min-h-screen bg-club-dark-bg text-club-light-gray">
+      <DashboardSidebar />
+      <main className={`flex-1 transition-all duration-300 ease-in-out ${isMobile ? 'pt-16' : ''}`}>
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-4 sm:space-y-6">
+          <div className="mb-4 sm:mb-6">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold mb-2">
+              Player Analysis
+            </h1>
+            <p className="text-sm sm:text-base text-club-light-gray/70">
+              {profile?.role === 'player' 
+                ? "View your individual performance statistics and development progress"
+                : "Analyze individual player performance and statistics"
+              }
+            </p>
+          </div>
+
+          {/* Mobile landscape orientation message */}
+          {isMobile && (
+            <Alert className="bg-blue-500/10 border-blue-500/30">
+              <RotateCcw className="h-4 w-4" />
+              <AlertDescription className="text-club-light-gray text-sm">
+                For better chart viewing, try rotating your device to landscape mode.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {/* Role-based access information */}
+          <RoleBasedContent allowedRoles={['player']}>
+            <Alert className="bg-club-gold/10 border-club-gold/30">
+              <Info className="h-4 w-4" />
+              <AlertDescription className="text-club-light-gray text-sm sm:text-base">
+                You can only view your own player statistics and performance data.
+              </AlertDescription>
+            </Alert>
+          </RoleBasedContent>
+
+          {/* Player Selector - Hidden for player role */}
+          <RoleBasedContent 
+            allowedRoles={['admin', 'management', 'coach', 'analyst', 'performance_director']}
+            fallback={null}
+          >
+            <PlayerSelector
+              players={players}
+              selectedPlayer={selectedPlayer}
+              onPlayerSelect={selectPlayer}
+              loading={loading}
+            />
+          </RoleBasedContent>
+
+          {/* Player Stats Component */}
+          {selectedPlayer && (
+            <PlayerStats player={selectedPlayer} />
+          )}
+
+          {/* No player selected message */}
+          {!selectedPlayer && !loading && (
+            <div className="flex items-center justify-center min-h-[50vh] text-center px-4">
+              <div className="space-y-2">
+                <p className="text-base sm:text-lg text-club-light-gray">
+                  {profile?.role === 'player' 
+                    ? "Loading your player profile..."
+                    : "No player selected"
+                  }
+                </p>
+                <p className="text-xs sm:text-sm text-club-light-gray/60">
+                  {profile?.role === 'player' 
+                    ? "Please wait while we load your statistics"
+                    : "Please select a player to view their statistics"
+                  }
+                </p>
+              </div>
+            </div>
+          )}
         </div>
+      </main>
 
-        {/* Player Selection */}
-        <Card className="bg-club-dark-gray border-club-gold/20">
-          <CardHeader className={isMobile ? 'p-3' : 'p-3 sm:p-4'}>
-            <CardTitle className={`text-club-gold ${isMobile ? 'text-base' : 'text-sm sm:text-base'}`}>
-              Select Player
-            </CardTitle>
-            <CardDescription className={`text-club-light-gray/70 ${isMobile ? 'text-sm' : 'text-xs sm:text-sm'}`}>
-              Choose a player to view detailed statistics and performance data
-            </CardDescription>
-          </CardHeader>
-          <CardContent className={`pt-0 ${isMobile ? 'p-3' : 'p-3 sm:p-4'}`}>
-            {isMobile ? (
-              <MobilePlayerSelector
-                players={players}
-                selectedPlayer={selectedPlayer}
-                onPlayerSelect={handlePlayerSelect}
-              />
-            ) : (
-              <PlayerSelector
-                players={players}
-                selectedPlayer={selectedPlayer}
-                onPlayerSelect={handlePlayerSelectById}
-              />
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Player Statistics */}
-        <PlayerStatsComponent player={selectedPlayer} />
-      </div>
-    </DashboardLayout>
+      <BackToTopButton />
+    </div>
   );
 };
 
-export default PlayerStats;
+export default PlayerStatsPage;
