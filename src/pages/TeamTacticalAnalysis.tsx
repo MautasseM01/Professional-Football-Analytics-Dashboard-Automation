@@ -1,12 +1,14 @@
+
 import { useEffect, useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Filter } from "lucide-react";
+import { Filter, AlertCircle, RefreshCw } from "lucide-react";
 import { PassingNetwork } from "@/components/PassingNetwork";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
+import { TacticalFormationImageView } from "@/components/TacticalFormationImageView";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -24,6 +26,7 @@ const TeamTacticalAnalysis = () => {
   const [selectedMatch, setSelectedMatch] = useState<number | null>(null);
   const [passDirectionFilter, setPassDirectionFilter] = useState<string>("all");
   const [passOutcomeFilter, setPassOutcomeFilter] = useState<string>("all");
+  const [imageLoadingError, setImageLoadingError] = useState<boolean>(false);
 
   const { data: matches, isLoading: isLoadingMatches } = useQuery({
     queryKey: ["matches"],
@@ -39,7 +42,6 @@ const TeamTacticalAnalysis = () => {
           throw error;
         }
         
-        // Ensure the data conforms to our Match interface
         return (data as Match[]) || [];
       } catch (error) {
         console.error("Error fetching matches:", error);
@@ -49,11 +51,19 @@ const TeamTacticalAnalysis = () => {
   });
 
   useEffect(() => {
-    // Set the first match as selected when data loads
     if (matches && matches.length > 0 && !selectedMatch) {
       setSelectedMatch(matches[0].id);
     }
   }, [matches, selectedMatch]);
+
+  const handleImageError = () => {
+    setImageLoadingError(true);
+    toast.error("Failed to load tactical formation images. Using fallback display.");
+  };
+
+  const handleImageRetry = () => {
+    setImageLoadingError(false);
+  };
 
   return (
     <DashboardLayout>
@@ -126,6 +136,22 @@ const TeamTacticalAnalysis = () => {
                   <ToggleGroupItem value="unsuccessful" aria-label="Unsuccessful passes">Unsuccessful</ToggleGroupItem>
                 </ToggleGroup>
               </div>
+
+              {imageLoadingError && (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-amber-600">
+                    <AlertCircle size={16} />
+                    <span className="text-sm">Image Loading Issues</span>
+                  </div>
+                  <button
+                    onClick={handleImageRetry}
+                    className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                  >
+                    <RefreshCw size={14} />
+                    Retry Loading Images
+                  </button>
+                </div>
+              )}
             </CardContent>
           </Card>
 
@@ -155,9 +181,27 @@ const TeamTacticalAnalysis = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Tactical Formation Images Section */}
+        {selectedMatch && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle>Tactical Formation Analysis</CardTitle>
+              <CardDescription>
+                Formation diagrams and tactical insights for the selected match
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <TacticalFormationImageView
+                matchId={selectedMatch}
+                onImageError={handleImageError}
+                onImageRetry={handleImageRetry}
+              />
+            </CardContent>
+          </Card>
+        )}
       </div>
 
-      {/* Back to Top Button */}
       <BackToTopButton />
     </DashboardLayout>
   );
