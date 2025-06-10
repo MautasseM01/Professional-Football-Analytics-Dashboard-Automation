@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
 import { Filter, AlertCircle, RefreshCw } from "lucide-react";
 import { PassingNetwork } from "@/components/PassingNetwork";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
@@ -13,6 +14,8 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { BackToTopButton } from "@/components/BackToTopButton";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 
 export interface Match {
   id: number;
@@ -27,6 +30,7 @@ const TeamTacticalAnalysis = () => {
   const [passDirectionFilter, setPassDirectionFilter] = useState<string>("all");
   const [passOutcomeFilter, setPassOutcomeFilter] = useState<string>("all");
   const [imageLoadingError, setImageLoadingError] = useState<boolean>(false);
+  const isMobile = useIsMobile();
 
   const { data: matches, isLoading: isLoadingMatches } = useQuery({
     queryKey: ["matches"],
@@ -67,29 +71,40 @@ const TeamTacticalAnalysis = () => {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-col gap-6 p-6">
+      <div className="flex flex-col gap-4 sm:gap-6 p-4 sm:p-6">
         <div className="flex flex-col gap-2">
-          <h1 className="text-3xl font-bold text-club-gold">Team Tactical Analysis</h1>
-          <p className="text-club-light-gray">
+          <h1 className="text-2xl sm:text-3xl font-bold text-club-gold">Team Tactical Analysis</h1>
+          <p className="text-sm sm:text-base text-club-light-gray">
             Analyze team passing networks and tactical patterns
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-          <Card className="lg:col-span-1">
-            <CardHeader>
-              <CardTitle>Filters</CardTitle>
-              <CardDescription>Select match and filter options</CardDescription>
+        <div className={cn(
+          "grid gap-4 sm:gap-6",
+          isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-4"
+        )}>
+          {/* Mobile-optimized Filters */}
+          <Card className={cn(isMobile ? "order-2" : "lg:col-span-1")}>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg">Filters</CardTitle>
+              <CardDescription className="text-sm">Select match and filter options</CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6">
+            <CardContent className="space-y-4 sm:space-y-6">
+              {/* Match Selection */}
               <div className="space-y-2">
-                <Label htmlFor="match-select">Select Match</Label>
+                <Label htmlFor="match-select" className="text-sm font-medium">Select Match</Label>
                 <Select 
                   value={selectedMatch?.toString() || ''} 
                   onValueChange={(value) => setSelectedMatch(parseInt(value))}
                   disabled={isLoadingMatches}
                 >
-                  <SelectTrigger id="match-select" className="w-full">
+                  <SelectTrigger 
+                    id="match-select" 
+                    className={cn(
+                      "w-full",
+                      isMobile && "min-h-[44px]"
+                    )}
+                  >
                     <SelectValue placeholder="Select a match" />
                   </SelectTrigger>
                   <SelectContent>
@@ -102,8 +117,9 @@ const TeamTacticalAnalysis = () => {
                 </Select>
               </div>
 
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
+              {/* Pass Direction Filter */}
+              <div className="space-y-3">
+                <Label className="flex items-center gap-2 text-sm font-medium">
                   <Filter size={16} />
                   Pass Direction
                 </Label>
@@ -111,17 +127,45 @@ const TeamTacticalAnalysis = () => {
                   type="single" 
                   value={passDirectionFilter}
                   onValueChange={(value) => value && setPassDirectionFilter(value)}
-                  className="justify-start"
+                  className={cn(
+                    "justify-start",
+                    isMobile && "grid grid-cols-2 gap-2 w-full"
+                  )}
                 >
-                  <ToggleGroupItem value="all" aria-label="All directions">All</ToggleGroupItem>
-                  <ToggleGroupItem value="forward" aria-label="Forward passes">Forward</ToggleGroupItem>
-                  <ToggleGroupItem value="backward" aria-label="Backward passes">Backward</ToggleGroupItem>
-                  <ToggleGroupItem value="sideways" aria-label="Sideways passes">Sideways</ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="all" 
+                    aria-label="All directions"
+                    className={cn(isMobile && "min-h-[44px] flex-1")}
+                  >
+                    All
+                  </ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="forward" 
+                    aria-label="Forward passes"
+                    className={cn(isMobile && "min-h-[44px] flex-1")}
+                  >
+                    Forward
+                  </ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="backward" 
+                    aria-label="Backward passes"
+                    className={cn(isMobile && "min-h-[44px] flex-1")}
+                  >
+                    Backward
+                  </ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="sideways" 
+                    aria-label="Sideways passes"
+                    className={cn(isMobile && "min-h-[44px] flex-1")}
+                  >
+                    Sideways
+                  </ToggleGroupItem>
                 </ToggleGroup>
               </div>
 
-              <div className="space-y-2">
-                <Label className="flex items-center gap-2">
+              {/* Pass Outcome Filter */}
+              <div className="space-y-3">
+                <Label className="flex items-center gap-2 text-sm font-medium">
                   <Filter size={16} />
                   Pass Outcome
                 </Label>
@@ -129,40 +173,71 @@ const TeamTacticalAnalysis = () => {
                   type="single" 
                   value={passOutcomeFilter}
                   onValueChange={(value) => value && setPassOutcomeFilter(value)}
-                  className="justify-start"
+                  className={cn(
+                    "justify-start",
+                    isMobile && "grid grid-cols-2 gap-2 w-full"
+                  )}
                 >
-                  <ToggleGroupItem value="all" aria-label="All passes">All</ToggleGroupItem>
-                  <ToggleGroupItem value="successful" aria-label="Successful passes">Successful</ToggleGroupItem>
-                  <ToggleGroupItem value="unsuccessful" aria-label="Unsuccessful passes">Unsuccessful</ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="all" 
+                    aria-label="All passes"
+                    className={cn(isMobile && "min-h-[44px] flex-1")}
+                  >
+                    All
+                  </ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="successful" 
+                    aria-label="Successful passes"
+                    className={cn(isMobile && "min-h-[44px] flex-1")}
+                  >
+                    Successful
+                  </ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="unsuccessful" 
+                    aria-label="Unsuccessful passes"
+                    className={cn(isMobile && "min-h-[44px] flex-1")}
+                  >
+                    Unsuccessful
+                  </ToggleGroupItem>
                 </ToggleGroup>
               </div>
 
+              {/* Mobile-optimized Error Display */}
               {imageLoadingError && (
-                <div className="space-y-2">
+                <div className="space-y-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
                   <div className="flex items-center gap-2 text-amber-600">
                     <AlertCircle size={16} />
-                    <span className="text-sm">Image Loading Issues</span>
+                    <span className="text-sm font-medium">Image Loading Issues</span>
                   </div>
-                  <button
+                  <TouchFeedbackButton
                     onClick={handleImageRetry}
-                    className="flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+                    variant="outline"
+                    size="sm"
+                    className="w-full min-h-[44px] text-sm"
+                    hapticType="medium"
                   >
-                    <RefreshCw size={14} />
+                    <RefreshCw size={14} className="mr-2" />
                     Retry Loading Images
-                  </button>
+                  </TouchFeedbackButton>
                 </div>
               )}
             </CardContent>
           </Card>
 
-          <Card className="lg:col-span-3 h-[700px] relative">
-            <CardHeader>
-              <CardTitle>Passing Network</CardTitle>
-              <CardDescription>
+          {/* Mobile-optimized Passing Network */}
+          <Card className={cn(
+            "relative",
+            isMobile ? "order-1 min-h-[500px]" : "lg:col-span-3 h-[700px]"
+          )}>
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg sm:text-xl">Passing Network</CardTitle>
+              <CardDescription className="text-sm">
                 Player positioning and passing connections
               </CardDescription>
             </CardHeader>
-            <CardContent className="h-[600px]">
+            <CardContent className={cn(
+              isMobile ? "h-[450px] p-2" : "h-[600px] p-6"
+            )}>
               {isLoadingMatches ? (
                 <LoadingOverlay isLoading={true} />
               ) : (
@@ -174,7 +249,17 @@ const TeamTacticalAnalysis = () => {
                   />
                 ) : (
                   <div className="flex items-center justify-center h-full text-club-light-gray">
-                    Select a match to view the passing network
+                    <div className="text-center space-y-2">
+                      <p className={cn(
+                        "font-medium",
+                        isMobile ? "text-base" : "text-lg"
+                      )}>
+                        Select a match to view the passing network
+                      </p>
+                      <p className="text-sm opacity-75">
+                        Choose from the filters above
+                      </p>
+                    </div>
                   </div>
                 )
               )}
@@ -182,16 +267,16 @@ const TeamTacticalAnalysis = () => {
           </Card>
         </div>
 
-        {/* Tactical Formation Images Section */}
+        {/* Mobile-optimized Tactical Formation Images Section */}
         {selectedMatch && (
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Tactical Formation Analysis</CardTitle>
-              <CardDescription>
+          <Card className="mt-4 sm:mt-6">
+            <CardHeader className="pb-4">
+              <CardTitle className="text-lg sm:text-xl">Tactical Formation Analysis</CardTitle>
+              <CardDescription className="text-sm">
                 Formation diagrams and tactical insights for the selected match
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 sm:p-6">
               <TacticalFormationImageView
                 matchId={selectedMatch}
                 onImageError={handleImageError}

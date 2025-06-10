@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { TouchFeedbackButton } from '@/components/TouchFeedbackButton';
 import { AlertCircle, RefreshCw, Download, ZoomIn, ZoomOut, RotateCcw } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { getGoogleDriveDirectUrl, getGoogleDriveThumbnailUrl } from '@/lib/image-utils';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TacticalImage {
   id: string;
@@ -38,6 +39,7 @@ export const TacticalFormationImageView = ({
   const [imageLoading, setImageLoading] = useState<Set<string>>(new Set());
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [zoom, setZoom] = useState(1);
+  const isMobile = useIsMobile();
 
   // Mock tactical images with fallback data
   const mockTacticalImages: TacticalImage[] = [
@@ -204,41 +206,64 @@ export const TacticalFormationImageView = ({
             <p className="text-lg font-medium text-gray-900 dark:text-white">Failed to Load Images</p>
             <p className="text-sm text-gray-600 dark:text-gray-400">{error}</p>
           </div>
-          <Button onClick={handleRetry} variant="outline" size="sm">
+          <TouchFeedbackButton onClick={handleRetry} variant="outline" size="sm" hapticType="medium">
             <RefreshCw className="h-4 w-4 mr-2" />
             Retry Loading
-          </Button>
+          </TouchFeedbackButton>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={cn("space-y-6", className)}>
-      {/* Zoom Controls */}
-      <div className="flex items-center justify-between">
+    <div className={cn("space-y-4 sm:space-y-6", className)}>
+      {/* Mobile-optimized Zoom Controls */}
+      <div className="flex items-center justify-between gap-3">
         <div className="flex items-center gap-2">
-          <Button onClick={handleZoomOut} variant="outline" size="sm" disabled={zoom <= 0.5}>
+          <TouchFeedbackButton 
+            onClick={handleZoomOut} 
+            variant="outline" 
+            size={isMobile ? "default" : "sm"} 
+            disabled={zoom <= 0.5}
+            className="min-h-[44px] min-w-[44px]"
+            hapticType="light"
+          >
             <ZoomOut className="h-4 w-4" />
-          </Button>
-          <span className="text-sm font-medium min-w-[60px] text-center">
+          </TouchFeedbackButton>
+          <span className="text-sm font-medium min-w-[60px] text-center bg-white dark:bg-gray-800 px-3 py-2 rounded-lg border">
             {Math.round(zoom * 100)}%
           </span>
-          <Button onClick={handleZoomIn} variant="outline" size="sm" disabled={zoom >= 3}>
+          <TouchFeedbackButton 
+            onClick={handleZoomIn} 
+            variant="outline" 
+            size={isMobile ? "default" : "sm"} 
+            disabled={zoom >= 3}
+            className="min-h-[44px] min-w-[44px]"
+            hapticType="light"
+          >
             <ZoomIn className="h-4 w-4" />
-          </Button>
-          <Button onClick={handleZoomReset} variant="outline" size="sm">
+          </TouchFeedbackButton>
+          <TouchFeedbackButton 
+            onClick={handleZoomReset} 
+            variant="outline" 
+            size={isMobile ? "default" : "sm"}
+            className="min-h-[44px] px-4"
+            hapticType="medium"
+          >
             <RotateCcw className="h-4 w-4" />
-          </Button>
+          </TouchFeedbackButton>
         </div>
-        <Badge variant="secondary" className="text-xs">
-          {images.length} tactical analysis image{images.length !== 1 ? 's' : ''}
+        <Badge variant="secondary" className="text-xs whitespace-nowrap">
+          {images.length} image{images.length !== 1 ? 's' : ''}
         </Badge>
       </div>
 
-      {/* Image Grid */}
+      {/* Mobile-responsive Image Grid */}
       <div 
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 transition-transform duration-200"
+        className={cn(
+          "grid gap-3 sm:gap-4 transition-transform duration-200",
+          isMobile ? "grid-cols-1" : "grid-cols-1 md:grid-cols-2 lg:grid-cols-3"
+        )}
         style={{ transform: `scale(${zoom})`, transformOrigin: 'top left' }}
       >
         {images.map((image) => (
@@ -247,7 +272,10 @@ export const TacticalFormationImageView = ({
             className="overflow-hidden hover:shadow-lg transition-all duration-200 cursor-pointer group"
             onClick={() => setSelectedImage(selectedImage === image.id ? null : image.id)}
           >
-            <div className="relative aspect-[4/3] bg-gray-100 dark:bg-gray-800">
+            <div className={cn(
+              "relative bg-gray-100 dark:bg-gray-800",
+              isMobile ? "aspect-[4/3]" : "aspect-[4/3]"
+            )}>
               {imageLoading.has(image.id) && (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
                   <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-club-gold"></div>
@@ -256,10 +284,10 @@ export const TacticalFormationImageView = ({
               
               {imageErrors.has(image.id) ? (
                 <div className="absolute inset-0 flex items-center justify-center bg-gray-100 dark:bg-gray-800">
-                  <div className="text-center space-y-2">
+                  <div className="text-center space-y-2 p-4">
                     <AlertCircle className="h-8 w-8 text-red-500 mx-auto" />
                     <p className="text-xs text-gray-600 dark:text-gray-400">Image failed to load</p>
-                    <Button 
+                    <TouchFeedbackButton 
                       onClick={(e) => {
                         e.stopPropagation();
                         setImageErrors(prev => {
@@ -270,10 +298,11 @@ export const TacticalFormationImageView = ({
                       }}
                       variant="outline" 
                       size="sm"
-                      className="text-xs"
+                      className="text-xs min-h-[44px]"
+                      hapticType="light"
                     >
                       Retry
-                    </Button>
+                    </TouchFeedbackButton>
                   </div>
                 </div>
               ) : (
@@ -288,23 +317,24 @@ export const TacticalFormationImageView = ({
                 />
               )}
               
-              {/* Overlay Controls */}
-              <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <Button
+              {/* Mobile-optimized Overlay Controls */}
+              <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <TouchFeedbackButton
                   onClick={(e) => {
                     e.stopPropagation();
                     handleDownload(image.imageUrl, image.title);
                   }}
                   variant="secondary"
                   size="sm"
-                  className="h-8 w-8 p-0"
+                  className="min-h-[44px] min-w-[44px] p-0 bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm"
+                  hapticType="medium"
                 >
                   <Download className="h-4 w-4" />
-                </Button>
+                </TouchFeedbackButton>
               </div>
 
               {/* Type Badge */}
-              <div className="absolute top-2 left-2">
+              <div className="absolute top-3 left-3">
                 <Badge className={cn("text-xs capitalize", getTypeColor(image.type))}>
                   {image.type}
                 </Badge>
@@ -312,19 +342,25 @@ export const TacticalFormationImageView = ({
 
               {/* Timestamp */}
               {image.timestamp && (
-                <div className="absolute bottom-2 right-2">
-                  <Badge variant="secondary" className="text-xs">
+                <div className="absolute bottom-3 right-3">
+                  <Badge variant="secondary" className="text-xs bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm">
                     {image.timestamp}
                   </Badge>
                 </div>
               )}
             </div>
 
-            <CardContent className="p-3">
-              <h3 className="font-medium text-sm mb-1 text-gray-900 dark:text-white">
+            <CardContent className="p-3 sm:p-4">
+              <h3 className={cn(
+                "font-medium mb-1 text-gray-900 dark:text-white",
+                isMobile ? "text-base" : "text-sm"
+              )}>
                 {image.title}
               </h3>
-              <p className="text-xs text-gray-600 dark:text-gray-400 line-clamp-2">
+              <p className={cn(
+                "text-gray-600 dark:text-gray-400 line-clamp-2",
+                isMobile ? "text-sm" : "text-xs"
+              )}>
                 {image.description}
               </p>
             </CardContent>
@@ -332,39 +368,50 @@ export const TacticalFormationImageView = ({
         ))}
       </div>
 
-      {/* Expanded View */}
+      {/* Mobile-optimized Expanded View */}
       {selectedImage && (
         <Card className="mt-6 bg-gray-50 dark:bg-gray-900">
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             {(() => {
               const image = images.find(img => img.id === selectedImage);
               if (!image) return null;
               
               return (
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="min-w-0 flex-1">
+                      <h3 className={cn(
+                        "font-semibold text-gray-900 dark:text-white",
+                        isMobile ? "text-lg" : "text-lg"
+                      )}>
                         {image.title}
                       </h3>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                      <p className={cn(
+                        "text-gray-600 dark:text-gray-400 mt-1",
+                        isMobile ? "text-sm" : "text-sm"
+                      )}>
                         {image.description}
                       </p>
                     </div>
-                    <Button
+                    <TouchFeedbackButton
                       onClick={() => setSelectedImage(null)}
                       variant="outline"
                       size="sm"
+                      className="min-h-[44px] flex-shrink-0"
+                      hapticType="light"
                     >
                       Close
-                    </Button>
+                    </TouchFeedbackButton>
                   </div>
                   
                   <div className="relative bg-white dark:bg-gray-800 rounded-lg overflow-hidden">
                     <img
                       src={getGoogleDriveDirectUrl(image.imageUrl)}
                       alt={`${image.title} - ${image.description}`}
-                      className="w-full max-h-[70vh] object-contain"
+                      className={cn(
+                        "w-full object-contain",
+                        isMobile ? "max-h-[60vh]" : "max-h-[70vh]"
+                      )}
                       loading="lazy"
                     />
                   </div>
@@ -375,17 +422,26 @@ export const TacticalFormationImageView = ({
         </Card>
       )}
 
-      {/* Error Summary */}
+      {/* Mobile-optimized Error Summary */}
       {imageErrors.size > 0 && (
-        <div className="flex items-center gap-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-          <AlertCircle className="h-4 w-4 text-amber-600 dark:text-amber-400" />
-          <span className="text-sm text-amber-800 dark:text-amber-200">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 p-4 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+          <AlertCircle className="h-5 w-5 text-amber-600 dark:text-amber-400 flex-shrink-0 mt-0.5 sm:mt-0" />
+          <span className={cn(
+            "text-amber-800 dark:text-amber-200 flex-1",
+            isMobile ? "text-sm" : "text-sm"
+          )}>
             {imageErrors.size} image{imageErrors.size !== 1 ? 's' : ''} failed to load. Using fallback display.
           </span>
-          <Button onClick={handleRetry} variant="outline" size="sm" className="ml-auto">
-            <RefreshCw className="h-4 w-4 mr-1" />
+          <TouchFeedbackButton 
+            onClick={handleRetry} 
+            variant="outline" 
+            size="sm" 
+            className="min-h-[44px] flex-shrink-0"
+            hapticType="medium"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
             Retry All
-          </Button>
+          </TouchFeedbackButton>
         </div>
       )}
     </div>

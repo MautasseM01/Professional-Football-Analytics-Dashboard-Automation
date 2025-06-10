@@ -1,3 +1,4 @@
+
 import { Player } from "@/types";
 import { PlayerProfileCard } from "./PlayerProfileCard";
 import { PlayerStatCards } from "./PlayerStatCards";
@@ -8,6 +9,7 @@ import { EnhancedPlayerHeatmap } from "./HeatmapVisualization";
 import { ResponsiveLayout } from "./ResponsiveLayout";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { usePlayerData } from "@/hooks/use-player-data";
+import { cn } from "@/lib/utils";
 
 interface PlayerStatsProps {
   player: Player | null;
@@ -21,12 +23,18 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
   
   if (!player) {
     return (
-      <div className="flex items-center justify-center min-h-[50vh] text-center container-responsive">
+      <div className="flex items-center justify-center min-h-[50vh] text-center container-responsive p-4">
         <div className="space-y-3">
-          <p className="text-lg sm:text-xl text-club-light-gray">
+          <p className={cn(
+            "text-club-light-gray font-medium",
+            isMobile ? "text-lg" : "text-xl"
+          )}>
             No player selected
           </p>
-          <p className="text-sm text-club-light-gray/60">
+          <p className={cn(
+            "text-club-light-gray/60",
+            isMobile ? "text-sm" : "text-base"
+          )}>
             Please select a player to view their statistics
           </p>
         </div>
@@ -76,7 +84,10 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
 
   return (
     <ResponsiveLayout className="w-full max-w-7xl mx-auto container-responsive">
-      <div className="space-y-6 sm:space-y-7 lg:space-y-8">
+      <div className={cn(
+        "space-y-4",
+        isMobile ? "space-y-4 px-4" : "space-y-6 lg:space-y-8"
+      )}>
         {/* Player Profile Card */}
         <div className="transition-all duration-300 ease-in-out">
           <PlayerProfileCard player={player} />
