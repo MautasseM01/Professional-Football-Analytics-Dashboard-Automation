@@ -1,4 +1,3 @@
-
 export interface Player {
   id: number;
   name: string;
@@ -15,6 +14,7 @@ export interface Player {
   reportUrl: string;
   maxSpeed?: number;
   number?: number; // Added player number field
+  sprintDistance?: number; // Added sprint distance field
 }
 
 export interface AuthUser {
