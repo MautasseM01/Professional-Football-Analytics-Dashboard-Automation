@@ -1,3 +1,4 @@
+
 export interface AuthUser {
   id: string;
   email: string;
@@ -8,6 +9,36 @@ export interface AuthUser {
     name?: string;
     avatar_url?: string;
   };
+}
+
+export interface Player {
+  id: number;
+  name: string;
+  position: string;
+  age?: number;
+  matches: number;
+  goals?: number;
+  assists?: number;
+  yellow_cards?: number;
+  red_cards?: number;
+  shots_per_game?: number;
+  pass_success?: number;
+  aerials_won?: number;
+  rating?: number;
+  team?: string;
+  number?: number;
+  distance?: number;
+  maxSpeed?: number;
+  passes_completed: number;
+  passes_attempted: number;
+  shots_on_target: number;
+  shots_total: number;
+  tackles_won: number;
+  tackles_attempted: number;
+  heatmapUrl?: string;
+  reportUrl?: string;
+  sprintDistance?: number;
+  [key: string]: any;
 }
 
 export interface PlayerData {
