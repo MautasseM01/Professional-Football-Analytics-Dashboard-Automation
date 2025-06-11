@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -29,10 +30,12 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useResponsiveBreakpoint } from "@/hooks/use-orientation";
-import { Monitor, TrendingUp, RefreshCw } from "lucide-react";
+import { Monitor, TrendingUp, RefreshCw, Loader2 } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { usePerformanceData } from "@/hooks/use-performance-data";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface PerformanceTrendsCardProps {
   player: Player;
@@ -66,95 +69,6 @@ const CHART_VIEW_OPTIONS = [
   { value: "line", label: "Line Chart" },
   { value: "area", label: "Area Chart" }
 ];
-
-// Generate enhanced match data with support for new metrics
-const generateMatchData = (player: Player, kpi: string, numMatches: number) => {
-  let baseValue = 0;
-  
-  // Set base values for each metric
-  switch (kpi) {
-    case "distance":
-      baseValue = player.distance || 10.5;
-      break;
-    case "sprintDistance":
-      baseValue = player.sprintDistance || 1.8;
-      break;
-    case "passes_completed":
-      baseValue = player.passes_completed || 45;
-      break;
-    case "shots_on_target":
-      baseValue = player.shots_on_target || 3;
-      break;
-    case "tackles_won":
-      baseValue = player.tackles_won || 5;
-      break;
-    case "goals":
-      // Generate realistic goals data (0-3 goals per match typical)
-      baseValue = 1.2;
-      break;
-    case "assists":
-      // Generate realistic assists data (0-2 assists per match typical)
-      baseValue = 0.8;
-      break;
-    case "match_rating":
-      // Generate realistic match ratings (6.0-9.0 scale)
-      baseValue = 7.5;
-      break;
-    default:
-      baseValue = 1;
-  }
-  
-  return Array.from({ length: numMatches }, (_, i) => {
-    let variationFactor = 0.2;
-    let value: number;
-    
-    if (kpi === "sprintDistance" || kpi === "distance") {
-      variationFactor = 0.15;
-      value = Math.max(0, baseValue * (1 + (Math.random() * 2 - 1) * variationFactor));
-    } else if (kpi === "tackles_won" || kpi === "shots_on_target") {
-      variationFactor = 0.3;
-      value = Math.max(0, baseValue * (1 + (Math.random() * 2 - 1) * variationFactor));
-    } else if (kpi === "goals") {
-      // Goals: discrete values 0-3, with realistic distribution
-      const rand = Math.random();
-      if (rand < 0.3) value = 0;
-      else if (rand < 0.6) value = 1;
-      else if (rand < 0.85) value = 2;
-      else value = 3;
-    } else if (kpi === "assists") {
-      // Assists: discrete values 0-2, with realistic distribution
-      const rand = Math.random();
-      if (rand < 0.4) value = 0;
-      else if (rand < 0.8) value = 1;
-      else value = 2;
-    } else if (kpi === "match_rating") {
-      // Match rating: 6.0-9.0 scale with normal distribution around 7.5
-      const variation = (Math.random() * 2 - 1) * 1.0; // ±1.0 variation
-      value = Math.max(6.0, Math.min(9.0, baseValue + variation));
-    } else {
-      value = Math.max(0, baseValue * (1 + (Math.random() * 2 - 1) * variationFactor));
-    }
-    
-    // Round appropriately for each metric
-    let roundedValue: number;
-    if (kpi === "sprintDistance" || kpi === "distance") {
-      roundedValue = Number(value.toFixed(2));
-    } else if (kpi === "match_rating") {
-      roundedValue = Number(value.toFixed(1));
-    } else {
-      roundedValue = Math.round(value);
-    }
-    
-    const matchDate = new Date();
-    matchDate.setDate(matchDate.getDate() - (i * 7));
-    
-    return {
-      match: `Match ${numMatches - i}`,
-      date: matchDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-      value: roundedValue,
-    };
-  }).reverse();
-};
 
 // Calculate moving average
 const calculateMovingAverage = (data: Array<{value: number}>, windowSize: number) => {
@@ -201,7 +115,6 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
   const [chartView, setChartView] = useState("area");
   const [showMovingAverage, setShowMovingAverage] = useState(false);
   const [showStats, setShowStats] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
   const isMobile = useIsMobile();
   const breakpoint = useResponsiveBreakpoint();
   const { theme } = useTheme();
@@ -214,41 +127,22 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
   // Get the selected KPI label
   const selectedKPILabel = KPI_OPTIONS.find(option => option.value === selectedKPI)?.label || "";
   
-  // Determine the number of matches based on selected time period
-  const getMatchCount = () => {
-    switch (selectedTimePeriod) {
-      case "last3": return 3;
-      case "last5": return 5;
-      case "last10": return 10;
-      case "last15": return 15;
-      case "season": return 20;
-      case "home": return 10;
-      case "away": return 10;
-      default: return 5;
-    }
-  };
-  
-  // Generate match data based on selected KPI and time period
+  // Fetch real performance data
+  const { data: rawMatchData, loading, error } = usePerformanceData(player, selectedKPI, selectedTimePeriod);
+
+  // Process match data with moving average if needed
   const matchData = useMemo(() => {
-    const numMatches = getMatchCount();
-    const rawData = generateMatchData(player, selectedKPI, numMatches);
+    if (!rawMatchData || rawMatchData.length === 0) return [];
     
     return showMovingAverage 
-      ? calculateMovingAverage(rawData, 3)
-      : rawData;
-  }, [player, selectedKPI, selectedTimePeriod, showMovingAverage]);
+      ? calculateMovingAverage(rawMatchData, 3)
+      : rawMatchData;
+  }, [rawMatchData, showMovingAverage]);
 
   // Calculate performance statistics
   const stats = useMemo(() => {
     return calculateStats(matchData);
   }, [matchData]);
-
-  // Refresh data handler
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setRefreshing(false);
-  };
 
   // Responsive chart configuration
   const getChartConfig = () => {
@@ -335,6 +229,72 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
     }
     return null;
   };
+
+  // Show loading state
+  if (loading) {
+    return (
+      <Card className={cn(
+        "border-club-gold/20 w-full overflow-hidden",
+        theme === 'dark' ? "bg-club-dark-gray" : "bg-white"
+      )}>
+        <CardContent className="flex items-center justify-center p-8">
+          <div className="flex items-center gap-3">
+            <Loader2 className="h-5 w-5 animate-spin text-club-gold" />
+            <span className={cn(
+              "text-sm",
+              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+            )}>
+              Loading performance data...
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show error state
+  if (error) {
+    return (
+      <Card className={cn(
+        "border-club-gold/20 w-full overflow-hidden",
+        theme === 'dark' ? "bg-club-dark-gray" : "bg-white"
+      )}>
+        <CardContent className="p-6">
+          <Alert className="border-red-500/20 bg-red-500/10">
+            <AlertDescription className="text-red-600 dark:text-red-400">
+              Failed to load performance data: {error}
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show no data state
+  if (!matchData || matchData.length === 0) {
+    return (
+      <Card className={cn(
+        "border-club-gold/20 w-full overflow-hidden",
+        theme === 'dark' ? "bg-club-dark-gray" : "bg-white"
+      )}>
+        <CardHeader className="pb-3">
+          <CardTitle className={cn(
+            "text-sm sm:text-base lg:text-lg xl:text-xl font-semibold",
+            theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+          )}>
+            {player.name}'s Performance Trends
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <Alert className="border-yellow-500/20 bg-yellow-500/10">
+            <AlertDescription className="text-yellow-600 dark:text-yellow-400">
+              No performance data available for the selected time period. Please check if there are matches in the database.
+            </AlertDescription>
+          </Alert>
+        </CardContent>
+      </Card>
+    );
+  }
 
   // If screen is too small, show optimized mobile view
   if (isVerySmallScreen) {
@@ -485,17 +445,6 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
               )}
             </div>
           </div>
-
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="h-8 px-3 border-club-gold/20 hover:bg-club-gold/10 text-club-gold"
-          >
-            <RefreshCw size={14} className={cn("mr-1", refreshing && "animate-spin")} />
-            Refresh
-          </Button>
         </div>
       </CardHeader>
 
