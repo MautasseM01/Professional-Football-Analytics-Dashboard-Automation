@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -39,13 +38,16 @@ interface PerformanceTrendsCardProps {
   player: Player;
 }
 
-// Enhanced KPI options with club gold theming
+// Enhanced KPI options with club gold theming - now includes all 8 metrics
 const KPI_OPTIONS = [
   { value: "distance", label: "Total Distance (km)", color: "#D4AF37" },
   { value: "sprintDistance", label: "Sprint Distance (km)", color: "#D4AF37" },
   { value: "passes_completed", label: "Passes Completed", color: "#D4AF37" },
   { value: "shots_on_target", label: "Shots on Target", color: "#D4AF37" },
-  { value: "tackles_won", label: "Tackles Won", color: "#D4AF37" }
+  { value: "tackles_won", label: "Tackles Won", color: "#D4AF37" },
+  { value: "goals", label: "Goals", color: "#D4AF37" },
+  { value: "assists", label: "Assists", color: "#D4AF37" },
+  { value: "match_rating", label: "Match Rating", color: "#D4AF37" }
 ];
 
 // Enhanced time period options
@@ -65,25 +67,83 @@ const CHART_VIEW_OPTIONS = [
   { value: "area", label: "Area Chart" }
 ];
 
-// Generate enhanced match data
+// Generate enhanced match data with support for new metrics
 const generateMatchData = (player: Player, kpi: string, numMatches: number) => {
-  const baseValue = player[kpi as keyof Player] as number || 0;
+  let baseValue = 0;
+  
+  // Set base values for each metric
+  switch (kpi) {
+    case "distance":
+      baseValue = player.distance || 10.5;
+      break;
+    case "sprintDistance":
+      baseValue = player.sprintDistance || 1.8;
+      break;
+    case "passes_completed":
+      baseValue = player.passes_completed || 45;
+      break;
+    case "shots_on_target":
+      baseValue = player.shots_on_target || 3;
+      break;
+    case "tackles_won":
+      baseValue = player.tackles_won || 5;
+      break;
+    case "goals":
+      // Generate realistic goals data (0-3 goals per match typical)
+      baseValue = 1.2;
+      break;
+    case "assists":
+      // Generate realistic assists data (0-2 assists per match typical)
+      baseValue = 0.8;
+      break;
+    case "match_rating":
+      // Generate realistic match ratings (6.0-9.0 scale)
+      baseValue = 7.5;
+      break;
+    default:
+      baseValue = 1;
+  }
   
   return Array.from({ length: numMatches }, (_, i) => {
     let variationFactor = 0.2;
+    let value: number;
     
     if (kpi === "sprintDistance" || kpi === "distance") {
       variationFactor = 0.15;
+      value = Math.max(0, baseValue * (1 + (Math.random() * 2 - 1) * variationFactor));
     } else if (kpi === "tackles_won" || kpi === "shots_on_target") {
       variationFactor = 0.3;
+      value = Math.max(0, baseValue * (1 + (Math.random() * 2 - 1) * variationFactor));
+    } else if (kpi === "goals") {
+      // Goals: discrete values 0-3, with realistic distribution
+      const rand = Math.random();
+      if (rand < 0.3) value = 0;
+      else if (rand < 0.6) value = 1;
+      else if (rand < 0.85) value = 2;
+      else value = 3;
+    } else if (kpi === "assists") {
+      // Assists: discrete values 0-2, with realistic distribution
+      const rand = Math.random();
+      if (rand < 0.4) value = 0;
+      else if (rand < 0.8) value = 1;
+      else value = 2;
+    } else if (kpi === "match_rating") {
+      // Match rating: 6.0-9.0 scale with normal distribution around 7.5
+      const variation = (Math.random() * 2 - 1) * 1.0; // ±1.0 variation
+      value = Math.max(6.0, Math.min(9.0, baseValue + variation));
+    } else {
+      value = Math.max(0, baseValue * (1 + (Math.random() * 2 - 1) * variationFactor));
     }
     
-    const variation = (Math.random() * 2 - 1) * variationFactor;
-    const value = Math.max(0, baseValue * (1 + variation));
-    
-    const roundedValue = kpi === "sprintDistance" || kpi === "distance" 
-      ? Number(value.toFixed(2)) 
-      : Math.round(value);
+    // Round appropriately for each metric
+    let roundedValue: number;
+    if (kpi === "sprintDistance" || kpi === "distance") {
+      roundedValue = Number(value.toFixed(2));
+    } else if (kpi === "match_rating") {
+      roundedValue = Number(value.toFixed(1));
+    } else {
+      roundedValue = Math.round(value);
+    }
     
     const matchDate = new Date();
     matchDate.setDate(matchDate.getDate() - (i * 7));
@@ -234,10 +294,19 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
 
   const chartConfig = getChartConfig();
 
-  // Enhanced tooltip component
+  // Enhanced tooltip component with better formatting for new metrics
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
+      const formatValue = (value: number, metric: string) => {
+        if (metric === "match_rating") {
+          return value.toFixed(1);
+        } else if (metric === "distance" || metric === "sprintDistance") {
+          return value.toFixed(2);
+        }
+        return value.toString();
+      };
+      
       return (
         <div className={cn(
           "border rounded-lg shadow-lg backdrop-blur-sm max-w-[200px] p-3",
@@ -251,14 +320,14 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
             theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
           )}>{data.date}</p>
           <p className="text-club-gold font-medium text-xs sm:text-sm">
-            {selectedKPILabel}: {data.value}
+            {selectedKPILabel}: {formatValue(data.value, selectedKPI)}
           </p>
           {showMovingAverage && data.movingAvg !== null && (
             <p className={cn(
               "text-xs",
               theme === 'dark' ? "text-gray-400" : "text-gray-500"
             )}>
-              3-Match Avg: {data.movingAvg}
+              3-Match Avg: {formatValue(data.movingAvg, selectedKPI)}
             </p>
           )}
         </div>
