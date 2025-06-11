@@ -2,8 +2,15 @@
 import { useState } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useUserProfile } from "@/hooks/use-user-profile";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { AdminDashboard } from "@/components/dashboards/AdminDashboard";
+import { ManagementDashboard } from "@/components/dashboards/ManagementDashboard";
+import { PerformanceDirectorDashboard } from "@/components/dashboards/PerformanceDirectorDashboard";
+import { CoachDashboard } from "@/components/dashboards/CoachDashboard";
+import { AnalystDashboard } from "@/components/dashboards/AnalystDashboard";
+import { PlayerDashboard } from "@/components/dashboards/PlayerDashboard";
+import { UnassignedRoleDashboard } from "@/components/dashboards/UnassignedRoleDashboard";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -13,28 +20,66 @@ import { Menu, RefreshCw } from "lucide-react";
 import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
 
 const Dashboard = () => {
-  const {
-    loading: playerDataLoading,
-    refreshData
-  } = usePlayerData();
-  const {
-    t
-  } = useLanguage();
+  const { loading: playerDataLoading, refreshData } = usePlayerData();
+  const { t } = useLanguage();
+  const { profile } = useUserProfile();
   const [showSidebar, setShowSidebar] = useState(true);
-  
-  // Mock profile for demo purposes
-  const mockProfile = {
-    id: 'demo-user',
-    email: 'demo@example.com',
-    role: 'admin' as const,
-    full_name: 'Demo User',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString()
-  };
 
   const handleRefresh = () => {
     console.log("Manual refresh triggered");
     refreshData();
+  };
+
+  // Render appropriate dashboard based on role
+  const renderDashboard = () => {
+    if (!profile) return <AdminDashboard profile={{
+      id: 'demo-user',
+      email: 'demo@example.com',
+      role: 'admin',
+      full_name: 'Demo User',
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
+    }} />;
+
+    switch (profile.role) {
+      case 'admin':
+        return <AdminDashboard profile={profile} />;
+      case 'management':
+        return <ManagementDashboard profile={profile} />;
+      case 'performance_director':
+        return <PerformanceDirectorDashboard profile={profile} />;
+      case 'coach':
+        return <CoachDashboard profile={profile} />;
+      case 'analyst':
+        return <AnalystDashboard profile={profile} />;
+      case 'player':
+        return <PlayerDashboard profile={profile} />;
+      case 'unassigned':
+        return <UnassignedRoleDashboard profile={profile} />;
+      default:
+        return <AdminDashboard profile={profile} />;
+    }
+  };
+
+  const getDashboardTitle = () => {
+    switch (profile?.role) {
+      case 'admin':
+        return 'Admin Dashboard';
+      case 'management':
+        return 'Management Dashboard';
+      case 'performance_director':
+        return 'Performance Director Dashboard';
+      case 'coach':
+        return 'Coach Dashboard';
+      case 'analyst':
+        return 'Analytics Dashboard';
+      case 'player':
+        return 'Player Dashboard';
+      case 'unassigned':
+        return 'Account Setup Required';
+      default:
+        return 'Dashboard';
+    }
   };
 
   return (
@@ -50,7 +95,7 @@ const Dashboard = () => {
                 {t('header.title')}
               </h1>
               <p className="text-ios-caption text-gray-600 dark:text-gray-400 truncate">
-                Admin {t('header.dashboard')} (Demo Mode)
+                {getDashboardTitle()} (Demo Mode)
               </p>
             </div>
             
@@ -94,13 +139,13 @@ const Dashboard = () => {
         </header>
         
         <main className="bg-transparent transition-colors duration-300 w-full">
-          {/* Role Tester for demo */}
+          {/* Role Tester for demo - prominently displayed */}
           <div className="p-4 sm:p-6 pb-0">
             <RoleTester />
           </div>
           
-          {/* Always show Admin Dashboard for demo */}
-          <AdminDashboard profile={mockProfile} />
+          {/* Render role-specific dashboard */}
+          {renderDashboard()}
         </main>
       </div>
 
