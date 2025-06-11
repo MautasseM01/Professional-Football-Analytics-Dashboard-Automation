@@ -1,288 +1,567 @@
 
-import { useState, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { Player } from "@/types";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { 
-  Card, 
-  CardContent, 
-  CardDescription, 
-  CardHeader, 
-  CardTitle 
-} from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ImageOff, ZoomIn, Activity } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
-import { getGoogleDriveThumbnailUrl } from "@/lib/image-utils";
+import { 
+  ZoomIn, 
+  ZoomOut, 
+  RotateCcw, 
+  Maximize2, 
+  Minimize2, 
+  Activity,
+  Eye,
+  EyeOff,
+  BarChart3
+} from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext";
+import { useHeatmapData, TimePeriod } from "@/hooks/use-heatmap-data";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { PlayerAvatar } from "@/components/PlayerAvatar";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 
 interface HeatmapCardProps {
   player: Player;
 }
 
-type MatchPeriod = 'First Half' | 'Second Half' | 'Full Match';
+interface HeatmapPoint {
+  x: number;
+  y: number;
+  intensity: number;
+  timestamp?: number;
+}
 
 export const HeatmapCard = ({ player }: HeatmapCardProps) => {
-  const [imageError, setImageError] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
-  const [selectedPeriod, setSelectedPeriod] = useState<MatchPeriod>('Full Match');
-  const [imageLoaded, setImageLoaded] = useState(false);
+  const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('full_match');
+  const [zoomLevel, setZoomLevel] = useState(1);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showPlayerIllustration, setShowPlayerIllustration] = useState(true);
+  const [isDragging, setIsDragging] = useState(false);
+  const [lastPanPoint, setLastPanPoint] = useState({ x: 0, y: 0 });
+  
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { theme } = useTheme();
   const isMobile = useIsMobile();
   
-  // Reset state when player changes to ensure image corresponds to current player
+  const { data: heatmapData, loading, error } = useHeatmapData(player, selectedPeriod);
+
+  // Draw football field background
+  const drawFootballField = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    ctx.clearRect(0, 0, width, height);
+    
+    ctx.save();
+    ctx.translate(width / 2 + panOffset.x, height / 2 + panOffset.y);
+    ctx.scale(zoomLevel, zoomLevel);
+    ctx.translate(-width / 2, -height / 2);
+    
+    const fieldWidth = width * 0.9;
+    const fieldHeight = height * 0.85;
+    const fieldX = (width - fieldWidth) / 2;
+    const fieldY = (height - fieldHeight) / 2;
+    
+    // Enhanced field background
+    const gradient = ctx.createLinearGradient(fieldX, fieldY, fieldX, fieldY + fieldHeight);
+    gradient.addColorStop(0, theme === 'dark' ? '#0f172a' : '#166534');
+    gradient.addColorStop(0.5, theme === 'dark' ? '#1e293b' : '#15803d');
+    gradient.addColorStop(1, theme === 'dark' ? '#0f172a' : '#14532d');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(fieldX, fieldY, fieldWidth, fieldHeight);
+    
+    // Field markings
+    ctx.strokeStyle = '#D4AF37';
+    ctx.lineWidth = 3;
+    ctx.setLineDash([]);
+    
+    // Outer boundary
+    ctx.strokeRect(fieldX, fieldY, fieldWidth, fieldHeight);
+    
+    // Center line
+    ctx.beginPath();
+    ctx.moveTo(fieldX + fieldWidth / 2, fieldY);
+    ctx.lineTo(fieldX + fieldWidth / 2, fieldY + fieldHeight);
+    ctx.stroke();
+    
+    // Center circle
+    const centerX = fieldX + fieldWidth / 2;
+    const centerY = fieldY + fieldHeight / 2;
+    const centerRadius = Math.min(fieldWidth, fieldHeight) * 0.08;
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, centerRadius, 0, Math.PI * 2);
+    ctx.stroke();
+    
+    // Center spot
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#D4AF37';
+    ctx.fill();
+    
+    // Penalty areas
+    const penaltyWidth = fieldWidth * 0.14;
+    const penaltyHeight = fieldHeight * 0.35;
+    const penaltyY = (fieldHeight - penaltyHeight) / 2 + fieldY;
+    
+    // Left penalty area
+    ctx.strokeRect(fieldX, penaltyY, penaltyWidth, penaltyHeight);
+    // Right penalty area
+    ctx.strokeRect(fieldX + fieldWidth - penaltyWidth, penaltyY, penaltyWidth, penaltyHeight);
+    
+    // Goal areas
+    const goalWidth = fieldWidth * 0.05;
+    const goalHeight = fieldHeight * 0.18;
+    const goalY = (fieldHeight - goalHeight) / 2 + fieldY;
+    
+    ctx.strokeRect(fieldX, goalY, goalWidth, goalHeight);
+    ctx.strokeRect(fieldX + fieldWidth - goalWidth, goalY, goalWidth, goalHeight);
+    
+    // Penalty spots
+    ctx.beginPath();
+    ctx.arc(fieldX + penaltyWidth * 0.7, centerY, 3, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.beginPath();
+    ctx.arc(fieldX + fieldWidth - penaltyWidth * 0.7, centerY, 3, 0, Math.PI * 2);
+    ctx.fill();
+    
+    ctx.restore();
+  }, [zoomLevel, panOffset, theme]);
+
+  // Draw heatmap overlay
+  const drawHeatmap = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
+    if (!heatmapData.length) return;
+    
+    ctx.save();
+    ctx.translate(width / 2 + panOffset.x, height / 2 + panOffset.y);
+    ctx.scale(zoomLevel, zoomLevel);
+    ctx.translate(-width / 2, -height / 2);
+    
+    heatmapData.forEach(point => {
+      const x = point.x * width;
+      const y = point.y * height;
+      const radius = Math.max(25, 45 * point.intensity) * zoomLevel;
+      
+      const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
+      
+      // Enhanced colorblind-friendly color scheme
+      if (point.intensity < 0.25) {
+        gradient.addColorStop(0, `rgba(37, 99, 235, ${Math.min(point.intensity * 1.2, 0.9)})`);
+        gradient.addColorStop(0.7, `rgba(37, 99, 235, ${point.intensity * 0.6})`);
+        gradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
+      } else if (point.intensity < 0.5) {
+        gradient.addColorStop(0, `rgba(6, 182, 212, ${Math.min(point.intensity * 1.2, 0.9)})`);
+        gradient.addColorStop(0.7, `rgba(6, 182, 212, ${point.intensity * 0.6})`);
+        gradient.addColorStop(1, 'rgba(6, 182, 212, 0)');
+      } else if (point.intensity < 0.75) {
+        gradient.addColorStop(0, `rgba(212, 175, 55, ${Math.min(point.intensity * 1.2, 0.9)})`);
+        gradient.addColorStop(0.7, `rgba(212, 175, 55, ${point.intensity * 0.6})`);
+        gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
+      } else {
+        gradient.addColorStop(0, `rgba(220, 38, 127, ${Math.min(point.intensity * 1.2, 0.9)})`);
+        gradient.addColorStop(0.7, `rgba(220, 38, 127, ${point.intensity * 0.6})`);
+        gradient.addColorStop(1, 'rgba(220, 38, 127, 0)');
+      }
+      
+      ctx.fillStyle = gradient;
+      ctx.beginPath();
+      ctx.arc(x, y, radius, 0, Math.PI * 2);
+      ctx.fill();
+    });
+    
+    ctx.restore();
+  }, [heatmapData, zoomLevel, panOffset]);
+
+  // Redraw canvas when data changes
   useEffect(() => {
-    console.log(`Player in HeatmapCard: ${player.name}, Setting image URL to: ${player.heatmapUrl}`);
-    setImageError(false);
-    setImageLoaded(false);
-    setImageUrl(player.heatmapUrl);
-  }, [player.id]);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    
+    const { width, height } = canvas;
+    drawFootballField(ctx, width, height);
+    drawHeatmap(ctx, width, height);
+  }, [drawFootballField, drawHeatmap]);
 
-  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement, Event>) => {
-    console.error("Error loading heatmap image:", e);
-    console.log("Failed URL:", imageUrl);
-    setImageError(true);
-    setImageLoaded(false);
-    toast({
-      title: "Image loading error",
-      description: "Could not load the player heatmap image",
-      variant: "destructive"
+  // Handle mouse events
+  const handlePointerDown = useCallback((e: React.PointerEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+    setLastPanPoint({ x: e.clientX, y: e.clientY });
+  }, []);
+
+  const handlePointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging) return;
+    
+    const deltaX = e.clientX - lastPanPoint.x;
+    const deltaY = e.clientY - lastPanPoint.y;
+    
+    setPanOffset({
+      x: panOffset.x + deltaX,
+      y: panOffset.y + deltaY
     });
+    
+    setLastPanPoint({ x: e.clientX, y: e.clientY });
+  }, [isDragging, lastPanPoint, panOffset]);
+
+  const handlePointerUp = useCallback(() => {
+    setIsDragging(false);
+  }, []);
+
+  const handleWheel = useCallback((e: React.WheelEvent) => {
+    e.preventDefault();
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const newZoom = Math.min(3, Math.max(0.5, zoomLevel * delta));
+    setZoomLevel(newZoom);
+  }, [zoomLevel]);
+
+  const handleZoomIn = () => setZoomLevel(prev => Math.min(prev * 1.2, 3));
+  const handleZoomOut = () => setZoomLevel(prev => Math.max(prev / 1.2, 0.5));
+  const handleResetZoom = () => {
+    setZoomLevel(1);
+    setPanOffset({ x: 0, y: 0 });
   };
 
-  const handleImageLoad = () => {
-    setImageLoaded(true);
-    setImageError(false);
-  };
+  const availableMatches = [
+    { id: 'match1', date: '2024-01-15', opponent: 'Barcelona' },
+    { id: 'match2', date: '2024-01-10', opponent: 'Real Madrid' },
+    { id: 'match3', date: '2024-01-05', opponent: 'Atletico Madrid' },
+  ];
 
-  const tryAlternativeUrl = () => {
-    const thumbnailUrl = getGoogleDriveThumbnailUrl(player.heatmapUrl);
-    if (thumbnailUrl) {
-      console.log(`Trying thumbnail URL for ${player.name}:`, thumbnailUrl);
-      setImageUrl(thumbnailUrl);
-      setImageError(false);
-      setImageLoaded(false);
-    }
-  };
-
-  const resetImageError = () => {
-    console.log(`Resetting to original URL for ${player.name}:`, player.heatmapUrl);
-    setImageUrl(player.heatmapUrl);
-    setImageError(false);
-    setImageLoaded(false);
-  };
-
-  const handlePeriodChange = (period: string) => {
-    setSelectedPeriod(period as MatchPeriod);
-    console.log(`Selected period changed to: ${period}`);
-    toast({
-      title: "Period Changed",
-      description: `Heatmap updated to show ${period} data`,
-    });
-  };
-
-  // Only show football pitch overlay when there's no image or when there's an error
-  const showPitchOverlay = !player.heatmapUrl || imageError;
+  if (loading) {
+    return (
+      <Card className={cn(
+        "relative overflow-hidden transition-all duration-300",
+        theme === 'dark' ? "bg-club-dark-gray/50 border-club-gold/20" : "bg-white/90 border-club-gold/30"
+      )}>
+        <LoadingOverlay isLoading={loading} />
+        <CardContent className="p-6 min-h-[400px]" />
+      </Card>
+    );
+  }
 
   return (
-    <Card className="bg-white/98 dark:bg-slate-900/98 backdrop-blur-xl border-2 border-slate-300/50 dark:border-slate-700/50 shadow-2xl w-full h-full flex flex-col">
-      <CardHeader className={`flex-shrink-0 bg-gradient-to-r from-slate-50/95 to-blue-50/95 dark:from-slate-800/95 dark:to-slate-700/95 border-b-2 border-slate-300/50 dark:border-slate-600/50 ${isMobile ? 'p-3 pb-2' : 'p-4 sm:p-6 pb-3 sm:pb-4'}`}>
-        <div className={`flex flex-col ${isMobile ? 'space-y-2' : 'space-y-3 sm:space-y-0 sm:flex-row sm:items-start sm:justify-between sm:gap-4'}`}>
-          <div className="min-w-0 flex-1">
-            <CardTitle className={`text-slate-900 dark:text-slate-100 font-bold tracking-tight flex items-center gap-2 ${
-              isMobile ? 'text-base' : 'text-lg sm:text-xl lg:text-2xl'
-            }`}>
-              <Activity className="w-5 h-5 text-blue-600 dark:text-blue-400" />
-              Performance Heatmap
-            </CardTitle>
-            <CardDescription className={`text-slate-700 dark:text-slate-300 mt-2 font-semibold ${
-              isMobile ? 'text-xs' : 'text-sm sm:text-base'
-            }`}>
-              Player's match positioning and movement patterns
-            </CardDescription>
-          </div>
-          <div className="flex-shrink-0 w-full sm:w-auto">
-            <Select onValueChange={handlePeriodChange} value={selectedPeriod}>
-              <SelectTrigger className={`bg-white/95 dark:bg-slate-800/95 text-slate-900 dark:text-slate-100 border-2 border-slate-400 dark:border-slate-500 focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400 shadow-lg backdrop-blur-sm font-medium ${
-                isMobile 
-                  ? 'w-full h-12 text-sm min-h-[48px]' 
-                  : 'w-full sm:w-[160px] lg:w-[180px] h-11'
-              }`}>
-                <SelectValue placeholder="Select Period" />
-              </SelectTrigger>
-              <SelectContent className="bg-white/98 dark:bg-slate-900/98 text-slate-900 dark:text-slate-100 border-2 border-slate-400 dark:border-slate-500 shadow-2xl backdrop-blur-xl z-50">
-                <SelectItem value="Full Match" className="hover:bg-blue-50 dark:hover:bg-slate-700 focus:bg-blue-100 dark:focus:bg-slate-600 font-medium">Full Match</SelectItem>
-                <SelectItem value="First Half" className="hover:bg-blue-50 dark:hover:bg-slate-700 focus:bg-blue-100 dark:focus:bg-slate-600 font-medium">First Half</SelectItem>
-                <SelectItem value="Second Half" className="hover:bg-blue-50 dark:hover:bg-slate-700 focus:bg-blue-100 dark:focus:bg-slate-600 font-medium">Second Half</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </CardHeader>
-      
-      <CardContent className={`flex-1 flex flex-col min-h-0 bg-gradient-to-br from-slate-50/80 to-blue-50/80 dark:from-slate-800/80 dark:to-slate-900/80 ${isMobile ? 'p-3 pt-0' : 'p-4 sm:p-6 pt-0'}`}>
-        {player.heatmapUrl ? (
-          <div className="flex-1 flex flex-col">
-            {/* Enhanced player name and period info with better contrast */}
-            {imageLoaded && (
-              <div className={`mb-2 sm:mb-3 text-center bg-white/95 dark:bg-slate-900/95 backdrop-blur-md rounded-xl px-4 py-3 shadow-lg border-2 border-slate-300/50 dark:border-slate-700/50 ${
-                isMobile ? 'text-xs' : 'text-sm'
-              }`}>
-                <span className="text-blue-700 dark:text-blue-300 font-bold">{player.name}'s Heatmap</span>
-                <span className="text-slate-500 dark:text-slate-400 mx-3 font-bold">•</span>
-                <span className="text-slate-700 dark:text-slate-300 font-semibold">{selectedPeriod}</span>
-              </div>
-            )}
-            
-            <div 
-              className={`relative w-full rounded-2xl overflow-hidden bg-gradient-to-br from-green-200 to-emerald-300 dark:from-green-900/50 dark:to-emerald-900/50 border-2 border-green-400/60 dark:border-green-700/60 shadow-xl flex-1 ${
-                isMobile ? 'touch-pan-x touch-pan-y' : ''
-              }`}
-              style={{ 
-                aspectRatio: isMobile ? '4/3' : '16/10',
-                minHeight: isMobile ? '200px' : '300px',
-                maxHeight: isMobile ? '350px' : '500px'
-              }}
-            >
-              {/* Enhanced football pitch SVG overlay with better contrast */}
-              {showPitchOverlay && (
-                <svg 
-                  className="absolute inset-0 w-full h-full z-10 pointer-events-none" 
-                  viewBox="0 0 1050 680" 
-                  fill="none" 
-                  xmlns="http://www.w3.org/2000/svg"
-                  preserveAspectRatio="xMidYMid meet"
-                >
-                  {/* Enhanced pitch outline with triple stroke for maximum contrast */}
-                  <rect x="48" y="48" width="954" height="584" stroke="#000000" strokeWidth="6" fill="none" />
-                  <rect x="49" y="49" width="952" height="582" stroke="#ffffff" strokeWidth="4" fill="none" />
-                  <rect x="50" y="50" width="950" height="580" stroke="#1f2937" strokeWidth="2" fill="none" />
-                  
-                  {/* Enhanced center line with triple stroke */}
-                  <line x1="525" y1="50" x2="525" y2="630" stroke="#000000" strokeWidth="6" />
-                  <line x1="525" y1="50" x2="525" y2="630" stroke="#ffffff" strokeWidth="4" />
-                  <line x1="525" y1="50" x2="525" y2="630" stroke="#1f2937" strokeWidth="2" />
-                  
-                  {/* Enhanced center circle with triple stroke */}
-                  <circle cx="525" cy="340" r="93.5" stroke="#000000" strokeWidth="6" fill="none" />
-                  <circle cx="525" cy="340" r="92.5" stroke="#ffffff" strokeWidth="4" fill="none" />
-                  <circle cx="525" cy="340" r="91.5" stroke="#1f2937" strokeWidth="2" fill="none" />
-                  <circle cx="525" cy="340" r="6" fill="#000000" />
-                  <circle cx="525" cy="340" r="4" fill="#ffffff" />
-                  <circle cx="525" cy="340" r="2" fill="#1f2937" />
-                  
-                  {/* Enhanced penalty areas with triple stroke */}
-                  <rect x="48" y="193" width="169" height="294" stroke="#000000" strokeWidth="6" fill="none" />
-                  <rect x="49" y="194" width="167" height="292" stroke="#ffffff" strokeWidth="4" fill="none" />
-                  <rect x="50" y="195" width="165" height="290" stroke="#1f2937" strokeWidth="2" fill="none" />
-                  <rect x="833" y="193" width="169" height="294" stroke="#000000" strokeWidth="6" fill="none" />
-                  <rect x="834" y="194" width="167" height="292" stroke="#ffffff" strokeWidth="4" fill="none" />
-                  <rect x="835" y="195" width="165" height="290" stroke="#1f2937" strokeWidth="2" fill="none" />
-                  
-                  {/* Enhanced goal areas */}
-                  <rect x="48" y="263" width="59" height="154" stroke="#000000" strokeWidth="6" fill="none" />
-                  <rect x="49" y="264" width="57" height="152" stroke="#ffffff" strokeWidth="4" fill="none" />
-                  <rect x="50" y="265" width="55" height="150" stroke="#1f2937" strokeWidth="2" fill="none" />
-                  <rect x="943" y="263" width="59" height="154" stroke="#000000" strokeWidth="6" fill="none" />
-                  <rect x="944" y="264" width="57" height="152" stroke="#ffffff" strokeWidth="4" fill="none" />
-                  <rect x="945" y="265" width="55" height="150" stroke="#1f2937" strokeWidth="2" fill="none" />
-                  
-                  {/* Enhanced penalty spots with triple circle */}
-                  <circle cx="165" cy="340" r="6" fill="#000000" />
-                  <circle cx="165" cy="340" r="4" fill="#ffffff" />
-                  <circle cx="165" cy="340" r="2" fill="#1f2937" />
-                  <circle cx="885" cy="340" r="6" fill="#000000" />
-                  <circle cx="885" cy="340" r="4" fill="#ffffff" />
-                  <circle cx="885" cy="340" r="2" fill="#1f2937" />
-                  
-                  {/* Enhanced corner arcs with triple stroke */}
-                  <path d="M62 62 A 12 12 0 0 1 50 48" stroke="#000000" strokeWidth="6" fill="none" />
-                  <path d="M61 61 A 11 11 0 0 1 50 49" stroke="#ffffff" strokeWidth="4" fill="none" />
-                  <path d="M60 60 A 10 10 0 0 1 50 50" stroke="#1f2937" strokeWidth="2" fill="none" />
-                  <path d="M988 62 A 12 12 0 0 0 1000 48" stroke="#000000" strokeWidth="6" fill="none" />
-                  <path d="M989 61 A 11 11 0 0 0 1000 49" stroke="#ffffff" strokeWidth="4" fill="none" />
-                  <path d="M990 60 A 10 10 0 0 0 1000 50" stroke="#1f2937" strokeWidth="2" fill="none" />
-                  <path d="M62 618 A 12 12 0 0 0 50 632" stroke="#000000" strokeWidth="6" fill="none" />
-                  <path d="M61 619 A 11 11 0 0 0 50 631" stroke="#ffffff" strokeWidth="4" fill="none" />
-                  <path d="M60 620 A 10 10 0 0 0 50 630" stroke="#1f2937" strokeWidth="2" fill="none" />
-                  <path d="M988 618 A 12 12 0 0 1 1000 632" stroke="#000000" strokeWidth="6" fill="none" />
-                  <path d="M989 619 A 11 11 0 0 1 1000 631" stroke="#ffffff" strokeWidth="4" fill="none" />
-                  <path d="M990 620 A 10 10 0 0 1 1000 630" stroke="#1f2937" strokeWidth="2" fill="none" />
-                </svg>
-              )}
-              
-              {imageError ? (
-                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/98 dark:bg-slate-900/98 backdrop-blur-lg p-3 sm:p-4 z-20 border-2 border-red-300 dark:border-red-700 rounded-2xl m-2 shadow-xl">
-                  <div className="bg-red-100 dark:bg-red-900/60 rounded-full p-4 mb-4 shadow-lg border-2 border-red-200 dark:border-red-800">
-                    <ImageOff className={`text-red-700 dark:text-red-300 ${isMobile ? 'w-8 h-8' : 'w-10 h-10 sm:w-12 sm:h-12'}`} />
-                  </div>
-                  <p className={`text-center text-slate-900 dark:text-slate-100 mb-3 font-bold ${
-                    isMobile ? 'text-sm' : 'text-base sm:text-lg'
-                  }`}>
-                    Unable to load heatmap image
-                  </p>
-                  <div className={`flex gap-3 w-full ${isMobile ? 'flex-col max-w-56' : 'flex-col sm:flex-row max-w-xs'}`}>
-                    <Button 
-                      variant="outline" 
-                      onClick={resetImageError}
-                      className={`bg-white dark:bg-slate-800 border-2 border-blue-400 dark:border-blue-500 text-blue-800 dark:text-blue-200 hover:bg-blue-50 dark:hover:bg-slate-700 hover:border-blue-500 dark:hover:border-blue-400 font-semibold shadow-lg flex-1 ${
-                        isMobile ? 'text-sm h-12 min-h-[48px]' : 'text-sm h-11'
-                      }`}
-                      size="sm"
-                    >
-                      Retry Original
-                    </Button>
-                    <Button 
-                      variant="outline" 
-                      onClick={tryAlternativeUrl}
-                      className={`bg-white dark:bg-slate-800 border-2 border-green-400 dark:border-green-500 text-green-800 dark:text-green-200 hover:bg-green-50 dark:hover:bg-slate-700 hover:border-green-500 dark:hover:border-green-400 font-semibold shadow-lg flex-1 ${
-                        isMobile ? 'text-sm h-12 min-h-[48px]' : 'text-sm h-11'
-                      }`}
-                      size="sm"
-                    >
-                      Try Thumbnail
-                    </Button>
-                  </div>
-                  <div className="mt-4 p-3 bg-orange-50 dark:bg-orange-900/30 border-2 border-orange-300 dark:border-orange-700 rounded-xl shadow-md">
-                    <p className={`text-slate-800 dark:text-slate-200 text-center font-semibold leading-relaxed ${
-                      isMobile ? 'text-xs' : 'text-sm'
-                    }`}>
-                      ⚠️ Image cannot be loaded due to CORS restrictions from Google Drive. 
-                      Try uploading to a CORS-enabled image hosting service.
-                    </p>
+    <Card className={cn(
+      "overflow-hidden transition-all duration-300",
+      theme === 'dark' ? "bg-club-dark-gray/50 border-club-gold/20" : "bg-white/90 border-club-gold/30"
+    )}>
+      <CardHeader className={cn(
+        "border-b",
+        theme === 'dark' ? "bg-club-black/40 border-club-gold/20" : "bg-blue-50/80 border-club-gold/30"
+      )}>
+        <div className="flex flex-col lg:flex-row lg:items-start gap-4">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start gap-4">
+              {showPlayerIllustration && (
+                <div className="flex-shrink-0 hidden sm:block">
+                  <div className="relative">
+                    <PlayerAvatar player={player} size="lg" />
+                    <div className="absolute -bottom-1 -right-1 bg-club-gold text-club-black text-xs px-1.5 py-0.5 rounded-full font-bold">
+                      #{player.number}
+                    </div>
                   </div>
                 </div>
-              ) : (
-                <>
-                  <img 
-                    src={imageUrl || player.heatmapUrl} 
-                    alt={`${player.name} heatmap`}
-                    className={`absolute inset-0 w-full h-full object-cover ${
-                      isMobile ? 'touch-manipulation' : ''
-                    }`}
-                    crossOrigin="anonymous"
-                    onError={handleImageError}
-                    onLoad={handleImageLoad}
-                    referrerPolicy="no-referrer"
-                    style={isMobile ? { touchAction: 'pan-x pan-y pinch-zoom' } : {}}
-                  />
-                  {/* Enhanced mobile zoom hint with better visibility */}
-                  {imageLoaded && isMobile && (
-                    <div className="absolute top-3 right-3 bg-white/98 dark:bg-slate-900/98 text-slate-900 dark:text-slate-100 px-3 py-2 rounded-xl z-20 flex items-center gap-2 shadow-xl border-2 border-slate-300 dark:border-slate-600 backdrop-blur-md">
-                      <ZoomIn className="w-4 h-4 text-blue-600 dark:text-blue-400" />
-                      <span className="text-sm font-semibold">Pinch to zoom</span>
-                    </div>
+              )}
+              
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-2">
+                  <CardTitle className={cn(
+                    "font-bold tracking-tight flex items-center gap-2",
+                    isMobile ? "text-lg" : "text-xl lg:text-2xl",
+                    theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                  )}>
+                    <Activity className="w-5 h-5 text-club-gold" />
+                    Player Heatmap Analysis
+                  </CardTitle>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowPlayerIllustration(!showPlayerIllustration)}
+                    className="p-1 h-6 w-6 hover:bg-club-gold/20"
+                  >
+                    {showPlayerIllustration ? <EyeOff size={14} /> : <Eye size={14} />}
+                  </Button>
+                </div>
+                
+                <div className={cn(
+                  "flex items-center gap-4 text-sm",
+                  theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
+                )}>
+                  <span className="font-medium text-club-gold">{player.name}</span>
+                  <span>•</span>
+                  <span>{player.position}</span>
+                  <span>•</span>
+                  <span>{player.matches} matches</span>
+                  <span>•</span>
+                  <span>{player.distance}km avg</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Controls */}
+          <div className="flex flex-col sm:flex-row lg:flex-col gap-3 lg:w-80">
+            <div className="min-w-0 flex-1">
+              <Select value={selectedPeriod} onValueChange={(value) => setSelectedPeriod(value as TimePeriod)}>
+                <SelectTrigger className={cn(
+                  "border-2 focus:ring-2 focus:ring-club-gold shadow-lg backdrop-blur-sm font-medium",
+                  theme === 'dark' 
+                    ? "bg-club-black/50 text-club-light-gray border-club-gold/30 hover:border-club-gold/50" 
+                    : "bg-white/95 text-gray-900 border-club-gold/40 hover:border-club-gold/60"
+                )}>
+                  <SelectValue placeholder="Select Period" />
+                </SelectTrigger>
+                <SelectContent className={cn(
+                  "border-2 shadow-2xl backdrop-blur-xl z-50",
+                  theme === 'dark' 
+                    ? "bg-club-black/95 text-club-light-gray border-club-gold/30" 
+                    : "bg-white/98 text-gray-900 border-club-gold/40"
+                )}>
+                  <SelectItem value="full_match" className="hover:bg-club-gold/20 focus:bg-club-gold/30 font-medium">Full Match</SelectItem>
+                  <SelectItem value="first_half" className="hover:bg-club-gold/20 focus:bg-club-gold/30 font-medium">First Half</SelectItem>
+                  <SelectItem value="second_half" className="hover:bg-club-gold/20 focus:bg-club-gold/30 font-medium">Second Half</SelectItem>
+                  <SelectItem value="last_15min" className="hover:bg-club-gold/20 focus:bg-club-gold/30 font-medium">Last 15 min</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            
+            {/* Zoom controls */}
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size={isMobile ? "sm" : "default"}
+                onClick={handleZoomOut}
+                disabled={zoomLevel <= 0.5}
+                className={cn(
+                  "border-2 transition-all backdrop-blur-sm",
+                  theme === 'dark'
+                    ? "bg-club-black/50 border-club-gold/30 hover:border-club-gold/50 text-club-light-gray"
+                    : "bg-white/90 border-club-gold/40 hover:border-club-gold/60 text-gray-900"
+                )}
+              >
+                <ZoomOut size={isMobile ? 14 : 16} />
+              </Button>
+
+              <div className={cn(
+                "px-3 py-1.5 border-2 rounded-md backdrop-blur-sm",
+                theme === 'dark'
+                  ? "bg-club-black/50 border-club-gold/30 text-club-light-gray"
+                  : "bg-white/90 border-club-gold/40 text-gray-900"
+              )}>
+                <span className="text-sm font-medium">
+                  {Math.round(zoomLevel * 100)}%
+                </span>
+              </div>
+
+              <Button
+                variant="outline"
+                size={isMobile ? "sm" : "default"}
+                onClick={handleZoomIn}
+                disabled={zoomLevel >= 3}
+                className={cn(
+                  "border-2 transition-all backdrop-blur-sm",
+                  theme === 'dark'
+                    ? "bg-club-black/50 border-club-gold/30 hover:border-club-gold/50 text-club-light-gray"
+                    : "bg-white/90 border-club-gold/40 hover:border-club-gold/60 text-gray-900"
+                )}
+              >
+                <ZoomIn size={isMobile ? 14 : 16} />
+              </Button>
+
+              <Button
+                variant="outline"
+                size={isMobile ? "sm" : "default"}
+                onClick={handleResetZoom}
+                className={cn(
+                  "border-2 transition-all backdrop-blur-sm",
+                  theme === 'dark'
+                    ? "bg-club-black/50 border-club-gold/30 hover:border-club-gold/50 text-club-light-gray"
+                    : "bg-white/90 border-club-gold/40 hover:border-club-gold/60 text-gray-900"
+                )}
+              >
+                <RotateCcw size={isMobile ? 14 : 16} />
+              </Button>
+
+              {!isMobile && (
+                <Button
+                  variant="outline"
+                  size="default"
+                  onClick={() => setIsFullscreen(!isFullscreen)}
+                  className={cn(
+                    "border-2 transition-all backdrop-blur-sm",
+                    theme === 'dark'
+                      ? "bg-club-black/50 border-club-gold/30 hover:border-club-gold/50 text-club-light-gray"
+                      : "bg-white/90 border-club-gold/40 hover:border-club-gold/60 text-gray-900"
                   )}
-                </>
+                >
+                  {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
+                </Button>
               )}
             </div>
           </div>
-        ) : (
-          <Alert className="bg-orange-50/95 dark:bg-orange-900/40 border-2 border-orange-300 dark:border-orange-600 flex-1 flex items-center shadow-lg backdrop-blur-sm rounded-xl">
-            <AlertDescription className={`text-slate-800 dark:text-slate-200 font-semibold ${isMobile ? 'text-sm' : ''}`}>
-              📊 Heatmap visualization not available for this player
-            </AlertDescription>
-          </Alert>
-        )}
+        </div>
+      </CardHeader>
+
+      <CardContent className={cn(
+        "p-4 lg:p-6",
+        theme === 'dark' ? "bg-club-black/20" : "bg-gradient-to-br from-slate-50/80 to-blue-50/80"
+      )}>
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Sidebar with metrics */}
+          <div className="lg:w-64 flex-shrink-0">
+            <div className="space-y-4">
+              <h4 className={cn(
+                "font-medium flex items-center gap-2",
+                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+              )}>
+                <BarChart3 size={16} className="text-club-gold" />
+                Key Metrics
+              </h4>
+              <div className="grid grid-cols-2 lg:grid-cols-1 gap-3">
+                <div className={cn(
+                  "rounded-lg p-3 border border-club-gold/20",
+                  theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
+                )}>
+                  <div className={cn(
+                    "text-xs",
+                    theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
+                  )}>Distance</div>
+                  <div className={cn(
+                    "text-lg font-bold text-club-gold"
+                  )}>
+                    {player.distance}km
+                  </div>
+                </div>
+                <div className={cn(
+                  "rounded-lg p-3 border border-club-gold/20",
+                  theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
+                )}>
+                  <div className={cn(
+                    "text-xs",
+                    theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
+                  )}>Max Speed</div>
+                  <div className="text-lg font-bold text-club-gold">
+                    {player.maxSpeed}km/h
+                  </div>
+                </div>
+                <div className={cn(
+                  "rounded-lg p-3 border border-club-gold/20",
+                  theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
+                )}>
+                  <div className={cn(
+                    "text-xs",
+                    theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
+                  )}>Sprint Distance</div>
+                  <div className="text-lg font-bold text-club-gold">
+                    {player.sprintDistance}km
+                  </div>
+                </div>
+                <div className={cn(
+                  "rounded-lg p-3 border border-club-gold/20",
+                  theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
+                )}>
+                  <div className={cn(
+                    "text-xs",
+                    theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
+                  )}>Passes</div>
+                  <div className="text-lg font-bold text-club-gold">
+                    {player.passes_completed}/{player.passes_attempted}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Heatmap visualization */}
+          <div className="flex-1 min-w-0">
+            <div 
+              ref={containerRef}
+              className={cn(
+                "relative rounded-2xl overflow-hidden shadow-xl border-2",
+                theme === 'dark' 
+                  ? "bg-gradient-to-br from-slate-900 to-slate-800 border-club-gold/30" 
+                  : "bg-gradient-to-br from-slate-100 to-slate-200 border-club-gold/40"
+              )}
+              style={{ 
+                aspectRatio: isMobile ? '4/3' : '16/10',
+                minHeight: isMobile ? '250px' : '400px',
+                touchAction: 'none'
+              }}
+            >
+              <canvas
+                ref={canvasRef}
+                width={800}
+                height={isMobile ? 600 : 500}
+                className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+                onPointerDown={handlePointerDown}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onWheel={handleWheel}
+                style={{ touchAction: 'none' }}
+              />
+              
+              {/* Mobile controls hint */}
+              {isMobile && (
+                <div className={cn(
+                  "absolute top-3 right-3 px-4 py-3 rounded-xl shadow-lg border-2 backdrop-blur-md",
+                  theme === 'dark'
+                    ? "bg-club-black/95 text-club-light-gray border-club-gold/30"
+                    : "bg-white/95 text-slate-900 border-club-gold/40"
+                )}>
+                  <span className="text-sm font-semibold">Pinch to zoom • Drag to pan</span>
+                </div>
+              )}
+              
+              {/* Activity legend */}
+              <div className={cn(
+                "absolute bottom-3 left-3 rounded-xl p-4 shadow-xl border-2 backdrop-blur-md",
+                theme === 'dark'
+                  ? "bg-club-black/95 border-club-gold/30"
+                  : "bg-white/95 border-club-gold/40"
+              )}>
+                <div className={cn(
+                  "text-sm font-bold mb-3 flex items-center gap-2",
+                  theme === 'dark' ? "text-club-light-gray" : "text-slate-900"
+                )}>
+                  Activity Intensity
+                  <div className="w-2 h-2 rounded-full bg-club-gold"></div>
+                </div>
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-4 bg-gradient-to-r from-blue-600 to-blue-500 rounded-sm shadow-md border border-blue-300"></div>
+                    <span className={cn(
+                      "text-xs font-medium",
+                      theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
+                    )}>Low</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-4 bg-gradient-to-r from-cyan-600 to-cyan-500 rounded-sm shadow-md border border-cyan-300"></div>
+                    <span className={cn(
+                      "text-xs font-medium",
+                      theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
+                    )}>Medium</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-4 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-sm shadow-md border border-yellow-300"></div>
+                    <span className={cn(
+                      "text-xs font-medium",
+                      theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
+                    )}>High</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-5 h-4 bg-gradient-to-r from-pink-600 to-pink-500 rounded-sm shadow-md border border-pink-300"></div>
+                    <span className={cn(
+                      "text-xs font-medium",
+                      theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
+                    )}>Peak</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
