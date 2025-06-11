@@ -26,7 +26,9 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
     sprintDistance: 2.8,
     maxSpeed: 32.1,
     passCompletionPct: 85,
-    number: 10
+    number: 10,
+    heatmapUrl: "/placeholder-heatmap.jpg",
+    reportUrl: "/placeholder-report.pdf"
   };
 
   const squadAvailability = [
