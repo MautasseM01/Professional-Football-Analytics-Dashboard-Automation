@@ -11,7 +11,7 @@ const DEMO_ROLE_KEY = 'demo-user-role';
 export const useUserProfile = () => {
   const { user } = useAuth();
   const [profile, setProfile] = useState<UserProfile | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Changed to false for instant load
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -20,7 +20,8 @@ export const useUserProfile = () => {
       return;
     }
 
-    // Demo mode: Create a mock profile with role from localStorage
+    // Demo mode: Instantly create mock profile with role
+    // Default to 'admin' for immediate full dashboard access
     const savedRole = localStorage.getItem(DEMO_ROLE_KEY) as UserRole || 'admin';
     
     const mockProfile: UserProfile = {
@@ -32,7 +33,7 @@ export const useUserProfile = () => {
       updated_at: new Date().toISOString()
     };
 
-    console.log('Demo mode: Using mock profile with role:', savedRole);
+    console.log('Demo mode: Instant profile setup with role:', savedRole);
     setProfile(mockProfile);
     setLoading(false);
 

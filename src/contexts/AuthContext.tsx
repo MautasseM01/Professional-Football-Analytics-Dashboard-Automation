@@ -16,11 +16,11 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Changed to false for instant load
   const { toast } = useToast();
 
   useEffect(() => {
-    // For demo purposes, provide a mock user immediately
+    // Instantly provide mock user for demo purposes - no delays
     const mockUser: AuthUser = {
       id: 'demo-user-id',
       email: 'demo@example.com',
@@ -31,6 +31,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     setUser(mockUser);
     setLoading(false);
+    console.log('Demo mode: Instant authentication enabled');
 
     // Still set up auth state listener for when authentication is re-enabled
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
@@ -56,51 +57,35 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, [toast]);
 
   const signIn = async (email: string, password: string) => {
-    try {
-      console.log("Demo mode: Sign in simulated");
-      toast({
-        title: "Demo Mode",
-        description: "Authentication is disabled for demo purposes.",
-      });
-    } catch (error: any) {
-      console.error("Demo mode: Login simulation");
-    }
+    console.log("Demo mode: Sign in simulated");
+    toast({
+      title: "Demo Mode",
+      description: "Authentication is disabled for demo purposes.",
+    });
   };
 
   const signInWithGoogle = async () => {
-    try {
-      console.log("Demo mode: Google sign in simulated");
-      toast({
-        title: "Demo Mode",
-        description: "Google authentication is disabled for demo purposes.",
-      });
-    } catch (error: any) {
-      console.error("Demo mode: Google login simulation");
-    }
+    console.log("Demo mode: Google sign in simulated");
+    toast({
+      title: "Demo Mode",
+      description: "Google authentication is disabled for demo purposes.",
+    });
   };
 
   const signOut = async () => {
-    try {
-      console.log("Demo mode: Sign out simulated");
-      toast({
-        title: "Demo Mode",
-        description: "Sign out is disabled for demo purposes.",
-      });
-    } catch (error: any) {
-      console.error("Demo mode: Logout simulation");
-    }
+    console.log("Demo mode: Sign out simulated");
+    toast({
+      title: "Demo Mode",
+      description: "Sign out is disabled for demo purposes.",
+    });
   };
 
   const signUp = async (email: string, password: string) => {
-    try {
-      console.log("Demo mode: Sign up simulated");
-      toast({
-        title: "Demo Mode",
-        description: "Registration is disabled for demo purposes.",
-      });
-    } catch (error: any) {
-      console.error("Demo mode: Sign up simulation");
-    }
+    console.log("Demo mode: Sign up simulated");
+    toast({
+      title: "Demo Mode",
+      description: "Registration is disabled for demo purposes.",
+    });
   };
 
   const value = {

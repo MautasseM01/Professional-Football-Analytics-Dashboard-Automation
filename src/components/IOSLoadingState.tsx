@@ -11,6 +11,7 @@ interface IOSLoadingStateProps {
   children?: React.ReactNode;
   className?: string;
   skeletonRows?: number;
+  suppressDemoLoading?: boolean; // New prop to suppress loading in demo mode
 }
 
 export const IOSLoadingState = ({
@@ -19,8 +20,12 @@ export const IOSLoadingState = ({
   onRetry,
   children,
   className,
-  skeletonRows = 3
+  skeletonRows = 3,
+  suppressDemoLoading = true // Default to true for demo
 }: IOSLoadingStateProps) => {
+  // In demo mode, suppress loading to show content immediately
+  const shouldShowLoading = suppressDemoLoading ? false : isLoading;
+
   if (error) {
     return (
       <div className={cn("flex flex-col items-center justify-center p-8 space-y-4", className)}>
@@ -49,7 +54,7 @@ export const IOSLoadingState = ({
     );
   }
 
-  if (isLoading) {
+  if (shouldShowLoading) {
     return (
       <div className={cn("space-y-4 p-4", className)}>
         {/* Skeleton animation */}

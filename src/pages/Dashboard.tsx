@@ -44,7 +44,8 @@ const Dashboard = () => {
 
   // Render appropriate content based on user role
   const renderDashboardContent = () => {
-    if (profileLoading) {
+    // In demo mode, show minimal loading to ensure instant content
+    if (profileLoading && !profile) {
       return <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
           <div className="h-6 sm:h-8 w-48 sm:w-64 bg-white/20 dark:bg-slate-700/20 rounded-xl animate-pulse" />
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
@@ -111,6 +112,9 @@ const Dashboard = () => {
     }
   };
 
+  // Log current state for debugging external access
+  console.log('Dashboard render - Profile:', profile?.role, 'Loading:', profileLoading, 'Error:', error);
+
   return <div className="flex h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
       {showSidebar && <DashboardSidebar />}
       
@@ -132,7 +136,7 @@ const Dashboard = () => {
                 {t('header.title')}
               </h1>
               <p className="text-ios-caption text-gray-600 dark:text-gray-400 truncate">
-                {profileLoading ? <div className="h-3 sm:h-4 w-24 sm:w-32 lg:w-40 bg-gray-200 dark:bg-slate-700 rounded-lg animate-pulse inline-block" /> : profile?.role ? `${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} ${t('header.dashboard')}` : t('header.dashboard')}
+                {profile?.role ? `${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} ${t('header.dashboard')}` : t('header.dashboard')}
               </p>
             </div>
             
