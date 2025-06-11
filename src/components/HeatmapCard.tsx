@@ -94,7 +94,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   if (loading) {
     return (
       <Card className={cn(
-        "relative overflow-hidden transition-all duration-300",
+        "relative overflow-hidden transition-all duration-300 w-full",
         theme === 'dark' ? "bg-club-dark-gray/50 border-club-gold/20" : "bg-white/90 border-club-gold/30"
       )}>
         <LoadingOverlay isLoading={loading} />
@@ -105,17 +105,17 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
 
   return (
     <Card className={cn(
-      "overflow-hidden transition-all duration-300",
+      "overflow-hidden transition-all duration-300 w-full",
       theme === 'dark' ? "bg-club-dark-gray/50 border-club-gold/20" : "bg-white/90 border-club-gold/30"
     )}>
-      {/* Header Section */}
+      {/* Header Section - Full Width */}
       <CardHeader className={cn(
-        "border-b pb-4",
+        "border-b pb-4 w-full",
         theme === 'dark' ? "bg-club-black/40 border-club-gold/20" : "bg-blue-50/80 border-club-gold/30"
       )}>
-        <div className="flex flex-col space-y-4">
+        <div className="flex flex-col space-y-4 w-full">
           {/* Title and Player Info Row */}
-          <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start justify-between gap-4 w-full">
             <div className="flex items-start gap-4 min-w-0 flex-1">
               {showPlayerIllustration && (
                 <div className="flex-shrink-0 hidden sm:block">
@@ -164,9 +164,8 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
             </div>
           </div>
 
-          {/* Controls Row */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start">
-            {/* Period Selector */}
+          {/* Period Selector Row */}
+          <div className="flex flex-col sm:flex-row gap-3 items-start w-full">
             <div className="w-full sm:w-64">
               <Select value={selectedPeriod} onValueChange={(value) => setSelectedPeriod(value as TimePeriod)}>
                 <SelectTrigger className={cn(
@@ -190,8 +189,86 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+        </div>
+      </CardHeader>
+
+      <CardContent className={cn(
+        "p-4 lg:p-6 space-y-6 w-full",
+        theme === 'dark' ? "bg-club-black/20" : "bg-gradient-to-br from-slate-50/80 to-blue-50/80"
+      )}>
+        {/* Key Metrics Section - Full Width */}
+        <div className="space-y-3 w-full">
+          <h4 className={cn(
+            "font-medium flex items-center gap-2 text-base",
+            theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+          )}>
+            <BarChart3 size={16} className="text-club-gold" />
+            Key Metrics
+          </h4>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 w-full">
+            <div className={cn(
+              "rounded-lg p-3 border border-club-gold/20 text-center",
+              theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
+            )}>
+              <div className={cn(
+                "text-xs mb-1",
+                theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
+              )}>Distance</div>
+              <div className="text-lg font-bold text-club-gold">
+                {player.distance}km
+              </div>
+            </div>
+            <div className={cn(
+              "rounded-lg p-3 border border-club-gold/20 text-center",
+              theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
+            )}>
+              <div className={cn(
+                "text-xs mb-1",
+                theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
+              )}>Max Speed</div>
+              <div className="text-lg font-bold text-club-gold">
+                {player.maxSpeed}km/h
+              </div>
+            </div>
+            <div className={cn(
+              "rounded-lg p-3 border border-club-gold/20 text-center",
+              theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
+            )}>
+              <div className={cn(
+                "text-xs mb-1",
+                theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
+              )}>Sprint Distance</div>
+              <div className="text-lg font-bold text-club-gold">
+                {player.sprintDistance}km
+              </div>
+            </div>
+            <div className={cn(
+              "rounded-lg p-3 border border-club-gold/20 text-center",
+              theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
+            )}>
+              <div className={cn(
+                "text-xs mb-1",
+                theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
+              )}>Passes</div>
+              <div className="text-lg font-bold text-club-gold">
+                {player.passes_completed}/{player.passes_attempted}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Heatmap with Adjacent Controls Section */}
+        <div className="space-y-4 w-full">
+          {/* Zoom Controls - Below Key Metrics */}
+          <div className="flex items-center justify-between gap-4 w-full">
+            <h4 className={cn(
+              "font-medium text-base",
+              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+            )}>
+              {player.name} - Match Heatmap
+            </h4>
             
-            {/* Zoom Controls */}
             <div className="flex items-center gap-2 flex-wrap">
               <Button
                 variant="outline"
@@ -265,94 +342,26 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               )}
             </div>
           </div>
-        </div>
-      </CardHeader>
 
-      <CardContent className={cn(
-        "p-4 lg:p-6 space-y-6",
-        theme === 'dark' ? "bg-club-black/20" : "bg-gradient-to-br from-slate-50/80 to-blue-50/80"
-      )}>
-        {/* Key Metrics Section - Directly above heatmap */}
-        <div className="space-y-3">
-          <h4 className={cn(
-            "font-medium flex items-center gap-2 text-base",
-            theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-          )}>
-            <BarChart3 size={16} className="text-club-gold" />
-            Key Metrics
-          </h4>
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className={cn(
-              "rounded-lg p-3 border border-club-gold/20 text-center",
-              theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
-            )}>
-              <div className={cn(
-                "text-xs mb-1",
-                theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
-              )}>Distance</div>
-              <div className="text-lg font-bold text-club-gold">
-                {player.distance}km
-              </div>
-            </div>
-            <div className={cn(
-              "rounded-lg p-3 border border-club-gold/20 text-center",
-              theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
-            )}>
-              <div className={cn(
-                "text-xs mb-1",
-                theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
-              )}>Max Speed</div>
-              <div className="text-lg font-bold text-club-gold">
-                {player.maxSpeed}km/h
-              </div>
-            </div>
-            <div className={cn(
-              "rounded-lg p-3 border border-club-gold/20 text-center",
-              theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
-            )}>
-              <div className={cn(
-                "text-xs mb-1",
-                theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
-              )}>Sprint Distance</div>
-              <div className="text-lg font-bold text-club-gold">
-                {player.sprintDistance}km
-              </div>
-            </div>
-            <div className={cn(
-              "rounded-lg p-3 border border-club-gold/20 text-center",
-              theme === 'dark' ? "bg-club-black/30" : "bg-white/50"
-            )}>
-              <div className={cn(
-                "text-xs mb-1",
-                theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500"
-              )}>Passes</div>
-              <div className="text-lg font-bold text-club-gold">
-                {player.passes_completed}/{player.passes_attempted}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Heatmap Visualization */}
-        <div className="space-y-2">
+          {/* Heatmap Visualization Container */}
           <div 
             ref={containerRef}
             className={cn(
-              "relative rounded-2xl overflow-hidden shadow-xl border-2 select-none",
+              "relative rounded-2xl overflow-hidden shadow-xl border-2 select-none w-full",
               theme === 'dark' 
                 ? "bg-gradient-to-br from-slate-900 to-slate-800 border-club-gold/30" 
                 : "bg-gradient-to-br from-slate-100 to-slate-200 border-club-gold/40"
             )}
             style={{ 
               aspectRatio: isMobile ? '4/3' : '16/10',
-              minHeight: isMobile ? '300px' : '450px'
+              minHeight: isMobile ? '300px' : '500px'
             }}
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerUp}
             onWheel={handleWheel}
           >
-            {/* Heatmap Image Container */}
+            {/* Heatmap Image */}
             <div className="absolute inset-0 w-full h-full overflow-hidden">
               {player.heatmapUrl ? (
                 <img
@@ -383,56 +392,56 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               )}
             </div>
             
-            {/* Mobile Touch Hint */}
+            {/* Mobile Touch Hint - Positioned to not block image */}
             {isMobile && (
               <div className={cn(
-                "absolute top-3 right-3 px-3 py-2 rounded-lg shadow-lg border backdrop-blur-md",
+                "absolute top-2 right-2 px-2 py-1 rounded-lg shadow-lg border backdrop-blur-md text-xs",
                 theme === 'dark'
-                  ? "bg-club-black/90 text-club-light-gray border-club-gold/30"
-                  : "bg-white/90 text-slate-900 border-club-gold/40"
+                  ? "bg-club-black/80 text-club-light-gray border-club-gold/30"
+                  : "bg-white/80 text-slate-900 border-club-gold/40"
               )}>
-                <span className="text-xs font-medium">Pinch to zoom • Drag to pan</span>
+                <span className="font-medium">Pinch to zoom • Drag to pan</span>
               </div>
             )}
             
-            {/* Activity Legend */}
+            {/* Activity Legend - Positioned to not block image */}
             <div className={cn(
-              "absolute bottom-3 left-3 rounded-xl p-3 shadow-xl border backdrop-blur-md",
+              "absolute bottom-2 left-2 rounded-xl p-2 shadow-xl border backdrop-blur-md",
               theme === 'dark'
-                ? "bg-club-black/90 border-club-gold/30"
-                : "bg-white/90 border-club-gold/40"
+                ? "bg-club-black/80 border-club-gold/30"
+                : "bg-white/80 border-club-gold/40"
             )}>
               <div className={cn(
-                "text-xs font-bold mb-2 flex items-center gap-2",
+                "text-xs font-bold mb-1 flex items-center gap-1",
                 theme === 'dark' ? "text-club-light-gray" : "text-slate-900"
               )}>
                 Activity Intensity
-                <div className="w-1.5 h-1.5 rounded-full bg-club-gold"></div>
+                <div className="w-1 h-1 rounded-full bg-club-gold"></div>
               </div>
-              <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-3 bg-gradient-to-r from-blue-600 to-blue-500 rounded-sm shadow-sm border border-blue-300"></div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-2 bg-gradient-to-r from-blue-600 to-blue-500 rounded-sm shadow-sm border border-blue-300"></div>
                   <span className={cn(
                     "text-xs font-medium",
                     theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
                   )}>Low</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-3 bg-gradient-to-r from-cyan-600 to-cyan-500 rounded-sm shadow-sm border border-cyan-300"></div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-2 bg-gradient-to-r from-cyan-600 to-cyan-500 rounded-sm shadow-sm border border-cyan-300"></div>
                   <span className={cn(
                     "text-xs font-medium",
                     theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
                   )}>Medium</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-3 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-sm shadow-sm border border-yellow-300"></div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-2 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-sm shadow-sm border border-yellow-300"></div>
                   <span className={cn(
                     "text-xs font-medium",
                     theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
                   )}>High</span>
                 </div>
-                <div className="flex items-center gap-2">
-                  <div className="w-4 h-3 bg-gradient-to-r from-pink-600 to-pink-500 rounded-sm shadow-sm border border-pink-300"></div>
+                <div className="flex items-center gap-1.5">
+                  <div className="w-3 h-2 bg-gradient-to-r from-pink-600 to-pink-500 rounded-sm shadow-sm border border-pink-300"></div>
                   <span className={cn(
                     "text-xs font-medium",
                     theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
