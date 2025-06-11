@@ -20,7 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     id: 'demo-user',
     email: 'demo@example.com',
     user_metadata: {
-      full_name: 'Demo User'
+      name: 'Demo User'
     }
   };
 
