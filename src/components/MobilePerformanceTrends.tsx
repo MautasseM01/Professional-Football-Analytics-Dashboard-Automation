@@ -1,11 +1,10 @@
 
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { LineChart, TrendingUp, TrendingDown, Activity } from "lucide-react";
+import { Activity, TrendingUp, TrendingDown } from "lucide-react";
 import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface MobilePerformanceTrendsProps {
   player: Player;
@@ -13,7 +12,6 @@ interface MobilePerformanceTrendsProps {
 
 export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps) => {
   const { theme } = useTheme();
-  const isMobile = useIsMobile();
 
   // Mock trend data - in real implementation, this would come from props or API
   const trendData = [
@@ -40,49 +38,36 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
         : "bg-white/90 border-club-gold/30"
     )}>
       <CardHeader className={cn(
-        "border-b pb-4",
+        "border-b pb-4 p-4",
         theme === 'dark' 
           ? "bg-club-black/40 border-club-gold/20" 
-          : "bg-blue-50/80 border-club-gold/30",
-        isMobile ? "p-4" : "p-6"
+          : "bg-blue-50/80 border-club-gold/30"
       )}>
         <CardTitle className={cn(
-          "font-bold tracking-tight flex items-center gap-2",
-          isMobile ? "text-base" : "text-lg",
+          "font-bold tracking-tight flex items-center gap-2 text-base",
           theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
         )}>
-          <Activity className={cn(
-            "text-club-gold",
-            isMobile ? "w-4 h-4" : "w-5 h-5"
-          )} />
+          <Activity className="text-club-gold w-4 h-4" />
           Key Performance Trends
         </CardTitle>
       </CardHeader>
 
-      <CardContent className={cn(
-        "w-full",
-        isMobile ? "p-4 space-y-4" : "p-6 space-y-6"
-      )}>
+      <CardContent className="p-4 space-y-4">
         {/* Performance Stats Cards */}
-        <div className={cn(
-          "grid gap-3 w-full",
-          isMobile ? "grid-cols-2" : "grid-cols-2 lg:grid-cols-4"
-        )}>
+        <div className="grid grid-cols-2 gap-3 w-full">
           {trendData.map((item, index) => (
             <div
               key={index}
               className={cn(
-                "rounded-lg p-3 border border-club-gold/20 transition-all duration-200",
+                "rounded-lg p-3 border border-club-gold/20 transition-all duration-200 min-h-[70px] flex flex-col justify-center",
                 theme === 'dark' 
                   ? "bg-club-black/30 hover:bg-club-black/40" 
-                  : "bg-white/50 hover:bg-white/70",
-                isMobile && "min-h-[70px] flex flex-col justify-center"
+                  : "bg-white/50 hover:bg-white/70"
               )}
             >
               <div className="flex items-center justify-between mb-1">
                 <span className={cn(
-                  "font-medium",
-                  isMobile ? "text-xs" : "text-sm",
+                  "font-medium text-xs",
                   theme === 'dark' ? "text-club-light-gray" : "text-gray-700"
                 )}>
                   {item.label}
@@ -95,10 +80,7 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
               </div>
               
               <div className="space-y-1">
-                <div className={cn(
-                  "font-bold text-club-gold",
-                  isMobile ? "text-sm" : "text-lg"
-                )}>
+                <div className="font-bold text-club-gold text-sm">
                   {typeof item.current === 'number' && item.current % 1 !== 0 
                     ? item.current.toFixed(1) 
                     : item.current}
@@ -126,32 +108,26 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
             ? "bg-club-black/20" 
             : "bg-gray-50/50"
         )}>
-          <h4 className={cn(
-            "font-medium mb-3 text-club-gold",
-            isMobile ? "text-sm" : "text-base"
-          )}>
+          <h4 className="font-medium mb-3 text-club-gold text-sm">
             Goals & Assists Trend
           </h4>
-          <div className={cn(
-            "w-full",
-            isMobile ? "h-[200px]" : "h-[250px]"
-          )}>
+          <div className="w-full h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
               <RechartsLineChart data={performanceData}>
                 <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
                 <XAxis 
                   dataKey="match" 
-                  tick={{ fontSize: isMobile ? 10 : 12, fill: theme === 'dark' ? '#9ca3af' : '#6b7280' }}
+                  tick={{ fontSize: 10, fill: theme === 'dark' ? '#9ca3af' : '#6b7280' }}
                 />
                 <YAxis 
-                  tick={{ fontSize: isMobile ? 10 : 12, fill: theme === 'dark' ? '#9ca3af' : '#6b7280' }}
+                  tick={{ fontSize: 10, fill: theme === 'dark' ? '#9ca3af' : '#6b7280' }}
                 />
                 <Tooltip 
                   contentStyle={{
                     backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
                     border: '1px solid #d97706',
                     borderRadius: '8px',
-                    fontSize: isMobile ? '12px' : '14px'
+                    fontSize: '12px'
                   }}
                 />
                 <Line type="monotone" dataKey="goals" stroke="#d97706" strokeWidth={2} dot={{ fill: '#d97706', r: 4 }} />
@@ -168,32 +144,26 @@ export const MobilePerformanceTrends = ({ player }: MobilePerformanceTrendsProps
             ? "bg-club-black/20" 
             : "bg-gray-50/50"
         )}>
-          <h4 className={cn(
-            "font-medium mb-3 text-club-gold",
-            isMobile ? "text-sm" : "text-base"
-          )}>
+          <h4 className="font-medium mb-3 text-club-gold text-sm">
             Distance & Pass Accuracy
           </h4>
-          <div className={cn(
-            "w-full",
-            isMobile ? "h-[200px]" : "h-[250px]"
-          )}>
+          <div className="w-full h-[200px]">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={performanceData}>
                 <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
                 <XAxis 
                   dataKey="match" 
-                  tick={{ fontSize: isMobile ? 10 : 12, fill: theme === 'dark' ? '#9ca3af' : '#6b7280' }}
+                  tick={{ fontSize: 10, fill: theme === 'dark' ? '#9ca3af' : '#6b7280' }}
                 />
                 <YAxis 
-                  tick={{ fontSize: isMobile ? 10 : 12, fill: theme === 'dark' ? '#9ca3af' : '#6b7280' }}
+                  tick={{ fontSize: 10, fill: theme === 'dark' ? '#9ca3af' : '#6b7280' }}
                 />
                 <Tooltip 
                   contentStyle={{
                     backgroundColor: theme === 'dark' ? '#1f2937' : '#ffffff',
                     border: '1px solid #d97706',
                     borderRadius: '8px',
-                    fontSize: isMobile ? '12px' : '14px'
+                    fontSize: '12px'
                   }}
                 />
                 <Bar dataKey="distance" fill="#3b82f6" />
