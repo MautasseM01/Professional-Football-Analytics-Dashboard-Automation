@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -42,7 +41,6 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   
   const { data: heatmapData, loading, error } = useHeatmapData(player, selectedPeriod);
 
-  // Handle pointer events for panning with better touch handling
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -75,7 +73,6 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
     }
   }, []);
 
-  // Prevent default wheel behavior to avoid scroll interference
   const handleWheel = useCallback((e: React.WheelEvent) => {
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
