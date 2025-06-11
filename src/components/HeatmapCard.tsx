@@ -26,13 +26,6 @@ interface HeatmapCardProps {
   player: Player;
 }
 
-interface HeatmapPoint {
-  x: number;
-  y: number;
-  intensity: number;
-  timestamp?: number;
-}
-
 export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   const [selectedPeriod, setSelectedPeriod] = useState<TimePeriod>('full_match');
   const [zoomLevel, setZoomLevel] = useState(1);
@@ -42,150 +35,14 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const [lastPanPoint, setLastPanPoint] = useState({ x: 0, y: 0 });
   
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imageRef = useRef<HTMLImageElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const { theme } = useTheme();
   const isMobile = useIsMobile();
   
   const { data: heatmapData, loading, error } = useHeatmapData(player, selectedPeriod);
 
-  // Draw football field background
-  const drawFootballField = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
-    ctx.clearRect(0, 0, width, height);
-    
-    ctx.save();
-    ctx.translate(width / 2 + panOffset.x, height / 2 + panOffset.y);
-    ctx.scale(zoomLevel, zoomLevel);
-    ctx.translate(-width / 2, -height / 2);
-    
-    const fieldWidth = width * 0.9;
-    const fieldHeight = height * 0.85;
-    const fieldX = (width - fieldWidth) / 2;
-    const fieldY = (height - fieldHeight) / 2;
-    
-    // Enhanced field background
-    const gradient = ctx.createLinearGradient(fieldX, fieldY, fieldX, fieldY + fieldHeight);
-    gradient.addColorStop(0, theme === 'dark' ? '#0f172a' : '#166534');
-    gradient.addColorStop(0.5, theme === 'dark' ? '#1e293b' : '#15803d');
-    gradient.addColorStop(1, theme === 'dark' ? '#0f172a' : '#14532d');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(fieldX, fieldY, fieldWidth, fieldHeight);
-    
-    // Field markings
-    ctx.strokeStyle = '#D4AF37';
-    ctx.lineWidth = 3;
-    ctx.setLineDash([]);
-    
-    // Outer boundary
-    ctx.strokeRect(fieldX, fieldY, fieldWidth, fieldHeight);
-    
-    // Center line
-    ctx.beginPath();
-    ctx.moveTo(fieldX + fieldWidth / 2, fieldY);
-    ctx.lineTo(fieldX + fieldWidth / 2, fieldY + fieldHeight);
-    ctx.stroke();
-    
-    // Center circle
-    const centerX = fieldX + fieldWidth / 2;
-    const centerY = fieldY + fieldHeight / 2;
-    const centerRadius = Math.min(fieldWidth, fieldHeight) * 0.08;
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, centerRadius, 0, Math.PI * 2);
-    ctx.stroke();
-    
-    // Center spot
-    ctx.beginPath();
-    ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
-    ctx.fillStyle = '#D4AF37';
-    ctx.fill();
-    
-    // Penalty areas
-    const penaltyWidth = fieldWidth * 0.14;
-    const penaltyHeight = fieldHeight * 0.35;
-    const penaltyY = (fieldHeight - penaltyHeight) / 2 + fieldY;
-    
-    // Left penalty area
-    ctx.strokeRect(fieldX, penaltyY, penaltyWidth, penaltyHeight);
-    // Right penalty area
-    ctx.strokeRect(fieldX + fieldWidth - penaltyWidth, penaltyY, penaltyWidth, penaltyHeight);
-    
-    // Goal areas
-    const goalWidth = fieldWidth * 0.05;
-    const goalHeight = fieldHeight * 0.18;
-    const goalY = (fieldHeight - goalHeight) / 2 + fieldY;
-    
-    ctx.strokeRect(fieldX, goalY, goalWidth, goalHeight);
-    ctx.strokeRect(fieldX + fieldWidth - goalWidth, goalY, goalWidth, goalHeight);
-    
-    // Penalty spots
-    ctx.beginPath();
-    ctx.arc(fieldX + penaltyWidth * 0.7, centerY, 3, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(fieldX + fieldWidth - penaltyWidth * 0.7, centerY, 3, 0, Math.PI * 2);
-    ctx.fill();
-    
-    ctx.restore();
-  }, [zoomLevel, panOffset, theme]);
-
-  // Draw heatmap overlay
-  const drawHeatmap = useCallback((ctx: CanvasRenderingContext2D, width: number, height: number) => {
-    if (!heatmapData.length) return;
-    
-    ctx.save();
-    ctx.translate(width / 2 + panOffset.x, height / 2 + panOffset.y);
-    ctx.scale(zoomLevel, zoomLevel);
-    ctx.translate(-width / 2, -height / 2);
-    
-    heatmapData.forEach(point => {
-      const x = point.x * width;
-      const y = point.y * height;
-      const radius = Math.max(25, 45 * point.intensity) * zoomLevel;
-      
-      const gradient = ctx.createRadialGradient(x, y, 0, x, y, radius);
-      
-      // Enhanced colorblind-friendly color scheme
-      if (point.intensity < 0.25) {
-        gradient.addColorStop(0, `rgba(37, 99, 235, ${Math.min(point.intensity * 1.2, 0.9)})`);
-        gradient.addColorStop(0.7, `rgba(37, 99, 235, ${point.intensity * 0.6})`);
-        gradient.addColorStop(1, 'rgba(37, 99, 235, 0)');
-      } else if (point.intensity < 0.5) {
-        gradient.addColorStop(0, `rgba(6, 182, 212, ${Math.min(point.intensity * 1.2, 0.9)})`);
-        gradient.addColorStop(0.7, `rgba(6, 182, 212, ${point.intensity * 0.6})`);
-        gradient.addColorStop(1, 'rgba(6, 182, 212, 0)');
-      } else if (point.intensity < 0.75) {
-        gradient.addColorStop(0, `rgba(212, 175, 55, ${Math.min(point.intensity * 1.2, 0.9)})`);
-        gradient.addColorStop(0.7, `rgba(212, 175, 55, ${point.intensity * 0.6})`);
-        gradient.addColorStop(1, 'rgba(212, 175, 55, 0)');
-      } else {
-        gradient.addColorStop(0, `rgba(220, 38, 127, ${Math.min(point.intensity * 1.2, 0.9)})`);
-        gradient.addColorStop(0.7, `rgba(220, 38, 127, ${point.intensity * 0.6})`);
-        gradient.addColorStop(1, 'rgba(220, 38, 127, 0)');
-      }
-      
-      ctx.fillStyle = gradient;
-      ctx.beginPath();
-      ctx.arc(x, y, radius, 0, Math.PI * 2);
-      ctx.fill();
-    });
-    
-    ctx.restore();
-  }, [heatmapData, zoomLevel, panOffset]);
-
-  // Redraw canvas when data changes
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-    
-    const { width, height } = canvas;
-    drawFootballField(ctx, width, height);
-    drawHeatmap(ctx, width, height);
-  }, [drawFootballField, drawHeatmap]);
-
-  // Handle mouse events
+  // Handle mouse events for panning
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault();
     setIsDragging(true);
@@ -210,25 +67,12 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
     setIsDragging(false);
   }, []);
 
-  const handleWheel = useCallback((e: React.WheelEvent) => {
-    e.preventDefault();
-    const delta = e.deltaY > 0 ? 0.9 : 1.1;
-    const newZoom = Math.min(3, Math.max(0.5, zoomLevel * delta));
-    setZoomLevel(newZoom);
-  }, [zoomLevel]);
-
   const handleZoomIn = () => setZoomLevel(prev => Math.min(prev * 1.2, 3));
   const handleZoomOut = () => setZoomLevel(prev => Math.max(prev / 1.2, 0.5));
   const handleResetZoom = () => {
     setZoomLevel(1);
     setPanOffset({ x: 0, y: 0 });
   };
-
-  const availableMatches = [
-    { id: 'match1', date: '2024-01-15', opponent: 'Barcelona' },
-    { id: 'match2', date: '2024-01-10', opponent: 'Real Madrid' },
-    { id: 'match3', date: '2024-01-05', opponent: 'Atletico Madrid' },
-  ];
 
   if (loading) {
     return (
@@ -486,21 +330,45 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               )}
               style={{ 
                 aspectRatio: isMobile ? '4/3' : '16/10',
-                minHeight: isMobile ? '250px' : '400px',
-                touchAction: 'none'
+                minHeight: isMobile ? '250px' : '400px'
               }}
             >
-              <canvas
-                ref={canvasRef}
-                width={800}
-                height={isMobile ? 600 : 500}
-                className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing"
+              {/* Heatmap Image Container */}
+              <div 
+                className="absolute inset-0 w-full h-full overflow-hidden cursor-grab active:cursor-grabbing"
                 onPointerDown={handlePointerDown}
                 onPointerMove={handlePointerMove}
                 onPointerUp={handlePointerUp}
-                onWheel={handleWheel}
                 style={{ touchAction: 'none' }}
-              />
+              >
+                {player.heatmapUrl ? (
+                  <img
+                    ref={imageRef}
+                    src={player.heatmapUrl}
+                    alt={`${player.name} heatmap`}
+                    className="w-full h-full object-contain transition-transform duration-200"
+                    style={{
+                      transform: `scale(${zoomLevel}) translate(${panOffset.x / zoomLevel}px, ${panOffset.y / zoomLevel}px)`,
+                      transformOrigin: 'center center'
+                    }}
+                    draggable={false}
+                    onError={(e) => {
+                      console.error('Failed to load heatmap image:', e);
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                ) : (
+                  <div className={cn(
+                    "w-full h-full flex items-center justify-center border-2 border-dashed",
+                    theme === 'dark' ? "border-club-gold/30 text-club-light-gray/50" : "border-club-gold/40 text-gray-400"
+                  )}>
+                    <div className="text-center">
+                      <Activity className="w-12 h-12 mx-auto mb-2 opacity-50" />
+                      <p className="text-sm">No heatmap data available</p>
+                    </div>
+                  </div>
+                )}
+              </div>
               
               {/* Mobile controls hint */}
               {isMobile && (
