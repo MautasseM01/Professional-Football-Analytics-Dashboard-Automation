@@ -12,14 +12,15 @@ import { ThemeToggle } from "./ThemeToggle";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { hasAccess } from "@/utils/roleAccess";
 import { useIsMobile } from "@/hooks/use-mobile";
-
 export const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [openSubMenus, setOpenSubMenus] = useState<Set<string>>(new Set());
   const [feedbackOpen, setFeedbackOpen] = useState(false);
   const location = useLocation();
-  const { profile } = useUserProfile();
+  const {
+    profile
+  } = useUserProfile();
   const isMobile = useIsMobile();
 
   // Auto-collapse sidebar on mobile
@@ -43,8 +44,6 @@ export const DashboardSidebar = () => {
       document.body.style.overflow = 'unset';
     };
   }, [isMobile, mobileOpen]);
-
-  // Filter navigation items based on current role
   const filteredNavigationItems = navigationItems.filter(item => {
     const hasItemAccess = hasAccess(profile?.role, item.allowedRoles);
     return hasItemAccess;
@@ -58,7 +57,6 @@ export const DashboardSidebar = () => {
       subItems: filteredSubItems
     };
   });
-
   const getActiveParentMenu = (pathname: string) => {
     for (const item of filteredNavigationItems) {
       if (item.subItems) {
@@ -70,14 +68,12 @@ export const DashboardSidebar = () => {
     }
     return null;
   };
-
   useEffect(() => {
     const activeParent = getActiveParentMenu(location.pathname);
     if (activeParent) {
       setOpenSubMenus(prev => new Set([...prev, activeParent]));
     }
   }, [location.pathname, filteredNavigationItems]);
-
   const toggleSubMenu = (name: string) => {
     setOpenSubMenus(prev => {
       const newSet = new Set(prev);
@@ -89,19 +85,17 @@ export const DashboardSidebar = () => {
       return newSet;
     });
   };
-
   const toggleMobileMenu = () => {
     setMobileOpen(prev => !prev);
   };
-
   const closeMobileMenu = () => {
     setMobileOpen(false);
   };
-
   const toggleDesktopSidebar = () => {
     setCollapsed(!collapsed);
   };
 
+  // Remove auto-close on navigation - let user control when to close
   const handleNavigate = () => {
     // Don't auto-close on mobile - let user decide when to close
   };
@@ -141,7 +135,6 @@ export const DashboardSidebar = () => {
         <FeedbackForm open={feedbackOpen} onOpenChange={setFeedbackOpen} />
       </>;
   }
-
   return <>
       {/* Mobile hamburger button - larger touch target */}
       {isMobile && <Button variant="ghost" size="icon" onClick={toggleMobileMenu} className="fixed top-4 left-4 z-30 text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 bg-club-black/90 backdrop-blur-sm lg:hidden h-12 w-12 touch-manipulation shadow-lg" aria-label="Open navigation menu">

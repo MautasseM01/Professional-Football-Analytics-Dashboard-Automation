@@ -1,6 +1,8 @@
 
 import { useState } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/use-user-profile';
+import { supabase } from '@/integrations/supabase/client';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,20 +14,20 @@ import {
 } from '@/components/ui/select';
 import { AlertTriangle, RefreshCw } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import { UserRole } from '@/types';
 
 const ROLES = [
   { value: 'admin', label: 'Admin', color: 'bg-red-500' },
   { value: 'management', label: 'Management', color: 'bg-purple-500' },
-  { value: 'performance_director', label: 'Performance Director', color: 'bg-green-500' },
   { value: 'coach', label: 'Coach', color: 'bg-blue-500' },
+  { value: 'performance_director', label: 'Performance Director', color: 'bg-green-500' },
   { value: 'analyst', label: 'Analyst', color: 'bg-cyan-500' },
   { value: 'player', label: 'Player', color: 'bg-yellow-500' },
   { value: 'unassigned', label: 'Unassigned', color: 'bg-gray-500' },
 ];
 
 export const RoleTester = () => {
-  const { profile, updateRole } = useUserProfile();
+  const { user } = useAuth();
+  const { profile } = useUserProfile();
   const [isUpdating, setIsUpdating] = useState(false);
 
   const getCurrentRoleInfo = () => {
@@ -33,18 +35,34 @@ export const RoleTester = () => {
   };
 
   const handleRoleChange = async (newRole: string) => {
+    if (!user?.id) {
+      toast({
+        title: "Error",
+        description: "No user found",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsUpdating(true);
     try {
-      updateRole(newRole as UserRole);
-      
+      const { error } = await supabase
+        .from('users')
+        .update({ role: newRole })
+        .eq('id', user.id);
+
+      if (error) {
+        throw error;
+      }
+
       toast({
         title: "Role Updated",
-        description: `Role changed to ${newRole}. Dashboard will update automatically.`,
+        description: `Role changed to ${newRole}`,
       });
 
-      // Small delay for visual feedback
+      // Refresh the page to update the dashboard view
       setTimeout(() => {
-        setIsUpdating(false);
+        window.location.reload();
       }, 500);
 
     } catch (error: any) {
@@ -54,6 +72,7 @@ export const RoleTester = () => {
         description: error.message || "Failed to update role",
         variant: "destructive",
       });
+    } finally {
       setIsUpdating(false);
     }
   };
@@ -65,54 +84,46 @@ export const RoleTester = () => {
   const currentRole = getCurrentRoleInfo();
 
   return (
-    <div className="flex items-center gap-3 p-4 bg-gradient-to-r from-orange-100 to-amber-100 dark:from-orange-900/30 dark:to-amber-900/30 border border-orange-300 dark:border-orange-600/30 rounded-lg shadow-sm">
-      {/* TEST MODE Warning - more prominent */}
-      <div className="flex items-center gap-2 px-3 py-1.5 bg-yellow-200 dark:bg-yellow-800 border border-yellow-400 dark:border-yellow-600 rounded-md text-sm font-bold text-yellow-800 dark:text-yellow-200">
-        <AlertTriangle size={16} />
-        DEMO MODE - ROLE TESTING
+    <div className="flex items-center gap-2 p-2 bg-orange-100 border border-orange-300 rounded-lg">
+      {/* TEST MODE Warning */}
+      <div className="flex items-center gap-1 px-2 py-1 bg-yellow-200 border border-yellow-400 rounded text-xs font-bold text-yellow-800">
+        <AlertTriangle size={12} />
+        TEST MODE
       </div>
 
-      {/* Current Role Badge - larger */}
+      {/* Current Role Badge */}
       <Badge 
-        className={`${currentRole.color} text-white text-sm px-3 py-1`}
+        className={`${currentRole.color} text-white text-xs`}
         variant="default"
       >
-        Current: {currentRole.label}
+        {currentRole.label}
       </Badge>
 
-      {/* Role Selector - more prominent */}
-      <div className="flex items-center gap-2">
-        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Switch Role:</span>
-        <Select 
-          value={profile.role || 'admin'} 
-          onValueChange={handleRoleChange}
-          disabled={isUpdating}
-        >
-          <SelectTrigger className="w-48 h-9 text-sm border-orange-300 dark:border-orange-600 bg-white dark:bg-gray-800">
-            <SelectValue placeholder="Select role" />
-          </SelectTrigger>
-          <SelectContent>
-            {ROLES.map((role) => (
-              <SelectItem key={role.value} value={role.value} className="text-sm">
-                <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${role.color}`} />
-                  {role.label}
-                </div>
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      {/* Role Selector */}
+      <Select 
+        value={profile.role || 'unassigned'} 
+        onValueChange={handleRoleChange}
+        disabled={isUpdating}
+      >
+        <SelectTrigger className="w-36 h-8 text-xs border-orange-300 bg-white">
+          <SelectValue placeholder="Select role" />
+        </SelectTrigger>
+        <SelectContent>
+          {ROLES.map((role) => (
+            <SelectItem key={role.value} value={role.value} className="text-xs">
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${role.color}`} />
+                {role.label}
+              </div>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
       {/* Loading Indicator */}
       {isUpdating && (
-        <RefreshCw size={16} className="animate-spin text-orange-600 dark:text-orange-400" />
+        <RefreshCw size={14} className="animate-spin text-orange-600" />
       )}
-
-      {/* Help text */}
-      <div className="text-xs text-gray-600 dark:text-gray-400 ml-auto">
-        Switch roles to see different dashboard views
-      </div>
     </div>
   );
 };

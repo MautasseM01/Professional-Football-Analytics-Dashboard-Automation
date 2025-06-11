@@ -1,71 +1,47 @@
-
-export interface AuthUser {
-  id: string;
-  email: string;
-  app_metadata?: {
-    provider?: string;
-  };
-  user_metadata?: {
-    name?: string;
-    avatar_url?: string;
-  };
-}
-
 export interface Player {
   id: number;
   name: string;
   position: string;
-  age?: number;
   matches: number;
-  goals?: number;
-  assists?: number;
-  yellow_cards?: number;
-  red_cards?: number;
-  shots_per_game?: number;
-  pass_success?: number;
-  aerials_won?: number;
-  rating?: number;
-  team?: string;
-  number?: number;
-  distance?: number;
-  maxSpeed?: number;
-  passes_completed: number;
+  distance: number;
   passes_attempted: number;
-  shots_on_target: number;
+  passes_completed: number;
   shots_total: number;
-  tackles_won: number;
+  shots_on_target: number;
   tackles_attempted: number;
-  heatmapUrl?: string;
-  reportUrl?: string;
-  sprintDistance?: number;
-  [key: string]: any;
+  tackles_won: number;
+  heatmapUrl: string;
+  reportUrl: string;
+  maxSpeed?: number;
+  number?: number; // Added player number field
+  sprintDistance?: number; // Added sprint distance field
 }
 
-export interface PlayerData {
-  id: number;
-  name: string;
-  position: string;
-  age: number;
-  matches: number;
-  goals: number;
-  assists: number;
-  yellow_cards: number;
-  red_cards: number;
-  shots_per_game: number;
-  pass_success: number;
-  aerials_won: number;
-  rating: number;
-  team: string;
-  [key: string]: any;
+export interface AuthUser {
+  id: string;
+  email?: string;
+  user_metadata?: {
+    name?: string;
+  };
 }
+
+export type UserRole = 'player' | 'coach' | 'analyst' | 'performance_director' | 'management' | 'admin' | 'unassigned';
 
 export interface UserProfile {
   id: string;
   email?: string;
-  role: UserRole;
   full_name?: string;
-  created_at: string;
-  updated_at: string;
+  role?: UserRole;
+  created_at?: string;
+  updated_at?: string;
 }
 
-export type UserRole = 'admin' | 'management' | 'performance_director' | 'analyst' | 'coach' | 'player' | 'unassigned';
+export type NavigationItem = {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  current: boolean;
+};
+
+// Re-export the Shot types for backwards compatibility
+export * from './shot';
