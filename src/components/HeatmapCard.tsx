@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -258,14 +259,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
         {/* Heatmap with Adjacent Controls Section */}
         <div className="space-y-4 w-full">
           {/* Zoom Controls - Below Key Metrics */}
-          <div className="flex items-center justify-between gap-4 w-full">
-            <h4 className={cn(
-              "font-medium text-base",
-              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-            )}>
-              {player.name} - Match Heatmap
-            </h4>
-            
+          <div className="flex items-center justify-end gap-2 w-full">
             <div className="flex items-center gap-2 flex-wrap">
               <Button
                 variant="outline"
