@@ -48,15 +48,15 @@ export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
     }
   };
 
-  const iconElement = <item.icon size={24} className="h-6 w-6 flex-shrink-0" />;
+  const iconElement = <item.icon size={20} className="h-5 w-5 flex-shrink-0" />;
 
   const buttonContent = (
     <Button
       variant="ghost"
       className={cn(
-        "w-full text-club-light-gray hover:text-club-gold hover:bg-club-gold/10 transition-colors",
-        collapsed ? "h-12 w-12 p-0 justify-center items-center" : "justify-start px-3",
-        isActive() && "bg-club-gold/20 text-club-gold",
+        "w-full text-club-light-gray hover:text-club-gold hover:bg-club-gold/10 transition-all duration-200 ease-in-out min-h-[44px] touch-manipulation",
+        collapsed ? "h-12 w-12 p-0 justify-center items-center" : "justify-start px-3 py-2",
+        isActive() && "bg-club-gold/20 text-club-gold border border-club-gold/30",
         className
       )}
       onClick={handleClick}
@@ -66,13 +66,13 @@ export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
       ) : (
         <>
           {iconElement}
-          <span className="ml-3 truncate">{item.name}</span>
+          <span className="ml-3 truncate font-medium">{item.name}</span>
           {hasSubItems && (
             <div className="ml-auto">
               {isOpen ? (
-                <ChevronDown size={16} className="text-club-light-gray" />
+                <ChevronDown size={16} className="text-club-light-gray transition-transform duration-200" />
               ) : (
-                <ChevronRight size={16} className="text-club-light-gray" />
+                <ChevronRight size={16} className="text-club-light-gray transition-transform duration-200" />
               )}
             </div>
           )}
@@ -110,9 +110,9 @@ export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
         mainElement
       )}
 
-      {/* Sub-menu items */}
+      {/* Sub-menu items with proper spacing and touch targets */}
       {hasSubItems && isOpen && !collapsed && (
-        <div className="ml-6 space-y-1">
+        <div className="ml-6 space-y-2 pt-2">
           {item.subItems!.map((subItem) => {
             const isSubActive = location.pathname === subItem.href || 
                               location.pathname.startsWith(subItem.href + '/');
@@ -127,9 +127,9 @@ export const SidebarNavItem: React.FC<SidebarNavItemProps> = ({
                   variant="ghost"
                   size="sm"
                   className={cn(
-                    "w-full justify-start text-club-light-gray/80 hover:text-club-gold hover:bg-club-gold/10 transition-colors pl-3",
-                    isSubActive && "bg-club-gold/20 text-club-gold",
-                    className && "text-base" // Larger text for mobile
+                    "w-full justify-start text-club-light-gray/80 hover:text-club-gold hover:bg-club-gold/10 transition-all duration-200 ease-in-out pl-3 min-h-[40px] touch-manipulation",
+                    isSubActive && "bg-club-gold/15 text-club-gold border-l-2 border-club-gold",
+                    className && "text-base font-medium" // Larger text for mobile
                   )}
                 >
                   <span className="truncate">{subItem.name}</span>
