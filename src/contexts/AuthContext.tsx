@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { AuthUser, UserRole } from '../types';
@@ -21,7 +20,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Set up auth state listener FIRST
+    // For demo purposes, provide a mock user immediately
+    const mockUser: AuthUser = {
+      id: 'demo-user-id',
+      email: 'demo@example.com',
+      user_metadata: {
+        name: 'Demo User'
+      }
+    };
+
+    setUser(mockUser);
+    setLoading(false);
+
+    // Still set up auth state listener for when authentication is re-enabled
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
         console.log("Auth state changed:", event, session);
@@ -32,32 +43,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
             user_metadata: session.user.user_metadata
           });
         } else {
-          setUser(null);
+          // Keep mock user for demo
+          setUser(mockUser);
         }
         setLoading(false);
       }
     );
-
-    // THEN check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      console.log("Current session:", session);
-      if (session?.user) {
-        setUser({
-          id: session.user.id,
-          email: session.user.email,
-          user_metadata: session.user.user_metadata
-        });
-      }
-      setLoading(false);
-    }).catch(error => {
-      console.error('Error fetching user session:', error);
-      toast({
-        title: "Authentication Error",
-        description: "Failed to fetch user session.",
-        variant: "destructive",
-      });
-      setLoading(false);
-    });
 
     return () => {
       subscription.unsubscribe();
@@ -66,84 +57,49 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const signIn = async (email: string, password: string) => {
     try {
-      console.log("Signing in with:", email);
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
+      console.log("Demo mode: Sign in simulated");
       toast({
-        title: "Success!",
-        description: "You have been logged in.",
+        title: "Demo Mode",
+        description: "Authentication is disabled for demo purposes.",
       });
     } catch (error: any) {
-      console.error("Login error:", error);
-      toast({
-        title: "Login failed",
-        description: error.message || "An error occurred during sign in.",
-        variant: "destructive",
-      });
-      throw error;
+      console.error("Demo mode: Login simulation");
     }
   };
 
   const signInWithGoogle = async () => {
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: window.location.origin,
-        },
-      });
-      if (error) throw error;
-    } catch (error: any) {
+      console.log("Demo mode: Google sign in simulated");
       toast({
-        title: "Google login failed",
-        description: error.message || "An error occurred during sign in with Google.",
-        variant: "destructive",
+        title: "Demo Mode",
+        description: "Google authentication is disabled for demo purposes.",
       });
-      throw error;
+    } catch (error: any) {
+      console.error("Demo mode: Google login simulation");
     }
   };
 
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+      console.log("Demo mode: Sign out simulated");
       toast({
-        title: "Logged out",
-        description: "You have been logged out successfully.",
+        title: "Demo Mode",
+        description: "Sign out is disabled for demo purposes.",
       });
     } catch (error: any) {
-      toast({
-        title: "Logout failed",
-        description: error.message || "An error occurred during sign out.",
-        variant: "destructive",
-      });
-      throw error;
+      console.error("Demo mode: Logout simulation");
     }
   };
 
   const signUp = async (email: string, password: string) => {
     try {
-      console.log("Signing up with:", email);
-      const { error } = await supabase.auth.signUp({ 
-        email, 
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`
-        }
-      });
-      if (error) throw error;
+      console.log("Demo mode: Sign up simulated");
       toast({
-        title: "Registration successful!",
-        description: "Please check your email to verify your account.",
+        title: "Demo Mode",
+        description: "Registration is disabled for demo purposes.",
       });
     } catch (error: any) {
-      console.error("Sign up error:", error);
-      toast({
-        title: "Registration failed",
-        description: error.message || "An error occurred during sign up.",
-        variant: "destructive",
-      });
-      throw error;
+      console.error("Demo mode: Sign up simulation");
     }
   };
 

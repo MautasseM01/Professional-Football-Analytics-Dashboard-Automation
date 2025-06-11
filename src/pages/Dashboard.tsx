@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { useUserProfile } from "@/hooks/use-user-profile";
@@ -18,7 +19,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { BackToTopButton } from "@/components/BackToTopButton";
 import { RoleTester } from "@/components/RoleTester";
-import { Menu, RefreshCw } from "lucide-react";
+import { Menu, RefreshCw, Sparkles } from "lucide-react";
 import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
 
 const Dashboard = () => {
@@ -114,6 +115,15 @@ const Dashboard = () => {
       {showSidebar && <DashboardSidebar />}
       
       <div className="flex-1 overflow-auto min-w-0">
+        {/* Prominent Demo Banner */}
+        <div className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-2 text-center">
+          <div className="flex items-center justify-center gap-2 text-sm font-medium">
+            <Sparkles size={16} />
+            <span>Football Analytics Dashboard - Interactive Demo</span>
+            <Sparkles size={16} />
+          </div>
+        </div>
+
         <header className="border-b border-white/20 dark:border-slate-700/20 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
           <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 gap-2 sm:gap-4 sm:py-[20px]">
             {/* Left section - Title and page info */}
@@ -166,10 +176,10 @@ const Dashboard = () => {
         </header>
         
         <main className="bg-transparent transition-colors duration-300 w-full">
-          {/* TEST MODE indicator as first element */}
-          {!profileLoading && profile && <div className="p-4 sm:p-6 pb-0">
-              <RoleTester />
-            </div>}
+          {/* Role Tester - prominently displayed */}
+          <div className="p-4 sm:p-6 pb-4">
+            <RoleTester />
+          </div>
           
           {renderDashboardContent()}
         </main>

@@ -1,8 +1,7 @@
 
 import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useUserProfile } from '@/hooks/use-user-profile';
-import { supabase } from '@/integrations/supabase/client';
+import { useUserProfile, changeDemoRole } from '@/hooks/use-user-profile';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,7 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import { AlertTriangle, RefreshCw, Eye } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
 
 const ROLES = [
@@ -31,39 +30,31 @@ export const RoleTester = () => {
   const [isUpdating, setIsUpdating] = useState(false);
 
   const getCurrentRoleInfo = () => {
-    return ROLES.find(role => role.value === profile?.role) || ROLES[6]; // Default to unassigned
+    return ROLES.find(role => role.value === profile?.role) || ROLES[0]; // Default to admin
   };
 
   const handleRoleChange = async (newRole: string) => {
     if (!user?.id) {
       toast({
-        title: "Error",
-        description: "No user found",
-        variant: "destructive",
+        title: "Demo Mode",
+        description: "Role switching enabled for demonstration",
       });
-      return;
     }
 
     setIsUpdating(true);
     try {
-      const { error } = await supabase
-        .from('users')
-        .update({ role: newRole })
-        .eq('id', user.id);
-
-      if (error) {
-        throw error;
-      }
+      // Use demo role change function
+      changeDemoRole(newRole as any);
 
       toast({
-        title: "Role Updated",
-        description: `Role changed to ${newRole}`,
+        title: "Role Changed",
+        description: `Now viewing as ${newRole}`,
       });
 
-      // Refresh the page to update the dashboard view
+      // Brief delay to show loading state
       setTimeout(() => {
-        window.location.reload();
-      }, 500);
+        setIsUpdating(false);
+      }, 300);
 
     } catch (error: any) {
       console.error('Error updating role:', error);
@@ -72,7 +63,6 @@ export const RoleTester = () => {
         description: error.message || "Failed to update role",
         variant: "destructive",
       });
-    } finally {
       setIsUpdating(false);
     }
   };
@@ -84,16 +74,16 @@ export const RoleTester = () => {
   const currentRole = getCurrentRoleInfo();
 
   return (
-    <div className="flex items-center gap-2 p-2 bg-orange-100 border border-orange-300 rounded-lg">
-      {/* TEST MODE Warning */}
-      <div className="flex items-center gap-1 px-2 py-1 bg-yellow-200 border border-yellow-400 rounded text-xs font-bold text-yellow-800">
-        <AlertTriangle size={12} />
-        TEST MODE
+    <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-700 rounded-lg shadow-sm">
+      {/* DEMO MODE Warning */}
+      <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-md text-sm font-bold shadow-sm">
+        <Eye size={14} />
+        DEMO MODE
       </div>
 
       {/* Current Role Badge */}
       <Badge 
-        className={`${currentRole.color} text-white text-xs`}
+        className={`${currentRole.color} text-white text-sm px-3 py-1 shadow-sm`}
         variant="default"
       >
         {currentRole.label}
@@ -101,18 +91,18 @@ export const RoleTester = () => {
 
       {/* Role Selector */}
       <Select 
-        value={profile.role || 'unassigned'} 
+        value={profile.role || 'admin'} 
         onValueChange={handleRoleChange}
         disabled={isUpdating}
       >
-        <SelectTrigger className="w-36 h-8 text-xs border-orange-300 bg-white">
+        <SelectTrigger className="w-44 h-9 text-sm border-blue-300 dark:border-blue-600 bg-white dark:bg-slate-800 shadow-sm">
           <SelectValue placeholder="Select role" />
         </SelectTrigger>
         <SelectContent>
           {ROLES.map((role) => (
-            <SelectItem key={role.value} value={role.value} className="text-xs">
+            <SelectItem key={role.value} value={role.value} className="text-sm">
               <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${role.color}`} />
+                <div className={`w-3 h-3 rounded-full ${role.color}`} />
                 {role.label}
               </div>
             </SelectItem>
@@ -122,8 +112,13 @@ export const RoleTester = () => {
 
       {/* Loading Indicator */}
       {isUpdating && (
-        <RefreshCw size={14} className="animate-spin text-orange-600" />
+        <RefreshCw size={16} className="animate-spin text-blue-600 dark:text-blue-400" />
       )}
+
+      {/* Info text */}
+      <span className="text-xs text-gray-600 dark:text-gray-400 ml-2">
+        Switch roles to see different dashboard views
+      </span>
     </div>
   );
 };
