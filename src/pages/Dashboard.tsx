@@ -1,18 +1,9 @@
+
 import { useState } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
-import { useUserProfile } from "@/hooks/use-user-profile";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
-import { TestModeIndicator } from "@/components/TestModeIndicator";
-import { PlayerDashboard } from "@/components/dashboards/PlayerDashboard";
-import { CoachDashboard } from "@/components/dashboards/CoachDashboard";
-import { AnalystDashboard } from "@/components/dashboards/AnalystDashboard";
-import { PerformanceDirectorDashboard } from "@/components/dashboards/PerformanceDirectorDashboard";
-import { ManagementDashboard } from "@/components/dashboards/ManagementDashboard";
 import { AdminDashboard } from "@/components/dashboards/AdminDashboard";
-import { UnassignedRoleDashboard } from "@/components/dashboards/UnassignedRoleDashboard";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -27,90 +18,27 @@ const Dashboard = () => {
     refreshData
   } = usePlayerData();
   const {
-    profile,
-    loading: profileLoading,
-    error
-  } = useUserProfile();
-  const {
     t
   } = useLanguage();
   const [showSidebar, setShowSidebar] = useState(true);
   
+  // Mock profile for demo purposes
+  const mockProfile = {
+    id: 'demo-user',
+    email: 'demo@example.com',
+    role: 'admin' as const,
+    full_name: 'Demo User',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
   const handleRefresh = () => {
     console.log("Manual refresh triggered");
     refreshData();
   };
 
-  // Render appropriate content based on user role
-  const renderDashboardContent = () => {
-    if (profileLoading) {
-      return <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-          <div className="h-6 sm:h-8 w-48 sm:w-64 bg-white/20 dark:bg-slate-700/20 rounded-xl animate-pulse" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
-            <div className="h-60 sm:h-80 w-full bg-white/20 dark:bg-slate-700/20 rounded-2xl animate-pulse" />
-            <div className="h-60 sm:h-80 w-full bg-white/20 dark:bg-slate-700/20 rounded-2xl animate-pulse" />
-            <div className="h-60 sm:h-80 w-full bg-white/20 dark:bg-slate-700/20 rounded-2xl animate-pulse" />
-          </div>
-        </div>;
-    }
-    
-    if (error) {
-      return <div className="p-4 sm:p-6">
-          <div className="bg-red-50/90 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-2xl p-6 backdrop-blur-sm">
-            <div className="flex flex-col gap-4">
-              <p className="text-ios-body text-red-800 dark:text-red-200">Error loading user profile: {error}</p>
-              <TouchFeedbackButton 
-                variant="outline" 
-                className="w-fit bg-white/50 dark:bg-slate-800/50 border-red-200 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-900/20" 
-                onClick={handleRefresh}
-              >
-                <RefreshCw size={16} className="mr-2" />
-                Retry Loading Data
-              </TouchFeedbackButton>
-            </div>
-          </div>
-        </div>;
-    }
-    
-    if (!profile) {
-      return <div className="p-4 sm:p-6">
-          <div className="bg-amber-50/90 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-2xl p-6 backdrop-blur-sm">
-            <div className="flex flex-col gap-4">
-              <p className="text-ios-body text-amber-800 dark:text-amber-200">User profile not found. Please try refreshing the page or contact an administrator.</p>
-              <TouchFeedbackButton 
-                variant="outline" 
-                className="w-fit bg-white/50 dark:bg-slate-800/50 border-amber-200 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20" 
-                onClick={handleRefresh}
-              >
-                <RefreshCw size={16} className="mr-2" />
-                Retry Loading Data
-              </TouchFeedbackButton>
-            </div>
-          </div>
-        </div>;
-    }
-
-    // Return the appropriate dashboard based on user role
-    switch (profile.role) {
-      case 'player':
-        return <PlayerDashboard profile={profile} />;
-      case 'coach':
-        return <CoachDashboard profile={profile} />;
-      case 'analyst':
-        return <AnalystDashboard profile={profile} />;
-      case 'performance_director':
-        return <PerformanceDirectorDashboard profile={profile} />;
-      case 'management':
-        return <ManagementDashboard profile={profile} />;
-      case 'admin':
-        return <AdminDashboard profile={profile} />;
-      case 'unassigned':
-      default:
-        return <UnassignedRoleDashboard profile={profile} />;
-    }
-  };
-
-  return <div className="flex h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
+  return (
+    <div className="flex h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 text-gray-900 dark:text-gray-100 transition-colors duration-300">
       {showSidebar && <DashboardSidebar />}
       
       <div className="flex-1 overflow-auto min-w-0">
@@ -122,7 +50,7 @@ const Dashboard = () => {
                 {t('header.title')}
               </h1>
               <p className="text-ios-caption text-gray-600 dark:text-gray-400 truncate">
-                {profileLoading ? <div className="h-3 sm:h-4 w-24 sm:w-32 lg:w-40 bg-gray-200 dark:bg-slate-700 rounded-lg animate-pulse inline-block" /> : profile?.role ? `${profile.role.charAt(0).toUpperCase() + profile.role.slice(1)} ${t('header.dashboard')}` : t('header.dashboard')}
+                Admin {t('header.dashboard')} (Demo Mode)
               </p>
             </div>
             
@@ -166,18 +94,20 @@ const Dashboard = () => {
         </header>
         
         <main className="bg-transparent transition-colors duration-300 w-full">
-          {/* TEST MODE indicator as first element */}
-          {!profileLoading && profile && <div className="p-4 sm:p-6 pb-0">
-              <RoleTester />
-            </div>}
+          {/* Role Tester for demo */}
+          <div className="p-4 sm:p-6 pb-0">
+            <RoleTester />
+          </div>
           
-          {renderDashboardContent()}
+          {/* Always show Admin Dashboard for demo */}
+          <AdminDashboard profile={mockProfile} />
         </main>
       </div>
 
       {/* Back to Top Button */}
       <BackToTopButton />
-    </div>;
+    </div>
+  );
 };
 
 export default Dashboard;
