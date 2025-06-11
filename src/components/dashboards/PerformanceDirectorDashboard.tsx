@@ -1,15 +1,34 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/types";
 import { HeartPulse, TrendingUp, BarChart3, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { PerformanceTrendsCard } from "../PerformanceTrendsCard";
 
 interface PerformanceDirectorDashboardProps {
   profile: UserProfile;
 }
 
 export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDashboardProps) => {
+  // Sample player data for performance trends
+  const samplePlayer = {
+    id: 1,
+    name: "Key Player Analysis",
+    position: "Midfielder",
+    matches: 15,
+    distance: 11.2,
+    passes_attempted: 89,
+    passes_completed: 76,
+    shots_total: 3,
+    shots_on_target: 2,
+    tackles_attempted: 5,
+    tackles_won: 3,
+    sprintDistance: 2.8,
+    maxSpeed: 32.1,
+    passCompletionPct: 85,
+    number: 10
+  };
+
   const squadAvailability = [
     { status: "Available", count: 18, color: "bg-green-600/80" },
     { status: "Light Training", count: 3, color: "bg-amber-600/80" },
@@ -48,6 +67,13 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
       <h1 className="text-2xl font-bold text-club-gold">
         Welcome back, {profile.full_name || "Performance Director"}
       </h1>
+      
+      {/* Enhanced Performance Trends Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="lg:col-span-2">
+          <PerformanceTrendsCard player={samplePlayer} />
+        </div>
+      </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Squad Availability */}
