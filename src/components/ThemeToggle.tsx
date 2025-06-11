@@ -12,7 +12,7 @@ export const ThemeToggle = () => {
       variant="outline"
       size="icon"
       onClick={toggleTheme}
-      className="text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors h-9 w-9 sm:h-10 sm:w-10"
+      className="text-club-gold border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors h-9 w-9 sm:h-10 sm:w-10 bg-club-black/50 hover:border-club-gold/30"
       title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
     >
       {theme === 'light' ? (

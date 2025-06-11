@@ -54,12 +54,12 @@ export default {
 					foreground: 'hsl(var(--card-foreground))'
 				},
 				club: {
-					black: '#121212',
+					black: '#0D0D0D',
 					gold: '#D4AF37',
 					white: '#FFFFFF',
 					'dark-gray': '#1A1A1A',
 					'light-gray': '#F5F5F5',
-					'dark-bg': '#0D0D0D'
+					'dark-bg': '#0A0A0A'
 				},
 				sidebar: {
 					DEFAULT: 'hsl(var(--sidebar-background))',

@@ -27,16 +27,16 @@ export const IOSCard = ({
   };
 
   const variantClasses = {
-    default: "bg-gradient-to-br from-white/90 to-white/70 dark:from-slate-800/90 dark:to-slate-900/70",
-    featured: "bg-gradient-to-br from-blue-50/90 to-indigo-100/70 dark:from-blue-900/40 dark:to-indigo-900/40",
-    minimal: "bg-white/50 dark:bg-slate-800/50"
+    default: "bg-gradient-to-br from-club-black/90 to-club-dark-gray/70 dark:from-club-black/90 dark:to-club-dark-gray/70",
+    featured: "bg-gradient-to-br from-club-gold/20 to-club-gold/10 dark:from-club-gold/20 dark:to-club-gold/10",
+    minimal: "bg-club-black/50 dark:bg-club-black/50"
   };
 
   return (
     <Card 
       className={cn(
-        "relative rounded-2xl border-0 shadow-lg backdrop-blur-xl transition-all duration-300 ease-out",
-        "hover:shadow-xl hover:scale-[1.02] active:scale-[0.98]",
+        "relative rounded-2xl border border-club-gold/20 shadow-lg backdrop-blur-xl transition-all duration-300 ease-out",
+        "hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] hover:border-club-gold/30",
         isInteractive && "cursor-pointer touch-manipulation",
         sizeClasses[size],
         variantClasses[variant],
@@ -49,7 +49,7 @@ export const IOSCard = ({
       </div>
       
       {/* iOS-style shine effect */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-white/20 via-transparent to-transparent opacity-60 pointer-events-none" />
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-club-gold/5 via-transparent to-transparent opacity-60 pointer-events-none" />
     </Card>
   );
 };
