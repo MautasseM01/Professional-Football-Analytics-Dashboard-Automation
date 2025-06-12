@@ -8,7 +8,6 @@ import {
 } from "@/components/ui/table";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { Player } from "@/types";
-import { ChartContainer, ChartLegend, ChartLegendContent } from "@/components/ui/chart";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from "recharts";
 import { MultiPlayerSelect } from "@/components/MultiPlayerSelect";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
@@ -19,6 +18,9 @@ import { BackToTopButton } from "@/components/BackToTopButton";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
+import { ResponsiveChartContainer } from "@/components/ResponsiveChartContainer";
+import { TableLoadingSkeleton, ChartLoadingSkeleton } from "@/components/LoadingStates";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 const formatPercentage = (value: number): string => {
   return `${value.toFixed(1)}%`;
@@ -146,304 +148,318 @@ export default function PlayerComparison() {
   }, [selectedPlayers]);
 
   return (
-    <DashboardLayout>
-      <div className="container mx-auto py-6 space-y-6">
-        {/* Header - iPhone weather style */}
-        <div className={cn(
-          "rounded-2xl p-6 backdrop-blur-sm transition-all duration-300",
-          theme === 'dark' 
-            ? "bg-club-dark-gray/60 border border-club-gold/20" 
-            : "bg-white/80 border border-club-gold/30",
-          "shadow-xl"
-        )}>
-          <div className="flex items-center gap-3 mb-2">
-            <div className={cn(
-              "p-2 rounded-xl",
-              theme === 'dark' 
-                ? "bg-club-gold/20" 
-                : "bg-club-gold/10"
-            )}>
-              <BarChart3 className="h-6 w-6 text-club-gold" />
-            </div>
-            <h1 className={cn(
-              "text-2xl sm:text-3xl font-bold",
-              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-            )}>
-              Player Comparison
-            </h1>
-          </div>
-          <p className={cn(
-            "text-sm sm:text-base",
-            theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
+    <ErrorBoundary>
+      <DashboardLayout>
+        <div className="container mx-auto py-6 space-y-6 animate-fade-in">
+          {/* Header - iPhone weather style */}
+          <div className={cn(
+            "rounded-2xl p-6 backdrop-blur-sm transition-all duration-300",
+            theme === 'dark' 
+              ? "bg-club-dark-gray/60 border border-club-gold/20" 
+              : "bg-white/80 border border-club-gold/30",
+            "shadow-xl"
           )}>
-            Compare performance metrics between multiple players (select 2-4 players)
-          </p>
-        </div>
-
-        {/* Player Selection Card - iPhone weather style */}
-        <Card className={cn(
-          "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
-          theme === 'dark' 
-            ? "bg-club-dark-gray/60" 
-            : "bg-white/80",
-          "shadow-xl"
-        )}>
-          <CardHeader className="pb-3">
-            <div className="flex items-center gap-3">
-              <UserRound className="h-5 w-5 text-club-gold" />
-              <div>
-                <CardTitle className={cn(
-                  "text-lg font-semibold",
-                  theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                )}>
-                  Player Selection
-                </CardTitle>
-                <CardDescription className={cn(
-                  "text-sm",
-                  theme === 'dark' ? "text-club-light-gray/60" : "text-gray-600"
-                )}>
-                  Select 2 to 4 players to compare their performance metrics
-                </CardDescription>
+            <div className="flex items-center gap-3 mb-2">
+              <div className={cn(
+                "p-2 rounded-xl",
+                theme === 'dark' 
+                  ? "bg-club-gold/20" 
+                  : "bg-club-gold/10"
+              )}>
+                <BarChart3 className="h-6 w-6 text-club-gold" />
               </div>
+              <h1 className={cn(
+                "text-2xl sm:text-3xl font-bold",
+                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+              )}>
+                Player Comparison
+              </h1>
             </div>
-          </CardHeader>
-          <CardContent>
-            <MultiPlayerSelect 
-              players={players || []}
-              selectedPlayerIds={selectedPlayerIds}
-              onChange={handlePlayerSelectionChange}
-              loading={loading}
-              maxSelections={4}
-            />
-          </CardContent>
-        </Card>
-
-        {selectedPlayers.length > 0 && (
-          <>
-            {/* Performance Metrics Table - iPhone weather style */}
-            <Card className={cn(
-              "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
-              theme === 'dark' 
-                ? "bg-club-dark-gray/60" 
-                : "bg-white/80",
-              "shadow-xl"
+            <p className={cn(
+              "text-sm sm:text-base",
+              theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
             )}>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <TrendingUp className="h-5 w-5 text-club-gold" />
-                  <div>
-                    <CardTitle className={cn(
-                      "text-lg font-semibold",
-                      theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                    )}>
-                      Performance Metrics Comparison
-                    </CardTitle>
-                    <CardDescription className={cn(
-                      "text-sm",
-                      theme === 'dark' ? "text-club-light-gray/60" : "text-gray-600"
-                    )}>
-                      Key performance indicators for the selected players
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow className={cn(
-                        theme === 'dark' 
-                          ? "border-club-gold/20" 
-                          : "border-club-gold/30"
-                      )}>
-                        <TableHead className={cn(
-                          "font-semibold",
-                          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                        )}>
-                          Metric
-                        </TableHead>
-                        {selectedPlayers.map((player) => (
-                          <TableHead key={player.id} className="text-center">
-                            <div className="flex items-center justify-center gap-2">
-                              <PlayerAvatar 
-                                player={player}
-                                size="sm"
-                              />
-                              <span className={cn(
-                                "font-medium text-sm",
-                                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                              )}>
-                                {player.name}
-                              </span>
-                            </div>
-                          </TableHead>
-                        ))}
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      <TableRow className={cn(
-                        theme === 'dark' 
-                          ? "border-club-gold/10 hover:bg-club-black/20" 
-                          : "border-club-gold/20 hover:bg-gray-50/50"
-                      )}>
-                        <TableCell className={cn(
-                          "font-medium",
-                          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                        )}>
-                          Total Distance (km)
-                        </TableCell>
-                        {selectedPlayers.map((player) => (
-                          <TableCell 
-                            key={`distance-${player.id}`} 
-                            className={cn(
-                              "text-center transition-all duration-200",
-                              highestDistance[player.id] 
-                                ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
-                                : theme === 'dark' 
-                                ? "text-club-light-gray" 
-                                : "text-gray-900"
-                            )}
-                          >
-                            {player.distance ? 
-                              player.distance.toFixed(1) : 
-                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
-                            }
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                      <TableRow className={cn(
-                        theme === 'dark' 
-                          ? "border-club-gold/10 hover:bg-club-black/20" 
-                          : "border-club-gold/20 hover:bg-gray-50/50"
-                      )}>
-                        <TableCell className={cn(
-                          "font-medium",
-                          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                        )}>
-                          Pass Completion %
-                        </TableCell>
-                        {selectedPlayers.map((player) => (
-                          <TableCell 
-                            key={`passes-${player.id}`} 
-                            className={cn(
-                              "text-center transition-all duration-200",
-                              highestPassCompletion[player.id] 
-                                ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
-                                : theme === 'dark' 
-                                ? "text-club-light-gray" 
-                                : "text-gray-900"
-                            )}
-                          >
-                            {player.passes_attempted && player.passes_attempted > 0 ?
-                              formatPercentage(getPassCompletionPercentage(player)) :
-                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
-                            }
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                      <TableRow className={cn(
-                        theme === 'dark' 
-                          ? "border-club-gold/10 hover:bg-club-black/20" 
-                          : "border-club-gold/20 hover:bg-gray-50/50"
-                      )}>
-                        <TableCell className={cn(
-                          "font-medium",
-                          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                        )}>
-                          Shots on Target
-                        </TableCell>
-                        {selectedPlayers.map((player) => (
-                          <TableCell 
-                            key={`shots-${player.id}`} 
-                            className={cn(
-                              "text-center transition-all duration-200",
-                              highestShotsOnTarget[player.id] 
-                                ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
-                                : theme === 'dark' 
-                                ? "text-club-light-gray" 
-                                : "text-gray-900"
-                            )}
-                          >
-                            {player.shots_on_target !== null && player.shots_on_target !== undefined ?
-                              player.shots_on_target :
-                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
-                            }
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                      <TableRow className={cn(
-                        theme === 'dark' 
-                          ? "border-club-gold/10 hover:bg-club-black/20" 
-                          : "border-club-gold/20 hover:bg-gray-50/50"
-                      )}>
-                        <TableCell className={cn(
-                          "font-medium",
-                          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                        )}>
-                          Tackles Won
-                        </TableCell>
-                        {selectedPlayers.map((player) => (
-                          <TableCell 
-                            key={`tackles-${player.id}`} 
-                            className={cn(
-                              "text-center transition-all duration-200",
-                              highestTacklesWon[player.id] 
-                                ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
-                                : theme === 'dark' 
-                                ? "text-club-light-gray" 
-                                : "text-gray-900"
-                            )}
-                          >
-                            {player.tackles_won !== null && player.tackles_won !== undefined ?
-                              player.tackles_won :
-                              <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
-                            }
-                          </TableCell>
-                        ))}
-                      </TableRow>
-                    </TableBody>
-                  </Table>
-                </div>
-              </CardContent>
-            </Card>
+              Compare performance metrics between multiple players (select 2-4 players)
+            </p>
+          </div>
 
-            {/* Radar Chart - iPhone weather style */}
-            <Card className={cn(
-              "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
-              theme === 'dark' 
-                ? "bg-club-dark-gray/60" 
-                : "bg-white/80",
-              "shadow-xl"
-            )}>
-              <CardHeader className="pb-3">
-                <div className="flex items-center gap-3">
-                  <BarChart3 className="h-5 w-5 text-club-gold" />
-                  <div>
-                    <CardTitle className={cn(
-                      "text-lg font-semibold",
-                      theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                    )}>
-                      Performance Radar Chart
-                    </CardTitle>
-                    <CardDescription className={cn(
-                      "text-sm",
-                      theme === 'dark' ? "text-club-light-gray/60" : "text-gray-600"
-                    )}>
-                      Visual comparison of player attributes across key categories
-                    </CardDescription>
-                  </div>
+          {/* Player Selection Card - iPhone weather style */}
+          <Card className={cn(
+            "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
+            theme === 'dark' 
+              ? "bg-club-dark-gray/60" 
+              : "bg-white/80",
+            "shadow-xl"
+          )}>
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-3">
+                <UserRound className="h-5 w-5 text-club-gold" />
+                <div>
+                  <CardTitle className={cn(
+                    "text-lg font-semibold",
+                    theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                  )}>
+                    Player Selection
+                  </CardTitle>
+                  <CardDescription className={cn(
+                    "text-sm",
+                    theme === 'dark' ? "text-club-light-gray/60" : "text-gray-600"
+                  )}>
+                    Select 2 to 4 players to compare their performance metrics
+                  </CardDescription>
                 </div>
-              </CardHeader>
-              <CardContent>
-                <div className={cn(
-                  "w-full rounded-2xl p-4 transition-all duration-300",
-                  theme === 'dark' 
-                    ? "bg-club-black/20 border border-club-gold/10" 
-                    : "bg-gray-50/30 border border-club-gold/20"
-                )}>
-                  <div className="w-full h-[400px] sm:h-[500px]">
-                    <ChartContainer config={chartConfig}>
-                      <>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <MultiPlayerSelect 
+                players={players || []}
+                selectedPlayerIds={selectedPlayerIds}
+                onChange={handlePlayerSelectionChange}
+                loading={loading}
+                maxSelections={4}
+              />
+            </CardContent>
+          </Card>
+
+          {selectedPlayers.length > 0 && (
+            <>
+              {/* Performance Metrics Table - iPhone weather style */}
+              <Card className={cn(
+                "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
+                theme === 'dark' 
+                  ? "bg-club-dark-gray/60" 
+                  : "bg-white/80",
+                "shadow-xl animate-fade-in"
+              )}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <TrendingUp className="h-5 w-5 text-club-gold" />
+                    <div>
+                      <CardTitle className={cn(
+                        "text-lg font-semibold",
+                        theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                      )}>
+                        Performance Metrics Comparison
+                      </CardTitle>
+                      <CardDescription className={cn(
+                        "text-sm",
+                        theme === 'dark' ? "text-club-light-gray/60" : "text-gray-600"
+                      )}>
+                        Key performance indicators for the selected players
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {loading ? (
+                    <TableLoadingSkeleton rows={4} columns={selectedPlayers.length + 1} />
+                  ) : (
+                    <div className="overflow-x-auto">
+                      <Table>
+                        <TableHeader>
+                          <TableRow className={cn(
+                            theme === 'dark' 
+                              ? "border-club-gold/20" 
+                              : "border-club-gold/30"
+                          )}>
+                            <TableHead className={cn(
+                              "font-semibold",
+                              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                            )}>
+                              Metric
+                            </TableHead>
+                            {selectedPlayers.map((player) => (
+                              <TableHead key={player.id} className="text-center">
+                                <div className="flex items-center justify-center gap-2">
+                                  <PlayerAvatar 
+                                    player={player}
+                                    size="sm"
+                                  />
+                                  <span className={cn(
+                                    "font-medium text-sm",
+                                    theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                                  )}>
+                                    {isMobile ? player.name.split(' ')[0] : player.name}
+                                  </span>
+                                </div>
+                              </TableHead>
+                            ))}
+                          </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                          <TableRow className={cn(
+                            "transition-colors duration-200",
+                            theme === 'dark' 
+                              ? "border-club-gold/10 hover:bg-club-black/20" 
+                              : "border-club-gold/20 hover:bg-gray-50/50"
+                          )}>
+                            <TableCell className={cn(
+                              "font-medium",
+                              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                            )}>
+                              {isMobile ? "Distance" : "Total Distance (km)"}
+                            </TableCell>
+                            {selectedPlayers.map((player) => (
+                              <TableCell 
+                                key={`distance-${player.id}`} 
+                                className={cn(
+                                  "text-center transition-all duration-200",
+                                  highestDistance[player.id] 
+                                    ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
+                                    : theme === 'dark' 
+                                    ? "text-club-light-gray" 
+                                    : "text-gray-900"
+                                )}
+                              >
+                                {player.distance ? 
+                                  player.distance.toFixed(1) : 
+                                  <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                                }
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                          <TableRow className={cn(
+                            "transition-colors duration-200",
+                            theme === 'dark' 
+                              ? "border-club-gold/10 hover:bg-club-black/20" 
+                              : "border-club-gold/20 hover:bg-gray-50/50"
+                          )}>
+                            <TableCell className={cn(
+                              "font-medium",
+                              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                            )}>
+                              {isMobile ? "Pass %" : "Pass Completion %"}
+                            </TableCell>
+                            {selectedPlayers.map((player) => (
+                              <TableCell 
+                                key={`passes-${player.id}`} 
+                                className={cn(
+                                  "text-center transition-all duration-200",
+                                  highestPassCompletion[player.id] 
+                                    ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
+                                    : theme === 'dark' 
+                                    ? "text-club-light-gray" 
+                                    : "text-gray-900"
+                                )}
+                              >
+                                {player.passes_attempted && player.passes_attempted > 0 ?
+                                  formatPercentage(getPassCompletionPercentage(player)) :
+                                  <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                                }
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                          <TableRow className={cn(
+                            "transition-colors duration-200",
+                            theme === 'dark' 
+                              ? "border-club-gold/10 hover:bg-club-black/20" 
+                              : "border-club-gold/20 hover:bg-gray-50/50"
+                          )}>
+                            <TableCell className={cn(
+                              "font-medium",
+                              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                            )}>
+                              {isMobile ? "Shots" : "Shots on Target"}
+                            </TableCell>
+                            {selectedPlayers.map((player) => (
+                              <TableCell 
+                                key={`shots-${player.id}`} 
+                                className={cn(
+                                  "text-center transition-all duration-200",
+                                  highestShotsOnTarget[player.id] 
+                                    ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
+                                    : theme === 'dark' 
+                                    ? "text-club-light-gray" 
+                                    : "text-gray-900"
+                                )}
+                              >
+                                {player.shots_on_target !== null && player.shots_on_target !== undefined ?
+                                  player.shots_on_target :
+                                  <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                                }
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                          <TableRow className={cn(
+                            "transition-colors duration-200",
+                            theme === 'dark' 
+                              ? "border-club-gold/10 hover:bg-club-black/20" 
+                              : "border-club-gold/20 hover:bg-gray-50/50"
+                          )}>
+                            <TableCell className={cn(
+                              "font-medium",
+                              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                            )}>
+                              {isMobile ? "Tackles" : "Tackles Won"}
+                            </TableCell>
+                            {selectedPlayers.map((player) => (
+                              <TableCell 
+                                key={`tackles-${player.id}`} 
+                                className={cn(
+                                  "text-center transition-all duration-200",
+                                  highestTacklesWon[player.id] 
+                                    ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
+                                    : theme === 'dark' 
+                                    ? "text-club-light-gray" 
+                                    : "text-gray-900"
+                                )}
+                              >
+                                {player.tackles_won !== null && player.tackles_won !== undefined ?
+                                  player.tackles_won :
+                                  <Badge variant="outline" className="bg-muted text-muted-foreground">N/A</Badge>
+                                }
+                              </TableCell>
+                            ))}
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Radar Chart - iPhone weather style */}
+              <Card className={cn(
+                "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
+                theme === 'dark' 
+                  ? "bg-club-dark-gray/60" 
+                  : "bg-white/80",
+                "shadow-xl animate-fade-in"
+              )}>
+                <CardHeader className="pb-3">
+                  <div className="flex items-center gap-3">
+                    <BarChart3 className="h-5 w-5 text-club-gold" />
+                    <div>
+                      <CardTitle className={cn(
+                        "text-lg font-semibold",
+                        theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                      )}>
+                        Performance Radar Chart
+                      </CardTitle>
+                      <CardDescription className={cn(
+                        "text-sm",
+                        theme === 'dark' ? "text-club-light-gray/60" : "text-gray-600"
+                      )}>
+                        Visual comparison of player attributes across key categories
+                      </CardDescription>
+                    </div>
+                  </div>
+                </CardHeader>
+                <CardContent>
+                  {loading ? (
+                    <ChartLoadingSkeleton showHeader={false} />
+                  ) : (
+                    <div className={cn(
+                      "w-full rounded-2xl p-4 transition-all duration-300",
+                      theme === 'dark' 
+                        ? "bg-club-black/20 border border-club-gold/10" 
+                        : "bg-gray-50/30 border border-club-gold/20"
+                    )}>
+                      <ResponsiveChartContainer 
+                        config={chartConfig}
+                        aspectRatio={isMobile ? 1 : 1.5}
+                        minHeight={isMobile ? 300 : 400}
+                      >
                         <ResponsiveContainer width="100%" height="100%">
                           <RadarChart data={radarData} className="mx-auto">
                             <PolarGrid stroke={theme === 'dark' ? "#333" : "#e5e7eb"} />
@@ -468,25 +484,35 @@ export default function PlayerComparison() {
                             ))}
                           </RadarChart>
                         </ResponsiveContainer>
-                        <ChartLegend>
-                          <ChartLegendContent payload={selectedPlayers.map((player, index) => ({
-                            value: player.name,
-                            color: playerColors[index % playerColors.length],
-                            dataKey: player.name
-                          }))} />
-                        </ChartLegend>
-                      </>
-                    </ChartContainer>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </>
-        )}
-      </div>
+                      </ResponsiveChartContainer>
+                      
+                      {/* Legend for mobile */}
+                      {isMobile && selectedPlayers.length > 0 && (
+                        <div className="mt-4 grid grid-cols-2 gap-2">
+                          {selectedPlayers.map((player, index) => (
+                            <div key={player.id} className="flex items-center gap-2">
+                              <div 
+                                className="w-3 h-3 rounded-full"
+                                style={{ backgroundColor: playerColors[index % playerColors.length] }}
+                              />
+                              <span className="text-xs font-medium text-club-light-gray truncate">
+                                {player.name.split(' ')[0]}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </>
+          )}
+        </div>
 
-      {/* Back to Top Button */}
-      <BackToTopButton />
-    </DashboardLayout>
+        {/* Back to Top Button */}
+        <BackToTopButton />
+      </DashboardLayout>
+    </ErrorBoundary>
   );
 }

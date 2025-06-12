@@ -9,17 +9,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { 
-  ChartContainer, 
-  ChartTooltipContent, 
-  ChartTooltip 
-} from "@/components/ui/chart";
-import { 
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { 
   LineChart as RechartsLineChart, 
   Line, 
   XAxis, 
@@ -32,11 +21,15 @@ import {
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { TrendingUp, RefreshCw, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { usePerformanceData } from "@/hooks/use-performance-data";
+import { useSwipeGestures } from "@/hooks/use-swipe-gestures";
+import { ResponsiveChartContainer } from "./ResponsiveChartContainer";
+import { ChartLoadingSkeleton } from "./LoadingStates";
+import { ErrorBoundary } from "./ErrorBoundary";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface PerformanceTrendsCardProps {
@@ -139,7 +132,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
     return calculateStats(matchData);
   }, [matchData]);
 
-  // iPhone weather app-style navigation for mobile
+  // Enhanced navigation with swipe gestures
   const nextMetric = () => {
     const nextIndex = (currentMetricIndex + 1) % KPI_OPTIONS.length;
     setCurrentMetricIndex(nextIndex);
@@ -151,6 +144,14 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
     setCurrentMetricIndex(prevIndex);
     setSelectedKPI(KPI_OPTIONS[prevIndex].value);
   };
+
+  // Swipe gestures for mobile
+  const { swipeProps } = useSwipeGestures({
+    onSwipeLeft: nextMetric,
+    onSwipeRight: prevMetric,
+    threshold: 50,
+    preventScroll: false
+  });
 
   // Enhanced tooltip component with better formatting for new metrics
   const CustomTooltip = ({ active, payload, label }: any) => {
@@ -168,6 +169,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
       return (
         <div className={cn(
           "border rounded-xl shadow-2xl backdrop-blur-md max-w-[200px] p-3 transition-all duration-200",
+          "animate-scale-in", // Add smooth animation
           theme === 'dark' 
             ? "bg-club-dark-gray/95 border-club-gold/30 text-club-light-gray" 
             : "bg-white/95 border-club-gold/40 text-gray-900"
@@ -194,29 +196,15 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
     return null;
   };
 
+  // Enhanced chart configuration for better mobile experience
+  const getChartConfig = () => ({
+    value: { color: "#D4AF37" },
+    average: { color: "#9CA3AF" }
+  });
+
   // Show loading state
   if (loading) {
-    return (
-      <Card className={cn(
-        "border-club-gold/20 w-full overflow-hidden backdrop-blur-sm",
-        theme === 'dark' 
-          ? "bg-club-dark-gray/50" 
-          : "bg-white/80",
-        "shadow-xl transition-all duration-300"
-      )}>
-        <CardContent className="flex items-center justify-center p-8">
-          <div className="flex items-center gap-3">
-            <Loader2 className="h-5 w-5 animate-spin text-club-gold" />
-            <span className={cn(
-              "text-sm",
-              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-            )}>
-              Loading performance data...
-            </span>
-          </div>
-        </CardContent>
-      </Card>
-    );
+    return <ChartLoadingSkeleton />;
   }
 
   // Show error state
@@ -270,14 +258,17 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
   }
 
   return (
-    <TooltipProvider>
-      <Card className={cn(
-        "border-club-gold/20 w-full overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-2xl",
-        theme === 'dark' 
-          ? "bg-club-dark-gray/60 hover:bg-club-dark-gray/70" 
-          : "bg-white/80 hover:bg-white/90",
-        "shadow-xl"
-      )}>
+    <ErrorBoundary>
+      <Card 
+        className={cn(
+          "border-club-gold/20 w-full overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-2xl",
+          theme === 'dark' 
+            ? "bg-club-dark-gray/60 hover:bg-club-dark-gray/70" 
+            : "bg-white/80 hover:bg-white/90",
+          "shadow-xl animate-fade-in"
+        )}
+        {...(isMobile ? swipeProps : {})}
+      >
         <CardHeader className="pb-3 px-4 sm:px-6">
           <div className="flex items-center justify-between">
             <div className="min-w-0 flex-1">
@@ -290,7 +281,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
               <div className="flex items-center gap-2 mt-1">
                 {stats.trend !== 'neutral' && (
                   <div className={cn(
-                    "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium",
+                    "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium animate-scale-in",
                     stats.trend === 'up' 
                       ? "bg-club-gold/20 text-club-gold"
                       : "bg-red-500/20 text-red-400"
@@ -298,6 +289,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                     <TrendingUp 
                       size={10} 
                       className={cn(
+                        "transition-transform duration-200",
                         stats.trend === 'down' && "rotate-180"
                       )} 
                     />
@@ -316,7 +308,8 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                   variant="ghost"
                   size="icon"
                   onClick={prevMetric}
-                  className="h-9 w-9 text-club-gold hover:bg-club-gold/10 rounded-full"
+                  className="h-9 w-9 text-club-gold hover:bg-club-gold/10 rounded-full hover-scale"
+                  aria-label="Previous metric"
                 >
                   <ChevronLeft className="h-4 w-4" />
                 </Button>
@@ -324,7 +317,8 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                   variant="ghost"
                   size="icon"
                   onClick={nextMetric}
-                  className="h-9 w-9 text-club-gold hover:bg-club-gold/10 rounded-full"
+                  className="h-9 w-9 text-club-gold hover:bg-club-gold/10 rounded-full hover-scale"
+                  aria-label="Next metric"
                 >
                   <ChevronRight className="h-4 w-4" />
                 </Button>
@@ -338,7 +332,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
             <div className="space-y-3 sm:space-y-4">
               {/* Mobile metric display - iPhone weather style */}
               {isMobile ? (
-                <div className="text-center space-y-2">
+                <div className="text-center space-y-2 animate-fade-in">
                   <h3 className="text-lg font-semibold text-club-gold">
                     {currentMetric.shortLabel}
                   </h3>
@@ -353,7 +347,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                         key={index}
                         className={cn(
                           "w-2 h-2 rounded-full transition-all duration-300",
-                          index === currentMetricIndex ? 'bg-club-gold' : 'bg-club-gold/30'
+                          index === currentMetricIndex ? 'bg-club-gold scale-125' : 'bg-club-gold/30'
                         )}
                       />
                     ))}
@@ -369,7 +363,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                     )}>Performance Metric</Label>
                     <Select value={selectedKPI} onValueChange={setSelectedKPI}>
                       <SelectTrigger className={cn(
-                        "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl",
+                        "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl transition-all duration-200",
                         theme === 'dark' 
                           ? "bg-club-black/50 text-club-light-gray" 
                           : "bg-white/70 text-gray-900"
@@ -386,7 +380,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                           <SelectItem 
                             key={option.value} 
                             value={option.value} 
-                            className="focus:bg-club-gold/20 text-sm rounded-lg"
+                            className="focus:bg-club-gold/20 text-sm rounded-lg transition-colors duration-150"
                           >
                             {option.label}
                           </SelectItem>
@@ -402,7 +396,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                     )}>Time Period</Label>
                     <Select value={selectedTimePeriod} onValueChange={setSelectedTimePeriod}>
                       <SelectTrigger className={cn(
-                        "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl",
+                        "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl transition-all duration-200",
                         theme === 'dark' 
                           ? "bg-club-black/50 text-club-light-gray" 
                           : "bg-white/70 text-gray-900"
@@ -419,7 +413,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                           <SelectItem 
                             key={option.value} 
                             value={option.value} 
-                            className="focus:bg-club-gold/20 text-sm rounded-lg"
+                            className="focus:bg-club-gold/20 text-sm rounded-lg transition-colors duration-150"
                           >
                             {option.label}
                           </SelectItem>
@@ -435,7 +429,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                     )}>Chart View</Label>
                     <Select value={chartView} onValueChange={setChartView}>
                       <SelectTrigger className={cn(
-                        "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl",
+                        "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl transition-all duration-200",
                         theme === 'dark' 
                           ? "bg-club-black/50 text-club-light-gray" 
                           : "bg-white/70 text-gray-900"
@@ -452,7 +446,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                           <SelectItem 
                             key={option.value} 
                             value={option.value} 
-                            className="focus:bg-club-gold/20 text-sm rounded-lg"
+                            className="focus:bg-club-gold/20 text-sm rounded-lg transition-colors duration-150"
                           >
                             {option.label}
                           </SelectItem>
@@ -465,7 +459,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
               
               {/* Performance Statistics - iPhone weather style */}
               <div className={cn(
-                "grid gap-3 p-4 rounded-2xl transition-all duration-300",
+                "grid gap-3 p-4 rounded-2xl transition-all duration-300 animate-fade-in",
                 isMobile ? "grid-cols-2" : "grid-cols-4",
                 theme === 'dark' 
                   ? "bg-club-black/30 border border-club-gold/10" 
@@ -473,7 +467,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
               )}>
                 <div className="text-center">
                   <div className={cn(
-                    "text-lg font-bold",
+                    "text-lg font-bold transition-colors duration-200",
                     theme === 'dark' ? "text-club-gold" : "text-club-gold"
                   )}>
                     {stats.avg.toFixed(1)}
@@ -485,7 +479,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                 </div>
                 <div className="text-center">
                   <div className={cn(
-                    "text-lg font-bold",
+                    "text-lg font-bold transition-colors duration-200",
                     theme === 'dark' ? "text-green-400" : "text-green-600"
                   )}>
                     {stats.max}
@@ -499,7 +493,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                   <>
                     <div className="text-center">
                       <div className={cn(
-                        "text-lg font-bold",
+                        "text-lg font-bold transition-colors duration-200",
                         theme === 'dark' ? "text-red-400" : "text-red-600"
                       )}>
                         {stats.min}
@@ -511,7 +505,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                     </div>
                     <div className="text-center">
                       <div className={cn(
-                        "text-lg font-bold",
+                        "text-lg font-bold transition-colors duration-200",
                         theme === 'dark' ? "text-blue-400" : "text-blue-600"
                       )}>
                         {matchData.length}
@@ -533,7 +527,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                       <Label 
                         htmlFor="movingAverage"
                         className={cn(
-                          "text-xs cursor-pointer select-none font-medium",
+                          "text-xs cursor-pointer select-none font-medium transition-colors duration-200",
                           theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
                         )}
                       >
@@ -563,11 +557,8 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
               )}
               style={{ height: isMobile ? '220px' : '300px' }}
             >
-              <ChartContainer 
-                config={{
-                  value: { color: "#D4AF37" },
-                  average: { color: "#9CA3AF" }
-                }}
+              <ResponsiveChartContainer
+                config={getChartConfig()}
                 aspectRatio={isMobile ? (4/3) : (16/10)}
                 minHeight={isMobile ? 200 : 280}
               >
@@ -670,11 +661,11 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                     </AreaChart>
                   )}
                 </ResponsiveContainer>
-              </ChartContainer>
+              </ResponsiveChartContainer>
             </div>
           </div>
         </CardContent>
       </Card>
-    </TooltipProvider>
+    </ErrorBoundary>
   );
 };
