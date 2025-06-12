@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/types";
 import { HeartPulse, TrendingUp, BarChart3, Star } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { PerformanceTrendsCard } from "../PerformanceTrendsCard";
+import { PerformanceTrendsCard } from "../PerformanceTrends";
 
 interface PerformanceDirectorDashboardProps {
   profile: UserProfile;

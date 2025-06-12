@@ -1,7 +1,6 @@
-
 import { Player } from "@/types";
 import { LineChart } from "lucide-react";
-import { PerformanceTrendsCard } from "./PerformanceTrendsCard";
+import { PerformanceTrendsCard } from "./PerformanceTrends";
 
 interface PlayerPerformanceSectionProps {
   player: Player;
