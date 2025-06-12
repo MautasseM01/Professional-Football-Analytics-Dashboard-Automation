@@ -5,11 +5,13 @@ interface StatCardProps {
   title: React.ReactNode;
   value: string | number;
   subValue?: string;
+  unit?: string;
+  subtitle?: string;
   icon?: React.ReactNode;
   className?: string;
 }
 
-export const StatCard = ({ title, value, subValue, icon, className = "" }: StatCardProps) => {
+export const StatCard = ({ title, value, subValue, unit, subtitle, icon, className = "" }: StatCardProps) => {
   return (
     <Card className={`
       border-club-gold/20 bg-club-black 
@@ -34,11 +36,11 @@ export const StatCard = ({ title, value, subValue, icon, className = "" }: StatC
           </div>
           <div className="space-y-1">
             <div className="text-2xl sm:text-3xl font-bold text-club-gold break-words leading-tight group-hover:text-club-gold/90 transition-colors duration-300">
-              {value}
+              {value}{unit && <span className="text-lg ml-1">{unit}</span>}
             </div>
-            {subValue && (
+            {(subValue || subtitle) && (
               <div className="text-xs text-gray-400 break-words leading-tight">
-                {subValue}
+                {subtitle || subValue}
               </div>
             )}
           </div>

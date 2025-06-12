@@ -48,6 +48,33 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
     setShowStats(!showStats);
   };
 
+  // Mock data generation for chart
+  const generateMockData = () => {
+    const matches = ['Match 1', 'Match 2', 'Match 3', 'Match 4', 'Match 5'];
+    return matches.map((match, index) => {
+      const baseValue = Math.random() * 100 + 50;
+      return {
+        match,
+        value: Math.round(baseValue),
+        movingAvg: index >= 2 ? Math.round((baseValue + Math.random() * 20 - 10)) : null
+      };
+    });
+  };
+
+  const mockData = generateMockData();
+  const selectedKPILabel = KPI_OPTIONS.find(option => option.value === selectedKPI)?.label || "Distance";
+
+  const getChartConfig = () => ({
+    value: {
+      label: selectedKPILabel,
+      color: "#D4AF37",
+    },
+    movingAvg: {
+      label: "3-Match Average",
+      color: "#9CA3AF",
+    },
+  });
+
   return (
     <Card className={cn(
       "w-full overflow-hidden transition-all duration-300",
@@ -123,12 +150,12 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
           <DesktopControls
             selectedKPI={selectedKPI}
             selectedTimePeriod={selectedTimePeriod}
-            selectedChartView={selectedChartView}
+            chartView={selectedChartView}
             showMovingAverage={showMovingAverage}
-            onKPIChange={setSelectedKPI}
-            onTimePeriodChange={setSelectedTimePeriod}
-            onChartViewChange={setSelectedChartView}
-            onMovingAverageToggle={setShowMovingAverage}
+            setSelectedKPI={setSelectedKPI}
+            setSelectedTimePeriod={setSelectedTimePeriod}
+            setChartView={setSelectedChartView}
+            setShowMovingAverage={setShowMovingAverage}
           />
         )}
       </CardHeader>
@@ -146,11 +173,12 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
 
           {/* Chart Renderer */}
           <ChartRenderer
-            player={player}
+            chartView={selectedChartView}
+            matchData={mockData}
             selectedKPI={selectedKPI}
-            selectedTimePeriod={selectedTimePeriod}
-            selectedChartView={selectedChartView}
+            selectedKPILabel={selectedKPILabel}
             showMovingAverage={showMovingAverage}
+            getChartConfig={getChartConfig}
           />
         </CardContent>
       )}
