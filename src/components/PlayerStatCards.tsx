@@ -33,11 +33,24 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
     ? ((player.shots_on_target / player.shots_total) * 100).toFixed(1)
     : "0";
 
-  // Always use a consistent 5-card layout that works well across all devices
-  const gridConfig = {
-    minWidth: '200px',
-    className: 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-5'
+  // Intelligent grid configuration based on breakpoint
+  const getGridConfig = () => {
+    switch (breakpoint) {
+      case 'mobile':
+        return { minWidth: '100%', className: 'grid-cols-1' };
+      case 'tablet-portrait':
+        return { minWidth: '280px', className: 'grid-cols-1 xs:grid-cols-2' };
+      case 'tablet-landscape':
+        return { minWidth: '240px', className: 'grid-cols-2 md:grid-cols-3' };
+      case 'desktop':
+        return { minWidth: '220px', className: 'grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' };
+      case 'large':
+      default:
+        return { minWidth: '200px', className: 'grid-cols-5' };
+    }
   };
+
+  const gridConfig = getGridConfig();
 
   return (
     <TooltipProvider>
@@ -136,7 +149,11 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
+              <div className={`
+                w-full h-full min-w-0 transition-all duration-300 ease-in-out
+                ${breakpoint === 'tablet-portrait' ? 'col-span-2' : ''}
+                ${breakpoint === 'tablet-landscape' ? 'col-span-1' : ''}
+              `}>
                 <DisciplinaryCard playerId={player.id} />
               </div>
             </TooltipTrigger>

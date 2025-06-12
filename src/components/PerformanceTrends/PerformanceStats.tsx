@@ -2,34 +2,20 @@
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { Player } from "@/types";
 
 interface PerformanceStatsProps {
-  player: Player;
+  stats: {
+    avg: number;
+    max: number;
+    min: number;
+    trend: string;
+  };
+  matchDataLength: number;
 }
 
-export const PerformanceStats = ({ player }: PerformanceStatsProps) => {
+export const PerformanceStats = ({ stats, matchDataLength }: PerformanceStatsProps) => {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
-
-  // Calculate basic stats from player data
-  const calculateStats = () => {
-    // Use actual player data to create meaningful stats
-    const distance = player.distance || 0;
-    const passes = player.passes_completed || 0;
-    const shots = player.shots_on_target || 0;
-    const tackles = player.tackles_won || 0;
-
-    return {
-      avg: Number(((distance + passes + shots + tackles) / 4).toFixed(1)),
-      max: Math.max(distance, passes, shots, tackles),
-      min: Math.min(distance, passes, shots, tackles),
-      trend: 'up' // Default trend
-    };
-  };
-
-  const stats = calculateStats();
-  const matchDataLength = player.matches || 0;
 
   return (
     <div className={cn(
@@ -44,7 +30,7 @@ export const PerformanceStats = ({ player }: PerformanceStatsProps) => {
           "text-lg font-bold transition-colors duration-200",
           theme === 'dark' ? "text-club-gold" : "text-club-gold"
         )}>
-          {stats.avg}
+          {stats.avg.toFixed(1)}
         </div>
         <div className={cn(
           "text-xs",

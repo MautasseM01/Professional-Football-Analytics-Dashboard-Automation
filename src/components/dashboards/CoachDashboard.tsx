@@ -25,10 +25,10 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
         </p>
       </div>
 
-      {/* Team Overview Cards with 2x2 Grid on Mobile */}
+      {/* Team Overview Cards with Responsive Grid */}
       <ResponsiveGrid 
-        forceTwoColumns={true}
-        className="auto-rows-fr"
+        minCardWidth="200px"
+        className="grid-cols-2 md:grid-cols-4"
       >
         <Card className="bg-club-dark-gray border-club-gold/20">
           <CardHeader className="pb-2">
@@ -119,7 +119,7 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
         loading={loading}
       />
 
-      {/* Player Stats Component - Now includes disciplinary records */}
+      {/* Player Stats Component */}
       {selectedPlayer && <PlayerStats player={selectedPlayer} />}
     </div>
   );
