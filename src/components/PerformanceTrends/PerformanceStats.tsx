@@ -2,20 +2,55 @@
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { Player } from "@/types";
 
 interface PerformanceStatsProps {
-  stats: {
-    avg: number;
-    max: number;
-    min: number;
-    trend: string;
-  };
-  matchDataLength: number;
+  player: Player;
+  selectedKPI: string;
+  selectedTimePeriod: string;
 }
 
-export const PerformanceStats = ({ stats, matchDataLength }: PerformanceStatsProps) => {
+export const PerformanceStats = ({ player, selectedKPI, selectedTimePeriod }: PerformanceStatsProps) => {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+
+  // Calculate stats based on player data and selected KPI
+  const calculateStats = () => {
+    let value = 0;
+    
+    switch (selectedKPI) {
+      case "distance":
+        value = player.distance || 0;
+        break;
+      case "sprintDistance":
+        value = player.sprintDistance || 0;
+        break;
+      case "passes_completed":
+        value = player.passes_completed || 0;
+        break;
+      case "shots_on_target":
+        value = player.shots_on_target || 0;
+        break;
+      case "tackles_won":
+        value = player.tackles_won || 0;
+        break;
+      case "match_rating":
+        value = 7.5; // Mock rating
+        break;
+      default:
+        value = 0;
+    }
+
+    // Mock calculations for demo - in real app, these would come from match history
+    const avg = value;
+    const max = Math.round(value * 1.2);
+    const min = Math.round(value * 0.8);
+    const matchDataLength = player.matches || 5;
+
+    return { avg, max, min, trend: 'up', matchDataLength };
+  };
+
+  const stats = calculateStats();
 
   return (
     <div className={cn(
@@ -68,7 +103,7 @@ export const PerformanceStats = ({ stats, matchDataLength }: PerformanceStatsPro
               "text-lg font-bold transition-colors duration-200",
               theme === 'dark' ? "text-blue-400" : "text-blue-600"
             )}>
-              {matchDataLength}
+              {stats.matchDataLength}
             </div>
             <div className={cn(
               "text-xs",
