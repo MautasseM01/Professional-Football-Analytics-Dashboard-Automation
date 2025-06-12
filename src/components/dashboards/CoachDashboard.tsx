@@ -6,7 +6,6 @@ import { PlayerSelector } from "@/components/PlayerSelector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, AlertTriangle, Target, TrendingUp } from "lucide-react";
 import { ResponsiveGrid } from "../ResponsiveLayout";
-import { useIsMobile } from "@/hooks/use-mobile";
 
 interface CoachDashboardProps {
   profile: UserProfile;
@@ -14,7 +13,6 @@ interface CoachDashboardProps {
 
 export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
   const { players, selectedPlayer, selectPlayer, loading } = usePlayerData();
-  const isMobile = useIsMobile();
 
   return (
     <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
@@ -27,11 +25,10 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
         </p>
       </div>
 
-      {/* Team Overview Cards with Responsive Grid - Force 2x2 on mobile */}
+      {/* Team Overview Cards with Responsive Grid */}
       <ResponsiveGrid 
         minCardWidth="200px"
-        forceGrid={isMobile ? "repeat(2, 1fr)" : "repeat(auto-fit, minmax(200px, 1fr))"}
-        className="auto-rows-fr"
+        className="grid-cols-2 md:grid-cols-4"
       >
         <Card className="bg-club-dark-gray border-club-gold/20">
           <CardHeader className="pb-2">

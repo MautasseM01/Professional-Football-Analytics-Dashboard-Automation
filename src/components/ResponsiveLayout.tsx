@@ -21,22 +21,13 @@ interface ResponsiveGridProps {
   children: ReactNode;
   className?: string;
   minCardWidth?: string;
-  forceGrid?: string; // Force specific grid layout
 }
 
 export const ResponsiveGrid = ({ 
   children, 
   className = "", 
-  minCardWidth = "280px",
-  forceGrid
+  minCardWidth = "280px" 
 }: ResponsiveGridProps) => {
-  const isMobile = useIsMobile();
-  
-  // If forceGrid is specified, use it instead of auto-fit
-  const gridColumns = forceGrid 
-    ? forceGrid 
-    : `repeat(auto-fit, minmax(${minCardWidth}, 1fr))`;
-
   return (
     <div className={`
       responsive-grid
@@ -45,7 +36,7 @@ export const ResponsiveGrid = ({
       ${className}
     `}
     style={{
-      gridTemplateColumns: gridColumns
+      gridTemplateColumns: `repeat(auto-fit, minmax(${minCardWidth}, 1fr))`
     }}>
       {children}
     </div>
