@@ -21,23 +21,33 @@ interface ResponsiveGridProps {
   children: ReactNode;
   className?: string;
   minCardWidth?: string;
+  forceTwoColumns?: boolean; // New prop for 2x2 layout on mobile
 }
 
 export const ResponsiveGrid = ({ 
   children, 
   className = "", 
-  minCardWidth = "280px" 
+  minCardWidth = "280px",
+  forceTwoColumns = false
 }: ResponsiveGridProps) => {
+  // Override grid classes for 2x2 layout on mobile when forceTwoColumns is true
+  const gridClasses = forceTwoColumns 
+    ? "grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 xs:gap-3 sm:gap-4 lg:gap-4 xl:gap-6"
+    : `grid gap-3 xs:gap-3 sm:gap-4 lg:gap-4 xl:gap-6 ${className}`;
+
+  const style = forceTwoColumns 
+    ? {} 
+    : { gridTemplateColumns: `repeat(auto-fit, minmax(${minCardWidth}, 1fr))` };
+
   return (
-    <div className={`
-      responsive-grid
-      grid gap-3 xs:gap-3 sm:gap-4 lg:gap-4 xl:gap-6
-      transition-all duration-300 ease-in-out
-      ${className}
-    `}
-    style={{
-      gridTemplateColumns: `repeat(auto-fit, minmax(${minCardWidth}, 1fr))`
-    }}>
+    <div 
+      className={`
+        responsive-grid
+        transition-all duration-300 ease-in-out
+        ${gridClasses}
+      `}
+      style={style}
+    >
       {children}
     </div>
   );

@@ -62,7 +62,7 @@ export const TackleSuccessCard = ({ player }: TackleSuccessCardProps) => {
         </div>
       </CardHeader>
       
-      <CardContent className="p-4 sm:p-5 lg:p-6 pt-0 space-y-4">
+      <CardContent className="p-4 sm:p-5 lg:p-6 pt-0 pb-4 space-y-4">
         {/* Main success rate display - iPhone weather style */}
         <div className={cn(
           "text-center p-4 rounded-2xl transition-all duration-300",
@@ -139,7 +139,7 @@ export const TackleSuccessCard = ({ player }: TackleSuccessCardProps) => {
             variant="outline"
             size="sm"
             className={cn(
-              "w-full border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold text-xs font-medium transition-all duration-300 rounded-xl",
+              "w-full border-club-gold/30 hover:bg-club-gold/10 hover:text-club-gold text-xs font-medium transition-all duration-300 rounded-xl mt-3",
               theme === 'dark' 
                 ? "bg-club-black/20 text-club-light-gray hover:bg-club-gold/20" 
                 : "bg-white/50 text-gray-900 hover:bg-club-gold/10",

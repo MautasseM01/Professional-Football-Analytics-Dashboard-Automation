@@ -1,251 +1,134 @@
 
-import { useState, useMemo } from "react";
-import { Player } from "@/types";
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, BarChart3, Maximize2, Minimize2 } from "lucide-react";
+import { Player } from "@/types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { TrendingUp } from "lucide-react";
-import { useTheme } from "@/contexts/ThemeContext";
-import { cn } from "@/lib/utils";
-import { usePerformanceData } from "@/hooks/use-performance-data";
-import { useSwipeGestures } from "@/hooks/use-swipe-gestures";
-import { ChartLoadingSkeleton } from "@/components/LoadingStates";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-
-import { KPI_OPTIONS } from "./constants";
-import { calculateMovingAverage, calculateStats } from "./utils";
+import { ChartRenderer } from "./ChartRenderer";
 import { PerformanceStats } from "./PerformanceStats";
 import { MobileControls } from "./MobileControls";
 import { DesktopControls } from "./DesktopControls";
-import { ChartRenderer } from "./ChartRenderer";
 
 interface PerformanceTrendsCardProps {
   player: Player;
 }
 
 export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) => {
-  const [selectedKPI, setSelectedKPI] = useState("distance");
-  const [selectedTimePeriod, setSelectedTimePeriod] = useState("last5");
-  const [chartView, setChartView] = useState("area");
-  const [showMovingAverage, setShowMovingAverage] = useState(false);
-  const [currentMetricIndex, setCurrentMetricIndex] = useState(0);
+  const [selectedMetric, setSelectedMetric] = useState("distance");
+  const [timeRange, setTimeRange] = useState("last5");
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [currentIndex, setCurrentIndex] = useState(0);
   const isMobile = useIsMobile();
-  const { theme } = useTheme();
-  
-  const currentMetric = KPI_OPTIONS.find(m => m.value === selectedKPI) || KPI_OPTIONS[0];
-  
-  // Get the selected KPI label
-  const selectedKPILabel = KPI_OPTIONS.find(option => option.value === selectedKPI)?.label || "";
-  
-  // Fetch real performance data
-  const { data: rawMatchData, loading, error } = usePerformanceData(player, selectedKPI, selectedTimePeriod);
 
-  // Process match data with moving average if needed
-  const matchData = useMemo(() => {
-    if (!rawMatchData || rawMatchData.length === 0) return [];
-    
-    return showMovingAverage 
-      ? calculateMovingAverage(rawMatchData, 3)
-      : rawMatchData;
-  }, [rawMatchData, showMovingAverage]);
+  const metrics = [
+    { key: "distance", label: "Distance (km)", color: "#8B5CF6" },
+    { key: "sprints", label: "Sprint Distance (km)", color: "#10B981" },
+    { key: "passes", label: "Pass Completion (%)", color: "#F59E0B" },
+    { key: "tackles", label: "Tackle Success (%)", color: "#EF4444" },
+  ];
 
-  // Calculate performance statistics
-  const stats = useMemo(() => {
-    return calculateStats(matchData);
-  }, [matchData]);
+  const timeRanges = [
+    { key: "last5", label: "Last 5 Matches" },
+    { key: "last10", label: "Last 10 Matches" },
+    { key: "season", label: "Full Season" },
+    { key: "recent", label: "Recent Form" }
+  ];
 
-  // Enhanced navigation with swipe gestures
-  const nextMetric = () => {
-    const nextIndex = (currentMetricIndex + 1) % KPI_OPTIONS.length;
-    setCurrentMetricIndex(nextIndex);
-    setSelectedKPI(KPI_OPTIONS[nextIndex].value);
+  const generateMockData = () => {
+    return Array.from({ length: 10 }, (_, i) => ({
+      match: `Match ${i + 1}`,
+      distance: Math.random() * 5 + 8,
+      sprints: Math.random() * 2 + 1,
+      passes: Math.random() * 20 + 70,
+      tackles: Math.random() * 30 + 50,
+    }));
   };
 
-  const prevMetric = () => {
-    const prevIndex = (currentMetricIndex - 1 + KPI_OPTIONS.length) % KPI_OPTIONS.length;
-    setCurrentMetricIndex(prevIndex);
-    setSelectedKPI(KPI_OPTIONS[prevIndex].value);
+  const data = generateMockData();
+  const selectedMetricData = metrics.find(m => m.key === selectedMetric);
+
+  const handlePrevious = () => {
+    setCurrentIndex(prev => Math.max(0, prev - 1));
   };
 
-  // Swipe gestures for mobile
-  const { swipeProps } = useSwipeGestures({
-    onSwipeLeft: nextMetric,
-    onSwipeRight: prevMetric,
-    threshold: 50,
-    preventScroll: false
-  });
+  const handleNext = () => {
+    setCurrentIndex(prev => Math.min(metrics.length - 1, prev + 1));
+  };
 
-  // Enhanced chart configuration for better mobile experience
-  const getChartConfig = () => ({
-    value: { color: "#D4AF37" },
-    average: { color: "#9CA3AF" }
-  });
-
-  // Show loading state
-  if (loading) {
-    return <ChartLoadingSkeleton />;
-  }
-
-  // Show error state
-  if (error) {
-    return (
-      <Card className={cn(
-        "border-club-gold/20 w-full overflow-hidden backdrop-blur-sm",
-        theme === 'dark' 
-          ? "bg-club-dark-gray/50" 
-          : "bg-white/80",
-        "shadow-xl transition-all duration-300"
-      )}>
-        <CardContent className="p-6">
-          <Alert className="border-red-500/20 bg-red-500/10">
-            <AlertDescription className="text-red-600 dark:text-red-400">
-              Failed to load performance data: {error}
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Show no data state
-  if (!matchData || matchData.length === 0) {
-    return (
-      <Card className={cn(
-        "border-club-gold/20 w-full overflow-hidden backdrop-blur-sm",
-        theme === 'dark' 
-          ? "bg-club-dark-gray/50" 
-          : "bg-white/80",
-        "shadow-xl transition-all duration-300"
-      )}>
-        <CardHeader className="pb-3">
-          <CardTitle className={cn(
-            "text-sm sm:text-base lg:text-lg font-semibold",
-            theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-          )}>
-            {player.name}'s Performance Trends
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-6">
-          <Alert className="border-yellow-500/20 bg-yellow-500/10">
-            <AlertDescription className="text-yellow-600 dark:text-yellow-400">
-              No performance data available for the selected time period.
-            </AlertDescription>
-          </Alert>
-        </CardContent>
-      </Card>
-    );
-  }
+  const toggleExpanded = () => {
+    setIsExpanded(!isExpanded);
+  };
 
   return (
-    <ErrorBoundary>
-      <Card 
-        className={cn(
-          "border-club-gold/20 w-full overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-2xl",
-          theme === 'dark' 
-            ? "bg-club-dark-gray/60 hover:bg-club-dark-gray/70" 
-            : "bg-white/80 hover:bg-white/90",
-          "shadow-xl animate-fade-in"
-        )}
-        {...(isMobile ? swipeProps : {})}
-      >
-        <CardHeader className="pb-3 px-4 sm:px-6">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <CardTitle className={cn(
-                "text-sm sm:text-base lg:text-lg font-semibold",
-                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-              )}>
-                {player.name}'s Performance
+    <Card className="bg-club-dark-gray border-club-gold/20 w-full overflow-hidden">
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-club-gold/20 rounded-lg">
+              <BarChart3 className="h-5 w-5 text-club-gold" />
+            </div>
+            <div>
+              <CardTitle className="text-lg font-semibold text-club-light-gray">
+                Performance Trends
               </CardTitle>
-              <div className="flex items-center gap-2 mt-1">
-                {stats.trend !== 'neutral' && (
-                  <div className={cn(
-                    "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium animate-scale-in",
-                    stats.trend === 'up' 
-                      ? "bg-club-gold/20 text-club-gold"
-                      : "bg-red-500/20 text-red-400"
-                  )}>
-                    <TrendingUp 
-                      size={10} 
-                      className={cn(
-                        "transition-transform duration-200",
-                        stats.trend === 'down' && "rotate-180"
-                      )} 
-                    />
-                    <span>
-                      {stats.trend === 'up' ? 'Improving' : 'Declining'}
-                    </span>
-                  </div>
-                )}
-              </div>
+              <p className="text-sm text-club-light-gray/60 mt-1">
+                {player.name} - {player.position}
+              </p>
             </div>
-            
-            {/* Mobile navigation controls */}
-            {isMobile && (
-              <MobileControls
-                currentMetricIndex={currentMetricIndex}
-                selectedTimePeriod={selectedTimePeriod}
-                currentMetric={currentMetric}
-                prevMetric={prevMetric}
-                nextMetric={nextMetric}
-              />
-            )}
           </div>
-        </CardHeader>
+          
+          {/* Expand/Collapse Toggle - Available on all screen sizes */}
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={toggleExpanded}
+            className="text-club-light-gray hover:text-club-gold hover:bg-club-gold/10"
+          >
+            {isExpanded ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
+          </Button>
+        </div>
+      </CardHeader>
 
-        <CardContent className="p-0">
-          <div className="px-4 sm:px-6 pb-4">
-            <div className="space-y-3 sm:space-y-4">
-              {/* Controls */}
-              {isMobile ? (
-                <MobileControls
-                  currentMetricIndex={currentMetricIndex}
-                  selectedTimePeriod={selectedTimePeriod}
-                  currentMetric={currentMetric}
-                  prevMetric={prevMetric}
-                  nextMetric={nextMetric}
-                />
-              ) : (
-                <DesktopControls
-                  selectedKPI={selectedKPI}
-                  selectedTimePeriod={selectedTimePeriod}
-                  chartView={chartView}
-                  showMovingAverage={showMovingAverage}
-                  setSelectedKPI={setSelectedKPI}
-                  setSelectedTimePeriod={setSelectedTimePeriod}
-                  setChartView={setChartView}
-                  setShowMovingAverage={setShowMovingAverage}
-                />
-              )}
-              
-              {/* Performance Statistics */}
-              <PerformanceStats stats={stats} matchDataLength={matchData.length} />
-            </div>
-          </div>
+      <CardContent className="space-y-4">
+        {/* Performance Statistics */}
+        <PerformanceStats player={player} />
 
-          {/* Chart Container */}
-          <div className="px-4 sm:px-6 pb-4">
-            <div 
-              className={cn(
-                "w-full rounded-2xl p-3 sm:p-4 transition-all duration-300",
-                theme === 'dark' 
-                  ? "bg-club-black/20 border border-club-gold/10" 
-                  : "bg-gray-50/30 border border-club-gold/20"
-              )}
-              style={{ height: isMobile ? '220px' : '300px' }}
-            >
-              <ChartRenderer
-                chartView={chartView}
-                matchData={matchData}
-                selectedKPI={selectedKPI}
-                selectedKPILabel={selectedKPILabel}
-                showMovingAverage={showMovingAverage}
-                getChartConfig={getChartConfig}
-              />
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </ErrorBoundary>
+        {/* Mobile Controls */}
+        {isMobile ? (
+          <MobileControls
+            metrics={metrics}
+            timeRanges={timeRanges}
+            currentIndex={currentIndex}
+            selectedMetric={selectedMetric}
+            timeRange={timeRange}
+            onPrevious={handlePrevious}
+            onNext={handleNext}
+            onMetricChange={setSelectedMetric}
+            onTimeRangeChange={setTimeRange}
+            isExpanded={isExpanded}
+          />
+        ) : (
+          <DesktopControls
+            metrics={metrics}
+            timeRanges={timeRanges}
+            selectedMetric={selectedMetric}
+            timeRange={timeRange}
+            onMetricChange={setSelectedMetric}
+            onTimeRangeChange={setTimeRange}
+            isExpanded={isExpanded}
+          />
+        )}
+
+        {/* Chart Renderer */}
+        <ChartRenderer
+          data={data}
+          selectedMetric={selectedMetric}
+          selectedMetricData={selectedMetricData}
+          isExpanded={isExpanded}
+          isMobile={isMobile}
+        />
+      </CardContent>
+    </Card>
   );
 };
