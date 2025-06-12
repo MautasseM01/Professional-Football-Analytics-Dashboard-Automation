@@ -18,6 +18,7 @@ import {
   AreaChart,
   Area
 } from "recharts";
+import { ChartTooltip } from "@/components/ui/chart";
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { useIsMobile } from "@/hooks/use-mobile";

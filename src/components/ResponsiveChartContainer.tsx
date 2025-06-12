@@ -6,7 +6,7 @@ import { ChartContainer } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
 
 interface ResponsiveChartContainerProps {
-  children: React.ReactNode;
+  children: React.ReactElement;
   className?: string;
   config: Record<string, { color: string }>;
   aspectRatio?: number;
