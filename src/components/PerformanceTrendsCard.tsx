@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,6 +13,12 @@ import {
   ChartTooltipContent, 
   ChartTooltip 
 } from "@/components/ui/chart";
+import { 
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { 
   LineChart as RechartsLineChart, 
   Line, 
@@ -265,14 +270,15 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
   }
 
   return (
-    <Card className={cn(
-      "border-club-gold/20 w-full overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-2xl",
-      theme === 'dark' 
-        ? "bg-club-dark-gray/60 hover:bg-club-dark-gray/70" 
-        : "bg-white/80 hover:bg-white/90",
-      "shadow-xl"
-    )}>
-      <CardHeader className="pb-3 px-4 sm:px-6">
+    <TooltipProvider>
+      <Card className={cn(
+        "border-club-gold/20 w-full overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-2xl",
+        theme === 'dark' 
+          ? "bg-club-dark-gray/60 hover:bg-club-dark-gray/70" 
+          : "bg-white/80 hover:bg-white/90",
+        "shadow-xl"
+      )}>
+        <CardHeader className="pb-3 px-4 sm:px-6">
         <div className="flex items-center justify-between">
           <div className="min-w-0 flex-1">
             <CardTitle className={cn(
@@ -587,7 +593,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                       width={isMobile ? 25 : 30}
                     />
                     
-                    <Tooltip content={<CustomTooltip />} />
+                    <ChartTooltip content={<CustomTooltip />} />
                     
                     <Line
                       type="monotone"
@@ -639,7 +645,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                       width={isMobile ? 25 : 30}
                     />
                     
-                    <Tooltip content={<CustomTooltip />} />
+                    <ChartTooltip content={<CustomTooltip />} />
                     
                     <Area
                       type="monotone"
@@ -668,6 +674,6 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
           </div>
         </div>
       </CardContent>
-    </Card>
+    </TooltipProvider>
   );
 };
