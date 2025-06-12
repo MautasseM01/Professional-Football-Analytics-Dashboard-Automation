@@ -1,3 +1,4 @@
+
 import { useState, useMemo } from "react";
 import { 
   Card, CardContent, CardDescription, CardHeader, CardTitle 
@@ -12,9 +13,12 @@ import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } fro
 import { MultiPlayerSelect } from "@/components/MultiPlayerSelect";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { Badge } from "@/components/ui/badge";
-import { UserRound } from "lucide-react";
+import { UserRound, TrendingUp, BarChart3 } from "lucide-react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { BackToTopButton } from "@/components/BackToTopButton";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { useTheme } from "@/contexts/ThemeContext";
+import { cn } from "@/lib/utils";
 
 const formatPercentage = (value: number): string => {
   return `${value.toFixed(1)}%`;
@@ -23,6 +27,8 @@ const formatPercentage = (value: number): string => {
 export default function PlayerComparison() {
   const { players, loading } = usePlayerData();
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<number[]>([]);
+  const isMobile = useIsMobile();
+  const { theme } = useTheme();
 
   const selectedPlayers = useMemo(() => {
     if (!players?.length || !selectedPlayerIds.length) return [];
@@ -142,19 +148,64 @@ export default function PlayerComparison() {
   return (
     <DashboardLayout>
       <div className="container mx-auto py-6 space-y-6">
-        <div className="flex flex-col space-y-2">
-          <h1 className="text-3xl font-bold">Player Comparison</h1>
-          <p className="text-muted-foreground">
-            Compare stats between multiple players (select 2-4 players)
+        {/* Header - iPhone weather style */}
+        <div className={cn(
+          "rounded-2xl p-6 backdrop-blur-sm transition-all duration-300",
+          theme === 'dark' 
+            ? "bg-club-dark-gray/60 border border-club-gold/20" 
+            : "bg-white/80 border border-club-gold/30",
+          "shadow-xl"
+        )}>
+          <div className="flex items-center gap-3 mb-2">
+            <div className={cn(
+              "p-2 rounded-xl",
+              theme === 'dark' 
+                ? "bg-club-gold/20" 
+                : "bg-club-gold/10"
+            )}>
+              <BarChart3 className="h-6 w-6 text-club-gold" />
+            </div>
+            <h1 className={cn(
+              "text-2xl sm:text-3xl font-bold",
+              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+            )}>
+              Player Comparison
+            </h1>
+          </div>
+          <p className={cn(
+            "text-sm sm:text-base",
+            theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
+          )}>
+            Compare performance metrics between multiple players (select 2-4 players)
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Player Selection</CardTitle>
-            <CardDescription>
-              Select 2 to 4 players to compare their performance metrics
-            </CardDescription>
+        {/* Player Selection Card - iPhone weather style */}
+        <Card className={cn(
+          "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
+          theme === 'dark' 
+            ? "bg-club-dark-gray/60" 
+            : "bg-white/80",
+          "shadow-xl"
+        )}>
+          <CardHeader className="pb-3">
+            <div className="flex items-center gap-3">
+              <UserRound className="h-5 w-5 text-club-gold" />
+              <div>
+                <CardTitle className={cn(
+                  "text-lg font-semibold",
+                  theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                )}>
+                  Player Selection
+                </CardTitle>
+                <CardDescription className={cn(
+                  "text-sm",
+                  theme === 'dark' ? "text-club-light-gray/60" : "text-gray-600"
+                )}>
+                  Select 2 to 4 players to compare their performance metrics
+                </CardDescription>
+              </div>
+            </div>
           </CardHeader>
           <CardContent>
             <MultiPlayerSelect 
@@ -169,19 +220,48 @@ export default function PlayerComparison() {
 
         {selectedPlayers.length > 0 && (
           <>
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Metrics Comparison</CardTitle>
-                <CardDescription>
-                  Key performance indicators for the selected players
-                </CardDescription>
+            {/* Performance Metrics Table - iPhone weather style */}
+            <Card className={cn(
+              "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
+              theme === 'dark' 
+                ? "bg-club-dark-gray/60" 
+                : "bg-white/80",
+              "shadow-xl"
+            )}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-3">
+                  <TrendingUp className="h-5 w-5 text-club-gold" />
+                  <div>
+                    <CardTitle className={cn(
+                      "text-lg font-semibold",
+                      theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                    )}>
+                      Performance Metrics Comparison
+                    </CardTitle>
+                    <CardDescription className={cn(
+                      "text-sm",
+                      theme === 'dark' ? "text-club-light-gray/60" : "text-gray-600"
+                    )}>
+                      Key performance indicators for the selected players
+                    </CardDescription>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="overflow-x-auto">
                   <Table>
                     <TableHeader>
-                      <TableRow>
-                        <TableHead>Metric</TableHead>
+                      <TableRow className={cn(
+                        theme === 'dark' 
+                          ? "border-club-gold/20" 
+                          : "border-club-gold/30"
+                      )}>
+                        <TableHead className={cn(
+                          "font-semibold",
+                          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                        )}>
+                          Metric
+                        </TableHead>
                         {selectedPlayers.map((player) => (
                           <TableHead key={player.id} className="text-center">
                             <div className="flex items-center justify-center gap-2">
@@ -189,19 +269,40 @@ export default function PlayerComparison() {
                                 player={player}
                                 size="sm"
                               />
-                              <span>{player.name}</span>
+                              <span className={cn(
+                                "font-medium text-sm",
+                                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                              )}>
+                                {player.name}
+                              </span>
                             </div>
                           </TableHead>
                         ))}
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      <TableRow>
-                        <TableCell className="font-medium">Total Distance (km)</TableCell>
+                      <TableRow className={cn(
+                        theme === 'dark' 
+                          ? "border-club-gold/10 hover:bg-club-black/20" 
+                          : "border-club-gold/20 hover:bg-gray-50/50"
+                      )}>
+                        <TableCell className={cn(
+                          "font-medium",
+                          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                        )}>
+                          Total Distance (km)
+                        </TableCell>
                         {selectedPlayers.map((player) => (
                           <TableCell 
                             key={`distance-${player.id}`} 
-                            className={`text-center ${highestDistance[player.id] ? 'bg-green-100/10' : ''}`}
+                            className={cn(
+                              "text-center transition-all duration-200",
+                              highestDistance[player.id] 
+                                ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
+                                : theme === 'dark' 
+                                ? "text-club-light-gray" 
+                                : "text-gray-900"
+                            )}
                           >
                             {player.distance ? 
                               player.distance.toFixed(1) : 
@@ -210,12 +311,28 @@ export default function PlayerComparison() {
                           </TableCell>
                         ))}
                       </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium">Pass Completion %</TableCell>
+                      <TableRow className={cn(
+                        theme === 'dark' 
+                          ? "border-club-gold/10 hover:bg-club-black/20" 
+                          : "border-club-gold/20 hover:bg-gray-50/50"
+                      )}>
+                        <TableCell className={cn(
+                          "font-medium",
+                          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                        )}>
+                          Pass Completion %
+                        </TableCell>
                         {selectedPlayers.map((player) => (
                           <TableCell 
                             key={`passes-${player.id}`} 
-                            className={`text-center ${highestPassCompletion[player.id] ? 'bg-green-100/10' : ''}`}
+                            className={cn(
+                              "text-center transition-all duration-200",
+                              highestPassCompletion[player.id] 
+                                ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
+                                : theme === 'dark' 
+                                ? "text-club-light-gray" 
+                                : "text-gray-900"
+                            )}
                           >
                             {player.passes_attempted && player.passes_attempted > 0 ?
                               formatPercentage(getPassCompletionPercentage(player)) :
@@ -224,12 +341,28 @@ export default function PlayerComparison() {
                           </TableCell>
                         ))}
                       </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium">Shots on Target</TableCell>
+                      <TableRow className={cn(
+                        theme === 'dark' 
+                          ? "border-club-gold/10 hover:bg-club-black/20" 
+                          : "border-club-gold/20 hover:bg-gray-50/50"
+                      )}>
+                        <TableCell className={cn(
+                          "font-medium",
+                          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                        )}>
+                          Shots on Target
+                        </TableCell>
                         {selectedPlayers.map((player) => (
                           <TableCell 
                             key={`shots-${player.id}`} 
-                            className={`text-center ${highestShotsOnTarget[player.id] ? 'bg-green-100/10' : ''}`}
+                            className={cn(
+                              "text-center transition-all duration-200",
+                              highestShotsOnTarget[player.id] 
+                                ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
+                                : theme === 'dark' 
+                                ? "text-club-light-gray" 
+                                : "text-gray-900"
+                            )}
                           >
                             {player.shots_on_target !== null && player.shots_on_target !== undefined ?
                               player.shots_on_target :
@@ -238,12 +371,28 @@ export default function PlayerComparison() {
                           </TableCell>
                         ))}
                       </TableRow>
-                      <TableRow>
-                        <TableCell className="font-medium">Tackles Won</TableCell>
+                      <TableRow className={cn(
+                        theme === 'dark' 
+                          ? "border-club-gold/10 hover:bg-club-black/20" 
+                          : "border-club-gold/20 hover:bg-gray-50/50"
+                      )}>
+                        <TableCell className={cn(
+                          "font-medium",
+                          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                        )}>
+                          Tackles Won
+                        </TableCell>
                         {selectedPlayers.map((player) => (
                           <TableCell 
                             key={`tackles-${player.id}`} 
-                            className={`text-center ${highestTacklesWon[player.id] ? 'bg-green-100/10' : ''}`}
+                            className={cn(
+                              "text-center transition-all duration-200",
+                              highestTacklesWon[player.id] 
+                                ? "bg-club-gold/20 font-semibold text-club-gold rounded-lg" 
+                                : theme === 'dark' 
+                                ? "text-club-light-gray" 
+                                : "text-gray-900"
+                            )}
                           >
                             {player.tackles_won !== null && player.tackles_won !== undefined ?
                               player.tackles_won :
@@ -258,44 +407,77 @@ export default function PlayerComparison() {
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Performance Radar Chart</CardTitle>
-                <CardDescription>
-                  Visual comparison of player attributes across key categories
-                </CardDescription>
+            {/* Radar Chart - iPhone weather style */}
+            <Card className={cn(
+              "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
+              theme === 'dark' 
+                ? "bg-club-dark-gray/60" 
+                : "bg-white/80",
+              "shadow-xl"
+            )}>
+              <CardHeader className="pb-3">
+                <div className="flex items-center gap-3">
+                  <BarChart3 className="h-5 w-5 text-club-gold" />
+                  <div>
+                    <CardTitle className={cn(
+                      "text-lg font-semibold",
+                      theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                    )}>
+                      Performance Radar Chart
+                    </CardTitle>
+                    <CardDescription className={cn(
+                      "text-sm",
+                      theme === 'dark' ? "text-club-light-gray/60" : "text-gray-600"
+                    )}>
+                      Visual comparison of player attributes across key categories
+                    </CardDescription>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="w-full h-[500px]">
-                  <ChartContainer config={chartConfig}>
-                    {/* Wrap the ResponsiveContainer in a fragment to make it a single child */}
-                    <>
-                      <ResponsiveContainer width="100%" height="100%">
-                        <RadarChart data={radarData} className="mx-auto">
-                          <PolarGrid />
-                          <PolarAngleAxis dataKey="category" />
-                          
-                          {selectedPlayers.map((player, index) => (
-                            <Radar
-                              key={player.id}
-                              name={player.name}
-                              dataKey={player.name}
-                              stroke={playerColors[index % playerColors.length]}
-                              fill={playerColors[index % playerColors.length]}
-                              fillOpacity={0.2}
+                <div className={cn(
+                  "w-full rounded-2xl p-4 transition-all duration-300",
+                  theme === 'dark' 
+                    ? "bg-club-black/20 border border-club-gold/10" 
+                    : "bg-gray-50/30 border border-club-gold/20"
+                )}>
+                  <div className="w-full h-[400px] sm:h-[500px]">
+                    <ChartContainer config={chartConfig}>
+                      <>
+                        <ResponsiveContainer width="100%" height="100%">
+                          <RadarChart data={radarData} className="mx-auto">
+                            <PolarGrid stroke={theme === 'dark' ? "#333" : "#e5e7eb"} />
+                            <PolarAngleAxis 
+                              dataKey="category" 
+                              tick={{ 
+                                fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", 
+                                fontSize: isMobile ? 10 : 12 
+                              }}
                             />
-                          ))}
-                        </RadarChart>
-                      </ResponsiveContainer>
-                      <ChartLegend>
-                        <ChartLegendContent payload={selectedPlayers.map((player, index) => ({
-                          value: player.name,
-                          color: playerColors[index % playerColors.length],
-                          dataKey: player.name
-                        }))} />
-                      </ChartLegend>
-                    </>
-                  </ChartContainer>
+                            
+                            {selectedPlayers.map((player, index) => (
+                              <Radar
+                                key={player.id}
+                                name={player.name}
+                                dataKey={player.name}
+                                stroke={playerColors[index % playerColors.length]}
+                                fill={playerColors[index % playerColors.length]}
+                                fillOpacity={0.2}
+                                strokeWidth={2}
+                              />
+                            ))}
+                          </RadarChart>
+                        </ResponsiveContainer>
+                        <ChartLegend>
+                          <ChartLegendContent payload={selectedPlayers.map((player, index) => ({
+                            value: player.name,
+                            color: playerColors[index % playerColors.length],
+                            dataKey: player.name
+                          }))} />
+                        </ChartLegend>
+                      </>
+                    </ChartContainer>
+                  </div>
                 </div>
               </CardContent>
             </Card>
