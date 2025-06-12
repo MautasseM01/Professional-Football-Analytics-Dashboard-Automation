@@ -279,401 +279,402 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
         "shadow-xl"
       )}>
         <CardHeader className="pb-3 px-4 sm:px-6">
-        <div className="flex items-center justify-between">
-          <div className="min-w-0 flex-1">
-            <CardTitle className={cn(
-              "text-sm sm:text-base lg:text-lg font-semibold",
-              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-            )}>
-              {player.name}'s Performance
-            </CardTitle>
-            <div className="flex items-center gap-2 mt-1">
-              {stats.trend !== 'neutral' && (
-                <div className={cn(
-                  "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium",
-                  stats.trend === 'up' 
-                    ? "bg-club-gold/20 text-club-gold"
-                    : "bg-red-500/20 text-red-400"
-                )}>
-                  <TrendingUp 
-                    size={10} 
-                    className={cn(
-                      stats.trend === 'down' && "rotate-180"
-                    )} 
-                  />
-                  <span>
-                    {stats.trend === 'up' ? 'Improving' : 'Declining'}
-                  </span>
-                </div>
-              )}
-            </div>
-          </div>
-          
-          {/* Mobile navigation controls - iPhone weather style */}
-          {isMobile && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={prevMetric}
-                className="h-9 w-9 text-club-gold hover:bg-club-gold/10 rounded-full"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={nextMetric}
-                className="h-9 w-9 text-club-gold hover:bg-club-gold/10 rounded-full"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </Button>
-            </div>
-          )}
-        </div>
-      </CardHeader>
-
-      <CardContent className="p-0">
-        <div className="px-4 sm:px-6 pb-4">
-          <div className="space-y-3 sm:space-y-4">
-            {/* Mobile metric display - iPhone weather style */}
-            {isMobile ? (
-              <div className="text-center space-y-2">
-                <h3 className="text-lg font-semibold text-club-gold">
-                  {currentMetric.shortLabel}
-                </h3>
-                <div className="text-xs text-club-light-gray/70">
-                  {TIME_PERIOD_OPTIONS.find(t => t.value === selectedTimePeriod)?.shortLabel}
-                </div>
-                
-                {/* Metric indicator dots */}
-                <div className="flex justify-center gap-1 mt-3">
-                  {KPI_OPTIONS.map((_, index) => (
-                    <div
-                      key={index}
+          <div className="flex items-center justify-between">
+            <div className="min-w-0 flex-1">
+              <CardTitle className={cn(
+                "text-sm sm:text-base lg:text-lg font-semibold",
+                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+              )}>
+                {player.name}'s Performance
+              </CardTitle>
+              <div className="flex items-center gap-2 mt-1">
+                {stats.trend !== 'neutral' && (
+                  <div className={cn(
+                    "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium",
+                    stats.trend === 'up' 
+                      ? "bg-club-gold/20 text-club-gold"
+                      : "bg-red-500/20 text-red-400"
+                  )}>
+                    <TrendingUp 
+                      size={10} 
                       className={cn(
-                        "w-2 h-2 rounded-full transition-all duration-300",
-                        index === currentMetricIndex ? 'bg-club-gold' : 'bg-club-gold/30'
-                      )}
+                        stats.trend === 'down' && "rotate-180"
+                      )} 
                     />
-                  ))}
-                </div>
-              </div>
-            ) : (
-              /* Desktop Controls */
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="space-y-1">
-                  <Label className={cn(
-                    "text-xs font-medium",
-                    theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
-                  )}>Performance Metric</Label>
-                  <Select value={selectedKPI} onValueChange={setSelectedKPI}>
-                    <SelectTrigger className={cn(
-                      "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl",
-                      theme === 'dark' 
-                        ? "bg-club-black/50 text-club-light-gray" 
-                        : "bg-white/70 text-gray-900"
-                    )}>
-                      <SelectValue placeholder="Select KPI" />
-                    </SelectTrigger>
-                    <SelectContent className={cn(
-                      "border-club-gold/30 z-50 max-h-60 rounded-xl backdrop-blur-md",
-                      theme === 'dark' 
-                        ? "bg-club-black/90 text-club-light-gray" 
-                        : "bg-white/90 text-gray-900"
-                    )}>
-                      {KPI_OPTIONS.map(option => (
-                        <SelectItem 
-                          key={option.value} 
-                          value={option.value} 
-                          className="focus:bg-club-gold/20 text-sm rounded-lg"
-                        >
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="space-y-1">
-                  <Label className={cn(
-                    "text-xs font-medium",
-                    theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
-                  )}>Time Period</Label>
-                  <Select value={selectedTimePeriod} onValueChange={setSelectedTimePeriod}>
-                    <SelectTrigger className={cn(
-                      "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl",
-                      theme === 'dark' 
-                        ? "bg-club-black/50 text-club-light-gray" 
-                        : "bg-white/70 text-gray-900"
-                    )}>
-                      <SelectValue placeholder="Time Period" />
-                    </SelectTrigger>
-                    <SelectContent className={cn(
-                      "border-club-gold/30 z-50 rounded-xl backdrop-blur-md",
-                      theme === 'dark' 
-                        ? "bg-club-black/90 text-club-light-gray" 
-                        : "bg-white/90 text-gray-900"
-                    )}>
-                      {TIME_PERIOD_OPTIONS.map(option => (
-                        <SelectItem 
-                          key={option.value} 
-                          value={option.value} 
-                          className="focus:bg-club-gold/20 text-sm rounded-lg"
-                        >
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-1">
-                  <Label className={cn(
-                    "text-xs font-medium",
-                    theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
-                  )}>Chart View</Label>
-                  <Select value={chartView} onValueChange={setChartView}>
-                    <SelectTrigger className={cn(
-                      "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl",
-                      theme === 'dark' 
-                        ? "bg-club-black/50 text-club-light-gray" 
-                        : "bg-white/70 text-gray-900"
-                    )}>
-                      <SelectValue placeholder="Chart View" />
-                    </SelectTrigger>
-                    <SelectContent className={cn(
-                      "border-club-gold/30 z-50 rounded-xl backdrop-blur-md",
-                      theme === 'dark' 
-                        ? "bg-club-black/90 text-club-light-gray" 
-                        : "bg-white/90 text-gray-900"
-                    )}>
-                      {CHART_VIEW_OPTIONS.map(option => (
-                        <SelectItem 
-                          key={option.value} 
-                          value={option.value} 
-                          className="focus:bg-club-gold/20 text-sm rounded-lg"
-                        >
-                          {option.label}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-            
-            {/* Performance Statistics - iPhone weather style */}
-            <div className={cn(
-              "grid gap-3 p-4 rounded-2xl transition-all duration-300",
-              isMobile ? "grid-cols-2" : "grid-cols-4",
-              theme === 'dark' 
-                ? "bg-club-black/30 border border-club-gold/10" 
-                : "bg-gray-50/50 border border-club-gold/20"
-            )}>
-              <div className="text-center">
-                <div className={cn(
-                  "text-lg font-bold",
-                  theme === 'dark' ? "text-club-gold" : "text-club-gold"
-                )}>
-                  {stats.avg.toFixed(1)}
-                </div>
-                <div className={cn(
-                  "text-xs",
-                  theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
-                )}>Average</div>
-              </div>
-              <div className="text-center">
-                <div className={cn(
-                  "text-lg font-bold",
-                  theme === 'dark' ? "text-green-400" : "text-green-600"
-                )}>
-                  {stats.max}
-                </div>
-                <div className={cn(
-                  "text-xs",
-                  theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
-                )}>Best</div>
-              </div>
-              {!isMobile && (
-                <>
-                  <div className="text-center">
-                    <div className={cn(
-                      "text-lg font-bold",
-                      theme === 'dark' ? "text-red-400" : "text-red-600"
-                    )}>
-                      {stats.min}
-                    </div>
-                    <div className={cn(
-                      "text-xs",
-                      theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
-                    )}>Worst</div>
+                    <span>
+                      {stats.trend === 'up' ? 'Improving' : 'Declining'}
+                    </span>
                   </div>
-                  <div className="text-center">
-                    <div className={cn(
-                      "text-lg font-bold",
-                      theme === 'dark' ? "text-blue-400" : "text-blue-600"
-                    )}>
-                      {matchData.length}
-                    </div>
-                    <div className={cn(
-                      "text-xs",
-                      theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
-                    )}>Matches</div>
-                  </div>
-                </>
-              )}
-            </div>
-
-            {/* Secondary Controls - Desktop only */}
-            {!isMobile && (
-              <div className="flex items-center justify-between pt-1">
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-2">
-                    <Label 
-                      htmlFor="movingAverage"
-                      className={cn(
-                        "text-xs cursor-pointer select-none font-medium",
-                        theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                      )}
-                    >
-                      3-Match Moving Average
-                    </Label>
-                    <Switch 
-                      id="movingAverage" 
-                      checked={showMovingAverage}
-                      onCheckedChange={setShowMovingAverage}
-                      className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30"
-                    />
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Chart Container - iPhone weather style */}
-        <div className="px-4 sm:px-6 pb-4">
-          <div 
-            className={cn(
-              "w-full rounded-2xl p-3 sm:p-4 transition-all duration-300",
-              theme === 'dark' 
-                ? "bg-club-black/20 border border-club-gold/10" 
-                : "bg-gray-50/30 border border-club-gold/20"
-            )}
-            style={{ height: isMobile ? '220px' : '300px' }}
-          >
-            <ChartContainer 
-              config={{
-                value: { color: "#D4AF37" },
-                average: { color: "#9CA3AF" }
-              }}
-              aspectRatio={isMobile ? (4/3) : (16/10)}
-              minHeight={isMobile ? 200 : 280}
-            >
-              <ResponsiveContainer width="100%" height="100%">
-                {chartView === 'line' ? (
-                  <RechartsLineChart data={matchData} margin={{ top: 10, right: 15, left: 10, bottom: 20 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "#333" : "#e5e7eb"} opacity={0.3} />
-                    <XAxis 
-                      dataKey="match" 
-                      stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
-                      tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
-                      tickLine={false}
-                      axisLine={false}
-                      angle={-45}
-                      textAnchor="end"
-                      interval={isMobile ? 1 : 0}
-                    />
-                    <YAxis 
-                      stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
-                      tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
-                      tickLine={false}
-                      axisLine={false}
-                      width={isMobile ? 25 : 30}
-                    />
-                    
-                    <ChartTooltip content={<CustomTooltip />} />
-                    
-                    <Line
-                      type="monotone"
-                      dataKey="value"
-                      name={selectedKPILabel}
-                      stroke="#D4AF37"
-                      strokeWidth={isMobile ? 2 : 2.5}
-                      dot={{ r: isMobile ? 3 : 4, strokeWidth: 2, fill: "#D4AF37" }}
-                      activeDot={{ r: isMobile ? 5 : 6, strokeWidth: 2, fill: "#D4AF37" }}
-                    />
-
-                    {showMovingAverage && !isMobile && (
-                      <Line
-                        type="monotone"
-                        dataKey="movingAvg"
-                        name="3-Match Average"
-                        stroke="#9CA3AF"
-                        strokeDasharray="5 5"
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    )}
-                  </RechartsLineChart>
-                ) : (
-                  <AreaChart data={matchData} margin={{ top: 10, right: 15, left: 10, bottom: 20 }}>
-                    <defs>
-                      <linearGradient id="metricGradient" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.4}/>
-                        <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.05}/>
-                      </linearGradient>
-                    </defs>
-                    
-                    <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "#333" : "#e5e7eb"} opacity={0.3} />
-                    <XAxis 
-                      dataKey="match" 
-                      stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
-                      tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
-                      tickLine={false}
-                      axisLine={false}
-                      angle={-45}
-                      textAnchor="end"
-                      interval={isMobile ? 1 : 0}
-                    />
-                    <YAxis 
-                      stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
-                      tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
-                      tickLine={false}
-                      axisLine={false}
-                      width={isMobile ? 25 : 30}
-                    />
-                    
-                    <ChartTooltip content={<CustomTooltip />} />
-                    
-                    <Area
-                      type="monotone"
-                      dataKey="value"
-                      stroke="#D4AF37"
-                      strokeWidth={isMobile ? 2 : 2.5}
-                      fill="url(#metricGradient)"
-                      dot={{ fill: "#D4AF37", strokeWidth: 2, r: isMobile ? 3 : 4 }}
-                      activeDot={{ r: isMobile ? 5 : 6, stroke: "#D4AF37", strokeWidth: 2 }}
-                    />
-
-                    {showMovingAverage && !isMobile && (
-                      <Line
-                        type="monotone"
-                        dataKey="movingAvg"
-                        stroke="#9CA3AF"
-                        strokeDasharray="5 5"
-                        strokeWidth={2}
-                        dot={false}
-                      />
-                    )}
-                  </AreaChart>
                 )}
-              </ResponsiveContainer>
-            </ChartContainer>
+              </div>
+            </div>
+            
+            {/* Mobile navigation controls - iPhone weather style */}
+            {isMobile && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={prevMetric}
+                  className="h-9 w-9 text-club-gold hover:bg-club-gold/10 rounded-full"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  onClick={nextMetric}
+                  className="h-9 w-9 text-club-gold hover:bg-club-gold/10 rounded-full"
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
-        </div>
-      </CardContent>
+        </CardHeader>
+
+        <CardContent className="p-0">
+          <div className="px-4 sm:px-6 pb-4">
+            <div className="space-y-3 sm:space-y-4">
+              {/* Mobile metric display - iPhone weather style */}
+              {isMobile ? (
+                <div className="text-center space-y-2">
+                  <h3 className="text-lg font-semibold text-club-gold">
+                    {currentMetric.shortLabel}
+                  </h3>
+                  <div className="text-xs text-club-light-gray/70">
+                    {TIME_PERIOD_OPTIONS.find(t => t.value === selectedTimePeriod)?.shortLabel}
+                  </div>
+                  
+                  {/* Metric indicator dots */}
+                  <div className="flex justify-center gap-1 mt-3">
+                    {KPI_OPTIONS.map((_, index) => (
+                      <div
+                        key={index}
+                        className={cn(
+                          "w-2 h-2 rounded-full transition-all duration-300",
+                          index === currentMetricIndex ? 'bg-club-gold' : 'bg-club-gold/30'
+                        )}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                /* Desktop Controls */
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="space-y-1">
+                    <Label className={cn(
+                      "text-xs font-medium",
+                      theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
+                    )}>Performance Metric</Label>
+                    <Select value={selectedKPI} onValueChange={setSelectedKPI}>
+                      <SelectTrigger className={cn(
+                        "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl",
+                        theme === 'dark' 
+                          ? "bg-club-black/50 text-club-light-gray" 
+                          : "bg-white/70 text-gray-900"
+                      )}>
+                        <SelectValue placeholder="Select KPI" />
+                      </SelectTrigger>
+                      <SelectContent className={cn(
+                        "border-club-gold/30 z-50 max-h-60 rounded-xl backdrop-blur-md",
+                        theme === 'dark' 
+                          ? "bg-club-black/90 text-club-light-gray" 
+                          : "bg-white/90 text-gray-900"
+                      )}>
+                        {KPI_OPTIONS.map(option => (
+                          <SelectItem 
+                            key={option.value} 
+                            value={option.value} 
+                            className="focus:bg-club-gold/20 text-sm rounded-lg"
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div className="space-y-1">
+                    <Label className={cn(
+                      "text-xs font-medium",
+                      theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
+                    )}>Time Period</Label>
+                    <Select value={selectedTimePeriod} onValueChange={setSelectedTimePeriod}>
+                      <SelectTrigger className={cn(
+                        "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl",
+                        theme === 'dark' 
+                          ? "bg-club-black/50 text-club-light-gray" 
+                          : "bg-white/70 text-gray-900"
+                      )}>
+                        <SelectValue placeholder="Time Period" />
+                      </SelectTrigger>
+                      <SelectContent className={cn(
+                        "border-club-gold/30 z-50 rounded-xl backdrop-blur-md",
+                        theme === 'dark' 
+                          ? "bg-club-black/90 text-club-light-gray" 
+                          : "bg-white/90 text-gray-900"
+                      )}>
+                        {TIME_PERIOD_OPTIONS.map(option => (
+                          <SelectItem 
+                            key={option.value} 
+                            value={option.value} 
+                            className="focus:bg-club-gold/20 text-sm rounded-lg"
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-1">
+                    <Label className={cn(
+                      "text-xs font-medium",
+                      theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
+                    )}>Chart View</Label>
+                    <Select value={chartView} onValueChange={setChartView}>
+                      <SelectTrigger className={cn(
+                        "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl",
+                        theme === 'dark' 
+                          ? "bg-club-black/50 text-club-light-gray" 
+                          : "bg-white/70 text-gray-900"
+                      )}>
+                        <SelectValue placeholder="Chart View" />
+                      </SelectTrigger>
+                      <SelectContent className={cn(
+                        "border-club-gold/30 z-50 rounded-xl backdrop-blur-md",
+                        theme === 'dark' 
+                          ? "bg-club-black/90 text-club-light-gray" 
+                          : "bg-white/90 text-gray-900"
+                      )}>
+                        {CHART_VIEW_OPTIONS.map(option => (
+                          <SelectItem 
+                            key={option.value} 
+                            value={option.value} 
+                            className="focus:bg-club-gold/20 text-sm rounded-lg"
+                          >
+                            {option.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              )}
+              
+              {/* Performance Statistics - iPhone weather style */}
+              <div className={cn(
+                "grid gap-3 p-4 rounded-2xl transition-all duration-300",
+                isMobile ? "grid-cols-2" : "grid-cols-4",
+                theme === 'dark' 
+                  ? "bg-club-black/30 border border-club-gold/10" 
+                  : "bg-gray-50/50 border border-club-gold/20"
+              )}>
+                <div className="text-center">
+                  <div className={cn(
+                    "text-lg font-bold",
+                    theme === 'dark' ? "text-club-gold" : "text-club-gold"
+                  )}>
+                    {stats.avg.toFixed(1)}
+                  </div>
+                  <div className={cn(
+                    "text-xs",
+                    theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
+                  )}>Average</div>
+                </div>
+                <div className="text-center">
+                  <div className={cn(
+                    "text-lg font-bold",
+                    theme === 'dark' ? "text-green-400" : "text-green-600"
+                  )}>
+                    {stats.max}
+                  </div>
+                  <div className={cn(
+                    "text-xs",
+                    theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
+                  )}>Best</div>
+                </div>
+                {!isMobile && (
+                  <>
+                    <div className="text-center">
+                      <div className={cn(
+                        "text-lg font-bold",
+                        theme === 'dark' ? "text-red-400" : "text-red-600"
+                      )}>
+                        {stats.min}
+                      </div>
+                      <div className={cn(
+                        "text-xs",
+                        theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
+                      )}>Worst</div>
+                    </div>
+                    <div className="text-center">
+                      <div className={cn(
+                        "text-lg font-bold",
+                        theme === 'dark' ? "text-blue-400" : "text-blue-600"
+                      )}>
+                        {matchData.length}
+                      </div>
+                      <div className={cn(
+                        "text-xs",
+                        theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
+                      )}>Matches</div>
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Secondary Controls - Desktop only */}
+              {!isMobile && (
+                <div className="flex items-center justify-between pt-1">
+                  <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2">
+                      <Label 
+                        htmlFor="movingAverage"
+                        className={cn(
+                          "text-xs cursor-pointer select-none font-medium",
+                          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                        )}
+                      >
+                        3-Match Moving Average
+                      </Label>
+                      <Switch 
+                        id="movingAverage" 
+                        checked={showMovingAverage}
+                        onCheckedChange={setShowMovingAverage}
+                        className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Chart Container - iPhone weather style */}
+          <div className="px-4 sm:px-6 pb-4">
+            <div 
+              className={cn(
+                "w-full rounded-2xl p-3 sm:p-4 transition-all duration-300",
+                theme === 'dark' 
+                  ? "bg-club-black/20 border border-club-gold/10" 
+                  : "bg-gray-50/30 border border-club-gold/20"
+              )}
+              style={{ height: isMobile ? '220px' : '300px' }}
+            >
+              <ChartContainer 
+                config={{
+                  value: { color: "#D4AF37" },
+                  average: { color: "#9CA3AF" }
+                }}
+                aspectRatio={isMobile ? (4/3) : (16/10)}
+                minHeight={isMobile ? 200 : 280}
+              >
+                <ResponsiveContainer width="100%" height="100%">
+                  {chartView === 'line' ? (
+                    <RechartsLineChart data={matchData} margin={{ top: 10, right: 15, left: 10, bottom: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "#333" : "#e5e7eb"} opacity={0.3} />
+                      <XAxis 
+                        dataKey="match" 
+                        stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
+                        tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
+                        tickLine={false}
+                        axisLine={false}
+                        angle={-45}
+                        textAnchor="end"
+                        interval={isMobile ? 1 : 0}
+                      />
+                      <YAxis 
+                        stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
+                        tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
+                        tickLine={false}
+                        axisLine={false}
+                        width={isMobile ? 25 : 30}
+                      />
+                      
+                      <ChartTooltip content={<CustomTooltip />} />
+                      
+                      <Line
+                        type="monotone"
+                        dataKey="value"
+                        name={selectedKPILabel}
+                        stroke="#D4AF37"
+                        strokeWidth={isMobile ? 2 : 2.5}
+                        dot={{ r: isMobile ? 3 : 4, strokeWidth: 2, fill: "#D4AF37" }}
+                        activeDot={{ r: isMobile ? 5 : 6, strokeWidth: 2, fill: "#D4AF37" }}
+                      />
+
+                      {showMovingAverage && !isMobile && (
+                        <Line
+                          type="monotone"
+                          dataKey="movingAvg"
+                          name="3-Match Average"
+                          stroke="#9CA3AF"
+                          strokeDasharray="5 5"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                      )}
+                    </RechartsLineChart>
+                  ) : (
+                    <AreaChart data={matchData} margin={{ top: 10, right: 15, left: 10, bottom: 20 }}>
+                      <defs>
+                        <linearGradient id="metricGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.4}/>
+                          <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.05}/>
+                        </linearGradient>
+                      </defs>
+                      
+                      <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "#333" : "#e5e7eb"} opacity={0.3} />
+                      <XAxis 
+                        dataKey="match" 
+                        stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
+                        tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
+                        tickLine={false}
+                        axisLine={false}
+                        angle={-45}
+                        textAnchor="end"
+                        interval={isMobile ? 1 : 0}
+                      />
+                      <YAxis 
+                        stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
+                        tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
+                        tickLine={false}
+                        axisLine={false}
+                        width={isMobile ? 25 : 30}
+                      />
+                      
+                      <ChartTooltip content={<CustomTooltip />} />
+                      
+                      <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke="#D4AF37"
+                        strokeWidth={isMobile ? 2 : 2.5}
+                        fill="url(#metricGradient)"
+                        dot={{ fill: "#D4AF37", strokeWidth: 2, r: isMobile ? 3 : 4 }}
+                        activeDot={{ r: isMobile ? 5 : 6, stroke: "#D4AF37", strokeWidth: 2 }}
+                      />
+
+                      {showMovingAverage && !isMobile && (
+                        <Line
+                          type="monotone"
+                          dataKey="movingAvg"
+                          stroke="#9CA3AF"
+                          strokeDasharray="5 5"
+                          strokeWidth={2}
+                          dot={false}
+                        />
+                      )}
+                    </AreaChart>
+                  )}
+                </ResponsiveContainer>
+              </ChartContainer>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </TooltipProvider>
   );
 };
