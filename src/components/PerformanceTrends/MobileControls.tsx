@@ -1,73 +1,65 @@
 
-import { cn } from "@/lib/utils";
-import { useTheme } from "@/contexts/ThemeContext";
+import React from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { KPI_OPTIONS, TIME_PERIOD_OPTIONS } from "./constants";
 
 interface MobileControlsProps {
-  currentMetricIndex: number;
-  selectedTimePeriod: string;
-  currentMetric: typeof KPI_OPTIONS[0];
-  prevMetric: () => void;
-  nextMetric: () => void;
+  metrics: Array<{ key: string; label: string; color: string }>;
+  timeRanges: Array<{ key: string; label: string }>;
+  currentIndex: number;
+  selectedMetric: string;
+  timeRange: string;
+  onPrevious: () => void;
+  onNext: () => void;
+  onMetricChange: (metric: string) => void;
+  onTimeRangeChange: (range: string) => void;
+  isExpanded: boolean;
 }
 
-export const MobileControls = ({ 
-  currentMetricIndex, 
-  selectedTimePeriod, 
-  currentMetric, 
-  prevMetric, 
-  nextMetric 
+export const MobileControls = ({
+  metrics,
+  timeRanges,
+  currentIndex,
+  selectedMetric,
+  timeRange,
+  onPrevious,
+  onNext,
+  onMetricChange,
+  onTimeRangeChange,
+  isExpanded
 }: MobileControlsProps) => {
-  const { theme } = useTheme();
+  const currentMetric = metrics[currentIndex];
 
   return (
-    <>
-      {/* Mobile navigation controls - iPhone weather style */}
-      <div className="flex items-center gap-2">
+    <div className="space-y-3">
+      {/* Metric Navigation */}
+      <div className="flex items-center justify-between">
         <Button
-          variant="ghost"
-          size="icon"
-          onClick={prevMetric}
-          className="h-9 w-9 text-club-gold hover:bg-club-gold/10 rounded-full hover-scale"
-          aria-label="Previous metric"
+          variant="outline"
+          size="sm"
+          onClick={onPrevious}
+          disabled={currentIndex === 0}
+          className="text-club-light-gray border-club-gold/30"
         >
           <ChevronLeft className="h-4 w-4" />
         </Button>
+        
+        <div className="text-center flex-1 mx-3">
+          <h3 className="text-sm font-medium text-club-light-gray">
+            {currentMetric?.label}
+          </h3>
+        </div>
+        
         <Button
-          variant="ghost"
-          size="icon"
-          onClick={nextMetric}
-          className="h-9 w-9 text-club-gold hover:bg-club-gold/10 rounded-full hover-scale"
-          aria-label="Next metric"
+          variant="outline"
+          size="sm"
+          onClick={onNext}
+          disabled={currentIndex === metrics.length - 1}
+          className="text-club-light-gray border-club-gold/30"
         >
           <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
-
-      {/* Mobile metric display - iPhone weather style */}
-      <div className="text-center space-y-2 animate-fade-in">
-        <h3 className="text-lg font-semibold text-club-gold">
-          {currentMetric.shortLabel}
-        </h3>
-        <div className="text-xs text-club-light-gray/70">
-          {TIME_PERIOD_OPTIONS.find(t => t.value === selectedTimePeriod)?.shortLabel}
-        </div>
-        
-        {/* Metric indicator dots */}
-        <div className="flex justify-center gap-1 mt-3">
-          {KPI_OPTIONS.map((_, index) => (
-            <div
-              key={index}
-              className={cn(
-                "w-2 h-2 rounded-full transition-all duration-300",
-                index === currentMetricIndex ? 'bg-club-gold scale-125' : 'bg-club-gold/30'
-              )}
-            />
-          ))}
-        </div>
-      </div>
-    </>
+    </div>
   );
 };
