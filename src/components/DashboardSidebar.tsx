@@ -168,6 +168,11 @@ export const DashboardSidebar = () => {
                 </div>
               </div>
             </ScrollArea>
+
+            {/* Footer section - matches desktop sidebar */}
+            <div className="border-t border-club-gold/20 p-6 flex-shrink-0">
+              <SidebarFooter collapsed={false} onFeedbackClick={() => setFeedbackOpen(true)} />
+            </div>
           </div>
         </div>
         
