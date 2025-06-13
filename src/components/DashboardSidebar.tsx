@@ -11,6 +11,7 @@ import { FeedbackForm } from "./FeedbackForm";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { hasAccess } from "@/utils/roleAccess";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export const DashboardSidebar = () => {
   const [collapsed, setCollapsed] = useState(false);
@@ -118,48 +119,55 @@ export const DashboardSidebar = () => {
           className="fixed inset-0 bg-club-black/95 backdrop-blur-md z-50 lg:hidden transition-all duration-300 ease-in-out" 
           onClick={closeMobileMenu}
         >
-          {/* Full-screen mobile menu content */}
+          {/* Full-screen mobile menu content with proper scrolling */}
           <div 
-            className="h-full w-full flex flex-col justify-start items-center relative pt-16 pb-8 px-6" 
+            className="h-full w-full flex flex-col relative" 
             onClick={e => e.stopPropagation()}
           >
             {/* Close button - large touch target in top-right */}
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              onClick={closeMobileMenu} 
-              className="absolute top-6 right-6 text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[48px] min-w-[48px] touch-manipulation rounded-xl" 
-              aria-label="Close menu"
-            >
-              <X size={28} />
-            </Button>
-
-            {/* Logo and branding */}
-            <div className="flex flex-col items-center mb-12">
-              <img 
-                src="/lovable-uploads/eb223be6-87a6-402c-a270-20313a00080c.png" 
-                alt="Club Logo" 
-                className="w-16 h-16 mb-4 rounded-xl shadow-lg" 
-              />
-              <span className="text-2xl font-bold text-club-gold">SMH Analytics</span>
-              <span className="text-sm text-gray-400 mt-1">Football Analytics Dashboard</span>
+            <div className="flex justify-end p-6 flex-shrink-0">
+              <Button 
+                variant="ghost" 
+                size="icon" 
+                onClick={closeMobileMenu} 
+                className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10 min-h-[48px] min-w-[48px] touch-manipulation rounded-xl" 
+                aria-label="Close menu"
+              >
+                <X size={28} />
+              </Button>
             </div>
 
-            {/* Navigation items - large touch targets with proper spacing */}
-            <div className="flex flex-col items-center space-y-3 w-full max-w-sm">
-              {filteredNavigationItems.map(item => (
-                <div key={item.name} className="w-full">
-                  <SidebarNavItem 
-                    item={item} 
-                    collapsed={false} 
-                    openSubMenu={openSubMenus.has(item.name) ? item.name : null} 
-                    toggleSubMenu={toggleSubMenu} 
-                    onNavigate={handleNavigate} 
-                    className="min-h-[48px] text-lg justify-center text-center hover:bg-club-gold/10 rounded-xl touch-manipulation py-3 px-6 transition-all duration-200 ease-in-out" 
+            {/* Scrollable content area */}
+            <ScrollArea className="flex-1 px-6">
+              <div className="flex flex-col items-center pb-8">
+                {/* Logo and branding */}
+                <div className="flex flex-col items-center mb-12">
+                  <img 
+                    src="/lovable-uploads/eb223be6-87a6-402c-a270-20313a00080c.png" 
+                    alt="Club Logo" 
+                    className="w-16 h-16 mb-4 rounded-xl shadow-lg" 
                   />
+                  <span className="text-2xl font-bold text-club-gold">SMH Analytics</span>
+                  <span className="text-sm text-gray-400 mt-1">Football Analytics Dashboard</span>
                 </div>
-              ))}
-            </div>
+
+                {/* Navigation items - large touch targets with proper spacing */}
+                <div className="flex flex-col items-center space-y-3 w-full max-w-sm">
+                  {filteredNavigationItems.map(item => (
+                    <div key={item.name} className="w-full">
+                      <SidebarNavItem 
+                        item={item} 
+                        collapsed={false} 
+                        openSubMenu={openSubMenus.has(item.name) ? item.name : null} 
+                        toggleSubMenu={toggleSubMenu} 
+                        onNavigate={handleNavigate} 
+                        className="min-h-[48px] text-lg justify-center text-center hover:bg-club-gold/10 rounded-xl touch-manipulation py-3 px-6 transition-all duration-200 ease-in-out" 
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </ScrollArea>
           </div>
         </div>
         
