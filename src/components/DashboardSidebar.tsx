@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -165,14 +164,14 @@ export const DashboardSidebar = () => {
                       />
                     </div>
                   ))}
+                  
+                  {/* Footer content directly under navigation options */}
+                  <div className="w-full mt-8 pt-8">
+                    <SidebarFooter collapsed={false} onFeedbackClick={() => setFeedbackOpen(true)} />
+                  </div>
                 </div>
               </div>
             </ScrollArea>
-
-            {/* Footer section - matches desktop sidebar */}
-            <div className="border-t border-club-gold/20 p-6 flex-shrink-0">
-              <SidebarFooter collapsed={false} onFeedbackClick={() => setFeedbackOpen(true)} />
-            </div>
           </div>
         </div>
         
