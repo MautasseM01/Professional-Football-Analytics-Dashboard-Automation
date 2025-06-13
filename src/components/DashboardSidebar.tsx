@@ -162,18 +162,6 @@ export const DashboardSidebar = () => {
                 </div>
               ))}
             </div>
-
-            {/* Mobile controls at bottom */}
-            <div className="absolute bottom-8 left-6 right-6">
-              <div className="flex justify-center items-center gap-4">
-                <div className="p-2 bg-club-gold/10 rounded-xl">
-                  <LanguageSelector />
-                </div>
-                <div className="p-2 bg-club-gold/10 rounded-xl">
-                  <ThemeToggle />
-                </div>
-              </div>
-            </div>
           </div>
         </div>
         
