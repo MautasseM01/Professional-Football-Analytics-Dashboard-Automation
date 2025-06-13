@@ -8,8 +8,6 @@ import { navigationItems } from "./sidebar/navigation-items";
 import { SidebarNavItem } from "./sidebar/SidebarNavItem";
 import { SidebarFooter } from "./sidebar/SidebarFooter";
 import { FeedbackForm } from "./FeedbackForm";
-import { LanguageSelector } from "./LanguageSelector";
-import { ThemeToggle } from "./ThemeToggle";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { hasAccess } from "@/utils/roleAccess";
 import { useIsMobile } from "@/hooks/use-mobile";
