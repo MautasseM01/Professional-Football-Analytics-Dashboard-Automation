@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -231,9 +232,9 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
         {/* Heatmap with Controls Section */}
         <div className="space-y-4 w-full">
           {/* Time Period Selector and Zoom Controls */}
-          <div className="flex items-center justify-between gap-3 w-full">
-            {/* Time Period Selector - Left Side */}
-            <div className="w-full sm:w-64">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 w-full">
+            {/* Time Period Selector - Left Side on desktop, top on mobile */}
+            <div className="w-full lg:w-64">
               <Select value={selectedPeriod} onValueChange={(value) => setSelectedPeriod(value as TimePeriod)}>
                 <SelectTrigger className={cn(
                   "border-2 focus:ring-2 focus:ring-club-gold shadow-lg backdrop-blur-sm font-medium",
@@ -257,7 +258,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               </Select>
             </div>
 
-            {/* Zoom Controls - Right Side */}
+            {/* Zoom Controls - Right Side on desktop, bottom on mobile */}
             <div className="flex items-center gap-2 flex-wrap">
               <Button
                 variant="outline"
