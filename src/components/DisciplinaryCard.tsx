@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertTriangle } from "lucide-react";
+import { AlertTriangle, Info } from "lucide-react";
 import { usePlayerDisciplinary } from "@/hooks/use-player-disciplinary";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -34,8 +34,9 @@ export const DisciplinaryCard = ({ playerId }: DisciplinaryCardProps) => {
         <CardContent className="p-4 sm:p-5 lg:p-6 h-full flex flex-col justify-between min-h-[140px]">
           <div className="min-w-0 flex-1 space-y-3">
             <div className="flex items-start justify-between gap-2">
-              <div className="text-sm text-gray-300 font-medium leading-tight min-w-0 flex-1">
-                Disciplinary Record
+              <div className="text-sm text-gray-300 font-medium leading-tight min-w-0 flex-1 flex items-center gap-1.5">
+                <span>Disciplinary Record</span>
+                <Info className="w-3 h-3 text-club-light-gray/60 flex-shrink-0" />
               </div>
               <div className="text-club-gold/50 flex-shrink-0 group-hover:text-club-gold transition-colors duration-300">
                 <div className="w-4 h-4 sm:w-5 sm:h-5">
@@ -65,8 +66,9 @@ export const DisciplinaryCard = ({ playerId }: DisciplinaryCardProps) => {
         <CardContent className="p-4 sm:p-5 lg:p-6 h-full flex flex-col justify-between min-h-[140px]">
           <div className="min-w-0 flex-1 space-y-3">
             <div className="flex items-start justify-between gap-2">
-              <div className="text-sm text-gray-300 font-medium leading-tight min-w-0 flex-1">
-                Disciplinary Record
+              <div className="text-sm text-gray-300 font-medium leading-tight min-w-0 flex-1 flex items-center gap-1.5">
+                <span>Disciplinary Record</span>
+                <Info className="w-3 h-3 text-club-light-gray/60 flex-shrink-0" />
               </div>
               <div className="text-club-gold/50 flex-shrink-0 group-hover:text-club-gold transition-colors duration-300">
                 <div className="w-4 h-4 sm:w-5 sm:h-5">
@@ -103,8 +105,9 @@ export const DisciplinaryCard = ({ playerId }: DisciplinaryCardProps) => {
       <CardContent className="p-4 sm:p-5 lg:p-6 h-full flex flex-col justify-between min-h-[140px]">
         <div className="min-w-0 flex-1 space-y-3">
           <div className="flex items-start justify-between gap-2">
-            <div className="text-sm text-gray-300 font-medium leading-tight min-w-0 flex-1">
-              Disciplinary Record
+            <div className="text-sm text-gray-300 font-medium leading-tight min-w-0 flex-1 flex items-center gap-1.5">
+              <span>Disciplinary Record</span>
+              <Info className="w-3 h-3 text-club-light-gray/60 flex-shrink-0" />
             </div>
             <div className="text-club-gold/50 flex-shrink-0 group-hover:text-club-gold transition-colors duration-300">
               <div className="w-4 h-4 sm:w-5 sm:h-5">
