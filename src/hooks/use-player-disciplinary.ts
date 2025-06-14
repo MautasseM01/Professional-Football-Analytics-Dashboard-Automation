@@ -23,11 +23,17 @@ export const usePlayerDisciplinary = (playerId: number | null) => {
         throw error;
       }
       
-      console.log('Disciplinary data for player', playerId, ':', data);
+      console.log('Raw disciplinary data for player', playerId, ':', data);
       
-      // Fix: Use lowercase to match your database values
-      const yellowCards = data?.filter(record => record.card_type === 'yellow').length || 0;
-      const redCards = data?.filter(record => record.card_type === 'red').length || 0;
+      // Handle both 'Yellow' and 'yellow' (case insensitive)
+      const yellowCards = data?.filter(record => 
+        record.card_type && record.card_type.toLowerCase() === 'yellow'
+      ).length || 0;
+      
+      const redCards = data?.filter(record => 
+        record.card_type && record.card_type.toLowerCase() === 'red'
+      ).length || 0;
+      
       const totalCards = yellowCards + redCards;
       
       let riskLevel: 'SAFE' | 'AT RISK' | 'CRITICAL' = 'SAFE';

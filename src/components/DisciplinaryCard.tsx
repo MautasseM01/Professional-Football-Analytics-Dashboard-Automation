@@ -78,8 +78,8 @@ export const DisciplinaryCard = ({ playerId }: DisciplinaryCardProps) => {
               <div className="text-2xl sm:text-3xl font-bold text-club-gold break-words leading-tight group-hover:text-club-gold/90 transition-colors duration-300">
                 0
               </div>
-              <div className="text-xs text-gray-400 break-words leading-tight">
-                Clean Record
+              <div className="text-xs text-green-500 break-words leading-tight font-semibold">
+                Clean Record (SAFE)
               </div>
             </div>
           </div>
@@ -118,7 +118,7 @@ export const DisciplinaryCard = ({ playerId }: DisciplinaryCardProps) => {
             </div>
             <div className="text-xs text-gray-400 break-words leading-tight">
               {disciplinaryData.totalCards === 0 ? (
-                'Clean Record'
+                <span className="text-green-500 font-semibold">Clean Record (SAFE)</span>
               ) : (
                 <div className="flex items-center gap-1 flex-wrap">
                   {/* Yellow Cards */}
