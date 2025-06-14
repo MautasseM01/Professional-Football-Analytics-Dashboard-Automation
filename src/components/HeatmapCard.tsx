@@ -257,10 +257,9 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               </Select>
             </div>
 
-            {/* Zoom Controls - Improved spacing and visibility */}
+            {/* Zoom Controls - Fixed sizing and spacing */}
             <div className={cn(
-              "flex items-center w-full lg:w-auto",
-              isMobile ? "justify-between" : "gap-2"
+              "flex items-center w-full lg:w-auto justify-between lg:justify-start lg:gap-2"
             )}>
               <Button
                 variant="outline"
@@ -268,13 +267,13 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                 onClick={handleZoomOut}
                 disabled={zoomLevel <= 0.5}
                 className={cn(
-                  "border-2 transition-all backdrop-blur-sm",
+                  "border-2 transition-all backdrop-blur-sm w-12 h-10",
                   theme === 'dark'
                     ? "bg-club-black/50 border-club-gold/30 hover:border-club-gold/50 text-club-light-gray"
                     : "bg-white/90 border-club-gold/40 hover:border-club-gold/60 text-gray-900"
                 )}
               >
-                <ZoomOut size={isMobile ? 14 : 16} />
+                <ZoomOut size={16} />
               </Button>
 
               <Button
@@ -282,8 +281,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                 size={isMobile ? "sm" : "default"}
                 disabled
                 className={cn(
-                  "border-2 transition-all backdrop-blur-sm cursor-default",
-                  "min-w-[60px] text-center font-medium",
+                  "border-2 transition-all backdrop-blur-sm cursor-default w-12 h-10 text-center font-medium",
                   theme === 'dark'
                     ? "bg-club-black/50 border-club-gold/30 text-club-light-gray hover:bg-club-black/50"
                     : "bg-white/90 border-club-gold/40 text-gray-900 hover:bg-white/90"
@@ -298,13 +296,13 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                 onClick={handleZoomIn}
                 disabled={zoomLevel >= 3}
                 className={cn(
-                  "border-2 transition-all backdrop-blur-sm",
+                  "border-2 transition-all backdrop-blur-sm w-12 h-10",
                   theme === 'dark'
                     ? "bg-club-black/50 border-club-gold/30 hover:border-club-gold/50 text-club-light-gray"
                     : "bg-white/90 border-club-gold/40 hover:border-club-gold/60 text-gray-900"
                 )}
               >
-                <ZoomIn size={isMobile ? 14 : 16} />
+                <ZoomIn size={16} />
               </Button>
 
               <Button
@@ -312,13 +310,13 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                 size={isMobile ? "sm" : "default"}
                 onClick={handleResetZoom}
                 className={cn(
-                  "border-2 transition-all backdrop-blur-sm",
+                  "border-2 transition-all backdrop-blur-sm w-12 h-10",
                   theme === 'dark'
                     ? "bg-club-black/50 border-club-gold/30 hover:border-club-gold/50 text-club-light-gray"
                     : "bg-white/90 border-club-gold/40 hover:border-club-gold/60 text-gray-900"
                 )}
               >
-                <RotateCcw size={isMobile ? 14 : 16} />
+                <RotateCcw size={16} />
               </Button>
 
               <Button
@@ -326,13 +324,13 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                 size={isMobile ? "sm" : "default"}
                 onClick={() => setIsFullscreen(!isFullscreen)}
                 className={cn(
-                  "border-2 transition-all backdrop-blur-sm",
+                  "border-2 transition-all backdrop-blur-sm w-12 h-10",
                   theme === 'dark'
                     ? "bg-club-black/50 border-club-gold/30 hover:border-club-gold/50 text-club-light-gray"
                     : "bg-white/90 border-club-gold/40 hover:border-club-gold/60 text-gray-900"
                 )}
               >
-                {isFullscreen ? <Minimize2 size={isMobile ? 14 : 16} /> : <Maximize2 size={isMobile ? 14 : 16} />}
+                {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
               </Button>
             </div>
           </div>
