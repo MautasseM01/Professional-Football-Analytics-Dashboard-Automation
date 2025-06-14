@@ -294,10 +294,10 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                 variant="outline"
                 disabled
                 className={cn(
-                  "border-2 transition-all backdrop-blur-sm cursor-default w-12 h-10 text-center font-medium",
+                  "border-2 transition-all backdrop-blur-sm w-12 h-10",
                   theme === 'dark'
-                    ? "bg-club-black/50 border-club-gold/30 text-club-light-gray hover:bg-club-black/50"
-                    : "bg-white/90 border-club-gold/40 text-gray-900 hover:bg-white/90"
+                    ? "bg-club-black/50 border-club-gold/30 hover:border-club-gold/50 text-club-light-gray"
+                    : "bg-white/90 border-club-gold/40 hover:border-club-gold/60 text-gray-900"
                 )}
               >
                 {Math.round(zoomLevel * 100)}%
