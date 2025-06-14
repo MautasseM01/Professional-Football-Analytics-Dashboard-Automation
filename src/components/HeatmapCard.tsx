@@ -468,20 +468,19 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                   <RotateCcw size={viewMode === 'focus' ? 14 : 16} />
                 </Button>
 
-                {viewMode !== 'focus' && (
-                  <Button
-                    variant="outline"
-                    onClick={handleFullscreen}
-                    className={cn(
-                      "border-2 transition-all backdrop-blur-sm w-12 h-10",
-                      theme === 'dark'
-                        ? "bg-club-black/50 border-club-gold/30 hover:border-club-gold/50 text-club-light-gray"
-                        : "bg-white/90 border-club-gold/40 hover:border-club-gold/60 text-gray-900"
-                    )}
-                  >
-                    {isFullscreen ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
-                  </Button>
-                )}
+                <Button
+                  variant="outline"
+                  onClick={handleFullscreen}
+                  className={cn(
+                    "border-2 transition-all backdrop-blur-sm",
+                    viewMode === 'focus' ? "w-10 h-8" : "w-12 h-10",
+                    theme === 'dark'
+                      ? "bg-club-black/50 border-club-gold/30 hover:border-club-gold/50 text-club-light-gray"
+                      : "bg-white/90 border-club-gold/40 hover:border-club-gold/60 text-gray-900"
+                  )}
+                >
+                  {isFullscreen ? <Minimize2 size={viewMode === 'focus' ? 14 : 16} /> : <Maximize2 size={viewMode === 'focus' ? 14 : 16} />}
+                </Button>
               </div>
             </div>
 
