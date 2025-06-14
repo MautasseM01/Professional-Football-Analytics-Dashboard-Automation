@@ -46,12 +46,12 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
   
   const { data: heatmapData, loading, error } = useHeatmapData(player, selectedPeriod);
 
-  // Auto-set compact mode on very small screens
+  // Set compact mode as default on mobile, but allow cycling through all modes
   useEffect(() => {
     if (isMobile && viewMode === 'standard') {
       setViewMode('compact');
     }
-  }, [isMobile, viewMode]);
+  }, [isMobile]);
 
   // Cycle through view modes
   const cycleViewMode = () => {
@@ -373,37 +373,39 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
             "space-y-4 w-full transition-all duration-300",
             viewMode === 'focus' ? "space-y-2" : ""
           )}>
-            {/* Controls - Simplified in focus mode */}
+            {/* Controls - Always show time period selector, simplified in focus mode */}
             <div className={cn(
               "flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 w-full transition-all duration-300",
               viewMode === 'focus' ? "gap-2" : ""
             )}>
-              {/* Time Period Selector */}
-              {viewMode !== 'focus' && (
-                <div className="w-full lg:w-64">
-                  <Select value={selectedPeriod} onValueChange={(value) => setSelectedPeriod(value as TimePeriod)}>
-                    <SelectTrigger className={cn(
-                      "border-2 focus:ring-2 focus:ring-club-gold shadow-lg backdrop-blur-sm font-medium",
-                      theme === 'dark' 
-                        ? "bg-club-black/50 text-club-light-gray border-club-gold/30 hover:border-club-gold/50" 
-                        : "bg-white/95 text-gray-900 border-club-gold/40 hover:border-club-gold/60"
-                    )}>
-                      <SelectValue placeholder="Select Period" />
-                    </SelectTrigger>
-                    <SelectContent className={cn(
-                      "border-2 shadow-2xl backdrop-blur-xl z-50",
-                      theme === 'dark' 
-                        ? "bg-club-black/95 text-club-light-gray border-club-gold/30" 
-                        : "bg-white/98 text-gray-900 border-club-gold/40"
-                    )}>
-                      <SelectItem value="full_match">Full Match</SelectItem>
-                      <SelectItem value="first_half">First Half</SelectItem>
-                      <SelectItem value="second_half">Second Half</SelectItem>
-                      <SelectItem value="last_15min">Last 15 min</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
+              {/* Time Period Selector - Always visible but compact in focus mode */}
+              <div className={cn(
+                "w-full transition-all duration-300",
+                viewMode === 'focus' ? "lg:w-48" : "lg:w-64"
+              )}>
+                <Select value={selectedPeriod} onValueChange={(value) => setSelectedPeriod(value as TimePeriod)}>
+                  <SelectTrigger className={cn(
+                    "border-2 focus:ring-2 focus:ring-club-gold shadow-lg backdrop-blur-sm font-medium transition-all duration-300",
+                    viewMode === 'focus' ? "h-8 text-xs" : "",
+                    theme === 'dark' 
+                      ? "bg-club-black/50 text-club-light-gray border-club-gold/30 hover:border-club-gold/50" 
+                      : "bg-white/95 text-gray-900 border-club-gold/40 hover:border-club-gold/60"
+                  )}>
+                    <SelectValue placeholder="Select Period" />
+                  </SelectTrigger>
+                  <SelectContent className={cn(
+                    "border-2 shadow-2xl backdrop-blur-xl z-50",
+                    theme === 'dark' 
+                      ? "bg-club-black/95 text-club-light-gray border-club-gold/30" 
+                      : "bg-white/98 text-gray-900 border-club-gold/40"
+                  )}>
+                    <SelectItem value="full_match">Full Match</SelectItem>
+                    <SelectItem value="first_half">First Half</SelectItem>
+                    <SelectItem value="second_half">Second Half</SelectItem>
+                    <SelectItem value="last_15min">Last 15 min</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
               {/* Zoom Controls */}
               <div className={cn(
