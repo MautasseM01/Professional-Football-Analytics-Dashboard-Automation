@@ -1,6 +1,6 @@
 
 import { Card, CardContent } from "@/components/ui/card";
-import { AlertTriangle, Check } from "lucide-react";
+import { AlertTriangle } from "lucide-react";
 import { usePlayerDisciplinary } from "@/hooks/use-player-disciplinary";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -24,20 +24,28 @@ export const DisciplinaryCard = ({ playerId }: DisciplinaryCardProps) => {
 
   if (isLoading) {
     return (
-      <Card className="border-club-gold/20 bg-club-dark-gray">
-        <CardContent className="h-[140px] p-5 flex flex-col justify-between">
-          <div className="flex items-start justify-between h-full">
-            <div className="min-w-0 flex-1 space-y-3 flex flex-col justify-center">
-              <div className="text-xs sm:text-sm text-club-light-gray/70 font-medium leading-tight">
+      <Card className="
+        border-club-gold/20 bg-club-black 
+        transition-all duration-300 ease-in-out
+        hover:border-club-gold/40 hover:shadow-lg 
+        hover:scale-[1.02] active:scale-[0.98]
+        group h-full
+      ">
+        <CardContent className="p-4 sm:p-5 lg:p-6 h-full flex flex-col justify-between min-h-[140px]">
+          <div className="min-w-0 flex-1 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="text-sm text-gray-300 font-medium leading-tight min-w-0 flex-1">
                 Disciplinary Record
               </div>
-              <div className="space-y-1">
-                <Skeleton className="h-8 w-16 bg-club-gold/10" />
-                <Skeleton className="h-4 w-24 bg-club-gold/10" />
+              <div className="text-club-gold/50 flex-shrink-0 group-hover:text-club-gold transition-colors duration-300">
+                <div className="w-4 h-4 sm:w-5 sm:h-5">
+                  <AlertTriangle />
+                </div>
               </div>
             </div>
-            <div className="text-club-gold/30 ml-4 flex-shrink-0 flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="space-y-1">
+              <Skeleton className="h-8 w-16 bg-club-gold/10" />
+              <Skeleton className="h-4 w-24 bg-club-gold/10" />
             </div>
           </div>
         </CardContent>
@@ -47,25 +55,32 @@ export const DisciplinaryCard = ({ playerId }: DisciplinaryCardProps) => {
 
   if (!disciplinaryData) {
     return (
-      <Card className="border-club-gold/20 bg-club-dark-gray">
-        <CardContent className="h-[140px] p-5 flex flex-col justify-between">
-          <div className="flex items-start justify-between h-full">
-            <div className="min-w-0 flex-1 space-y-3 flex flex-col justify-center">
-              <div className="text-xs sm:text-sm text-club-light-gray/70 font-medium leading-tight">
+      <Card className="
+        border-club-gold/20 bg-club-black 
+        transition-all duration-300 ease-in-out
+        hover:border-club-gold/40 hover:shadow-lg 
+        hover:scale-[1.02] active:scale-[0.98]
+        group h-full
+      ">
+        <CardContent className="p-4 sm:p-5 lg:p-6 h-full flex flex-col justify-between min-h-[140px]">
+          <div className="min-w-0 flex-1 space-y-3">
+            <div className="flex items-start justify-between gap-2">
+              <div className="text-sm text-gray-300 font-medium leading-tight min-w-0 flex-1">
                 Disciplinary Record
               </div>
-              <div className="space-y-1">
-                <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold break-words leading-tight">
-                  0
-                </div>
-                <div className="flex items-center gap-1">
-                  <Check className="w-4 h-4 text-green-500" />
-                  <span className="text-xs sm:text-sm text-green-500">Clean Record</span>
+              <div className="text-club-gold/50 flex-shrink-0 group-hover:text-club-gold transition-colors duration-300">
+                <div className="w-4 h-4 sm:w-5 sm:h-5">
+                  <AlertTriangle />
                 </div>
               </div>
             </div>
-            <div className="text-club-gold/30 ml-4 flex-shrink-0 flex items-center justify-center">
-              <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
+            <div className="space-y-1">
+              <div className="text-2xl sm:text-3xl font-bold text-club-gold break-words leading-tight group-hover:text-club-gold/90 transition-colors duration-300">
+                0
+              </div>
+              <div className="text-xs text-gray-400 break-words leading-tight">
+                Clean Record
+              </div>
             </div>
           </div>
         </CardContent>
@@ -78,43 +93,50 @@ export const DisciplinaryCard = ({ playerId }: DisciplinaryCardProps) => {
   const redCardsArray = Array.from({ length: disciplinaryData.redCards }, (_, i) => i);
 
   return (
-    <Card className="border-club-gold/20 bg-club-dark-gray">
-      <CardContent className="h-[140px] p-5 flex flex-col justify-between">
-        <div className="flex items-start justify-between h-full">
-          <div className="min-w-0 flex-1 space-y-3 flex flex-col justify-center">
-            <div className="text-xs sm:text-sm text-club-light-gray/70 font-medium leading-tight">
+    <Card className="
+      border-club-gold/20 bg-club-black 
+      transition-all duration-300 ease-in-out
+      hover:border-club-gold/40 hover:shadow-lg 
+      hover:scale-[1.02] active:scale-[0.98]
+      group h-full
+    ">
+      <CardContent className="p-4 sm:p-5 lg:p-6 h-full flex flex-col justify-between min-h-[140px]">
+        <div className="min-w-0 flex-1 space-y-3">
+          <div className="flex items-start justify-between gap-2">
+            <div className="text-sm text-gray-300 font-medium leading-tight min-w-0 flex-1">
               Disciplinary Record
             </div>
-            <div className="space-y-2">
-              <div className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold break-words leading-tight">
-                {disciplinaryData.totalCards}
-              </div>
-              <div className="flex items-center gap-1 flex-wrap">
-                {/* Yellow Cards */}
-                {yellowCardsArray.map((_, index) => (
-                  <CardIcon key={`yellow-${index}`} type="yellow" />
-                ))}
-                
-                {/* Red Cards */}
-                {redCardsArray.map((_, index) => (
-                  <CardIcon key={`red-${index}`} type="red" />
-                ))}
-                
-                {/* Show clean record if no cards */}
-                {disciplinaryData.totalCards === 0 && (
-                  <div className="flex items-center gap-1">
-                    <Check className="w-4 h-4 text-green-500" />
-                    <span className="text-xs sm:text-sm text-green-500">Clean Record</span>
-                  </div>
-                )}
-              </div>
-              <div className={`text-xs font-semibold ${disciplinaryData.riskColor}`}>
-                {disciplinaryData.riskLevel}
+            <div className="text-club-gold/50 flex-shrink-0 group-hover:text-club-gold transition-colors duration-300">
+              <div className="w-4 h-4 sm:w-5 sm:h-5">
+                <AlertTriangle />
               </div>
             </div>
           </div>
-          <div className="text-club-gold/30 ml-4 flex-shrink-0 flex items-center justify-center">
-            <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
+          <div className="space-y-1">
+            <div className="text-2xl sm:text-3xl font-bold text-club-gold break-words leading-tight group-hover:text-club-gold/90 transition-colors duration-300">
+              {disciplinaryData.totalCards}
+            </div>
+            <div className="text-xs text-gray-400 break-words leading-tight">
+              {disciplinaryData.totalCards === 0 ? (
+                'Clean Record'
+              ) : (
+                <div className="flex items-center gap-1 flex-wrap">
+                  {/* Yellow Cards */}
+                  {yellowCardsArray.map((_, index) => (
+                    <CardIcon key={`yellow-${index}`} type="yellow" />
+                  ))}
+                  
+                  {/* Red Cards */}
+                  {redCardsArray.map((_, index) => (
+                    <CardIcon key={`red-${index}`} type="red" />
+                  ))}
+                  
+                  <span className={`ml-2 text-xs font-semibold ${disciplinaryData.riskColor}`}>
+                    {disciplinaryData.riskLevel}
+                  </span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </CardContent>
