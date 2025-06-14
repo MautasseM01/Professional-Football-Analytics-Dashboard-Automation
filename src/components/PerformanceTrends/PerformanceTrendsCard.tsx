@@ -28,6 +28,7 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
   const [selectedTimePeriod, setSelectedTimePeriod] = useState("last5");
   const [chartView, setChartView] = useState("area");
   const [showMovingAverage, setShowMovingAverage] = useState(false);
+  const [showStatistics, setShowStatistics] = useState(true);
   const [currentMetricIndex, setCurrentMetricIndex] = useState(0);
   const isMobile = useIsMobile();
   const { theme } = useTheme();
@@ -211,15 +212,21 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
                   selectedTimePeriod={selectedTimePeriod}
                   chartView={chartView}
                   showMovingAverage={showMovingAverage}
+                  showStatistics={showStatistics}
                   setSelectedKPI={setSelectedKPI}
                   setSelectedTimePeriod={setSelectedTimePeriod}
                   setChartView={setChartView}
                   setShowMovingAverage={setShowMovingAverage}
+                  setShowStatistics={setShowStatistics}
                 />
               )}
               
-              {/* Performance Statistics */}
-              <PerformanceStats stats={stats} matchDataLength={matchData.length} />
+              {/* Performance Statistics - conditionally rendered */}
+              {showStatistics && (
+                <div className="transition-all duration-300 ease-in-out">
+                  <PerformanceStats stats={stats} matchDataLength={matchData.length} />
+                </div>
+              )}
             </div>
           </div>
 

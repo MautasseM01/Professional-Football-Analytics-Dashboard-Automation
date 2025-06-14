@@ -11,10 +11,12 @@ interface DesktopControlsProps {
   selectedTimePeriod: string;
   chartView: string;
   showMovingAverage: boolean;
+  showStatistics: boolean;
   setSelectedKPI: (value: string) => void;
   setSelectedTimePeriod: (value: string) => void;
   setChartView: (value: string) => void;
   setShowMovingAverage: (value: boolean) => void;
+  setShowStatistics: (value: boolean) => void;
 }
 
 export const DesktopControls = ({
@@ -22,10 +24,12 @@ export const DesktopControls = ({
   selectedTimePeriod,
   chartView,
   showMovingAverage,
+  showStatistics,
   setSelectedKPI,
   setSelectedTimePeriod,
   setChartView,
-  setShowMovingAverage
+  setShowMovingAverage,
+  setShowStatistics
 }: DesktopControlsProps) => {
   const { theme } = useTheme();
 
@@ -135,7 +139,25 @@ export const DesktopControls = ({
 
       {/* Secondary Controls */}
       <div className="flex items-center justify-between pt-1">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-2">
+            <Label 
+              htmlFor="showStatistics"
+              className={cn(
+                "text-xs cursor-pointer select-none font-medium transition-colors duration-200",
+                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+              )}
+            >
+              Show Statistics
+            </Label>
+            <Switch 
+              id="showStatistics" 
+              checked={showStatistics}
+              onCheckedChange={setShowStatistics}
+              className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30"
+            />
+          </div>
+          
           <div className="flex items-center gap-2">
             <Label 
               htmlFor="movingAverage"
