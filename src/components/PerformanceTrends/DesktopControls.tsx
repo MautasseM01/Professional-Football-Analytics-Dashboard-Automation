@@ -157,18 +157,18 @@ export const DesktopControls = ({
       {/* Secondary Controls - Responsive Layout */}
       <div className={cn(
         "flex gap-4 pt-2",
-        isMobile ? "flex-col space-y-4" : "items-center justify-between"
+        isMobile ? "flex-row justify-between" : "items-center justify-between"
       )}>
         <div className={cn(
-          "flex gap-6",
-          isMobile ? "flex-col space-y-4" : "items-center"
+          "flex",
+          isMobile ? "gap-3" : "gap-6 items-center"
         )}>
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Label 
               htmlFor="showStatistics"
               className={cn(
                 "cursor-pointer select-none font-medium transition-colors duration-200",
-                isMobile ? "text-base" : "text-sm",
+                isMobile ? "text-sm" : "text-sm",
                 theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
               )}
             >
@@ -182,12 +182,12 @@ export const DesktopControls = ({
             />
           </div>
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             <Label 
               htmlFor="movingAverage"
               className={cn(
                 "cursor-pointer select-none font-medium transition-colors duration-200",
-                isMobile ? "text-base" : "text-sm",
+                isMobile ? "text-sm" : "text-sm",
                 theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
               )}
             >

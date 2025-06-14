@@ -46,7 +46,7 @@ export const PerformanceTrendsControls = ({
   nextMetric
 }: PerformanceTrendsControlsProps) => {
   return (
-    <div className="px-4 sm:px-6 pb-4">
+    <div className="pb-4">
       <div className="space-y-3 sm:space-y-4">
         {/* Always use responsive desktop controls */}
         <DesktopControls
