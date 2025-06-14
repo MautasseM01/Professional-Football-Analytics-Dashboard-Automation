@@ -1,3 +1,4 @@
+
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,7 +13,8 @@ import {
   Activity,
   Eye,
   EyeOff,
-  BarChart3
+  BarChart3,
+  TrendingUp
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -403,50 +405,110 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                 <span className="font-medium">Pinch to zoom • Drag to pan</span>
               </div>
             )}
-            
-            {/* Activity Intensity Scale - Updated to 0-10 numerical scale */}
-            <div className={cn(
-              "absolute bottom-2 left-2 rounded-xl p-3 shadow-xl border backdrop-blur-md",
-              theme === 'dark'
-                ? "bg-club-black/80 border-club-gold/30"
-                : "bg-white/80 border-club-gold/40"
-            )}>
-              <div className={cn(
-                "text-xs font-bold mb-2 flex items-center gap-1",
-                theme === 'dark' ? "text-club-light-gray" : "text-slate-900"
-              )}>
-                Activity Intensity
-                <div className="w-1 h-1 rounded-full bg-club-gold"></div>
+          </div>
+
+          {/* Professional Activity Intensity Legend - Full Width */}
+          <div className={cn(
+            "w-full rounded-2xl border-2 shadow-lg backdrop-blur-md",
+            theme === 'dark'
+              ? "bg-club-black/80 border-club-gold/30"
+              : "bg-white/90 border-club-gold/40"
+          )}>
+            <div className="p-4 lg:p-6">
+              {/* Legend Header */}
+              <div className="flex items-center gap-3 mb-4">
+                <div className={cn(
+                  "p-2 rounded-lg border",
+                  theme === 'dark' 
+                    ? "bg-club-gold/20 border-club-gold/30" 
+                    : "bg-club-gold/10 border-club-gold/40"
+                )}>
+                  <TrendingUp className="w-5 h-5 text-club-gold" />
+                </div>
+                <div>
+                  <h4 className={cn(
+                    "text-lg font-bold",
+                    theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                  )}>
+                    Activity Intensity Scale
+                  </h4>
+                  <p className={cn(
+                    "text-sm",
+                    theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
+                  )}>
+                    Player movement density and engagement level across field zones
+                  </p>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                {/* Vertical Scale Bar */}
-                <div className="flex flex-col items-center">
-                  <div className="h-16 w-4 rounded-lg border border-gray-300 relative overflow-hidden"
-                       style={{
-                         background: 'linear-gradient(to top, #22c55e 0%, #84cc16 20%, #eab308 40%, #f59e0b 60%, #ef4444 80%, #dc2626 100%)'
-                       }}>
+
+              {/* Horizontal Gradient Bar */}
+              <div className="space-y-3">
+                <div className="relative">
+                  {/* Main gradient bar */}
+                  <div 
+                    className="w-full h-8 rounded-lg border-2 border-club-gold/30 shadow-inner relative overflow-hidden"
+                    style={{
+                      background: theme === 'dark' 
+                        ? 'linear-gradient(to right, #1a1a1a 0%, #2d4a22 20%, #4a7c59 40%, #d4af37 60%, #f59e0b 80%, #dc2626 100%)'
+                        : 'linear-gradient(to right, #f8fafc 0%, #86efac 20%, #65a3d9 40%, #d4af37 60%, #f59e0b 80%, #dc2626 100%)'
+                    }}
+                  >
+                    {/* Subtle overlay for depth */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent"></div>
+                  </div>
+                  
+                  {/* Scale markers */}
+                  <div className="absolute inset-0 flex justify-between items-center px-1">
+                    {[0, 2, 4, 6, 8, 10].map((value, index) => (
+                      <div key={value} className="relative">
+                        <div className={cn(
+                          "w-0.5 h-6 rounded-full",
+                          theme === 'dark' ? "bg-club-light-gray/40" : "bg-gray-700/40"
+                        )}></div>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                {/* Scale Numbers */}
-                <div className="flex flex-col justify-between h-16 text-xs font-medium">
-                  <span className={cn(
-                    theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
-                  )}>10</span>
-                  <span className={cn(
-                    theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
-                  )}>8</span>
-                  <span className={cn(
-                    theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
-                  )}>6</span>
-                  <span className={cn(
-                    theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
-                  )}>4</span>
-                  <span className={cn(
-                    theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
-                  )}>2</span>
-                  <span className={cn(
-                    theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
-                  )}>0</span>
+
+                {/* Scale labels */}
+                <div className="flex justify-between items-center text-sm font-medium">
+                  {[
+                    { value: 0, label: 'Minimal' },
+                    { value: 2, label: 'Low' },
+                    { value: 4, label: 'Moderate' },
+                    { value: 6, label: 'Active' },
+                    { value: 8, label: 'High' },
+                    { value: 10, label: 'Peak' }
+                  ].map(({ value, label }) => (
+                    <div key={value} className="text-center flex-1">
+                      <div className={cn(
+                        "font-bold text-club-gold text-base mb-1"
+                      )}>
+                        {value}
+                      </div>
+                      <div className={cn(
+                        "text-xs",
+                        theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
+                      )}>
+                        {label}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+
+                {/* Additional info */}
+                <div className={cn(
+                  "mt-4 p-3 rounded-lg border text-center",
+                  theme === 'dark' 
+                    ? "bg-club-dark-gray/30 border-club-gold/20" 
+                    : "bg-gray-50 border-club-gold/30"
+                )}>
+                  <p className={cn(
+                    "text-sm",
+                    theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
+                  )}>
+                    <span className="font-medium text-club-gold">Higher values</span> indicate areas of frequent player presence and activity
+                  </p>
                 </div>
               </div>
             </div>
