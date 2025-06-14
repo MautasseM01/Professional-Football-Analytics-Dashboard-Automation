@@ -82,18 +82,18 @@ export const DesktopControls = ({
       {/* Secondary Controls - Responsive Layout */}
       <div className={cn("flex gap-4 pt-2", isMobile ? "flex-row justify-between" : "items-center justify-between")}>
         <div className={cn("flex", isMobile ? "gap-3" : "gap-6 items-center")}>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mx-0 px-[16px]">
             <Label htmlFor="showStatistics" className={cn("cursor-pointer select-none font-medium transition-colors duration-200", isMobile ? "text-sm" : "text-sm", theme === 'dark' ? "text-club-light-gray" : "text-gray-900")}>
               Show Statistics
             </Label>
-            <Switch id="showStatistics" checked={showStatistics} onCheckedChange={setShowStatistics} className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30" />
+            <Switch id="showStatistics" checked={showStatistics} onCheckedChange={setShowStatistics} className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30 my-0 mx-0" />
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 py-0 px-[16px]">
             <Label htmlFor="movingAverage" className={cn("cursor-pointer select-none font-medium transition-colors duration-200", isMobile ? "text-sm" : "text-sm", theme === 'dark' ? "text-club-light-gray" : "text-gray-900")}>
               3-Match Moving Average
             </Label>
-            <Switch id="movingAverage" checked={showMovingAverage} onCheckedChange={setShowMovingAverage} className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30" />
+            <Switch id="movingAverage" checked={showMovingAverage} onCheckedChange={setShowMovingAverage} className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30 my-0 px-0 py-0 mx-0" />
           </div>
         </div>
       </div>
