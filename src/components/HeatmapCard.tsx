@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -259,7 +258,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
             </div>
 
             {/* Zoom Controls - Right Side on desktop, bottom on mobile */}
-            <div className="flex items-center gap-2 flex-wrap">
+            <div className="flex items-center gap-2">
               <Button
                 variant="outline"
                 size={isMobile ? "sm" : "default"}
@@ -276,14 +275,14 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               </Button>
 
               <div className={cn(
-                "px-3 py-1.5 border-2 rounded-md backdrop-blur-sm min-w-[60px] text-center",
+                "flex items-center justify-center border-2 rounded-md backdrop-blur-sm transition-all",
+                "px-3 py-2 min-w-[60px] text-center font-medium text-sm",
+                isMobile ? "h-9" : "h-10",
                 theme === 'dark'
                   ? "bg-club-black/50 border-club-gold/30 text-club-light-gray"
                   : "bg-white/90 border-club-gold/40 text-gray-900"
               )}>
-                <span className="text-sm font-medium">
-                  {Math.round(zoomLevel * 100)}%
-                </span>
+                {Math.round(zoomLevel * 100)}%
               </div>
 
               <Button
