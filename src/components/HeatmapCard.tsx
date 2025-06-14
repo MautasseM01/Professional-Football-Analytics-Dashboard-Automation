@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -279,7 +278,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               </Button>
 
               <Button
-                variant="ghost"
+                variant="outline"
                 size={isMobile ? "sm" : "default"}
                 disabled
                 className={cn(
