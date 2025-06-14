@@ -88,20 +88,44 @@ export const PlayerSelector = ({
             <SelectValue placeholder="Choose a player" />
           </SelectTrigger>
           <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-            {players.map((player) => (
-              <SelectItem 
-                key={player.id} 
-                value={player.id.toString()}
-                className="focus:bg-club-gold/20 pl-3"
-              >
-                <span className="font-medium">{player.name}</span>
-                {player.position && (
-                  <span className="text-club-light-gray/70 ml-2">
-                    - {player.position}
-                  </span>
-                )}
-              </SelectItem>
-            ))}
+            {players.map((player) => {
+              const isSelected = selectedPlayer?.id === player.id;
+              return (
+                <SelectItem 
+                  key={player.id} 
+                  value={player.id.toString()}
+                  className={`
+                    relative pl-6 pr-3 py-2 cursor-pointer transition-all duration-200
+                    hover:bg-club-gold/20 
+                    focus:bg-club-gold/20 
+                    data-[highlighted]:bg-club-gold/20
+                    ${isSelected 
+                      ? 'bg-club-gold/10 border-l-4 border-l-club-gold' 
+                      : 'border-l-4 border-l-transparent'
+                    }
+                  `}
+                >
+                  <div className="flex items-center gap-3">
+                    {/* Player Number Badge */}
+                    <div className="flex-shrink-0 w-8 h-8 bg-club-gold/20 rounded-full flex items-center justify-center">
+                      <span className="text-xs font-bold text-club-gold">
+                        {player.number || '?'}
+                      </span>
+                    </div>
+                    
+                    {/* Player Info */}
+                    <div className="flex-1">
+                      <span className="font-medium text-club-light-gray">{player.name}</span>
+                      {player.position && (
+                        <span className="text-club-light-gray/70 ml-2 text-sm">
+                          - {player.position}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </SelectItem>
+              );
+            })}
           </SelectContent>
         </Select>
       </CardContent>
