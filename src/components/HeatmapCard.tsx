@@ -88,6 +88,21 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
     setPanOffset({ x: 0, y: 0 });
   };
 
+  const handleFullscreen = () => {
+    if (!isFullscreen) {
+      // Enter fullscreen
+      if (containerRef.current?.requestFullscreen) {
+        containerRef.current.requestFullscreen();
+      }
+    } else {
+      // Exit fullscreen
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+    setIsFullscreen(!isFullscreen);
+  };
+
   if (loading) {
     return (
       <Card className={cn(
@@ -257,13 +272,10 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               </Select>
             </div>
 
-            {/* Zoom Controls - Fixed sizing and spacing */}
-            <div className={cn(
-              "flex items-center w-full lg:w-auto justify-between lg:justify-start lg:gap-2"
-            )}>
+            {/* Zoom Controls - Uniform sizing and spacing */}
+            <div className="flex items-center gap-2 w-full lg:w-auto">
               <Button
                 variant="outline"
-                size={isMobile ? "sm" : "default"}
                 onClick={handleZoomOut}
                 disabled={zoomLevel <= 0.5}
                 className={cn(
@@ -278,7 +290,6 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
 
               <Button
                 variant="outline"
-                size={isMobile ? "sm" : "default"}
                 disabled
                 className={cn(
                   "border-2 transition-all backdrop-blur-sm cursor-default w-12 h-10 text-center font-medium",
@@ -292,7 +303,6 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
 
               <Button
                 variant="outline"
-                size={isMobile ? "sm" : "default"}
                 onClick={handleZoomIn}
                 disabled={zoomLevel >= 3}
                 className={cn(
@@ -307,7 +317,6 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
 
               <Button
                 variant="outline"
-                size={isMobile ? "sm" : "default"}
                 onClick={handleResetZoom}
                 className={cn(
                   "border-2 transition-all backdrop-blur-sm w-12 h-10",
@@ -321,8 +330,7 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
 
               <Button
                 variant="outline"
-                size={isMobile ? "sm" : "default"}
-                onClick={() => setIsFullscreen(!isFullscreen)}
+                onClick={handleFullscreen}
                 className={cn(
                   "border-2 transition-all backdrop-blur-sm w-12 h-10",
                   theme === 'dark'
