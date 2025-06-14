@@ -178,10 +178,7 @@ export const DesktopControls = ({
               id="showStatistics" 
               checked={showStatistics}
               onCheckedChange={setShowStatistics}
-              className={cn(
-                "data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30",
-                isMobile && "scale-110"
-              )}
+              className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30"
             />
           </div>
           
@@ -200,10 +197,7 @@ export const DesktopControls = ({
               id="movingAverage" 
               checked={showMovingAverage}
               onCheckedChange={setShowMovingAverage}
-              className={cn(
-                "data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30",
-                isMobile && "scale-110"
-              )}
+              className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30"
             />
           </div>
         </div>

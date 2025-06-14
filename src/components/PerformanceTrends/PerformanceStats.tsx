@@ -49,34 +49,30 @@ export const PerformanceStats = ({ stats, matchDataLength }: PerformanceStatsPro
           theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
         )}>Best</div>
       </div>
-      {!isMobile && (
-        <>
-          <div className="text-center">
-            <div className={cn(
-              "text-lg font-bold transition-colors duration-200",
-              theme === 'dark' ? "text-red-400" : "text-red-600"
-            )}>
-              {stats.min}
-            </div>
-            <div className={cn(
-              "text-xs",
-              theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
-            )}>Worst</div>
-          </div>
-          <div className="text-center">
-            <div className={cn(
-              "text-lg font-bold transition-colors duration-200",
-              theme === 'dark' ? "text-blue-400" : "text-blue-600"
-            )}>
-              {matchDataLength}
-            </div>
-            <div className={cn(
-              "text-xs",
-              theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
-            )}>Matches</div>
-          </div>
-        </>
-      )}
+      <div className="text-center">
+        <div className={cn(
+          "text-lg font-bold transition-colors duration-200",
+          theme === 'dark' ? "text-red-400" : "text-red-600"
+        )}>
+          {stats.min}
+        </div>
+        <div className={cn(
+          "text-xs",
+          theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
+        )}>Worst</div>
+      </div>
+      <div className="text-center">
+        <div className={cn(
+          "text-lg font-bold transition-colors duration-200",
+          theme === 'dark' ? "text-blue-400" : "text-blue-600"
+        )}>
+          {matchDataLength}
+        </div>
+        <div className={cn(
+          "text-xs",
+          theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600"
+        )}>Matches</div>
+      </div>
     </div>
   );
 };
