@@ -1,9 +1,8 @@
 
 import { useState, useMemo } from "react";
 import { Player } from "@/types";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { TrendingUp } from "lucide-react";
 import { useTheme } from "@/contexts/ThemeContext";
 import { cn } from "@/lib/utils";
 import { usePerformanceData } from "@/hooks/use-performance-data";
@@ -14,10 +13,9 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 import { KPI_OPTIONS } from "./constants";
 import { calculateMovingAverage, calculateStats } from "./utils";
-import { PerformanceStats } from "./PerformanceStats";
-import { MobileControls } from "./MobileControls";
-import { DesktopControls } from "./DesktopControls";
-import { ChartRenderer } from "./ChartRenderer";
+import { PerformanceTrendsHeader } from "./PerformanceTrendsHeader";
+import { PerformanceTrendsControls } from "./PerformanceTrendsControls";
+import { PerformanceTrendsChart } from "./PerformanceTrendsChart";
 
 interface PerformanceTrendsCardProps {
   player: Player;
@@ -118,14 +116,15 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
           : "bg-white/80",
         "shadow-xl transition-all duration-300"
       )}>
-        <CardHeader className="pb-3">
-          <CardTitle className={cn(
-            "text-sm sm:text-base lg:text-lg font-semibold",
-            theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-          )}>
-            {player.name}'s Performance Trends
-          </CardTitle>
-        </CardHeader>
+        <PerformanceTrendsHeader
+          player={player}
+          stats={stats}
+          currentMetricIndex={currentMetricIndex}
+          selectedTimePeriod={selectedTimePeriod}
+          currentMetric={currentMetric}
+          prevMetric={prevMetric}
+          nextMetric={nextMetric}
+        />
         <CardContent className="p-6">
           <Alert className="border-yellow-500/20 bg-yellow-500/10">
             <AlertDescription className="text-yellow-600 dark:text-yellow-400">
@@ -149,108 +148,44 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
         )}
         {...(isMobile ? swipeProps : {})}
       >
-        <CardHeader className="pb-3 px-4 sm:px-6">
-          <div className="flex items-center justify-between">
-            <div className="min-w-0 flex-1">
-              <CardTitle className={cn(
-                "text-sm sm:text-base lg:text-lg font-semibold",
-                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-              )}>
-                {player.name}'s Performance
-              </CardTitle>
-              <div className="flex items-center gap-2 mt-1">
-                {stats.trend !== 'neutral' && (
-                  <div className={cn(
-                    "flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium animate-scale-in",
-                    stats.trend === 'up' 
-                      ? "bg-club-gold/20 text-club-gold"
-                      : "bg-red-500/20 text-red-400"
-                  )}>
-                    <TrendingUp 
-                      size={10} 
-                      className={cn(
-                        "transition-transform duration-200",
-                        stats.trend === 'down' && "rotate-180"
-                      )} 
-                    />
-                    <span>
-                      {stats.trend === 'up' ? 'Improving' : 'Declining'}
-                    </span>
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            {/* Mobile navigation controls */}
-            {isMobile && (
-              <MobileControls
-                currentMetricIndex={currentMetricIndex}
-                selectedTimePeriod={selectedTimePeriod}
-                currentMetric={currentMetric}
-                prevMetric={prevMetric}
-                nextMetric={nextMetric}
-              />
-            )}
-          </div>
-        </CardHeader>
+        <PerformanceTrendsHeader
+          player={player}
+          stats={stats}
+          currentMetricIndex={currentMetricIndex}
+          selectedTimePeriod={selectedTimePeriod}
+          currentMetric={currentMetric}
+          prevMetric={prevMetric}
+          nextMetric={nextMetric}
+        />
 
         <CardContent className="p-0">
-          <div className="px-4 sm:px-6 pb-4">
-            <div className="space-y-3 sm:space-y-4">
-              {/* Controls */}
-              {isMobile ? (
-                <MobileControls
-                  currentMetricIndex={currentMetricIndex}
-                  selectedTimePeriod={selectedTimePeriod}
-                  currentMetric={currentMetric}
-                  prevMetric={prevMetric}
-                  nextMetric={nextMetric}
-                />
-              ) : (
-                <DesktopControls
-                  selectedKPI={selectedKPI}
-                  selectedTimePeriod={selectedTimePeriod}
-                  chartView={chartView}
-                  showMovingAverage={showMovingAverage}
-                  showStatistics={showStatistics}
-                  setSelectedKPI={setSelectedKPI}
-                  setSelectedTimePeriod={setSelectedTimePeriod}
-                  setChartView={setChartView}
-                  setShowMovingAverage={setShowMovingAverage}
-                  setShowStatistics={setShowStatistics}
-                />
-              )}
-              
-              {/* Performance Statistics - conditionally rendered */}
-              {showStatistics && (
-                <div className="transition-all duration-300 ease-in-out">
-                  <PerformanceStats stats={stats} matchDataLength={matchData.length} />
-                </div>
-              )}
-            </div>
-          </div>
+          <PerformanceTrendsControls
+            selectedKPI={selectedKPI}
+            selectedTimePeriod={selectedTimePeriod}
+            chartView={chartView}
+            showMovingAverage={showMovingAverage}
+            showStatistics={showStatistics}
+            currentMetricIndex={currentMetricIndex}
+            currentMetric={currentMetric}
+            stats={stats}
+            matchDataLength={matchData.length}
+            setSelectedKPI={setSelectedKPI}
+            setSelectedTimePeriod={setSelectedTimePeriod}
+            setChartView={setChartView}
+            setShowMovingAverage={setShowMovingAverage}
+            setShowStatistics={setShowStatistics}
+            prevMetric={prevMetric}
+            nextMetric={nextMetric}
+          />
 
-          {/* Chart Container */}
-          <div className="px-4 sm:px-6 pb-4">
-            <div 
-              className={cn(
-                "w-full rounded-2xl p-3 sm:p-4 transition-all duration-300",
-                theme === 'dark' 
-                  ? "bg-club-black/20 border border-club-gold/10" 
-                  : "bg-gray-50/30 border border-club-gold/20"
-              )}
-              style={{ height: isMobile ? '220px' : '300px' }}
-            >
-              <ChartRenderer
-                chartView={chartView}
-                matchData={matchData}
-                selectedKPI={selectedKPI}
-                selectedKPILabel={selectedKPILabel}
-                showMovingAverage={showMovingAverage}
-                getChartConfig={getChartConfig}
-              />
-            </div>
-          </div>
+          <PerformanceTrendsChart
+            chartView={chartView}
+            matchData={matchData}
+            selectedKPI={selectedKPI}
+            selectedKPILabel={selectedKPILabel}
+            showMovingAverage={showMovingAverage}
+            getChartConfig={getChartConfig}
+          />
         </CardContent>
       </Card>
     </ErrorBoundary>
