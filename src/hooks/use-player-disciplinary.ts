@@ -39,7 +39,8 @@ export const usePlayerDisciplinary = (playerId: number | null) => {
       let riskLevel: 'SAFE' | 'AT RISK' | 'CRITICAL' = 'SAFE';
       let riskColor = 'text-green-500';
       
-      if (totalCards >= 5) {
+      // Red cards should immediately make the player critical
+      if (redCards > 0 || totalCards >= 5) {
         riskLevel = 'CRITICAL';
         riskColor = 'text-red-500';
       } else if (totalCards === 4) {
