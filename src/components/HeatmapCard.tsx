@@ -1,4 +1,3 @@
-
 import { useState, useRef, useEffect, useCallback } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -161,33 +160,6 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               </div>
             </div>
           </div>
-
-          {/* Period Selector Row */}
-          <div className="flex flex-col sm:flex-row gap-3 items-start w-full">
-            <div className="w-full sm:w-64">
-              <Select value={selectedPeriod} onValueChange={(value) => setSelectedPeriod(value as TimePeriod)}>
-                <SelectTrigger className={cn(
-                  "border-2 focus:ring-2 focus:ring-club-gold shadow-lg backdrop-blur-sm font-medium",
-                  theme === 'dark' 
-                    ? "bg-club-black/50 text-club-light-gray border-club-gold/30 hover:border-club-gold/50" 
-                    : "bg-white/95 text-gray-900 border-club-gold/40 hover:border-club-gold/60"
-                )}>
-                  <SelectValue placeholder="Select Period" />
-                </SelectTrigger>
-                <SelectContent className={cn(
-                  "border-2 shadow-2xl backdrop-blur-xl z-50",
-                  theme === 'dark' 
-                    ? "bg-club-black/95 text-club-light-gray border-club-gold/30" 
-                    : "bg-white/98 text-gray-900 border-club-gold/40"
-                )}>
-                  <SelectItem value="full_match">Full Match</SelectItem>
-                  <SelectItem value="first_half">First Half</SelectItem>
-                  <SelectItem value="second_half">Second Half</SelectItem>
-                  <SelectItem value="last_15min">Last 15 min</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
         </div>
       </CardHeader>
 
@@ -256,10 +228,36 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
           </div>
         </div>
 
-        {/* Heatmap with Adjacent Controls Section */}
+        {/* Heatmap with Controls Section */}
         <div className="space-y-4 w-full">
-          {/* Zoom Controls - Below Key Metrics */}
-          <div className="flex items-center justify-end gap-2 w-full">
+          {/* Time Period Selector and Zoom Controls */}
+          <div className="flex items-center justify-between gap-3 w-full">
+            {/* Time Period Selector - Left Side */}
+            <div className="w-full sm:w-64">
+              <Select value={selectedPeriod} onValueChange={(value) => setSelectedPeriod(value as TimePeriod)}>
+                <SelectTrigger className={cn(
+                  "border-2 focus:ring-2 focus:ring-club-gold shadow-lg backdrop-blur-sm font-medium",
+                  theme === 'dark' 
+                    ? "bg-club-black/50 text-club-light-gray border-club-gold/30 hover:border-club-gold/50" 
+                    : "bg-white/95 text-gray-900 border-club-gold/40 hover:border-club-gold/60"
+                )}>
+                  <SelectValue placeholder="Select Period" />
+                </SelectTrigger>
+                <SelectContent className={cn(
+                  "border-2 shadow-2xl backdrop-blur-xl z-50",
+                  theme === 'dark' 
+                    ? "bg-club-black/95 text-club-light-gray border-club-gold/30" 
+                    : "bg-white/98 text-gray-900 border-club-gold/40"
+                )}>
+                  <SelectItem value="full_match">Full Match</SelectItem>
+                  <SelectItem value="first_half">First Half</SelectItem>
+                  <SelectItem value="second_half">Second Half</SelectItem>
+                  <SelectItem value="last_15min">Last 15 min</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Zoom Controls - Right Side */}
             <div className="flex items-center gap-2 flex-wrap">
               <Button
                 variant="outline"
@@ -395,48 +393,49 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
               </div>
             )}
             
-            {/* Activity Legend - Positioned to not block image */}
+            {/* Activity Intensity Scale - Updated to 0-10 numerical scale */}
             <div className={cn(
-              "absolute bottom-2 left-2 rounded-xl p-2 shadow-xl border backdrop-blur-md",
+              "absolute bottom-2 left-2 rounded-xl p-3 shadow-xl border backdrop-blur-md",
               theme === 'dark'
                 ? "bg-club-black/80 border-club-gold/30"
                 : "bg-white/80 border-club-gold/40"
             )}>
               <div className={cn(
-                "text-xs font-bold mb-1 flex items-center gap-1",
+                "text-xs font-bold mb-2 flex items-center gap-1",
                 theme === 'dark' ? "text-club-light-gray" : "text-slate-900"
               )}>
                 Activity Intensity
                 <div className="w-1 h-1 rounded-full bg-club-gold"></div>
               </div>
-              <div className="space-y-1">
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-2 bg-gradient-to-r from-blue-600 to-blue-500 rounded-sm shadow-sm border border-blue-300"></div>
-                  <span className={cn(
-                    "text-xs font-medium",
-                    theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
-                  )}>Low</span>
+              <div className="flex items-center gap-2">
+                {/* Vertical Scale Bar */}
+                <div className="flex flex-col items-center">
+                  <div className="h-16 w-4 rounded-lg border border-gray-300 relative overflow-hidden"
+                       style={{
+                         background: 'linear-gradient(to top, #22c55e 0%, #84cc16 20%, #eab308 40%, #f59e0b 60%, #ef4444 80%, #dc2626 100%)'
+                       }}>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-2 bg-gradient-to-r from-cyan-600 to-cyan-500 rounded-sm shadow-sm border border-cyan-300"></div>
+                {/* Scale Numbers */}
+                <div className="flex flex-col justify-between h-16 text-xs font-medium">
                   <span className={cn(
-                    "text-xs font-medium",
                     theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
-                  )}>Medium</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-2 bg-gradient-to-r from-yellow-600 to-yellow-500 rounded-sm shadow-sm border border-yellow-300"></div>
+                  )}>10</span>
                   <span className={cn(
-                    "text-xs font-medium",
                     theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
-                  )}>High</span>
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <div className="w-3 h-2 bg-gradient-to-r from-pink-600 to-pink-500 rounded-sm shadow-sm border border-pink-300"></div>
+                  )}>8</span>
                   <span className={cn(
-                    "text-xs font-medium",
                     theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
-                  )}>Peak</span>
+                  )}>6</span>
+                  <span className={cn(
+                    theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
+                  )}>4</span>
+                  <span className={cn(
+                    theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
+                  )}>2</span>
+                  <span className={cn(
+                    theme === 'dark' ? "text-club-light-gray/80" : "text-slate-700"
+                  )}>0</span>
                 </div>
               </div>
             </div>
