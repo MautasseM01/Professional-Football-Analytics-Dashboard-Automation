@@ -1,6 +1,7 @@
 
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
@@ -32,19 +33,24 @@ export const DesktopControls = ({
   setShowStatistics
 }: DesktopControlsProps) => {
   const { theme } = useTheme();
+  const isMobile = useIsMobile();
 
   return (
     <>
-      {/* Main Controls */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <div className="space-y-1">
+      {/* Main Controls - Responsive Grid */}
+      <div className={cn(
+        "grid gap-3 sm:gap-4",
+        isMobile ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
+      )}>
+        <div className="space-y-2">
           <Label className={cn(
-            "text-xs font-medium",
+            "text-sm font-medium",
             theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
           )}>Performance Metric</Label>
           <Select value={selectedKPI} onValueChange={setSelectedKPI}>
             <SelectTrigger className={cn(
-              "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl transition-all duration-200",
+              "w-full border-club-gold/30 focus:ring-club-gold/50 text-sm rounded-xl transition-all duration-200",
+              isMobile ? "h-11" : "h-10",
               theme === 'dark' 
                 ? "bg-club-black/50 text-club-light-gray" 
                 : "bg-white/70 text-gray-900"
@@ -61,7 +67,10 @@ export const DesktopControls = ({
                 <SelectItem 
                   key={option.value} 
                   value={option.value} 
-                  className="focus:bg-club-gold/20 text-sm rounded-lg transition-colors duration-150"
+                  className={cn(
+                    "focus:bg-club-gold/20 rounded-lg transition-colors duration-150",
+                    isMobile ? "text-base py-3" : "text-sm"
+                  )}
                 >
                   {option.label}
                 </SelectItem>
@@ -70,14 +79,15 @@ export const DesktopControls = ({
           </Select>
         </div>
         
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label className={cn(
-            "text-xs font-medium",
+            "text-sm font-medium",
             theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
           )}>Time Period</Label>
           <Select value={selectedTimePeriod} onValueChange={setSelectedTimePeriod}>
             <SelectTrigger className={cn(
-              "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl transition-all duration-200",
+              "w-full border-club-gold/30 focus:ring-club-gold/50 text-sm rounded-xl transition-all duration-200",
+              isMobile ? "h-11" : "h-10",
               theme === 'dark' 
                 ? "bg-club-black/50 text-club-light-gray" 
                 : "bg-white/70 text-gray-900"
@@ -94,7 +104,10 @@ export const DesktopControls = ({
                 <SelectItem 
                   key={option.value} 
                   value={option.value} 
-                  className="focus:bg-club-gold/20 text-sm rounded-lg transition-colors duration-150"
+                  className={cn(
+                    "focus:bg-club-gold/20 rounded-lg transition-colors duration-150",
+                    isMobile ? "text-base py-3" : "text-sm"
+                  )}
                 >
                   {option.label}
                 </SelectItem>
@@ -103,14 +116,15 @@ export const DesktopControls = ({
           </Select>
         </div>
 
-        <div className="space-y-1">
+        <div className="space-y-2">
           <Label className={cn(
-            "text-xs font-medium",
+            "text-sm font-medium",
             theme === 'dark' ? "text-club-light-gray/80" : "text-gray-600"
           )}>Chart View</Label>
           <Select value={chartView} onValueChange={setChartView}>
             <SelectTrigger className={cn(
-              "w-full border-club-gold/30 focus:ring-club-gold/50 h-9 text-sm rounded-xl transition-all duration-200",
+              "w-full border-club-gold/30 focus:ring-club-gold/50 text-sm rounded-xl transition-all duration-200",
+              isMobile ? "h-11" : "h-10",
               theme === 'dark' 
                 ? "bg-club-black/50 text-club-light-gray" 
                 : "bg-white/70 text-gray-900"
@@ -127,7 +141,10 @@ export const DesktopControls = ({
                 <SelectItem 
                   key={option.value} 
                   value={option.value} 
-                  className="focus:bg-club-gold/20 text-sm rounded-lg transition-colors duration-150"
+                  className={cn(
+                    "focus:bg-club-gold/20 rounded-lg transition-colors duration-150",
+                    isMobile ? "text-base py-3" : "text-sm"
+                  )}
                 >
                   {option.label}
                 </SelectItem>
@@ -137,14 +154,21 @@ export const DesktopControls = ({
         </div>
       </div>
 
-      {/* Secondary Controls */}
-      <div className="flex items-center justify-between pt-1">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2">
+      {/* Secondary Controls - Responsive Layout */}
+      <div className={cn(
+        "flex gap-4 pt-2",
+        isMobile ? "flex-col space-y-4" : "items-center justify-between"
+      )}>
+        <div className={cn(
+          "flex gap-6",
+          isMobile ? "flex-col space-y-4" : "items-center"
+        )}>
+          <div className="flex items-center gap-3">
             <Label 
               htmlFor="showStatistics"
               className={cn(
-                "text-xs cursor-pointer select-none font-medium transition-colors duration-200",
+                "cursor-pointer select-none font-medium transition-colors duration-200",
+                isMobile ? "text-base" : "text-sm",
                 theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
               )}
             >
@@ -154,15 +178,19 @@ export const DesktopControls = ({
               id="showStatistics" 
               checked={showStatistics}
               onCheckedChange={setShowStatistics}
-              className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30"
+              className={cn(
+                "data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30",
+                isMobile && "scale-110"
+              )}
             />
           </div>
           
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             <Label 
               htmlFor="movingAverage"
               className={cn(
-                "text-xs cursor-pointer select-none font-medium transition-colors duration-200",
+                "cursor-pointer select-none font-medium transition-colors duration-200",
+                isMobile ? "text-base" : "text-sm",
                 theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
               )}
             >
@@ -172,7 +200,10 @@ export const DesktopControls = ({
               id="movingAverage" 
               checked={showMovingAverage}
               onCheckedChange={setShowMovingAverage}
-              className="data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30"
+              className={cn(
+                "data-[state=checked]:bg-club-gold data-[state=unchecked]:bg-club-black/40 border-club-gold/30",
+                isMobile && "scale-110"
+              )}
             />
           </div>
         </div>

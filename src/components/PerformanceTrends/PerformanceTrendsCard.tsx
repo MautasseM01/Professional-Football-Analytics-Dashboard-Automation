@@ -119,11 +119,6 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
         <PerformanceTrendsHeader
           player={player}
           stats={stats}
-          currentMetricIndex={currentMetricIndex}
-          selectedTimePeriod={selectedTimePeriod}
-          currentMetric={currentMetric}
-          prevMetric={prevMetric}
-          nextMetric={nextMetric}
         />
         <CardContent className="p-6">
           <Alert className="border-yellow-500/20 bg-yellow-500/10">
@@ -151,11 +146,6 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
         <PerformanceTrendsHeader
           player={player}
           stats={stats}
-          currentMetricIndex={currentMetricIndex}
-          selectedTimePeriod={selectedTimePeriod}
-          currentMetric={currentMetric}
-          prevMetric={prevMetric}
-          nextMetric={nextMetric}
         />
 
         <CardContent className="p-0">

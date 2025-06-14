@@ -1,7 +1,4 @@
 
-import { useIsMobile } from "@/hooks/use-mobile";
-import { Player } from "@/types";
-import { MobileControls } from "./MobileControls";
 import { DesktopControls } from "./DesktopControls";
 import { PerformanceStats } from "./PerformanceStats";
 import { KPI_OPTIONS } from "./constants";
@@ -48,34 +45,22 @@ export const PerformanceTrendsControls = ({
   prevMetric,
   nextMetric
 }: PerformanceTrendsControlsProps) => {
-  const isMobile = useIsMobile();
-
   return (
     <div className="px-4 sm:px-6 pb-4">
       <div className="space-y-3 sm:space-y-4">
-        {/* Controls */}
-        {isMobile ? (
-          <MobileControls
-            currentMetricIndex={currentMetricIndex}
-            selectedTimePeriod={selectedTimePeriod}
-            currentMetric={currentMetric}
-            prevMetric={prevMetric}
-            nextMetric={nextMetric}
-          />
-        ) : (
-          <DesktopControls
-            selectedKPI={selectedKPI}
-            selectedTimePeriod={selectedTimePeriod}
-            chartView={chartView}
-            showMovingAverage={showMovingAverage}
-            showStatistics={showStatistics}
-            setSelectedKPI={setSelectedKPI}
-            setSelectedTimePeriod={setSelectedTimePeriod}
-            setChartView={setChartView}
-            setShowMovingAverage={setShowMovingAverage}
-            setShowStatistics={setShowStatistics}
-          />
-        )}
+        {/* Always use responsive desktop controls */}
+        <DesktopControls
+          selectedKPI={selectedKPI}
+          selectedTimePeriod={selectedTimePeriod}
+          chartView={chartView}
+          showMovingAverage={showMovingAverage}
+          showStatistics={showStatistics}
+          setSelectedKPI={setSelectedKPI}
+          setSelectedTimePeriod={setSelectedTimePeriod}
+          setChartView={setChartView}
+          setShowMovingAverage={setShowMovingAverage}
+          setShowStatistics={setShowStatistics}
+        />
         
         {/* Performance Statistics - conditionally rendered */}
         {showStatistics && (

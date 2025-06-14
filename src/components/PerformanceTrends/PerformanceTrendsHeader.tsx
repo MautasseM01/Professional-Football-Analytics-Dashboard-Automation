@@ -2,35 +2,21 @@
 import { TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
-import { useIsMobile } from "@/hooks/use-mobile";
 import { CardHeader, CardTitle } from "@/components/ui/card";
 import { Player } from "@/types";
-import { MobileControls } from "./MobileControls";
-import { KPI_OPTIONS } from "./constants";
 
 interface PerformanceTrendsHeaderProps {
   player: Player;
   stats: {
     trend: string;
   };
-  currentMetricIndex: number;
-  selectedTimePeriod: string;
-  currentMetric: typeof KPI_OPTIONS[0];
-  prevMetric: () => void;
-  nextMetric: () => void;
 }
 
 export const PerformanceTrendsHeader = ({
   player,
-  stats,
-  currentMetricIndex,
-  selectedTimePeriod,
-  currentMetric,
-  prevMetric,
-  nextMetric
+  stats
 }: PerformanceTrendsHeaderProps) => {
   const { theme } = useTheme();
-  const isMobile = useIsMobile();
 
   return (
     <CardHeader className="pb-3 px-4 sm:px-6">
@@ -64,17 +50,6 @@ export const PerformanceTrendsHeader = ({
             )}
           </div>
         </div>
-        
-        {/* Mobile navigation controls */}
-        {isMobile && (
-          <MobileControls
-            currentMetricIndex={currentMetricIndex}
-            selectedTimePeriod={selectedTimePeriod}
-            currentMetric={currentMetric}
-            prevMetric={prevMetric}
-            nextMetric={nextMetric}
-          />
-        )}
       </div>
     </CardHeader>
   );
