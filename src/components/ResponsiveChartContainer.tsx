@@ -24,7 +24,7 @@ export const ResponsiveChartContainer = ({
   const breakpoint = useResponsiveBreakpoint();
 
   const responsiveConfig = useMemo(() => {
-    const baseHeight = isMobile ? 280 : 320;
+    const baseHeight = isMobile ? 260 : 350;
     const calculatedMinHeight = minHeight || baseHeight;
     
     const ratio = aspectRatio || (isMobile ? 1.2 : 2.0);
@@ -33,8 +33,8 @@ export const ResponsiveChartContainer = ({
       aspectRatio: ratio,
       minHeight: calculatedMinHeight,
       margin: isMobile 
-        ? { top: 10, right: 10, bottom: 20, left: 10 }
-        : { top: 20, right: 20, bottom: 30, left: 20 }
+        ? { top: 10, right: 10, bottom: 40, left: 10 }
+        : { top: 20, right: 20, bottom: 50, left: 20 }
     };
   }, [isMobile, aspectRatio, minHeight]);
 

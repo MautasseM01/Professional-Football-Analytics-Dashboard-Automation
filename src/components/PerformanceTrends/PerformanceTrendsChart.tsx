@@ -25,7 +25,7 @@ export const PerformanceTrendsChart = ({
   const isMobile = useIsMobile();
 
   return (
-    <div className="px-4 sm:px-6 pb-4">
+    <div className="px-4 sm:px-6 pb-6">
       <div 
         className={cn(
           "w-full rounded-2xl p-3 sm:p-4 transition-all duration-300",
@@ -33,7 +33,7 @@ export const PerformanceTrendsChart = ({
             ? "bg-club-black/20 border border-club-gold/10" 
             : "bg-gray-50/30 border border-club-gold/20"
         )}
-        style={{ height: isMobile ? '220px' : '300px' }}
+        style={{ height: isMobile ? '260px' : '350px' }}
       >
         <ChartRenderer
           chartView={chartView}

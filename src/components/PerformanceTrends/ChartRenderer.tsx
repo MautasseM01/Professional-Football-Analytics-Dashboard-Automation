@@ -30,11 +30,11 @@ export const ChartRenderer = ({
     <ResponsiveChartContainer
       config={getChartConfig()}
       aspectRatio={isMobile ? (4/3) : (16/10)}
-      minHeight={isMobile ? 200 : 280}
+      minHeight={isMobile ? 260 : 350}
     >
       <ResponsiveContainer width="100%" height="100%">
         {chartView === 'line' ? (
-          <RechartsLineChart data={matchData} margin={{ top: 10, right: 15, left: 10, bottom: 20 }}>
+          <RechartsLineChart data={matchData} margin={{ top: 10, right: 15, left: 10, bottom: isMobile ? 40 : 50 }}>
             <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "#333" : "#e5e7eb"} opacity={0.3} />
             <XAxis 
               dataKey="match" 
@@ -45,6 +45,7 @@ export const ChartRenderer = ({
               angle={-45}
               textAnchor="end"
               interval={isMobile ? 1 : 0}
+              height={isMobile ? 35 : 45}
             />
             <YAxis 
               stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
@@ -87,7 +88,7 @@ export const ChartRenderer = ({
             )}
           </RechartsLineChart>
         ) : (
-          <AreaChart data={matchData} margin={{ top: 10, right: 15, left: 10, bottom: 20 }}>
+          <AreaChart data={matchData} margin={{ top: 10, right: 15, left: 10, bottom: isMobile ? 40 : 50 }}>
             <defs>
               <linearGradient id="metricGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.4}/>
@@ -105,6 +106,7 @@ export const ChartRenderer = ({
               angle={-45}
               textAnchor="end"
               interval={isMobile ? 1 : 0}
+              height={isMobile ? 35 : 45}
             />
             <YAxis 
               stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
