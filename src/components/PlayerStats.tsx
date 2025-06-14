@@ -3,7 +3,8 @@ import { Player } from "@/types";
 import { PlayerProfileCard } from "./PlayerProfileCard";
 import { PlayerStatCards } from "./PlayerStatCards";
 import { PlayerPerformanceSection } from "./PlayerPerformanceSection";
-import { PlayerHeatmapTackleSection } from "./PlayerHeatmapTackleSection";
+import { PlayerHeatmapSection } from "./PlayerHeatmapSection";
+import { PlayerTackleSuccessSection } from "./PlayerTackleSuccessSection";
 import { ResponsiveLayout } from "./ResponsiveLayout";
 
 interface PlayerStatsProps {
@@ -22,8 +23,11 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
       {/* Performance Trends */}
       <PlayerPerformanceSection player={player} />
       
-      {/* Heatmap and Tackle Success */}
-      <PlayerHeatmapTackleSection player={player} />
+      {/* Player Heatmap Analysis */}
+      <PlayerHeatmapSection player={player} />
+      
+      {/* Tackle Success */}
+      <PlayerTackleSuccessSection player={player} />
     </ResponsiveLayout>
   );
 };
