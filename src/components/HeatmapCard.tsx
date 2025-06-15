@@ -373,19 +373,19 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
             "space-y-4 w-full transition-all duration-300",
             viewMode === 'focus' ? "space-y-2" : ""
           )}>
-            {/* Controls - Always show time period selector, simplified in focus mode */}
+            {/* Controls - Two rows on small/medium screens, side by side on large screens */}
             <div className={cn(
-              "flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 w-full transition-all duration-300",
-              viewMode === 'focus' ? "gap-2" : ""
+              "space-y-3 xl:space-y-0 xl:flex xl:items-center xl:justify-between xl:gap-4 w-full transition-all duration-300",
+              viewMode === 'focus' ? "space-y-2" : ""
             )}>
-              {/* Time Period Selector - Always visible but compact in focus mode */}
+              {/* Time Period Selector - First row on small/medium, left side on large */}
               <div className={cn(
-                "w-full transition-all duration-300",
-                viewMode === 'focus' ? "lg:w-48" : "lg:w-64"
+                "w-full px-4 sm:px-6 md:px-8 xl:px-0 xl:w-auto transition-all duration-300",
+                viewMode === 'focus' ? "xl:w-48" : "xl:w-64"
               )}>
                 <Select value={selectedPeriod} onValueChange={(value) => setSelectedPeriod(value as TimePeriod)}>
                   <SelectTrigger className={cn(
-                    "border-2 focus:ring-2 focus:ring-club-gold shadow-lg backdrop-blur-sm font-medium transition-all duration-300",
+                    "w-full border-2 focus:ring-2 focus:ring-club-gold shadow-lg backdrop-blur-sm font-medium transition-all duration-300",
                     viewMode === 'focus' ? "h-8 text-xs" : "",
                     theme === 'dark' 
                       ? "bg-club-black/50 text-club-light-gray border-club-gold/30 hover:border-club-gold/50" 
@@ -407,10 +407,10 @@ export const HeatmapCard = ({ player }: HeatmapCardProps) => {
                 </Select>
               </div>
 
-              {/* Zoom Controls */}
+              {/* Zoom Controls - Second row centered on small/medium, right side on large */}
               <div className={cn(
-                "flex items-center gap-2 w-full lg:w-auto transition-all duration-300",
-                viewMode === 'focus' ? "justify-center" : ""
+                "flex items-center justify-center gap-2 px-4 sm:px-6 md:px-8 xl:px-0 xl:justify-end transition-all duration-300",
+                viewMode === 'focus' ? "" : ""
               )}>
                 <Button
                   variant="outline"
