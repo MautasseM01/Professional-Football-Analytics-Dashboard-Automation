@@ -14,24 +14,24 @@ interface TrainingPlanTabProps {
 
 export const TrainingPlanTab = ({ recommendations }: TrainingPlanTabProps) => {
   return (
-    <div className="grid gap-6">
+    <div className="grid gap-4 sm:gap-6">
       {recommendations.map((rec, index) => (
         <Card key={index} className="bg-club-dark-gray border-club-gold/20">
-          <CardHeader>
-            <CardTitle className="text-club-gold flex items-center gap-2">
-              <TrendingUp className="h-5 w-5" />
-              {rec.type} Training
+          <CardHeader className="pb-3">
+            <CardTitle className="text-club-gold flex items-center gap-2 text-sm sm:text-base">
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 flex-shrink-0" />
+              <span className="truncate">{rec.type} Training</span>
             </CardTitle>
-            <CardDescription className="text-club-light-gray/70">
+            <CardDescription className="text-club-light-gray/70 text-xs sm:text-sm">
               Frequency: {rec.frequency}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             <ul className="space-y-2">
               {rec.exercises.map((exercise, idx) => (
-                <li key={idx} className="flex items-center gap-2 text-club-light-gray">
-                  <div className="w-2 h-2 bg-club-gold rounded-full"></div>
-                  {exercise}
+                <li key={idx} className="flex items-start gap-2 text-club-light-gray text-sm sm:text-base">
+                  <div className="w-1.5 h-1.5 sm:w-2 sm:h-2 bg-club-gold rounded-full mt-2 flex-shrink-0"></div>
+                  <span className="leading-relaxed">{exercise}</span>
                 </li>
               ))}
             </ul>

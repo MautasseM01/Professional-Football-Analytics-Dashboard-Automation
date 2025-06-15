@@ -22,18 +22,23 @@ export const PlayerDevelopmentHeader = ({ onRefresh, onToggleSidebar }: PlayerDe
             <h1 className="text-ios-headline font-bold text-club-gold dark:text-club-gold truncate">
               Player Development
             </h1>
-            <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
+            <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate hidden sm:block">
               {profile?.role === 'player' 
                 ? "Track your development goals and progress"
                 : "Monitor player development and provide guidance"
               }
             </p>
+            <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate sm:hidden">
+              {profile?.role === 'player' ? "Your goals & progress" : "Player development"}
+            </p>
           </div>
           
           {/* Right section - Controls */}
           <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-shrink-0">
-            {/* Language Selector */}
-            <LanguageSelector />
+            {/* Language Selector - Hidden on very small screens */}
+            <div className="hidden xs:block">
+              <LanguageSelector />
+            </div>
             
             {/* Theme Toggle */}
             <ThemeToggle />
