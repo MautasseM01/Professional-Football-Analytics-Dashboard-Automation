@@ -1,0 +1,71 @@
+
+import { Player } from "@/types";
+
+export const formatPercentage = (value: number): string => {
+  return `${value.toFixed(1)}%`;
+};
+
+export const getPassCompletionPercentage = (player: Player): number => {
+  if (!player.passes_attempted || player.passes_attempted === 0) return 0;
+  return (player.passes_completed / player.passes_attempted) * 100;
+};
+
+export const getHighestValuesInRow = (
+  selectedPlayers: Player[], 
+  statFunction: (player: Player) => number | null | undefined
+) => {
+  if (!selectedPlayers.length) return {};
+  
+  const validValues = selectedPlayers
+    .map(player => ({ id: player.id, value: statFunction(player) }))
+    .filter(item => item.value !== null && item.value !== undefined);
+    
+  if (!validValues.length) return {};
+  
+  const maxValue = Math.max(...validValues.map(item => Number(item.value)));
+  
+  return validValues.reduce((acc, item) => {
+    if (Number(item.value) === maxValue) {
+      acc[item.id] = true;
+    }
+    return acc;
+  }, {} as Record<number, boolean>);
+};
+
+export const prepareRadarData = (selectedPlayers: Player[]) => {
+  const radarData = [
+    { category: "Distance", fullMark: 100 },
+    { category: "Shots on Target", fullMark: 100 },
+    { category: "Passes Completed", fullMark: 100 },
+    { category: "Tackles Won", fullMark: 100 }
+  ];
+
+  // Find max values to normalize data
+  const maxValues = {
+    distance: Math.max(...selectedPlayers.map(p => p.distance || 0), 1),
+    shots_on_target: Math.max(...selectedPlayers.map(p => p.shots_on_target || 0), 1),
+    passes_completed: Math.max(...selectedPlayers.map(p => p.passes_completed || 0), 1),
+    tackles_won: Math.max(...selectedPlayers.map(p => p.tackles_won || 0), 1)
+  };
+
+  // Add player data to radar chart
+  selectedPlayers.forEach(player => {
+    radarData[0][player.name] = player.distance 
+      ? (player.distance / maxValues.distance) * 100 
+      : 0;
+      
+    radarData[1][player.name] = player.shots_on_target 
+      ? (player.shots_on_target / maxValues.shots_on_target) * 100 
+      : 0;
+      
+    radarData[2][player.name] = player.passes_completed 
+      ? (player.passes_completed / maxValues.passes_completed) * 100 
+      : 0;
+      
+    radarData[3][player.name] = player.tackles_won 
+      ? (player.tackles_won / maxValues.tackles_won) * 100 
+      : 0;
+  });
+
+  return radarData;
+};
