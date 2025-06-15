@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
@@ -52,10 +51,10 @@ export default function PlayerComparison() {
             <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
               {/* Left section - Title and page info */}
               <div className="flex-1 min-w-0">
-                <h1 className="text-ios-headline font-bold text-club-gold dark:text-club-gold truncate">
+                <h1 className="text-lg sm:text-xl md:text-lg lg:text-2xl font-bold text-club-gold dark:text-club-gold truncate sm:line-clamp-none md:line-clamp-2 lg:line-clamp-none">
                   Player Comparison
                 </h1>
-                <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
+                <p className="text-xs sm:text-sm md:text-xs lg:text-base text-gray-400 dark:text-gray-400 truncate sm:line-clamp-none md:line-clamp-3 lg:line-clamp-none">
                   Compare performance metrics between multiple players
                 </p>
               </div>

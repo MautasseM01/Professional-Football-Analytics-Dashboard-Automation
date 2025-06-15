@@ -36,6 +36,7 @@ const PlayerStatsPage = () => {
     console.log("Manual refresh triggered");
     refreshData();
   };
+  
   return <div className="flex h-screen bg-gradient-to-br from-slate-900 via-club-black to-slate-900 dark:from-slate-900 dark:via-club-black dark:to-slate-900 text-gray-100 dark:text-gray-100 transition-colors duration-300">
       {showSidebar && <DashboardSidebar />}
       
@@ -47,10 +48,10 @@ const PlayerStatsPage = () => {
           <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
             {/* Left section - Title and page info */}
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-club-gold dark:text-club-gold truncate">
+              <h2 className="text-lg sm:text-xl md:text-lg lg:text-2xl font-bold text-club-gold dark:text-club-gold truncate sm:line-clamp-none md:line-clamp-2 lg:line-clamp-none">
                 {t('nav.individualStats')}
               </h2>
-              <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
+              <p className="text-xs sm:text-sm md:text-xs lg:text-base text-gray-400 dark:text-gray-400 truncate sm:line-clamp-none md:line-clamp-3 lg:line-clamp-none">
                 {profile?.role === 'player' ? "View your individual performance statistics and development progress" : "Analyze individual player performance and statistics"}
               </p>
             </div>
