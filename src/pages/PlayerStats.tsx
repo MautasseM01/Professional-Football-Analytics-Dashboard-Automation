@@ -46,11 +46,11 @@ const PlayerStatsPage = () => {
         <header className="border-b border-club-gold/20 dark:border-club-gold/20 bg-club-black/80 dark:bg-club-black/80 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
           <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
             {/* Left section - Title and page info */}
-            <div className="flex-1 min-w-0 pr-2">
-              <h2 className="text-lg md:text-base lg:text-2xl font-bold text-club-gold dark:text-club-gold truncate md:whitespace-normal md:line-clamp-2">
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-club-gold dark:text-club-gold truncate">
                 {t('nav.individualStats')}
               </h2>
-              <p className="text-ios-caption md:text-xs lg:text-sm text-gray-400 dark:text-gray-400 truncate md:whitespace-normal md:line-clamp-3 md:leading-tight">
+              <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
                 {profile?.role === 'player' ? "View your individual performance statistics and development progress" : "Analyze individual player performance and statistics"}
               </p>
             </div>
@@ -79,7 +79,6 @@ const PlayerStatsPage = () => {
             </div>
           </div>
         </header>
-        
         
         <main className="bg-transparent transition-colors duration-300 w-full">
           <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
