@@ -26,6 +26,13 @@ export const LanguageSelector = () => {
     setShowBubble(true);
   };
 
+  // Show initial French bubble when component mounts
+  useEffect(() => {
+    if (language === 'fr') {
+      setShowBubble(true);
+    }
+  }, []);
+
   useEffect(() => {
     if (showBubble) {
       const timer = setTimeout(() => {
@@ -58,7 +65,7 @@ export const LanguageSelector = () => {
       )}
 
       <Select value={language} onValueChange={handleLanguageChange}>
-        <SelectTrigger className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors bg-transparent">
+        <SelectTrigger className="w-9 h-9 sm:w-10 sm:h-10 text-club-gold border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors bg-club-black/50 hover:border-club-gold/30 [&>svg]:hidden">
           <SelectValue>
             <div className="flex items-center justify-center">
               <span className="text-sm">🌐</span>
