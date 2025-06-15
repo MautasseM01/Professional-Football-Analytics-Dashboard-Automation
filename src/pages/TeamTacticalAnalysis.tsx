@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -138,197 +137,181 @@ const TeamTacticalAnalysis = () => {
         
         <main className="bg-transparent transition-colors duration-300 w-full">
           <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-            <div className={cn(
-              "grid gap-4 sm:gap-6",
-              isMobile ? "grid-cols-1" : "grid-cols-1 lg:grid-cols-4"
-            )}>
-              {/* Mobile-optimized Filters */}
-              <Card className={cn(isMobile ? "order-2" : "lg:col-span-1", "bg-club-dark-gray border-club-gold/20")}>
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg text-club-gold">Filters</CardTitle>
-                  <CardDescription className="text-sm text-club-light-gray/70">Select match and filter options</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4 sm:space-y-6">
-                  {/* Match Selection */}
-                  <div className="space-y-2">
-                    <Label htmlFor="match-select" className="text-sm font-medium text-club-light-gray">Select Match</Label>
-                    <Select 
-                      value={selectedMatch?.toString() || ''} 
-                      onValueChange={(value) => setSelectedMatch(parseInt(value))}
-                      disabled={isLoadingMatches}
-                    >
-                      <SelectTrigger 
-                        id="match-select" 
-                        className={cn(
-                          "w-full bg-club-black border-club-gold/30 text-club-light-gray",
-                          isMobile && "min-h-[44px]"
-                        )}
-                      >
-                        <SelectValue placeholder="Select a match" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-                        {matches?.map(match => (
-                          <SelectItem key={match.id} value={match.id.toString()}>
-                            {match.date.substring(0, 10)} - {match.opponent} ({match.result})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  {/* Pass Direction Filter */}
-                  <div className="space-y-3">
-                    <Label className="flex items-center gap-2 text-sm font-medium text-club-light-gray">
-                      <Filter size={16} />
-                      Pass Direction
-                    </Label>
-                    <ToggleGroup 
-                      type="single" 
-                      value={passDirectionFilter}
-                      onValueChange={(value) => value && setPassDirectionFilter(value)}
+            {/* Full-width Filters Section */}
+            <div className="bg-club-dark-gray/50 rounded-lg p-3 sm:p-4 border border-club-gold/20">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                <h2 className="text-lg sm:text-xl font-semibold text-club-gold flex items-center gap-2">
+                  <Filter size={18} className="sm:size-5" />
+                  Filters
+                </h2>
+              </div>
+              
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                {/* Match Selection */}
+                <div className="space-y-2">
+                  <Label htmlFor="match-select" className="text-sm font-medium text-club-light-gray">Select Match</Label>
+                  <Select 
+                    value={selectedMatch?.toString() || ''} 
+                    onValueChange={(value) => setSelectedMatch(parseInt(value))}
+                    disabled={isLoadingMatches}
+                  >
+                    <SelectTrigger 
+                      id="match-select" 
                       className={cn(
-                        "justify-start",
-                        isMobile && "grid grid-cols-2 gap-2 w-full"
+                        "w-full bg-club-black border-club-gold/30 text-club-light-gray",
+                        isMobile && "min-h-[44px]"
                       )}
                     >
-                      <ToggleGroupItem 
-                        value="all" 
-                        aria-label="All directions"
-                        className={cn(isMobile && "min-h-[44px] flex-1", "data-[state=on]:bg-club-gold/20")}
-                      >
-                        All
-                      </ToggleGroupItem>
-                      <ToggleGroupItem 
-                        value="forward" 
-                        aria-label="Forward passes"
-                        className={cn(isMobile && "min-h-[44px] flex-1", "data-[state=on]:bg-club-gold/20")}
-                      >
-                        Forward
-                      </ToggleGroupItem>
-                      <ToggleGroupItem 
-                        value="backward" 
-                        aria-label="Backward passes"
-                        className={cn(isMobile && "min-h-[44px] flex-1", "data-[state=on]:bg-club-gold/20")}
-                      >
-                        Backward
-                      </ToggleGroupItem>
-                      <ToggleGroupItem 
-                        value="sideways" 
-                        aria-label="Sideways passes"
-                        className={cn(isMobile && "min-h-[44px] flex-1", "data-[state=on]:bg-club-gold/20")}
-                      >
-                        Sideways
-                      </ToggleGroupItem>
-                    </ToggleGroup>
-                  </div>
+                      <SelectValue placeholder="Select a match" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
+                      {matches?.map(match => (
+                        <SelectItem key={match.id} value={match.id.toString()}>
+                          {match.date.substring(0, 10)} - {match.opponent} ({match.result})
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-                  {/* Pass Outcome Filter */}
-                  <div className="space-y-3">
-                    <Label className="flex items-center gap-2 text-sm font-medium text-club-light-gray">
-                      <Filter size={16} />
-                      Pass Outcome
-                    </Label>
-                    <ToggleGroup 
-                      type="single" 
-                      value={passOutcomeFilter}
-                      onValueChange={(value) => value && setPassOutcomeFilter(value)}
-                      className={cn(
-                        "justify-start",
-                        isMobile && "grid grid-cols-2 gap-2 w-full"
-                      )}
+                {/* Pass Direction Filter */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-sm font-medium text-club-light-gray">
+                    <Filter size={16} />
+                    Pass Direction
+                  </Label>
+                  <ToggleGroup 
+                    type="single" 
+                    value={passDirectionFilter}
+                    onValueChange={(value) => value && setPassDirectionFilter(value)}
+                    className="grid grid-cols-2 gap-2 w-full"
+                  >
+                    <ToggleGroupItem 
+                      value="all" 
+                      aria-label="All directions"
+                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
                     >
-                      <ToggleGroupItem 
-                        value="all" 
-                        aria-label="All passes"
-                        className={cn(isMobile && "min-h-[44px] flex-1", "data-[state=on]:bg-club-gold/20")}
-                      >
-                        All
-                      </ToggleGroupItem>
-                      <ToggleGroupItem 
-                        value="successful" 
-                        aria-label="Successful passes"
-                        className={cn(isMobile && "min-h-[44px] flex-1", "data-[state=on]:bg-club-gold/20")}
-                      >
-                        Successful
-                      </ToggleGroupItem>
-                      <ToggleGroupItem 
-                        value="unsuccessful" 
-                        aria-label="Unsuccessful passes"
-                        className={cn(isMobile && "min-h-[44px] flex-1", "data-[state=on]:bg-club-gold/20")}
-                      >
-                        Unsuccessful
-                      </ToggleGroupItem>
-                    </ToggleGroup>
-                  </div>
+                      All
+                    </ToggleGroupItem>
+                    <ToggleGroupItem 
+                      value="forward" 
+                      aria-label="Forward passes"
+                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                    >
+                      Forward
+                    </ToggleGroupItem>
+                    <ToggleGroupItem 
+                      value="backward" 
+                      aria-label="Backward passes"
+                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                    >
+                      Backward
+                    </ToggleGroupItem>
+                    <ToggleGroupItem 
+                      value="sideways" 
+                      aria-label="Sideways passes"
+                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                    >
+                      Sideways
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                </div>
 
-                  {/* Mobile-optimized Error Display */}
-                  {imageLoadingError && (
-                    <div className="space-y-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                      <div className="flex items-center gap-2 text-amber-600">
-                        <AlertCircle size={16} />
-                        <span className="text-sm font-medium">Image Loading Issues</span>
-                      </div>
-                      <TouchFeedbackButton
-                        onClick={handleImageRetry}
-                        variant="outline"
-                        size="sm"
-                        className="w-full min-h-[44px] text-sm"
-                        hapticType="medium"
-                      >
-                        <RefreshCw size={14} className="mr-2" />
-                        Retry Loading Images
-                      </TouchFeedbackButton>
+                {/* Pass Outcome Filter */}
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-sm font-medium text-club-light-gray">
+                    <Filter size={16} />
+                    Pass Outcome
+                  </Label>
+                  <ToggleGroup 
+                    type="single" 
+                    value={passOutcomeFilter}
+                    onValueChange={(value) => value && setPassOutcomeFilter(value)}
+                    className="grid grid-cols-2 gap-2 w-full"
+                  >
+                    <ToggleGroupItem 
+                      value="all" 
+                      aria-label="All passes"
+                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                    >
+                      All
+                    </ToggleGroupItem>
+                    <ToggleGroupItem 
+                      value="successful" 
+                      aria-label="Successful passes"
+                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                    >
+                      Successful
+                    </ToggleGroupItem>
+                    <ToggleGroupItem 
+                      value="unsuccessful" 
+                      aria-label="Unsuccessful passes"
+                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                    >
+                      Unsuccessful
+                    </ToggleGroupItem>
+                  </ToggleGroup>
+                </div>
+
+                {/* Error Display */}
+                {imageLoadingError && (
+                  <div className="space-y-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                    <div className="flex items-center gap-2 text-amber-600">
+                      <AlertCircle size={16} />
+                      <span className="text-sm font-medium">Image Loading Issues</span>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
-
-              {/* Mobile-optimized Passing Network */}
-              <Card className={cn(
-                "relative bg-club-dark-gray border-club-gold/20",
-                isMobile ? "order-1 min-h-[500px]" : "lg:col-span-3 h-[700px]"
-              )}>
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg sm:text-xl text-club-gold">Passing Network</CardTitle>
-                  <CardDescription className="text-sm text-club-light-gray/70">
-                    Player positioning and passing connections
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className={cn(
-                  isMobile ? "h-[450px] p-2" : "h-[600px] p-6"
-                )}>
-                  {isLoadingMatches ? (
-                    <LoadingOverlay isLoading={true} />
-                  ) : (
-                    selectedMatch ? (
-                      <PassingNetwork 
-                        matchId={selectedMatch} 
-                        passDirectionFilter={passDirectionFilter}
-                        passOutcomeFilter={passOutcomeFilter}
-                      />
-                    ) : (
-                      <div className="flex items-center justify-center h-full text-club-light-gray">
-                        <div className="text-center space-y-2">
-                          <p className={cn(
-                            "font-medium",
-                            isMobile ? "text-base" : "text-lg"
-                          )}>
-                            Select a match to view the passing network
-                          </p>
-                          <p className="text-sm opacity-75">
-                            Choose from the filters above
-                          </p>
-                        </div>
-                      </div>
-                    )
-                  )}
-                </CardContent>
-              </Card>
+                    <TouchFeedbackButton
+                      onClick={handleImageRetry}
+                      variant="outline"
+                      size="sm"
+                      className="w-full min-h-[44px] text-sm"
+                      hapticType="medium"
+                    >
+                      <RefreshCw size={14} className="mr-2" />
+                      Retry Loading Images
+                    </TouchFeedbackButton>
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Mobile-optimized Tactical Formation Images Section */}
+            {/* Full-width Passing Network */}
+            <Card className="bg-club-dark-gray border-club-gold/20 min-h-[500px]">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg sm:text-xl text-club-gold">Passing Network</CardTitle>
+                <CardDescription className="text-sm text-club-light-gray/70">
+                  Player positioning and passing connections
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-[600px] p-6">
+                {isLoadingMatches ? (
+                  <LoadingOverlay isLoading={true} />
+                ) : (
+                  selectedMatch ? (
+                    <PassingNetwork 
+                      matchId={selectedMatch} 
+                      passDirectionFilter={passDirectionFilter}
+                      passOutcomeFilter={passOutcomeFilter}
+                    />
+                  ) : (
+                    <div className="flex items-center justify-center h-full text-club-light-gray">
+                      <div className="text-center space-y-2">
+                        <p className="text-lg font-medium">
+                          Select a match to view the passing network
+                        </p>
+                        <p className="text-sm opacity-75">
+                          Choose from the filters above
+                        </p>
+                      </div>
+                    </div>
+                  )
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Full-width Tactical Formation Images Section */}
             {selectedMatch && (
-              <Card className="mt-4 sm:mt-6 bg-club-dark-gray border-club-gold/20">
+              <Card className="bg-club-dark-gray border-club-gold/20">
                 <CardHeader className="pb-4">
                   <CardTitle className="text-lg sm:text-xl text-club-gold">Tactical Formation Analysis</CardTitle>
                   <CardDescription className="text-sm text-club-light-gray/70">
