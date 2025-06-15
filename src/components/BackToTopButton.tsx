@@ -2,9 +2,11 @@
 import { useState, useEffect } from "react";
 import { ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useLocation } from "react-router-dom";
 
 export const BackToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const location = useLocation();
 
   useEffect(() => {
     const toggleVisibility = () => {
@@ -38,6 +40,11 @@ export const BackToTopButton = () => {
       scrollToTop();
     }
   };
+
+  // Hide button on login page
+  if (location.pathname === '/login') {
+    return null;
+  }
 
   return (
     <div

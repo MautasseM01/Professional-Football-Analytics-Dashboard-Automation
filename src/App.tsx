@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./contexts/AuthContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
+import { BackToTopButton } from "./components/BackToTopButton";
 import Dashboard from "./pages/Dashboard";
 import PlayerComparison from "./pages/PlayerComparison";
 import PlayerStats from "./pages/PlayerStats";
@@ -49,6 +50,9 @@ const App = () => (
                 {/* 404 Not Found */}
                 <Route path="*" element={<NotFound />} />
               </Routes>
+              
+              {/* BackToTopButton appears on all pages */}
+              <BackToTopButton />
             </TooltipProvider>
           </ThemeProvider>
         </AuthProvider>
