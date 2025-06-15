@@ -71,7 +71,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                   title={
                     <div className="flex items-center gap-1.5">
                       <span>Matches Played</span>
-                      <Info className="w-3 h-3 text-club-light-gray/60 flex-shrink-0" />
+                      <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
                   } 
                   value={player.matches} 
@@ -79,7 +79,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray max-w-xs text-xs sm:text-sm">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Total number of matches the player has participated in during the current season.</p>
             </TooltipContent>
           </Tooltip>
@@ -91,7 +91,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                   title={
                     <div className="flex items-center gap-1.5">
                       <span>Distance Covered</span>
-                      <Info className="w-3 h-3 text-club-light-gray/60 flex-shrink-0" />
+                      <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
                   } 
                   value={player.distance} 
@@ -100,7 +100,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray max-w-xs text-xs sm:text-sm">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Total distance covered by the player during matches, measured in kilometers. Indicates player's mobility and endurance.</p>
             </TooltipContent>
           </Tooltip>
@@ -112,7 +112,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                   title={
                     <div className="flex items-center gap-1.5">
                       <span>Pass Completion</span>
-                      <Info className="w-3 h-3 text-club-light-gray/60 flex-shrink-0" />
+                      <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
                   } 
                   value={`${passCompletionRate}%`} 
@@ -121,7 +121,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray max-w-xs text-xs sm:text-sm">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Percentage of successful passes relative to total pass attempts. Higher percentage indicates better passing accuracy and decision-making.</p>
             </TooltipContent>
           </Tooltip>
@@ -133,7 +133,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                   title={
                     <div className="flex items-center gap-1.5">
                       <span>Shot Accuracy</span>
-                      <Info className="w-3 h-3 text-club-light-gray/60 flex-shrink-0" />
+                      <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
                   } 
                   value={`${shotsAccuracy}%`} 
@@ -142,7 +142,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray max-w-xs text-xs sm:text-sm">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Percentage of shots that were on target compared to total shots taken. Measures a player's shooting precision and efficiency.</p>
             </TooltipContent>
           </Tooltip>
@@ -157,7 +157,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 <DisciplinaryCard playerId={player.id} />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray max-w-xs text-xs sm:text-sm">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Player's disciplinary record including yellow and red cards. Risk levels: SAFE (0-3), AT RISK (4), CRITICAL (5+).</p>
             </TooltipContent>
           </Tooltip>
