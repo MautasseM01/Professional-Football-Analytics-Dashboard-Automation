@@ -170,8 +170,7 @@ export const ProfessionalPerformanceTable = ({
       "shadow-xl animate-fade-in"
     )}>
       <CardHeader className="pb-3">
-        <div className="flex flex-col gap-4">
-          {/* Title section */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 sm:gap-3">
             <TrendingUp className={cn(responsiveClasses.iconSize, "text-club-gold")} />
             <CardTitle className={cn(
@@ -182,23 +181,20 @@ export const ProfessionalPerformanceTable = ({
             </CardTitle>
           </div>
           
-          {/* Controls section on separate line */}
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             {isMobile && (
-              <Badge variant="outline" className="text-xs bg-club-gold/10 border-club-gold/30 text-club-gold self-start">
+              <Badge variant="outline" className="text-xs bg-club-gold/10 border-club-gold/30 text-club-gold">
                 Swipe → to see more metrics
               </Badge>
             )}
             
-            <div className={isMobile ? "mt-2" : ""}>
-              <SortControls
-                currentMetric={sortState.metric}
-                currentDirection={sortState.direction}
-                metrics={visibleMetrics}
-                onSort={handleSort}
-                onClear={clearSort}
-              />
-            </div>
+            <SortControls
+              currentMetric={sortState.metric}
+              currentDirection={sortState.direction}
+              metrics={visibleMetrics}
+              onSort={handleSort}
+              onClear={clearSort}
+            />
           </div>
         </div>
       </CardHeader>
