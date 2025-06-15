@@ -40,23 +40,20 @@ const PlayerStatsPage = () => {
       {showSidebar && <DashboardSidebar />}
       
       <div className="flex-1 overflow-auto min-w-0">
-        {/* Prominent Demo Banner */}
-        
-
         <header className="border-b border-club-gold/20 dark:border-club-gold/20 bg-club-black/80 dark:bg-club-black/80 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
-          <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
+          <div className="flex justify-between items-start lg:items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
             {/* Left section - Title and page info */}
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-club-gold dark:text-club-gold truncate">
+              <h2 className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-bold text-club-gold dark:text-club-gold line-clamp-2 lg:truncate">
                 {t('nav.individualStats')}
               </h2>
-              <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
+              <p className="text-xs sm:text-sm md:text-sm lg:text-base text-gray-400 dark:text-gray-400 line-clamp-2 lg:truncate">
                 {profile?.role === 'player' ? "View your individual performance statistics and development progress" : "Analyze individual player performance and statistics"}
               </p>
             </div>
             
             {/* Right section - Controls */}
-            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-shrink-0">
+            <div className="grid grid-cols-2 gap-1 sm:gap-1.5 lg:flex lg:items-center lg:gap-1.5 xl:gap-3 flex-shrink-0">
               {/* Language Selector */}
               <LanguageSelector />
               
