@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Select,
@@ -31,6 +30,25 @@ export const LanguageSelector = () => {
       default: return 'En';
     }
   };
+
+  // Dynamic positioning based on language
+  const getBadgePositioning = () => {
+    if (language === 'ar') {
+      // For Arabic (RTL), keep badge on the right side
+      return {
+        className: "absolute -top-1 -right-1 sm:-top-0.5 sm:-right-0.5 z-10 pointer-events-none",
+        transform: 'translate(50%, -50%)'
+      };
+    } else {
+      // For French and English (LTR), move badge to the left side
+      return {
+        className: "absolute -top-1 -left-1 sm:-top-0.5 sm:-left-0.5 z-10 pointer-events-none",
+        transform: 'translate(-50%, -50%)'
+      };
+    }
+  };
+
+  const badgePosition = getBadgePositioning();
 
   return (
     <div className="relative">
@@ -66,10 +84,10 @@ export const LanguageSelector = () => {
         </SelectContent>
       </Select>
 
-      {/* External stylish language badge positioned outside button borders */}
+      {/* External stylish language badge with dynamic positioning */}
       <div 
-        className="absolute -top-1 -right-1 sm:-top-0.5 sm:-right-0.5 z-10 pointer-events-none"
-        style={{ transform: 'translate(50%, -50%)' }}
+        className={badgePosition.className}
+        style={{ transform: badgePosition.transform }}
       >
         <div
           className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-club-gold via-club-gold to-yellow-600 text-club-black flex items-center justify-center text-[10px] sm:text-xs font-bold shadow-lg shadow-club-gold/30 border border-club-gold/20 ring-1 ring-white/40 transition-all duration-300"
