@@ -24,20 +24,20 @@ export const PerformanceTrendsChart = ({
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
-  // Calculate dynamic height based on content and screen size with improved spacing
+  // Calculate dynamic height based on content and screen size
   const calculateContainerHeight = () => {
     if (isMobile) {
-      return Math.max(380, 300 + (matchData.length * 2)); // Increased minimum height for better spacing
+      return Math.max(380, 300 + (matchData.length * 2));
     }
-    return Math.max(500, 420 + (matchData.length * 3)); // Increased minimum height for desktop
+    return Math.max(500, 420 + (matchData.length * 3));
   };
 
-  // Responsive padding based on screen size
+  // Asymmetric padding to position chart towards bottom-left
   const getContainerPadding = () => {
     if (isMobile) {
-      return "p-3 sm:p-4"; // Tighter padding on mobile
+      return "pt-6 pr-6 pb-2 pl-2"; // More top/right, less bottom/left
     }
-    return "p-6 lg:p-8"; // More generous padding on larger screens
+    return "pt-8 pr-8 pb-2 pl-2"; // More pronounced on desktop
   };
 
   return (
@@ -45,7 +45,7 @@ export const PerformanceTrendsChart = ({
       <div 
         className={cn(
           "w-full rounded-2xl transition-all duration-300 overflow-hidden",
-          "flex flex-col justify-center", // Center content vertically
+          "flex justify-start items-end", // Position content to bottom-left
           getContainerPadding(),
           theme === 'dark' 
             ? "bg-club-black/20 border border-club-gold/10" 
@@ -56,20 +56,15 @@ export const PerformanceTrendsChart = ({
           contain: 'layout style paint'
         }}
       >
-        <div className="w-full h-full flex items-center justify-center">
-          <div className="w-full h-full" style={{ 
-            maxHeight: '100%',
-            minHeight: isMobile ? '280px' : '360px' // Ensure minimum chart area
-          }}>
-            <ChartRenderer
-              chartView={chartView}
-              matchData={matchData}
-              selectedKPI={selectedKPI}
-              selectedKPILabel={selectedKPILabel}
-              showMovingAverage={showMovingAverage}
-              getChartConfig={getChartConfig}
-            />
-          </div>
+        <div className="w-full h-full">
+          <ChartRenderer
+            chartView={chartView}
+            matchData={matchData}
+            selectedKPI={selectedKPI}
+            selectedKPILabel={selectedKPILabel}
+            showMovingAverage={showMovingAverage}
+            getChartConfig={getChartConfig}
+          />
         </div>
       </div>
     </div>
