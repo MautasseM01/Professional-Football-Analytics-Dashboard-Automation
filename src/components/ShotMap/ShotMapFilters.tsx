@@ -15,6 +15,7 @@ import {
   SelectValue 
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
+import { PlayerAvatar } from "@/components/PlayerAvatar";
 
 interface ShotMapFiltersProps {
   players: Player[];
@@ -68,14 +69,24 @@ export const ShotMapFilters = ({
           >
             <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray w-full h-10 sm:h-9">
               <SelectValue placeholder="All players">
-                {selectedPlayer ? `${selectedPlayer.number || '?'} ${selectedPlayer.name} - ${selectedPlayer.position}` : "All players"}
+                {selectedPlayer ? (
+                  <div className="flex items-center gap-2">
+                    <PlayerAvatar player={selectedPlayer} size="sm" />
+                    <span>{selectedPlayer.number || '?'} {selectedPlayer.name} - {selectedPlayer.position}</span>
+                  </div>
+                ) : (
+                  "All players"
+                )}
               </SelectValue>
             </SelectTrigger>
             <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
               <SelectItem value="all-players">All players</SelectItem>
               {players.map((player) => (
                 <SelectItem key={player.id} value={player.id.toString()}>
-                  {player.number || '?'} {player.name} - {player.position}
+                  <div className="flex items-center gap-2">
+                    <PlayerAvatar player={player} size="sm" />
+                    <span>{player.number || '?'} {player.name} - {player.position}</span>
+                  </div>
                 </SelectItem>
               ))}
             </SelectContent>
