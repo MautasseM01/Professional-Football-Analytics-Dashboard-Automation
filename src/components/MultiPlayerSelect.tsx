@@ -154,9 +154,9 @@ export function MultiPlayerSelect({
 
       {/* Selected players badges */}
       {selectedPlayerIds.length > 0 && (
-        <div className="flex flex-wrap sm:flex-nowrap gap-2 mt-2 sm:overflow-x-auto">
+        <div className="flex flex-wrap gap-2 mt-2">
           {Array.from(selectedPlayersMap.values()).map(player => (
-            <Badge key={player.id} variant="secondary" className="px-3 py-1.5 flex items-center gap-2 flex-shrink-0">
+            <Badge key={player.id} variant="secondary" className="px-3 py-1.5 flex items-center gap-2">
               <PlayerAvatar player={player} size="sm" />
               {player.name}
               <Button
