@@ -16,7 +16,6 @@ import {
 } from "@/utils/comparisonUtils";
 import { useSorting } from "./hooks/useSorting";
 import { SortControls } from "./components/SortControls";
-import { SortableHeader } from "./components/SortableHeader";
 import { MetricConfig } from "./types";
 
 interface ProfessionalPerformanceTableProps {
@@ -100,19 +99,47 @@ export const ProfessionalPerformanceTable = ({
     return metrics;
   }, [typeof window !== 'undefined' ? window.innerWidth : 0]);
 
-  // Use the sorting hook
+  // Responsive player filtering for mobile
+  const visiblePlayers = useMemo(() => {
+    if (typeof window === 'undefined') return selectedPlayers;
+    
+    const screenWidth = window.innerWidth;
+    
+    if (screenWidth < 640) {
+      return selectedPlayers.slice(0, 2); // Show max 2 players on mobile
+    }
+    
+    if (screenWidth < 1024) {
+      return selectedPlayers.slice(0, 3); // Show max 3 players on tablet
+    }
+    
+    return selectedPlayers; // Show all players on desktop
+  }, [selectedPlayers, typeof window !== 'undefined' ? window.innerWidth : 0]);
+
+  // Use the sorting hook for metrics
   const { sortState, handleSort, clearSort, sortedPlayers } = useSorting({
-    players: selectedPlayers,
+    players: visibleMetrics as any[], // We'll sort metrics instead of players
     metrics: visibleMetrics
   });
+
+  // Sort metrics instead of players
+  const sortedMetrics = useMemo(() => {
+    if (sortState.metric === 'name') {
+      return [...visibleMetrics].sort((a, b) => {
+        const comparison = a.label.localeCompare(b.label);
+        return sortState.direction === 'asc' ? comparison : -comparison;
+      });
+    }
+    return visibleMetrics;
+  }, [visibleMetrics, sortState]);
 
   // Calculate highest values for each metric
   const highestValues = useMemo(() => {
     return visibleMetrics.reduce((acc, metric) => {
-      acc[metric.key] = getHighestValuesInRow(selectedPlayers, metric.getValue);
+      acc[metric.key] = getHighestValuesInRow(visiblePlayers, metric.getValue);
       return acc;
     }, {} as Record<string, Record<number, boolean>>);
-  }, [selectedPlayers, visibleMetrics]);
+  }, [visiblePlayers, visibleMetrics]);
 
   const getPerformanceLevel = (value: number | null, metric: MetricConfig) => {
     if (value === null || value === undefined) return 'none';
@@ -124,7 +151,7 @@ export const ProfessionalPerformanceTable = ({
       return 'poor';
     }
     
-    const allValues = selectedPlayers
+    const allValues = visiblePlayers
       .map(p => metric.getValue(p))
       .filter(v => v !== null && v !== undefined) as number[];
     
@@ -175,7 +202,8 @@ export const ProfessionalPerformanceTable = ({
             <TrendingUp className={cn(responsiveClasses.iconSize, "text-club-gold")} />
             <CardTitle className={cn(
               responsiveClasses.headerText,
-              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+              theme === 'dark' ? "text-club-light-gray" : "text-gray-900",
+              "whitespace-nowrap overflow-hidden text-ellipsis"
             )}>
               Professional Performance Analysis
             </CardTitle>
@@ -184,14 +212,16 @@ export const ProfessionalPerformanceTable = ({
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             {isMobile && (
               <Badge variant="outline" className="text-xs bg-club-gold/10 border-club-gold/30 text-club-gold">
-                Swipe → to see more metrics
+                Swipe → to see more players
               </Badge>
             )}
             
             <SortControls
               currentMetric={sortState.metric}
               currentDirection={sortState.direction}
-              metrics={visibleMetrics}
+              metrics={[
+                { key: 'name' as const, label: 'Metric Name', shortLabel: 'Name', mobileLabel: 'Name', getValue: () => null, format: () => '', unit: '', icon: TrendingUp, description: '', priority: 1 }
+              ]}
               onSort={handleSort}
               onClear={clearSort}
             />
@@ -202,7 +232,7 @@ export const ProfessionalPerformanceTable = ({
       <CardContent className="p-0">
         {loading ? (
           <div className="p-3 sm:p-6">
-            <TableLoadingSkeleton rows={6} columns={selectedPlayers.length + 1} />
+            <TableLoadingSkeleton rows={visibleMetrics.length + 1} columns={visiblePlayers.length + 1} />
           </div>
         ) : (
           <div className="relative">
@@ -239,72 +269,42 @@ export const ProfessionalPerformanceTable = ({
                       : "border-club-gold/30 bg-gray-50/95",
                     "backdrop-blur-sm"
                   )}>
-                    <SortableHeader
-                      metric="name"
-                      label="Player"
-                      currentMetric={sortState.metric}
-                      currentDirection={sortState.direction}
-                      onSort={handleSort}
-                      className={cn(
-                        "text-left sticky left-0 z-30",
-                        responsiveClasses.cellPadding,
-                        "w-[140px] sm:w-[160px] lg:w-[180px]",
-                        theme === 'dark' 
-                          ? "text-club-light-gray bg-club-dark-gray/95" 
-                          : "text-gray-900 bg-white/95",
-                        "border-r border-club-gold/20"
-                      )}
-                    />
-                    
-                    {visibleMetrics.map((metric) => (
-                      <SortableHeader
-                        key={metric.key}
-                        metric={metric.key}
-                        label={isMobile ? metric.mobileLabel : 
-                               window.innerWidth < 1024 ? metric.shortLabel : metric.label}
-                        currentMetric={sortState.metric}
-                        currentDirection={sortState.direction}
-                        onSort={handleSort}
-                        icon={metric.icon}
-                        unit={metric.unit}
-                        description={metric.description}
-                        className={cn(
-                          responsiveClasses.cellPadding,
-                          "w-[100px] sm:w-[120px] lg:w-[140px]"
-                        )}
-                      />
-                    ))}
-                  </tr>
-                </thead>
-                
-                <tbody>
-                  {sortedPlayers.map((player, index) => (
-                    <tr
-                      key={player.id}
-                      className={cn(
-                        "transition-all duration-200 hover:shadow-md border-b",
-                        theme === 'dark' 
-                          ? "border-club-gold/10 hover:bg-club-black/20 even:bg-club-black/10" 
-                          : "border-club-gold/20 hover:bg-gray-50/50 even:bg-gray-25/25",
-                        index % 2 === 0 && "bg-opacity-50"
-                      )}
-                    >
-                      <td className={cn(
-                        "sticky left-0 z-10 border-r",
-                        responsiveClasses.cellPadding,
-                        "w-[140px] sm:w-[160px] lg:w-[180px]",
-                        theme === 'dark' 
-                          ? "bg-club-dark-gray/95 border-club-gold/10" 
-                          : "bg-white/95 border-club-gold/20"
+                    {/* Metric header */}
+                    <th className={cn(
+                      "text-left sticky left-0 z-30",
+                      responsiveClasses.cellPadding,
+                      "w-[140px] sm:w-[160px] lg:w-[180px]",
+                      theme === 'dark' 
+                        ? "text-club-light-gray bg-club-dark-gray/95" 
+                        : "text-gray-900 bg-white/95",
+                      "border-r border-club-gold/20"
+                    )}>
+                      <div className={cn(
+                        "font-semibold",
+                        responsiveClasses.fontSize
                       )}>
-                        <div className="flex items-center gap-1 sm:gap-2">
+                        Metric
+                      </div>
+                    </th>
+                    
+                    {/* Player headers */}
+                    {visiblePlayers.map((player) => (
+                      <th
+                        key={player.id}
+                        className={cn(
+                          "text-center transition-all duration-200",
+                          responsiveClasses.cellPadding,
+                          "w-[120px] sm:w-[140px] lg:w-[160px]"
+                        )}
+                      >
+                        <div className="flex flex-col items-center gap-1">
                           <PlayerAvatar 
                             player={player} 
                             size={isMobile ? "xs" : "sm"} 
                           />
-                          <div className="min-w-0 flex-1">
+                          <div className="text-center">
                             <div className={cn(
-                              "font-medium truncate",
+                              "font-medium truncate max-w-[100px]",
                               responsiveClasses.fontSize,
                               theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
                             )}>
@@ -318,16 +318,64 @@ export const ProfessionalPerformanceTable = ({
                             </div>
                           </div>
                         </div>
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                
+                <tbody>
+                  {sortedMetrics.map((metric, index) => (
+                    <tr
+                      key={metric.key}
+                      className={cn(
+                        "transition-all duration-200 hover:shadow-md border-b",
+                        theme === 'dark' 
+                          ? "border-club-gold/10 hover:bg-club-black/20 even:bg-club-black/10" 
+                          : "border-club-gold/20 hover:bg-gray-50/50 even:bg-gray-25/25",
+                        index % 2 === 0 && "bg-opacity-50"
+                      )}
+                    >
+                      {/* Metric name cell */}
+                      <td className={cn(
+                        "sticky left-0 z-10 border-r",
+                        responsiveClasses.cellPadding,
+                        "w-[140px] sm:w-[160px] lg:w-[180px]",
+                        theme === 'dark' 
+                          ? "bg-club-dark-gray/95 border-club-gold/10" 
+                          : "bg-white/95 border-club-gold/20"
+                      )}>
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <metric.icon className={cn(responsiveClasses.iconSize, "text-club-gold/70")} />
+                          <div className="min-w-0 flex-1">
+                            <div className={cn(
+                              "font-medium truncate",
+                              responsiveClasses.fontSize,
+                              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                            )}>
+                              {isMobile ? metric.mobileLabel : 
+                               window.innerWidth < 1024 ? metric.shortLabel : metric.label}
+                            </div>
+                            {metric.unit && (
+                              <div className={cn(
+                                "text-gray-500 truncate",
+                                "text-xs"
+                              )}>
+                                {metric.unit}
+                              </div>
+                            )}
+                          </div>
+                        </div>
                       </td>
                       
-                      {visibleMetrics.map((metric) => {
+                      {/* Player data cells */}
+                      {visiblePlayers.map((player) => {
                         const value = metric.getValue(player);
                         const isHighest = highestValues[metric.key]?.[player.id];
                         const level = getPerformanceLevel(value, metric);
                         
                         return (
                           <td
-                            key={`${player.id}-${metric.key}`}
+                            key={`${metric.key}-${player.id}`}
                             className={cn(
                               "text-center transition-all duration-200 relative",
                               responsiveClasses.cellPadding,
@@ -377,7 +425,7 @@ export const ProfessionalPerformanceTable = ({
                                     isHighest ? "bg-club-gold" : getPerformanceLevelColor(level).replace('text-', 'bg-')
                                   )}
                                   style={{
-                                    width: `${Math.min(100, Math.max(10, (value / Math.max(...selectedPlayers.map(p => metric.getValue(p) || 0))) * 100))}%`
+                                    width: `${Math.min(100, Math.max(10, (value / Math.max(...visiblePlayers.map(p => metric.getValue(p) || 0))) * 100))}%`
                                   }}
                                 />
                               </div>
@@ -397,9 +445,14 @@ export const ProfessionalPerformanceTable = ({
                   <span>← Scroll →</span>
                 </div>
               )}
+              {visiblePlayers.length < selectedPlayers.length && (
+                <div className="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs backdrop-blur-sm">
+                  {selectedPlayers.length - visiblePlayers.length} more players on larger screen
+                </div>
+              )}
               {visibleMetrics.length < metrics.length && (
                 <div className="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs backdrop-blur-sm">
-                  {metrics.length - visibleMetrics.length} more on larger screen
+                  {metrics.length - visibleMetrics.length} more metrics on larger screen
                 </div>
               )}
             </div>
