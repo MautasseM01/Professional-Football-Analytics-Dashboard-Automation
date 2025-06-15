@@ -31,7 +31,7 @@ const TeamTacticalAnalysis = () => {
   const [selectedMatch, setSelectedMatch] = useState<number | null>(null);
   const [passDirectionFilter, setPassDirectionFilter] = useState<string>("all");
   const [passOutcomeFilter, setPassOutcomeFilter] = useState<string>("all");
-  const [imageLoadingError, setImageLoadingError] useState<boolean>(false);
+  const [imageLoadingError, setImageLoadingError] = useState<boolean>(false);
   const isMobile = useIsMobile();
 
   const { data: matches, isLoading: isLoadingMatches, refetch: refetchMatches } = useQuery({
