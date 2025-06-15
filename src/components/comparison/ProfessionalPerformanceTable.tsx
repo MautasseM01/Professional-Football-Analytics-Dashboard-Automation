@@ -154,7 +154,7 @@ export const ProfessionalPerformanceTable = ({
   };
 
   const responsiveClasses = {
-    headerText: cn("text-base font-semibold", "sm:text-lg", "lg:text-xl"),
+    headerText: cn("text-sm font-semibold", "sm:text-base", "lg:text-lg"),
     tablePadding: cn("p-2", "sm:p-3", "lg:p-4"),
     cellPadding: cn("p-1", "sm:p-2", "lg:p-3"),
     fontSize: cn("text-xs", "sm:text-sm", "lg:text-base"),
@@ -171,17 +171,18 @@ export const ProfessionalPerformanceTable = ({
     )}>
       <CardHeader className="pb-3">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2 sm:gap-3">
-            <TrendingUp className={cn(responsiveClasses.iconSize, "text-club-gold")} />
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+            <TrendingUp className={cn(responsiveClasses.iconSize, "text-club-gold flex-shrink-0")} />
             <CardTitle className={cn(
               responsiveClasses.headerText,
+              "whitespace-nowrap overflow-hidden text-ellipsis",
               theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
             )}>
               Professional Performance Analysis
             </CardTitle>
           </div>
           
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center flex-shrink-0">
             {isMobile && (
               <Badge variant="outline" className="text-xs bg-club-gold/10 border-club-gold/30 text-club-gold">
                 Swipe → to see more metrics
