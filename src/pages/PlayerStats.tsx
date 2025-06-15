@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { usePlayerData } from "@/hooks/use-player-data";
@@ -14,6 +15,7 @@ import { LanguageSelector } from "@/components/LanguageSelector";
 import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
 import { Info, RotateCcw, RefreshCw, Menu, Sparkles } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
+
 const PlayerStatsPage = () => {
   const {
     players,
@@ -43,7 +45,7 @@ const PlayerStatsPage = () => {
         
 
         <header className="border-b border-club-gold/20 dark:border-club-gold/20 bg-club-black/80 dark:bg-club-black/80 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
-          <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 gap-2 sm:gap-4 sm:py-[20px]">
+          <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
             {/* Left section - Title and page info */}
             <div className="flex-1 min-w-0">
               <h1 className="text-ios-headline font-bold text-club-gold dark:text-club-gold truncate">

@@ -20,6 +20,7 @@ import { BackToTopButton } from "@/components/BackToTopButton";
 import { RoleTester } from "@/components/RoleTester";
 import { Menu, RefreshCw, Sparkles } from "lucide-react";
 import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
+
 const Dashboard = () => {
   const {
     loading: playerDataLoading,
@@ -39,7 +40,6 @@ const Dashboard = () => {
     refreshData();
   };
 
-  // Render appropriate content based on user role
   const renderDashboardContent = () => {
     // In demo mode, show minimal loading to ensure instant content
     if (profileLoading && !profile) {
@@ -109,7 +109,7 @@ const Dashboard = () => {
         
 
         <header className="border-b border-club-gold/20 dark:border-club-gold/20 bg-club-black/80 dark:bg-club-black/80 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
-          <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-3 gap-2 sm:gap-4 sm:py-[20px]">
+          <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4 sm:py-[20px]">
             {/* Left section - Title and page info */}
             <div className="flex-1 min-w-0">
               <h1 className="text-ios-headline font-bold text-club-gold dark:text-club-gold truncate">
