@@ -2,21 +2,13 @@
 import React from "react";
 
 interface FootballPitchProps {
-  width: number;
-  height: number;
+  className?: string;
   children: React.ReactNode;
 }
 
-const FootballPitch: React.FC<FootballPitchProps> = ({ width, height, children }) => {
+const FootballPitch: React.FC<FootballPitchProps> = ({ className, children }) => {
   return (
-    <div 
-      className="relative overflow-hidden"
-      style={{
-        width: `${width}px`,
-        height: `${height}px`,
-        borderRadius: "8px"
-      }}
-    >
+    <div className={`relative w-full h-full ${className}`}>
       <svg
         viewBox="0 0 1050 680"
         className="w-full h-full"
@@ -166,8 +158,10 @@ const FootballPitch: React.FC<FootballPitchProps> = ({ width, height, children }
         />
       </svg>
       
-      {/* Children (players, connections, etc.) */}
-      {children}
+      {/* Children (players, connections, etc.) positioned absolutely */}
+      <div className="absolute inset-0">
+        {children}
+      </div>
     </div>
   );
 };
