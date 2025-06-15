@@ -25,43 +25,42 @@ export const ChartRenderer = ({
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
-  // Enhanced margins for right-bottom positioning
+  // Enhanced margins with better spacing for proper centering
   const getMargins = () => {
     if (isMobile) {
       return { 
-        top: 35,      // Increased top margin to push chart down
-        right: 10,    // Reduced right margin to bring chart closer to right edge
-        left: 65,     // Increased left margin to push chart right
-        bottom: 85    // Bottom margin for X-axis labels
+        top: 30,      // Increased top margin for better balance
+        right: 25,    // Adequate right margin
+        left: 45,     // Sufficient left margin for Y-axis labels
+        bottom: 80    // Generous bottom margin for rotated X-axis labels
       };
     }
     return { 
-      top: 45,       // Increased top margin on desktop
-      right: 15,     // Reduced right margin for larger screens
-      left: 80,      // Increased left margin to push chart right
-      bottom: 105    // Bottom margin for rotated labels
+      top: 40,       // More generous top margin on desktop
+      right: 35,     // Better right margin for larger screens
+      left: 60,      // More space for Y-axis labels
+      bottom: 100    // Ample bottom margin for rotated labels
     };
   };
 
   const margins = getMargins();
 
   return (
-    <div className="w-full h-full flex items-end justify-end" style={{ contain: 'layout' }}> {/* Changed to items-end and justify-end */}
+    <div className="w-full h-full flex items-center justify-center" style={{ contain: 'layout' }}>
       <div className="w-full h-full" style={{ 
-        padding: isMobile ? '4px 0px 8px 12px' : '8px 0px 12px 16px', // Asymmetric padding - more left and bottom
+        padding: isMobile ? '8px' : '12px', // Responsive inner padding
         minHeight: '100%'
       }}>
         <ResponsiveContainer width="100%" height="100%">
           {chartView === 'line' ? (
             <RechartsLineChart data={matchData} margin={margins}>
-              
               <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "#333" : "#e5e7eb"} opacity={0.3} />
               <XAxis 
                 dataKey="match" 
                 stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
                 tick={{ 
                   fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", 
-                  fontSize: isMobile ? 10 : 12,
+                  fontSize: isMobile ? 10 : 12, // Slightly larger font for better readability
                   textAnchor: 'end'
                 }}
                 tickLine={false}
