@@ -8,7 +8,7 @@ interface PerformanceStatsProps {
     avg: number;
     max: number;
     min: number;
-    trend: string;
+    trend: 'up' | 'down' | 'neutral';
   };
   matchDataLength: number;
 }

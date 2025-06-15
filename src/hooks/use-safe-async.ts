@@ -3,7 +3,7 @@ import { useState, useCallback, useRef, useEffect } from 'react';
 import { useErrorHandler } from './use-error-handler';
 
 interface UseSafeAsyncOptions<T> {
-  component: string;
+  component?: string;
   initialData?: T;
   retryCount?: number;
   retryDelay?: number;
@@ -22,7 +22,7 @@ export const useSafeAsync = <T>(
   options: UseSafeAsyncOptions<T> = {}
 ): SafeAsyncState<T> => {
   const {
-    component,
+    component = 'Unknown Component',
     initialData = null,
     retryCount = 3,
     retryDelay = 1000

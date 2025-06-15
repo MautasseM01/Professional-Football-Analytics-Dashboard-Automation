@@ -8,7 +8,10 @@ import { Player } from "@/types";
 interface PerformanceTrendsHeaderProps {
   player: Player;
   stats: {
-    trend: string;
+    avg: number;
+    min: number;
+    max: number;
+    trend: 'up' | 'down' | 'neutral';
   };
 }
 

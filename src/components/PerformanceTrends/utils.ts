@@ -19,7 +19,7 @@ export const calculateMovingAverage = (data: Array<{value: number}>, windowSize:
 // Calculate performance statistics
 export const calculateStats = (data: Array<{value: number}>) => {
   const values = data.map(d => d.value).filter(v => v !== undefined && v !== null);
-  if (values.length === 0) return { avg: 0, min: 0, max: 0, trend: 'neutral' };
+  if (values.length === 0) return { avg: 0, min: 0, max: 0, trend: 'neutral' as const };
   
   const avg = values.reduce((sum, val) => sum + val, 0) / values.length;
   const min = Math.min(...values);
@@ -31,7 +31,7 @@ export const calculateStats = (data: Array<{value: number}>) => {
   const recentAvg = recent.reduce((sum, val) => sum + val, 0) / recent.length;
   const previousAvg = previous.length > 0 ? previous.reduce((sum, val) => sum + val, 0) / previous.length : recentAvg;
   
-  let trend = 'neutral';
+  let trend: 'up' | 'down' | 'neutral' = 'neutral';
   if (recentAvg > previousAvg * 1.1) trend = 'up';
   else if (recentAvg < previousAvg * 0.9) trend = 'down';
   

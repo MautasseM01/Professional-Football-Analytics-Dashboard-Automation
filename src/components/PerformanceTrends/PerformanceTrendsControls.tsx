@@ -15,7 +15,7 @@ interface PerformanceTrendsControlsProps {
     avg: number;
     max: number;
     min: number;
-    trend: string;
+    trend: 'up' | 'down' | 'neutral';
   };
   matchDataLength: number;
   setSelectedKPI: (value: string) => void;
