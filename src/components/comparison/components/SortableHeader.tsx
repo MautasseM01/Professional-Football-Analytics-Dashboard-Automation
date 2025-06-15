@@ -63,7 +63,7 @@ export const SortableHeader = ({
             )} />
           )}
           <span className={cn(
-            "font-medium truncate max-w-[80px]",
+            "font-medium",
             isActive 
               ? "text-club-gold" 
               : theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
