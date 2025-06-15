@@ -1,0 +1,159 @@
+
+/* Typography classes and text utilities */
+@layer base {
+  /* iOS-style Dynamic Typography Classes */
+  .text-ios-caption {
+    font-size: var(--text-caption);
+    line-height: var(--line-height-normal);
+    font-weight: 400;
+  }
+
+  .text-ios-footnote {
+    font-size: var(--text-footnote);
+    line-height: var(--line-height-normal);
+    font-weight: 400;
+  }
+
+  .text-ios-subheadline {
+    font-size: var(--text-subheadline);
+    line-height: var(--line-height-normal);
+    font-weight: 400;
+  }
+
+  .text-ios-callout {
+    font-size: var(--text-callout);
+    line-height: var(--line-height-normal);
+    font-weight: 400;
+  }
+
+  .text-ios-body {
+    font-size: var(--text-body);
+    line-height: var(--line-height-relaxed);
+    font-weight: 400;
+  }
+
+  .text-ios-headline {
+    font-size: var(--text-headline);
+    line-height: var(--line-height-normal);
+    font-weight: 600;
+  }
+
+  .text-ios-title3 {
+    font-size: var(--text-title3);
+    line-height: var(--line-height-tight);
+    font-weight: 400;
+  }
+
+  .text-ios-title2 {
+    font-size: var(--text-title2);
+    line-height: var(--line-height-tight);
+    font-weight: 700;
+  }
+
+  .text-ios-title1 {
+    font-size: var(--text-title1);
+    line-height: var(--line-height-tight);
+    font-weight: 700;
+  }
+
+  .text-ios-large-title {
+    font-size: var(--text-large-title);
+    line-height: var(--line-height-tight);
+    font-weight: 700;
+  }
+
+  /* Enhanced Typography Scale Classes with better contrast */
+  .text-responsive-xs {
+    font-size: var(--text-xs);
+    line-height: var(--line-height-normal);
+  }
+
+  .text-responsive-sm {
+    font-size: var(--text-sm);
+    line-height: var(--line-height-normal);
+  }
+
+  .text-responsive-base {
+    font-size: var(--text-base);
+    line-height: var(--line-height-relaxed);
+  }
+
+  .text-responsive-lg {
+    font-size: var(--text-lg);
+    line-height: var(--line-height-normal);
+  }
+
+  .text-responsive-xl {
+    font-size: var(--text-xl);
+    line-height: var(--line-height-normal);
+  }
+
+  .text-responsive-2xl {
+    font-size: var(--text-2xl);
+    line-height: var(--line-height-tight);
+  }
+
+  .text-responsive-3xl {
+    font-size: var(--text-3xl);
+    line-height: var(--line-height-tight);
+  }
+
+  .text-responsive-4xl {
+    font-size: var(--text-4xl);
+    line-height: var(--line-height-tight);
+  }
+
+  .text-responsive-5xl {
+    font-size: var(--text-5xl);
+    line-height: var(--line-height-tight);
+  }
+
+  /* Enhanced Responsive Spacing Classes */
+  .space-responsive-1 {
+    margin: var(--space-1);
+  }
+
+  .space-responsive-2 {
+    margin: var(--space-2);
+  }
+
+  .space-responsive-3 {
+    margin: var(--space-3);
+  }
+
+  .space-responsive-4 {
+    margin: var(--space-4);
+  }
+
+  .space-responsive-5 {
+    margin: var(--space-5);
+  }
+
+  .space-responsive-6 {
+    margin: var(--space-6);
+  }
+
+  .space-responsive-8 {
+    margin: var(--space-8);
+  }
+
+  .p-responsive-2 {
+    padding: var(--space-2);
+  }
+
+  .p-responsive-3 {
+    padding: var(--space-3);
+  }
+
+  .p-responsive-4 {
+    padding: var(--space-4);
+  }
+
+  .p-responsive-5 {
+    padding: var(--space-5);
+  }
+
+  .p-responsive-6 {
+    padding: var(--space-6);
+  }
+}

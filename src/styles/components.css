@@ -1,0 +1,209 @@
+
+/* Component-level styles and reusable UI patterns */
+@layer components {
+  .stat-card {
+    @apply bg-secondary rounded-lg shadow-md border border-club-gold/20 transition-colors duration-300;
+    padding: var(--space-4);
+  }
+  
+  .stat-value {
+    font-size: var(--text-2xl);
+    @apply font-bold text-club-gold;
+  }
+  
+  .stat-label {
+    font-size: var(--text-sm);
+    @apply text-club-light-gray/80;
+  }
+
+  /* Light theme overrides for component classes */
+  .light-theme .stat-card {
+    @apply bg-white border-gray-200 shadow-md !important;
+  }
+
+  .light-theme .stat-value {
+    @apply text-yellow-600 !important;
+  }
+
+  .light-theme .stat-label {
+    @apply text-gray-700 !important;
+  }
+
+  /* Enhanced Typography Component Classes with iOS styling */
+  .heading-primary {
+    font-size: var(--text-large-title);
+    @apply font-bold text-club-gold;
+    line-height: var(--line-height-tight);
+    margin-bottom: var(--space-4);
+  }
+
+  .light-theme .heading-primary {
+    @apply text-yellow-600 !important;
+  }
+
+  .heading-secondary {
+    font-size: var(--text-title1);
+    @apply font-bold text-club-gold;
+    line-height: var(--line-height-tight);
+    margin-bottom: var(--space-3);
+  }
+
+  .light-theme .heading-secondary {
+    @apply text-yellow-600 !important;
+  }
+
+  .heading-tertiary {
+    font-size: var(--text-title2);
+    @apply font-semibold text-club-gold;
+    line-height: var(--line-height-tight);
+    margin-bottom: var(--space-3);
+  }
+
+  .light-theme .heading-tertiary {
+    @apply text-yellow-600 !important;
+  }
+
+  .heading-quaternary {
+    font-size: var(--text-title3);
+    @apply font-semibold text-club-light-gray;
+    line-height: var(--line-height-normal);
+    margin-bottom: var(--space-2);
+  }
+
+  .light-theme .heading-quaternary {
+    @apply text-gray-800 !important;
+  }
+
+  .body-large {
+    font-size: var(--text-headline);
+    @apply text-club-light-gray;
+    line-height: var(--line-height-relaxed);
+    margin-bottom: var(--space-3);
+  }
+
+  .light-theme .body-large {
+    @apply text-gray-800 !important;
+  }
+
+  .body-normal {
+    font-size: var(--text-body);
+    @apply text-club-light-gray;
+    line-height: var(--line-height-relaxed);
+    margin-bottom: var(--space-2);
+  }
+
+  .light-theme .body-normal {
+    @apply text-gray-800 !important;
+  }
+
+  .body-small {
+    font-size: var(--text-callout);
+    @apply text-club-light-gray/80;
+    line-height: var(--line-height-normal);
+    margin-bottom: var(--space-2);
+  }
+
+  .light-theme .body-small {
+    @apply text-gray-700 !important;
+  }
+
+  .caption {
+    font-size: var(--text-caption);
+    @apply text-club-light-gray/70;
+    line-height: var(--line-height-normal);
+  }
+
+  .light-theme .caption {
+    @apply text-gray-600 !important;
+  }
+
+  /* Enhanced mobile-optimized components */
+  .mobile-card {
+    @apply w-full rounded-lg border border-club-gold/20 bg-club-dark-gray;
+    padding: var(--space-4);
+    min-height: 110px;
+  }
+
+  .light-theme .mobile-card {
+    @apply bg-white border-gray-200 !important;
+  }
+
+  .mobile-touch-target {
+    min-height: var(--touch-target-min);
+    min-width: var(--touch-target-min);
+    @apply touch-manipulation;
+  }
+
+  .mobile-scroll-container {
+    @apply overflow-x-auto;
+    -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x mandatory;
+  }
+
+  /* iOS-style touch feedback animations */
+  .ios-touch-feedback {
+    @apply transition-all duration-150 ease-out;
+    @apply active:scale-95 hover:scale-105;
+    transform-origin: center;
+  }
+
+  .ios-card-press {
+    @apply transition-all duration-200 ease-out;
+    @apply active:scale-[0.98] active:shadow-sm;
+  }
+
+  /* Smooth page transitions */
+  .page-transition-enter {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+
+  .page-transition-enter-active {
+    opacity: 1;
+    transform: translateX(0);
+    transition: opacity 300ms ease-out, transform 300ms ease-out;
+  }
+
+  .page-transition-exit {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .page-transition-exit-active {
+    opacity: 0;
+    transform: translateX(-100%);
+    transition: opacity 300ms ease-out, transform 300ms ease-out;
+  }
+
+  /* Enhanced responsive container classes */
+  .container-responsive {
+    padding-left: var(--space-3);
+    padding-right: var(--space-3);
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100%;
+  }
+
+  @media (min-width: 640px) {
+    .container-responsive {
+      padding-left: var(--space-4);
+      padding-right: var(--space-4);
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .container-responsive {
+      padding-left: var(--space-6);
+      padding-right: var(--space-6);
+      max-width: 1200px;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .container-responsive {
+      padding-left: var(--space-8);
+      padding-right: var(--space-8);
+      max-width: 1400px;
+    }
+  }
+}

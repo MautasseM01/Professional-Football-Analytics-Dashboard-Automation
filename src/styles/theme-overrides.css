@@ -1,0 +1,123 @@
+
+/* Light theme overrides for club colors and custom classes */
+@layer base {
+  /* Background Color Fixes */
+  .light-theme .bg-club-black {
+    @apply bg-white !important;
+  }
+
+  .light-theme .bg-club-black\/80 {
+    @apply bg-white/95 !important;
+  }
+
+  .light-theme .bg-club-black\/90 {
+    @apply bg-white !important;
+  }
+
+  .light-theme .bg-club-black\/50 {
+    @apply bg-white/90 !important;
+  }
+
+  .light-theme .bg-club-dark-gray {
+    @apply bg-gray-50 !important;
+  }
+
+  .light-theme .bg-club-dark-gray\/50 {
+    @apply bg-gray-100/80 !important;
+  }
+
+  .light-theme .bg-club-dark-gray\/60 {
+    @apply bg-gray-100/90 !important;
+  }
+
+  .light-theme .bg-club-dark-bg {
+    @apply bg-white !important;
+  }
+
+  /* Text Color Fixes */
+  .light-theme .text-club-light-gray {
+    @apply text-gray-900 !important;
+  }
+
+  .light-theme .text-club-light-gray\/70 {
+    @apply text-gray-700 !important;
+  }
+
+  .light-theme .text-club-light-gray\/80 {
+    @apply text-gray-800 !important;
+  }
+
+  .light-theme .text-club-light-gray\/60 {
+    @apply text-gray-600 !important;
+  }
+
+  .light-theme .text-gray-100 {
+    @apply text-gray-900 !important;
+  }
+
+  .light-theme .text-gray-300 {
+    @apply text-gray-700 !important;
+  }
+
+  .light-theme .text-gray-400 {
+    @apply text-gray-600 !important;
+  }
+
+  /* Removed the circular dependency - text-gray-500 stays the same in both themes */
+
+  /* Border Color Fixes */
+  .light-theme .border-club-gold\/20 {
+    @apply border-yellow-600/50 !important;
+  }
+
+  .light-theme .border-club-gold\/30 {
+    @apply border-yellow-600/60 !important;
+  }
+
+  .light-theme .border-club-gold\/40 {
+    @apply border-yellow-600/70 !important;
+  }
+
+  /* Background Hover and Interaction Fixes */
+  .light-theme .hover\:bg-club-gold\/10:hover {
+    @apply bg-yellow-600/20 !important;
+  }
+
+  .light-theme .hover\:bg-club-gold\/20:hover {
+    @apply bg-yellow-600/30 !important;
+  }
+
+  .light-theme .bg-club-gold\/10 {
+    @apply bg-yellow-600/20 !important;
+  }
+
+  .light-theme .bg-club-gold\/20 {
+    @apply bg-yellow-600/30 !important;
+  }
+
+  /* Fix background gradients in light mode */
+  .light-theme .bg-gradient-to-br.from-slate-900.via-club-black.to-slate-900 {
+    @apply from-gray-50 via-white to-gray-50 !important;
+  }
+
+  .light-theme .bg-gradient-to-br.from-club-black\/90.to-club-dark-gray\/70 {
+    @apply from-white/95 to-gray-50/90 border-gray-200 !important;
+  }
+
+  .light-theme .bg-gradient-to-br.from-club-gold\/20.to-club-gold\/10 {
+    @apply from-yellow-600/25 to-yellow-600/15 !important;
+  }
+
+  /* Chart and data visualization fixes */
+  .light-theme .fill-club-gold {
+    @apply fill-yellow-600 !important;
+  }
+
+  .light-theme .stroke-club-gold {
+    @apply stroke-yellow-600 !important;
+  }
+
+  .light-theme .text-club-gold {
+    @apply text-yellow-600 !important;
+  }
+}
