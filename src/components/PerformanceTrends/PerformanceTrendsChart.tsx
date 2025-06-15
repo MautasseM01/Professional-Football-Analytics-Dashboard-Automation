@@ -24,19 +24,29 @@ export const PerformanceTrendsChart = ({
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
-  // Calculate dynamic height based on content and screen size
+  // Calculate dynamic height based on content and screen size with improved spacing
   const calculateContainerHeight = () => {
     if (isMobile) {
-      return Math.max(320, 260 + (matchData.length * 2)); // Minimum 320px on mobile
+      return Math.max(380, 300 + (matchData.length * 2)); // Increased minimum height for better spacing
     }
-    return Math.max(400, 350 + (matchData.length * 3)); // Minimum 400px on desktop
+    return Math.max(500, 420 + (matchData.length * 3)); // Increased minimum height for desktop
+  };
+
+  // Responsive padding based on screen size
+  const getContainerPadding = () => {
+    if (isMobile) {
+      return "p-3 sm:p-4"; // Tighter padding on mobile
+    }
+    return "p-6 lg:p-8"; // More generous padding on larger screens
   };
 
   return (
     <div className="px-4 sm:px-6 pb-6">
       <div 
         className={cn(
-          "w-full rounded-2xl p-4 sm:p-6 transition-all duration-300 overflow-hidden",
+          "w-full rounded-2xl transition-all duration-300 overflow-hidden",
+          "flex flex-col justify-center", // Center content vertically
+          getContainerPadding(),
           theme === 'dark' 
             ? "bg-club-black/20 border border-club-gold/10" 
             : "bg-gray-50/30 border border-club-gold/20"
@@ -46,14 +56,21 @@ export const PerformanceTrendsChart = ({
           contain: 'layout style paint'
         }}
       >
-        <ChartRenderer
-          chartView={chartView}
-          matchData={matchData}
-          selectedKPI={selectedKPI}
-          selectedKPILabel={selectedKPILabel}
-          showMovingAverage={showMovingAverage}
-          getChartConfig={getChartConfig}
-        />
+        <div className="w-full h-full flex items-center justify-center">
+          <div className="w-full h-full" style={{ 
+            maxHeight: '100%',
+            minHeight: isMobile ? '280px' : '360px' // Ensure minimum chart area
+          }}>
+            <ChartRenderer
+              chartView={chartView}
+              matchData={matchData}
+              selectedKPI={selectedKPI}
+              selectedKPILabel={selectedKPILabel}
+              showMovingAverage={showMovingAverage}
+              getChartConfig={getChartConfig}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
