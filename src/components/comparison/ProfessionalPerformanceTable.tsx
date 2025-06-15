@@ -29,11 +29,13 @@ interface MetricConfig {
   key: SortableMetric;
   label: string;
   shortLabel: string;
+  mobileLabel: string;
   getValue: (player: Player) => number | null;
   format: (value: number | null) => string;
   unit: string;
   icon: any;
   description: string;
+  priority: number; // For responsive column management
 }
 
 export const ProfessionalPerformanceTable = ({
@@ -50,58 +52,86 @@ export const ProfessionalPerformanceTable = ({
       key: 'distance',
       label: 'Total Distance',
       shortLabel: 'Distance',
+      mobileLabel: 'Dist',
       getValue: (player) => player.distance,
       format: (value) => value ? `${value.toFixed(1)} km` : 'N/A',
       unit: 'km',
       icon: TrendingUp,
-      description: 'Total distance covered during the match'
+      description: 'Total distance covered during the match',
+      priority: 1
     },
     {
       key: 'passCompletion',
       label: 'Pass Completion',
       shortLabel: 'Pass %',
+      mobileLabel: 'Pass',
       getValue: (player) => player.passes_attempted && player.passes_attempted > 0 
         ? getPassCompletionPercentage(player) : null,
       format: (value) => value ? formatPercentage(value) : 'N/A',
       unit: '%',
       icon: Target,
-      description: 'Percentage of successful passes'
+      description: 'Percentage of successful passes',
+      priority: 1
     },
     {
       key: 'shots',
       label: 'Shots on Target',
       shortLabel: 'Shots',
+      mobileLabel: 'SOT',
       getValue: (player) => player.shots_on_target,
       format: (value) => value !== null ? value.toString() : 'N/A',
       unit: '',
       icon: BarChart3,
-      description: 'Number of shots that were on target'
+      description: 'Number of shots that were on target',
+      priority: 2
     },
     {
       key: 'tackles',
       label: 'Tackles Won',
       shortLabel: 'Tackles',
+      mobileLabel: 'Tack',
       getValue: (player) => player.tackles_won,
       format: (value) => value !== null ? value.toString() : 'N/A',
       unit: '',
       icon: Medal,
-      description: 'Number of successful tackles'
+      description: 'Number of successful tackles',
+      priority: 2
     }
   ];
 
+  // Responsive metric filtering
+  const visibleMetrics = useMemo(() => {
+    if (typeof window === 'undefined') return metrics;
+    
+    const screenWidth = window.innerWidth;
+    
+    // Mobile: Show high priority metrics only
+    if (screenWidth < 640) {
+      return metrics.filter(m => m.priority === 1);
+    }
+    
+    // Tablet: Show high and medium priority
+    if (screenWidth < 1024) {
+      return metrics.filter(m => m.priority <= 2);
+    }
+    
+    // Desktop: Show all metrics
+    return metrics;
+  }, [typeof window !== 'undefined' ? window.innerWidth : 0]);
+
   // Calculate highest values for each metric
   const highestValues = useMemo(() => {
-    return metrics.reduce((acc, metric) => {
+    return visibleMetrics.reduce((acc, metric) => {
       acc[metric.key] = getHighestValuesInRow(selectedPlayers, metric.getValue);
       return acc;
     }, {} as Record<SortableMetric, Record<number, boolean>>);
-  }, [selectedPlayers]);
+  }, [selectedPlayers, visibleMetrics]);
 
   // Sort players based on selected metric
   const sortedPlayers = useMemo(() => {
     if (!sortMetric || !sortDirection) return selectedPlayers;
 
-    const metric = metrics.find(m => m.key === sortMetric);
+    const metric = visibleMetrics.find(m => m.key === sortMetric);
     if (!metric) return selectedPlayers;
 
     return [...selectedPlayers].sort((a, b) => {
@@ -117,7 +147,7 @@ export const ProfessionalPerformanceTable = ({
       const comparison = valueA > valueB ? 1 : -1;
       return sortDirection === 'asc' ? comparison : -comparison;
     });
-  }, [selectedPlayers, sortMetric, sortDirection, metrics]);
+  }, [selectedPlayers, sortMetric, sortDirection, visibleMetrics]);
 
   const handleSort = (metric: SortableMetric) => {
     if (sortMetric === metric) {
@@ -179,6 +209,39 @@ export const ProfessionalPerformanceTable = ({
     }
   };
 
+  // Responsive sizing classes
+  const getResponsiveClasses = () => {
+    return {
+      headerText: cn(
+        "text-base font-semibold",
+        "sm:text-lg",
+        "lg:text-xl"
+      ),
+      tablePadding: cn(
+        "p-2",
+        "sm:p-3",
+        "lg:p-4"
+      ),
+      cellPadding: cn(
+        "p-1",
+        "sm:p-2",
+        "lg:p-3"
+      ),
+      fontSize: cn(
+        "text-xs",
+        "sm:text-sm",
+        "lg:text-base"
+      ),
+      iconSize: cn(
+        "w-3 h-3",
+        "sm:w-4 sm:h-4",
+        "lg:w-5 lg:h-5"
+      )
+    };
+  };
+
+  const responsiveClasses = getResponsiveClasses();
+
   return (
     <Card className={cn(
       "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
@@ -188,54 +251,69 @@ export const ProfessionalPerformanceTable = ({
       "shadow-xl animate-fade-in"
     )}>
       <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <TrendingUp className="h-5 w-5 text-club-gold" />
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <TrendingUp className={cn(responsiveClasses.iconSize, "text-club-gold")} />
             <CardTitle className={cn(
-              "text-lg font-semibold",
+              responsiveClasses.headerText,
               theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
             )}>
               Professional Performance Analysis
             </CardTitle>
           </div>
           
-          {sortMetric && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setSortMetric(null);
-                setSortDirection(null);
-              }}
-              className="text-xs"
-            >
-              Clear Sort
-            </Button>
-          )}
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            {/* Responsive info badge */}
+            {isMobile && (
+              <Badge variant="outline" className="text-xs bg-club-gold/10 border-club-gold/30 text-club-gold">
+                Swipe → to see more metrics
+              </Badge>
+            )}
+            
+            {sortMetric && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  setSortMetric(null);
+                  setSortDirection(null);
+                }}
+                className="text-xs"
+              >
+                Clear Sort
+              </Button>
+            )}
+          </div>
         </div>
       </CardHeader>
       
       <CardContent className="p-0">
         {loading ? (
-          <div className="p-6">
+          <div className="p-3 sm:p-6">
             <TableLoadingSkeleton rows={6} columns={selectedPlayers.length + 1} />
           </div>
         ) : (
           <div className="relative">
             <ScrollArea className="w-full">
-              <div className="min-w-full overflow-x-auto">
-                <table className="w-full min-w-[800px]">
+              <div className="overflow-x-auto">
+                <table className={cn(
+                  "w-full border-separate border-spacing-0",
+                  "min-w-[600px]", // Minimum width for proper display
+                  "sm:min-w-[800px]",
+                  "lg:min-w-full"
+                )}>
                   <thead className="sticky top-0 z-20">
                     <tr className={cn(
                       "border-b transition-colors",
                       theme === 'dark' 
-                        ? "border-club-gold/20 bg-club-black/90" 
-                        : "border-club-gold/30 bg-gray-50/90",
+                        ? "border-club-gold/20 bg-club-black/95" 
+                        : "border-club-gold/30 bg-gray-50/95",
                       "backdrop-blur-sm"
                     )}>
                       <th className={cn(
-                        "text-left p-3 font-semibold sticky left-0 z-30 min-w-[160px]",
-                        isMobile ? "text-sm p-2" : "text-base p-4",
+                        "text-left sticky left-0 z-30",
+                        responsiveClasses.cellPadding,
+                        "min-w-[120px] sm:min-w-[160px] lg:min-w-[180px]",
                         theme === 'dark' 
                           ? "text-club-light-gray bg-club-dark-gray/95" 
                           : "text-gray-900 bg-white/95",
@@ -246,8 +324,8 @@ export const ProfessionalPerformanceTable = ({
                           size="sm"
                           onClick={() => handleSort('name')}
                           className={cn(
-                            "h-auto p-0 font-semibold justify-start gap-2",
-                            isMobile && "text-sm"
+                            "h-auto p-0 font-semibold justify-start gap-1 sm:gap-2",
+                            responsiveClasses.fontSize
                           )}
                         >
                           Player
@@ -255,38 +333,39 @@ export const ProfessionalPerformanceTable = ({
                         </Button>
                       </th>
                       
-                      {metrics.map((metric) => (
+                      {visibleMetrics.map((metric) => (
                         <th key={metric.key} className={cn(
-                          "text-center p-3",
-                          isMobile ? "min-w-[120px] p-2" : "min-w-[140px] p-4"
+                          "text-center",
+                          responsiveClasses.cellPadding,
+                          "min-w-[80px] sm:min-w-[120px] lg:min-w-[140px]"
                         )}>
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => handleSort(metric.key)}
                             className={cn(
-                              "h-auto p-1 font-semibold flex-col gap-1 w-full",
-                              isMobile && "text-xs gap-0.5"
+                              "h-auto p-1 font-semibold flex-col gap-0.5 w-full",
+                              responsiveClasses.fontSize
                             )}
                             title={metric.description}
                           >
-                            <div className="flex items-center gap-2 justify-center">
+                            <div className="flex items-center gap-1 justify-center">
                               <metric.icon className={cn(
                                 "text-club-gold",
-                                isMobile ? "w-3 h-3" : "w-4 h-4"
+                                "w-3 h-3 sm:w-4 sm:h-4"
                               )} />
                               <span className={cn(
-                                "font-medium",
-                                isMobile ? "text-xs" : "text-sm",
+                                "font-medium truncate",
                                 theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
                               )}>
-                                {isMobile ? metric.shortLabel : metric.label}
+                                {isMobile ? metric.mobileLabel : 
+                                 window.innerWidth < 1024 ? metric.shortLabel : metric.label}
                               </span>
                               {getSortIcon(metric.key)}
                             </div>
                             <span className={cn(
                               "text-gray-500",
-                              isMobile ? "text-xs" : "text-xs"
+                              "text-xs"
                             )}>
                               ({metric.unit || 'count'})
                             </span>
@@ -309,13 +388,14 @@ export const ProfessionalPerformanceTable = ({
                         )}
                       >
                         <td className={cn(
-                          "sticky left-0 z-10 border-r min-w-[160px]",
-                          isMobile ? "p-2" : "p-4",
+                          "sticky left-0 z-10 border-r",
+                          responsiveClasses.cellPadding,
+                          "min-w-[120px] sm:min-w-[160px] lg:min-w-[180px]",
                           theme === 'dark' 
                             ? "bg-club-dark-gray/95 border-club-gold/10" 
                             : "bg-white/95 border-club-gold/20"
                         )}>
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-1 sm:gap-2">
                             <PlayerAvatar 
                               player={player} 
                               size={isMobile ? "xs" : "sm"} 
@@ -323,14 +403,14 @@ export const ProfessionalPerformanceTable = ({
                             <div className="min-w-0 flex-1">
                               <div className={cn(
                                 "font-medium truncate",
-                                isMobile ? "text-sm" : "text-base",
+                                responsiveClasses.fontSize,
                                 theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
                               )}>
                                 {player.name}
                               </div>
                               <div className={cn(
                                 "text-gray-500 truncate",
-                                isMobile ? "text-xs" : "text-sm"
+                                "text-xs"
                               )}>
                                 {player.position || 'N/A'}
                               </div>
@@ -338,7 +418,7 @@ export const ProfessionalPerformanceTable = ({
                           </div>
                         </td>
                         
-                        {metrics.map((metric) => {
+                        {visibleMetrics.map((metric) => {
                           const value = metric.getValue(player);
                           const isHighest = highestValues[metric.key]?.[player.id];
                           const level = getPerformanceLevel(value, metric);
@@ -348,14 +428,14 @@ export const ProfessionalPerformanceTable = ({
                               key={`${player.id}-${metric.key}`}
                               className={cn(
                                 "text-center transition-all duration-200 relative",
-                                isMobile ? "p-2" : "p-4",
+                                responsiveClasses.cellPadding,
                                 isHighest && "bg-club-gold/10 border-club-gold/20"
                               )}
                             >
-                              <div className="space-y-1">
+                              <div className="space-y-0.5 sm:space-y-1">
                                 <div className={cn(
                                   "font-bold",
-                                  isMobile ? "text-sm" : "text-base",
+                                  responsiveClasses.fontSize,
                                   isHighest 
                                     ? "text-club-gold" 
                                     : getPerformanceLevelColor(level)
@@ -368,18 +448,16 @@ export const ProfessionalPerformanceTable = ({
                                     variant="outline" 
                                     className={cn(
                                       "bg-club-gold/20 text-club-gold border-club-gold/30",
-                                      isMobile ? "text-xs px-1 py-0" : "text-xs"
+                                      "text-xs px-1 py-0"
                                     )}
                                   >
-                                    <Medal className={cn(
-                                      "mr-1",
-                                      isMobile ? "w-2 h-2" : "w-3 h-3"
-                                    )} />
-                                    Best
+                                    <Medal className="w-2 h-2 mr-0.5 sm:w-3 sm:h-3 sm:mr-1" />
+                                    <span className="hidden sm:inline">Best</span>
+                                    <span className="sm:hidden">★</span>
                                   </Badge>
                                 )}
                                 
-                                {/* Performance level indicator for non-mobile */}
+                                {/* Performance level indicator for larger screens */}
                                 {!isHighest && value !== null && !isMobile && (
                                   <div className={cn(
                                     "text-xs opacity-60",
@@ -414,12 +492,19 @@ export const ProfessionalPerformanceTable = ({
               </div>
             </ScrollArea>
             
-            {/* Horizontal scroll indicator for mobile */}
-            {isMobile && (
-              <div className="absolute bottom-2 right-2 bg-club-gold/20 text-club-gold px-2 py-1 rounded text-xs backdrop-blur-sm">
-                ← Scroll →
-              </div>
-            )}
+            {/* Enhanced scroll indicators */}
+            <div className="absolute bottom-2 right-2 flex items-center gap-2">
+              {isMobile && (
+                <div className="bg-club-gold/20 text-club-gold px-2 py-1 rounded text-xs backdrop-blur-sm flex items-center gap-1">
+                  <span>← Scroll →</span>
+                </div>
+              )}
+              {visibleMetrics.length < metrics.length && (
+                <div className="bg-blue-500/20 text-blue-400 px-2 py-1 rounded text-xs backdrop-blur-sm">
+                  {metrics.length - visibleMetrics.length} more on larger screen
+                </div>
+              )}
+            </div>
           </div>
         )}
       </CardContent>

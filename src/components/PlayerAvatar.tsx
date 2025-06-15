@@ -3,24 +3,27 @@ import { Player } from "@/types";
 
 interface PlayerAvatarProps {
   player: Player;
-  size?: "sm" | "md" | "lg";
+  size?: "xs" | "sm" | "md" | "lg";
   className?: string;
 }
 
 export const PlayerAvatar = ({ player, size = "md", className = "" }: PlayerAvatarProps) => {
   const sizeClasses = {
+    xs: "h-6 w-6",
     sm: "h-8 w-8",
     md: "h-12 w-12", 
     lg: "h-24 w-24"
   };
 
   const textSizes = {
+    xs: "text-xs",
     sm: "text-xs",
     md: "text-sm",
     lg: "text-xl"
   };
 
   const numberSizes = {
+    xs: "text-sm font-bold",
     sm: "text-lg font-black",
     md: "text-xl font-black",
     lg: "text-3xl font-black"
