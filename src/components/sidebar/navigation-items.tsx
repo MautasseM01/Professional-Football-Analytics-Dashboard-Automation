@@ -65,7 +65,7 @@ export const navigationItems: AccessibleNavigationItem[] = [
         allowedRoles: ['admin', 'management', 'performance_director', 'coach']
       },
       { 
-        name: "Tactical Analysis", 
+        name: "Team Tactical Analysis", 
         href: "/team-performance/tactical-analysis", 
         translationKey: "nav.tacticalAnalysis",
         allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
