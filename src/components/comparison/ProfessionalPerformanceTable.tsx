@@ -122,11 +122,14 @@ export const ProfessionalPerformanceTable = ({
     metrics: visibleMetrics
   });
 
-  // Sort metrics instead of players
+  // Sort metrics instead of players with null-safe comparison
   const sortedMetrics = useMemo(() => {
     if (sortState.metric === 'name') {
       return [...visibleMetrics].sort((a, b) => {
-        const comparison = a.label.localeCompare(b.label);
+        // Add null/undefined checks for metric labels
+        const labelA = a.label || '';
+        const labelB = b.label || '';
+        const comparison = labelA.localeCompare(labelB);
         return sortState.direction === 'asc' ? comparison : -comparison;
       });
     }
@@ -308,7 +311,7 @@ export const ProfessionalPerformanceTable = ({
                               responsiveClasses.fontSize,
                               theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
                             )}>
-                              {player.name}
+                              {player.name || 'Unknown Player'}
                             </div>
                             <div className={cn(
                               "text-gray-500 truncate",
