@@ -33,14 +33,14 @@ export const getHighestValuesInRow = (
 };
 
 export const prepareRadarData = (selectedPlayers: Player[]) => {
-  const radarData = [
-    { category: "Distance", fullMark: 100 },
-    { category: "Shots on Target", fullMark: 100 },
-    { category: "Passes Completed", fullMark: 100 },
-    { category: "Tackles Won", fullMark: 100 }
-  ];
+  console.log("prepareRadarData called with players:", selectedPlayers);
+  
+  if (!selectedPlayers || selectedPlayers.length === 0) {
+    console.log("No players provided to prepareRadarData");
+    return [];
+  }
 
-  // Find max values to normalize data
+  // Find max values to normalize data (ensure we don't divide by 0)
   const maxValues = {
     distance: Math.max(...selectedPlayers.map(p => p.distance || 0), 1),
     shots_on_target: Math.max(...selectedPlayers.map(p => p.shots_on_target || 0), 1),
@@ -48,24 +48,44 @@ export const prepareRadarData = (selectedPlayers: Player[]) => {
     tackles_won: Math.max(...selectedPlayers.map(p => p.tackles_won || 0), 1)
   };
 
-  // Add player data to radar chart
-  selectedPlayers.forEach(player => {
-    radarData[0][player.name] = player.distance 
-      ? (player.distance / maxValues.distance) * 100 
-      : 0;
-      
-    radarData[1][player.name] = player.shots_on_target 
-      ? (player.shots_on_target / maxValues.shots_on_target) * 100 
-      : 0;
-      
-    radarData[2][player.name] = player.passes_completed 
-      ? (player.passes_completed / maxValues.passes_completed) * 100 
-      : 0;
-      
-    radarData[3][player.name] = player.tackles_won 
-      ? (player.tackles_won / maxValues.tackles_won) * 100 
-      : 0;
+  console.log("Max values for normalization:", maxValues);
+
+  // Create the base data structure
+  const radarData = [
+    { category: "Distance", fullMark: 100 },
+    { category: "Shots on Target", fullMark: 100 },
+    { category: "Passes Completed", fullMark: 100 },
+    { category: "Tackles Won", fullMark: 100 }
+  ];
+
+  // Add each player's data to each category
+  selectedPlayers.forEach((player, playerIndex) => {
+    console.log(`Processing player ${player.name} (${playerIndex})`);
+    
+    // Distance
+    const distanceValue = player.distance ? (player.distance / maxValues.distance) * 100 : 0;
+    radarData[0][player.name] = Math.round(distanceValue);
+    
+    // Shots on Target
+    const shotsValue = player.shots_on_target ? (player.shots_on_target / maxValues.shots_on_target) * 100 : 0;
+    radarData[1][player.name] = Math.round(shotsValue);
+    
+    // Passes Completed
+    const passesValue = player.passes_completed ? (player.passes_completed / maxValues.passes_completed) * 100 : 0;
+    radarData[2][player.name] = Math.round(passesValue);
+    
+    // Tackles Won
+    const tacklesValue = player.tackles_won ? (player.tackles_won / maxValues.tackles_won) * 100 : 0;
+    radarData[3][player.name] = Math.round(tacklesValue);
+    
+    console.log(`Player ${player.name} normalized values:`, {
+      distance: distanceValue,
+      shots: shotsValue,
+      passes: passesValue,
+      tackles: tacklesValue
+    });
   });
 
+  console.log("Final radar data:", radarData);
   return radarData;
 };
