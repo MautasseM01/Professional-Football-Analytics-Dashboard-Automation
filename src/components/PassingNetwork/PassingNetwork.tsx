@@ -40,7 +40,7 @@ export const PassingNetwork = ({
   const [lastTouch, setLastTouch] = useState({ x: 0, y: 0 });
   const [transform, setTransform] = useState({ x: 0, y: 0 });
 
-  // Responsive dimensions calculation
+  // Responsive dimensions calculation with iOS-style aspect ratios
   const getOptimalDimensions = () => {
     if (!containerRef.current) return { width: 0, height: 0 };
     
@@ -48,20 +48,20 @@ export const PassingNetwork = ({
     let width = container.width;
     let height = container.height;
 
-    // Maintain aspect ratio similar to shot map
+    // iOS Weather app-inspired aspect ratios
     if (breakpoint === 'mobile') {
       width = Math.max(width, 375);
-      height = Math.max(height, 250);
-      // Maintain 3:2 aspect ratio for mobile
-      if (width / height > 1.5) {
-        height = width / 1.5;
+      height = Math.max(height, 280);
+      // Maintain 4:3 aspect ratio for mobile
+      if (width / height > 1.33) {
+        height = width / 1.33;
       }
     } else if (breakpoint === 'tablet-portrait') {
       width = Math.max(width, 768);
-      height = Math.max(height, 512);
+      height = Math.max(height, 480);
     } else {
       width = Math.max(width, 1024);
-      height = Math.max(height, 683);
+      height = Math.max(height, 640);
     }
 
     return { width, height };
@@ -145,14 +145,14 @@ export const PassingNetwork = ({
     triggerHaptic('medium');
   };
 
-  // Container classes matching shot map styling
+  // iOS-style container classes with gradients
   const getContainerClasses = () => {
-    const baseClasses = "relative transition-all duration-300 ease-out rounded-lg overflow-hidden bg-gradient-to-br from-green-50 to-emerald-100 dark:from-emerald-900/20 dark:to-green-900/20";
+    const baseClasses = "relative transition-all duration-300 ease-out rounded-2xl overflow-hidden";
     
     if (breakpoint === 'mobile') {
-      return `${baseClasses} min-h-[250px]`;
+      return `${baseClasses} min-h-[280px] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800`;
     }
-    return `${baseClasses} min-h-[500px]`;
+    return `${baseClasses} min-h-[500px] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800`;
   };
 
   if (isLoading) {
@@ -160,6 +160,7 @@ export const PassingNetwork = ({
       <div className={getContainerClasses()}>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="space-y-4 text-center">
+            {/* iOS-style loading skeleton */}
             <div className="mx-auto w-16 h-16 bg-white/20 dark:bg-white/10 rounded-full animate-pulse" />
             <div className="space-y-2">
               <div className="h-4 bg-white/20 dark:bg-white/10 rounded-full w-32 mx-auto animate-pulse" />
@@ -173,7 +174,7 @@ export const PassingNetwork = ({
 
   return (
     <div className={getContainerClasses()}>
-      {/* Control bar matching shot map style */}
+      {/* iOS-style control bar */}
       <div className="absolute top-4 right-4 z-20 flex gap-2">
         <Button
           variant="secondary"
@@ -216,7 +217,7 @@ export const PassingNetwork = ({
         <FootballPitch width={dimensions.width} height={dimensions.height}>
           {players && players.length > 0 ? (
             <>
-              {/* Render passing connections */}
+              {/* Render passing connections with enhanced styling */}
               {connections.map((connection, idx) => {
                 const fromPlayer = players.find(p => p.id === connection.from);
                 const toPlayer = players.find(p => p.id === connection.to);
@@ -244,7 +245,7 @@ export const PassingNetwork = ({
                 );
               })}
               
-              {/* Render player nodes */}
+              {/* Render player nodes with touch optimization */}
               {players.map(player => (
                 <PlayerNode
                   key={`player-${player.id}`}
