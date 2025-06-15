@@ -60,7 +60,7 @@ export const navigationItems: AccessibleNavigationItem[] = [
     subItems: [
       { 
         name: "Team Overview", 
-        href: "/team-performance", 
+        href: "/team-performance/overview", 
         translationKey: "nav.teamOverview",
         allowedRoles: ['admin', 'management', 'performance_director', 'coach']
       },

@@ -41,8 +41,12 @@ const App = () => (
                 <Route path="/player-analysis/comparison" element={<PlayerComparison />} />
                 <Route path="/player-analysis/development" element={<PlayerDevelopment />} />
                 <Route path="/player-analysis/shot-map" element={<ShotMap />} />
-                <Route path="/team-performance" element={<TeamOverview />} />
+                
+                {/* Team Performance routes - redirect base path to overview */}
+                <Route path="/team-performance" element={<Navigate to="/team-performance/overview" replace />} />
+                <Route path="/team-performance/overview" element={<TeamOverview />} />
                 <Route path="/team-performance/tactical-analysis" element={<TeamTacticalAnalysis />} />
+                
                 <Route path="/reports" element={<Dashboard />} />
                 <Route path="/settings" element={<Dashboard />} />
                 
