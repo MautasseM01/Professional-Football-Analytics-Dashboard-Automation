@@ -40,25 +40,13 @@ export const LanguageSelector = () => {
           style={{ minWidth: 0 }}
         >
           <SelectValue>
-            <div className="flex items-center justify-center w-full h-full relative">
-              {/* Lucide globe icon */}
+            <div className="flex items-center justify-center w-full h-full">
               <Globe
                 size={18}
                 className="text-club-gold"
                 strokeWidth={2}
                 aria-label="Language selector"
               />
-              {/* Language code badge */}
-              <span
-                className="absolute -top-2 -right-2 sm:-top-1.5 sm:-right-1.5 bg-club-gold text-club-black rounded-full px-1 py-0.5 text-[10px] font-bold shadow ring-1 ring-club-gold/50 border border-white/40 select-none transition-all min-w-[18px] text-center pointer-events-none"
-                style={{
-                  lineHeight: "1",
-                  fontVariant: "small-caps",
-                }}
-                aria-live="polite"
-              >
-                {getLanguageCode(language)}
-              </span>
             </div>
           </SelectValue>
         </SelectTrigger>
@@ -77,6 +65,24 @@ export const LanguageSelector = () => {
           ))}
         </SelectContent>
       </Select>
+
+      {/* External stylish language badge positioned outside button borders */}
+      <div 
+        className="absolute -top-1 -right-1 sm:-top-0.5 sm:-right-0.5 z-10 pointer-events-none"
+        style={{ transform: 'translate(50%, -50%)' }}
+      >
+        <div
+          className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-gradient-to-br from-club-gold via-club-gold to-yellow-600 text-club-black flex items-center justify-center text-[10px] sm:text-xs font-bold shadow-lg shadow-club-gold/30 border border-club-gold/20 ring-1 ring-white/40 transition-all duration-300"
+          style={{
+            lineHeight: "1",
+            fontVariant: "small-caps",
+          }}
+          aria-live="polite"
+        >
+          {getLanguageCode(language)}
+        </div>
+      </div>
+
       {/* Hide SelectTrigger's chevron arrow using style */}
       <style>
         {`
