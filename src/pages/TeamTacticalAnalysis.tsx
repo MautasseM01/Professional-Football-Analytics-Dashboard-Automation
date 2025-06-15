@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -87,10 +88,10 @@ const TeamTacticalAnalysis = () => {
             <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
               {/* Left section - Title and page info */}
               <div className="flex-1 min-w-0">
-                <h1 className="font-bold text-club-gold dark:text-club-gold truncate md:line-clamp-2 lg:line-clamp-none text-base md:text-lg lg:text-2xl">
+                <h1 className="text-ios-headline font-bold text-club-gold dark:text-club-gold truncate">
                   Team Tactical Analysis
                 </h1>
-                <p className="text-gray-400 dark:text-gray-400 truncate md:line-clamp-2 lg:line-clamp-none text-xs md:text-sm lg:text-base">
+                <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
                   Analyze team passing networks and tactical patterns
                 </p>
               </div>

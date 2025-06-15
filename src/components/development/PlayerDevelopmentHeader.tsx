@@ -19,16 +19,16 @@ export const PlayerDevelopmentHeader = ({ onRefresh, onToggleSidebar }: PlayerDe
         <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
           {/* Left section - Title and page info */}
           <div className="flex-1 min-w-0">
-            <h2 className="font-bold text-club-gold dark:text-club-gold truncate md:line-clamp-2 lg:line-clamp-none text-base md:text-lg lg:text-2xl">
+            <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-club-gold dark:text-club-gold truncate">
               Player Development
             </h2>
-            <p className="text-gray-400 dark:text-gray-400 truncate md:line-clamp-2 lg:line-clamp-none text-xs md:text-sm lg:text-base hidden sm:block">
+            <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate hidden sm:block">
               {profile?.role === 'player' 
                 ? "Track your development goals and progress"
                 : "Monitor player development and provide guidance"
               }
             </p>
-            <p className="text-gray-400 dark:text-gray-400 truncate md:line-clamp-2 lg:line-clamp-none text-xs md:text-sm lg:text-base sm:hidden">
+            <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate sm:hidden">
               {profile?.role === 'player' ? "Your goals & progress" : "Player development"}
             </p>
           </div>
