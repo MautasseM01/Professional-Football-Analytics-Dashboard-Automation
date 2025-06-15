@@ -1,3 +1,4 @@
+
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -168,22 +169,21 @@ export const ProfessionalPerformanceTable = ({
         : "bg-white/80",
       "shadow-xl animate-fade-in"
     )}>
-      <CardHeader>
-        <div className="flex items-center justify-between">
-          <div className="flex items-center">
-            <TrendingUp className={cn(responsiveClasses.iconSize, "text-club-gold mr-2")} />
+      <CardHeader className="pb-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-2 sm:gap-3">
+            <TrendingUp className={cn(responsiveClasses.iconSize, "text-club-gold")} />
             <CardTitle className={cn(
               responsiveClasses.headerText,
-              "whitespace-nowrap",
               theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
             )}>
               Professional Performance Analysis
             </CardTitle>
           </div>
           
-          <div className="flex items-center">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             {isMobile && (
-              <Badge variant="outline" className="text-xs bg-club-gold/10 border-club-gold/30 text-club-gold mr-2">
+              <Badge variant="outline" className="text-xs bg-club-gold/10 border-club-gold/30 text-club-gold">
                 Swipe → to see more metrics
               </Badge>
             )}
