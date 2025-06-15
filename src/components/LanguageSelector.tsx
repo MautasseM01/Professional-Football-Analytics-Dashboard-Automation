@@ -22,7 +22,7 @@ export const LanguageSelector = () => {
 
   return (
     <Select value={language} onValueChange={setLanguage}>
-      <SelectTrigger className="w-12 sm:w-14 lg:w-16 h-8 sm:h-9 lg:h-10 text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors bg-transparent">
+      <SelectTrigger className="w-8 h-8 sm:w-9 sm:h-9 lg:w-10 lg:h-10 text-club-light-gray border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors bg-transparent">
         <SelectValue>
           <div className="flex items-center justify-center">
             <span className="text-xs font-medium">
