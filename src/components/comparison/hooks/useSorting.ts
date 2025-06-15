@@ -47,10 +47,7 @@ export const useSorting = ({ players, metrics }: UseSortingProps) => {
     
     return [...players].sort((a, b) => {
       if (sortState.metric === 'name') {
-        // Add null/undefined checks for player names
-        const nameA = a.name || '';
-        const nameB = b.name || '';
-        const comparison = nameA.localeCompare(nameB);
+        const comparison = a.name.localeCompare(b.name);
         return sortState.direction === 'asc' ? comparison : -comparison;
       }
 

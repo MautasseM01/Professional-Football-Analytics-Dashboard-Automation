@@ -24,8 +24,10 @@ export const usePlayerData = () => {
   }, []);
   
   const fetchPlayersAsync = useCallback(async () => {
-    // Allow fetching players even if profile is not loaded yet in demo mode
-    // This is essential for the demo mode functionality
+    if (!profile) {
+      throw new Error('User profile not loaded');
+    }
+
     try {
       const { data, error: fetchError } = await supabase
         .from("players")
@@ -39,10 +41,10 @@ export const usePlayerData = () => {
         throw new Error('No player data found');
       }
       
-      // Apply role-based filtering only if profile is available
+      // Apply role-based filtering
       let filteredData = data as Player[];
       
-      if (profile?.role === 'player') {
+      if (profile.role === 'player') {
         // Players can only see their own data
         filteredData = data.slice(0, 1) as Player[];
       }
@@ -56,7 +58,7 @@ export const usePlayerData = () => {
 
   const { data, loading, error: asyncError, retry } = useSafeAsync(
     fetchPlayersAsync,
-    [], // Remove profile dependency to allow loading without profile
+    [profile],
     { component: 'usePlayerData' }
   );
 
@@ -78,7 +80,8 @@ export const usePlayerData = () => {
   }, [asyncError]);
   
   useEffect(() => {
-    // Set up subscription regardless of profile status
+    if (!profile) return;
+    
     const playersSubscription = supabase
       .channel('public:players')
       .on('postgres_changes', { 
@@ -95,12 +98,12 @@ export const usePlayerData = () => {
     return () => {
       playersSubscription.unsubscribe();
     };
-  }, [retry]); // Remove profile dependency
+  }, [profile, retry]);
   
   const selectPlayer = useCallback((id: number) => {
     const player = players.find(p => p.id === id);
     if (player) {
-      // Check role-based access only if profile is available
+      // Check role-based access
       if (profile?.role === 'player' && players.length === 1 && player.id !== players[0].id) {
         toast({
           title: "Access Denied",
@@ -115,7 +118,7 @@ export const usePlayerData = () => {
   }, [players, profile, toast]);
   
   const canAccessPlayerData = useCallback((playerId: number): boolean => {
-    if (!profile) return true; // Allow access in demo mode when profile is loading
+    if (!profile) return false;
     
     switch (profile.role) {
       case 'admin':
@@ -127,7 +130,7 @@ export const usePlayerData = () => {
       case 'player':
         return players.length === 1 && players[0]?.id === playerId;
       default:
-        return true; // Default to allowing access in demo mode
+        return false;
     }
   }, [profile, players]);
   
