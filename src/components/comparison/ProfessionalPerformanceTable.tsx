@@ -3,7 +3,6 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, BarChart3, Medal, Target } from "lucide-react";
 import { Player } from "@/types";
@@ -35,7 +34,7 @@ interface MetricConfig {
   unit: string;
   icon: any;
   description: string;
-  priority: number; // For responsive column management
+  priority: number;
 }
 
 export const ProfessionalPerformanceTable = ({
@@ -294,203 +293,227 @@ export const ProfessionalPerformanceTable = ({
           </div>
         ) : (
           <div className="relative">
-            <ScrollArea className="w-full">
-              <div className="overflow-x-auto">
-                <table className={cn(
-                  "w-full border-separate border-spacing-0",
-                  "min-w-[600px]", // Minimum width for proper display
-                  "sm:min-w-[800px]",
-                  "lg:min-w-full"
-                )}>
-                  <thead className="sticky top-0 z-20">
-                    <tr className={cn(
-                      "border-b transition-colors",
+            {/* Native scrollable container with visible scroll bars */}
+            <div 
+              className={cn(
+                "w-full overflow-x-auto",
+                "scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-club-gold/30",
+                "hover:scrollbar-thumb-club-gold/50",
+                // Custom scroll bar styling for all browsers
+                "[&::-webkit-scrollbar]:h-3",
+                "[&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full",
+                "[&::-webkit-scrollbar-thumb]:bg-club-gold/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:bg-clip-content",
+                "[&::-webkit-scrollbar-thumb:hover]:bg-club-gold/50",
+                // Firefox scrollbar
+                "scrollbar-width-thin scrollbar-color-club-gold/30 scrollbar-color-transparent",
+                theme === 'dark' && [
+                  "[&::-webkit-scrollbar-track]:bg-club-dark-gray/50",
+                  "[&::-webkit-scrollbar-thumb]:bg-club-gold/40"
+                ]
+              )}
+              style={{
+                // Ensure scroll bars are always visible
+                scrollbarWidth: 'thin',
+                msOverflowStyle: 'scrollbar'
+              }}
+            >
+              <table className={cn(
+                "w-full border-separate border-spacing-0",
+                // Optimized minimum widths for better responsiveness
+                "min-w-[500px]", // Reduced from 600px
+                "sm:min-w-[600px]", // Reduced from 800px
+                "lg:min-w-[800px]" // Reduced from full width
+              )}>
+                <thead className="sticky top-0 z-20">
+                  <tr className={cn(
+                    "border-b transition-colors",
+                    theme === 'dark' 
+                      ? "border-club-gold/20 bg-club-black/95" 
+                      : "border-club-gold/30 bg-gray-50/95",
+                    "backdrop-blur-sm"
+                  )}>
+                    <th className={cn(
+                      "text-left sticky left-0 z-30",
+                      responsiveClasses.cellPadding,
+                      // Optimized column widths
+                      "w-[140px] sm:w-[160px] lg:w-[180px]", // More specific width control
                       theme === 'dark' 
-                        ? "border-club-gold/20 bg-club-black/95" 
-                        : "border-club-gold/30 bg-gray-50/95",
-                      "backdrop-blur-sm"
+                        ? "text-club-light-gray bg-club-dark-gray/95" 
+                        : "text-gray-900 bg-white/95",
+                      "border-r border-club-gold/20"
                     )}>
-                      <th className={cn(
-                        "text-left sticky left-0 z-30",
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleSort('name')}
+                        className={cn(
+                          "h-auto p-0 font-semibold justify-start gap-1 sm:gap-2",
+                          responsiveClasses.fontSize
+                        )}
+                      >
+                        Player
+                        {getSortIcon('name')}
+                      </Button>
+                    </th>
+                    
+                    {visibleMetrics.map((metric) => (
+                      <th key={metric.key} className={cn(
+                        "text-center",
                         responsiveClasses.cellPadding,
-                        "min-w-[120px] sm:min-w-[160px] lg:min-w-[180px]",
-                        theme === 'dark' 
-                          ? "text-club-light-gray bg-club-dark-gray/95" 
-                          : "text-gray-900 bg-white/95",
-                        "border-r border-club-gold/20"
+                        // More flexible column sizing
+                        "w-[100px] sm:w-[120px] lg:w-[140px]" // Reduced minimum widths
                       )}>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => handleSort('name')}
+                          onClick={() => handleSort(metric.key)}
                           className={cn(
-                            "h-auto p-0 font-semibold justify-start gap-1 sm:gap-2",
+                            "h-auto p-1 font-semibold flex-col gap-0.5 w-full",
                             responsiveClasses.fontSize
                           )}
+                          title={metric.description}
                         >
-                          Player
-                          {getSortIcon('name')}
+                          <div className="flex items-center gap-1 justify-center">
+                            <metric.icon className={cn(
+                              "text-club-gold",
+                              "w-3 h-3 sm:w-4 sm:h-4"
+                            )} />
+                            <span className={cn(
+                              "font-medium truncate max-w-[80px]", // Prevent text overflow
+                              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                            )}>
+                              {isMobile ? metric.mobileLabel : 
+                               window.innerWidth < 1024 ? metric.shortLabel : metric.label}
+                            </span>
+                            {getSortIcon(metric.key)}
+                          </div>
+                          <span className={cn(
+                            "text-gray-500",
+                            "text-xs"
+                          )}>
+                            ({metric.unit || 'count'})
+                          </span>
                         </Button>
                       </th>
-                      
-                      {visibleMetrics.map((metric) => (
-                        <th key={metric.key} className={cn(
-                          "text-center",
-                          responsiveClasses.cellPadding,
-                          "min-w-[80px] sm:min-w-[120px] lg:min-w-[140px]"
-                        )}>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => handleSort(metric.key)}
-                            className={cn(
-                              "h-auto p-1 font-semibold flex-col gap-0.5 w-full",
-                              responsiveClasses.fontSize
-                            )}
-                            title={metric.description}
-                          >
-                            <div className="flex items-center gap-1 justify-center">
-                              <metric.icon className={cn(
-                                "text-club-gold",
-                                "w-3 h-3 sm:w-4 sm:h-4"
-                              )} />
-                              <span className={cn(
-                                "font-medium truncate",
-                                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                              )}>
-                                {isMobile ? metric.mobileLabel : 
-                                 window.innerWidth < 1024 ? metric.shortLabel : metric.label}
-                              </span>
-                              {getSortIcon(metric.key)}
+                    ))}
+                  </tr>
+                </thead>
+                
+                <tbody>
+                  {sortedPlayers.map((player, index) => (
+                    <tr
+                      key={player.id}
+                      className={cn(
+                        "transition-all duration-200 hover:shadow-md border-b",
+                        theme === 'dark' 
+                          ? "border-club-gold/10 hover:bg-club-black/20 even:bg-club-black/10" 
+                          : "border-club-gold/20 hover:bg-gray-50/50 even:bg-gray-25/25",
+                        index % 2 === 0 && "bg-opacity-50"
+                      )}
+                    >
+                      <td className={cn(
+                        "sticky left-0 z-10 border-r",
+                        responsiveClasses.cellPadding,
+                        "w-[140px] sm:w-[160px] lg:w-[180px]",
+                        theme === 'dark' 
+                          ? "bg-club-dark-gray/95 border-club-gold/10" 
+                          : "bg-white/95 border-club-gold/20"
+                      )}>
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <PlayerAvatar 
+                            player={player} 
+                            size={isMobile ? "xs" : "sm"} 
+                          />
+                          <div className="min-w-0 flex-1">
+                            <div className={cn(
+                              "font-medium truncate",
+                              responsiveClasses.fontSize,
+                              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                            )}>
+                              {player.name}
                             </div>
-                            <span className={cn(
-                              "text-gray-500",
+                            <div className={cn(
+                              "text-gray-500 truncate",
                               "text-xs"
                             )}>
-                              ({metric.unit || 'count'})
-                            </span>
-                          </Button>
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  
-                  <tbody>
-                    {sortedPlayers.map((player, index) => (
-                      <tr
-                        key={player.id}
-                        className={cn(
-                          "transition-all duration-200 hover:shadow-md border-b",
-                          theme === 'dark' 
-                            ? "border-club-gold/10 hover:bg-club-black/20 even:bg-club-black/10" 
-                            : "border-club-gold/20 hover:bg-gray-50/50 even:bg-gray-25/25",
-                          index % 2 === 0 && "bg-opacity-50"
-                        )}
-                      >
-                        <td className={cn(
-                          "sticky left-0 z-10 border-r",
-                          responsiveClasses.cellPadding,
-                          "min-w-[120px] sm:min-w-[160px] lg:min-w-[180px]",
-                          theme === 'dark' 
-                            ? "bg-club-dark-gray/95 border-club-gold/10" 
-                            : "bg-white/95 border-club-gold/20"
-                        )}>
-                          <div className="flex items-center gap-1 sm:gap-2">
-                            <PlayerAvatar 
-                              player={player} 
-                              size={isMobile ? "xs" : "sm"} 
-                            />
-                            <div className="min-w-0 flex-1">
-                              <div className={cn(
-                                "font-medium truncate",
-                                responsiveClasses.fontSize,
-                                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                              )}>
-                                {player.name}
-                              </div>
-                              <div className={cn(
-                                "text-gray-500 truncate",
-                                "text-xs"
-                              )}>
-                                {player.position || 'N/A'}
-                              </div>
+                              {player.position || 'N/A'}
                             </div>
                           </div>
-                        </td>
+                        </div>
+                      </td>
+                      
+                      {visibleMetrics.map((metric) => {
+                        const value = metric.getValue(player);
+                        const isHighest = highestValues[metric.key]?.[player.id];
+                        const level = getPerformanceLevel(value, metric);
                         
-                        {visibleMetrics.map((metric) => {
-                          const value = metric.getValue(player);
-                          const isHighest = highestValues[metric.key]?.[player.id];
-                          const level = getPerformanceLevel(value, metric);
-                          
-                          return (
-                            <td
-                              key={`${player.id}-${metric.key}`}
-                              className={cn(
-                                "text-center transition-all duration-200 relative",
-                                responsiveClasses.cellPadding,
-                                isHighest && "bg-club-gold/10 border-club-gold/20"
-                              )}
-                            >
-                              <div className="space-y-0.5 sm:space-y-1">
-                                <div className={cn(
-                                  "font-bold",
-                                  responsiveClasses.fontSize,
-                                  isHighest 
-                                    ? "text-club-gold" 
-                                    : getPerformanceLevelColor(level)
-                                )}>
-                                  {metric.format(value)}
-                                </div>
-                                
-                                {isHighest && (
-                                  <Badge 
-                                    variant="outline" 
-                                    className={cn(
-                                      "bg-club-gold/20 text-club-gold border-club-gold/30",
-                                      "text-xs px-1 py-0"
-                                    )}
-                                  >
-                                    <Medal className="w-2 h-2 mr-0.5 sm:w-3 sm:h-3 sm:mr-1" />
-                                    <span className="hidden sm:inline">Best</span>
-                                    <span className="sm:hidden">★</span>
-                                  </Badge>
-                                )}
-                                
-                                {/* Performance level indicator for larger screens */}
-                                {!isHighest && value !== null && !isMobile && (
-                                  <div className={cn(
-                                    "text-xs opacity-60",
-                                    getPerformanceLevelColor(level)
-                                  )}>
-                                    {level}
-                                  </div>
-                                )}
+                        return (
+                          <td
+                            key={`${player.id}-${metric.key}`}
+                            className={cn(
+                              "text-center transition-all duration-200 relative",
+                              responsiveClasses.cellPadding,
+                              isHighest && "bg-club-gold/10 border-club-gold/20"
+                            )}
+                          >
+                            <div className="space-y-0.5 sm:space-y-1">
+                              <div className={cn(
+                                "font-bold",
+                                responsiveClasses.fontSize,
+                                isHighest 
+                                  ? "text-club-gold" 
+                                  : getPerformanceLevelColor(level)
+                              )}>
+                                {metric.format(value)}
                               </div>
                               
-                              {/* Performance bar */}
-                              {value !== null && (
-                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200">
-                                  <div 
-                                    className={cn(
-                                      "h-full transition-all duration-300",
-                                      isHighest ? "bg-club-gold" : getPerformanceLevelColor(level).replace('text-', 'bg-')
-                                    )}
-                                    style={{
-                                      width: `${Math.min(100, Math.max(10, (value / Math.max(...selectedPlayers.map(p => metric.getValue(p) || 0))) * 100))}%`
-                                    }}
-                                  />
+                              {isHighest && (
+                                <Badge 
+                                  variant="outline" 
+                                  className={cn(
+                                    "bg-club-gold/20 text-club-gold border-club-gold/30",
+                                    "text-xs px-1 py-0"
+                                  )}
+                                >
+                                  <Medal className="w-2 h-2 mr-0.5 sm:w-3 sm:h-3 sm:mr-1" />
+                                  <span className="hidden sm:inline">Best</span>
+                                  <span className="sm:hidden">★</span>
+                                </Badge>
+                              )}
+                              
+                              {/* Performance level indicator for larger screens */}
+                              {!isHighest && value !== null && !isMobile && (
+                                <div className={cn(
+                                  "text-xs opacity-60",
+                                  getPerformanceLevelColor(level)
+                                )}>
+                                  {level}
                                 </div>
                               )}
-                            </td>
-                          );
-                        })}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </ScrollArea>
+                            </div>
+                            
+                            {/* Performance bar */}
+                            {value !== null && (
+                              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200">
+                                <div 
+                                  className={cn(
+                                    "h-full transition-all duration-300",
+                                    isHighest ? "bg-club-gold" : getPerformanceLevelColor(level).replace('text-', 'bg-')
+                                  )}
+                                  style={{
+                                    width: `${Math.min(100, Math.max(10, (value / Math.max(...selectedPlayers.map(p => metric.getValue(p) || 0))) * 100))}%`
+                                  }}
+                                />
+                              </div>
+                            )}
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
             
             {/* Enhanced scroll indicators */}
             <div className="absolute bottom-2 right-2 flex items-center gap-2">
