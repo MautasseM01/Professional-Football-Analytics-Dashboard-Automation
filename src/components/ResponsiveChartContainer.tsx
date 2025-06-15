@@ -29,15 +29,15 @@ export const ResponsiveChartContainer = ({
     return {
       minHeight: calculatedMinHeight,
       padding: isMobile 
-        ? { top: 12, right: 12, bottom: 12, left: 12 } // Balanced padding on mobile
-        : { top: 20, right: 20, bottom: 20, left: 20 }  // More generous padding on desktop
+        ? { top: 16, right: 8, bottom: 12, left: 20 } // Asymmetric padding - more top and left, less right
+        : { top: 24, right: 12, bottom: 20, left: 32 }  // More generous top and left padding on desktop
     };
   }, [isMobile, minHeight]);
 
   return (
     <div className={cn(
       "w-full h-full transition-all duration-300 ease-out overflow-hidden",
-      "flex items-center justify-center", // Center content both horizontally and vertically
+      "flex items-start justify-start", // Changed from center alignment to start alignment
       "touch-manipulation", // Optimize for touch devices
       className
     )}
@@ -46,7 +46,7 @@ export const ResponsiveChartContainer = ({
       contain: 'layout style paint'
     }}>
       <div 
-        className="w-full h-full flex items-center justify-center"
+        className="w-full h-full flex items-start justify-start" // Changed alignment here too
         style={{
           padding: `${responsiveConfig.padding.top}px ${responsiveConfig.padding.right}px ${responsiveConfig.padding.bottom}px ${responsiveConfig.padding.left}px`
         }}

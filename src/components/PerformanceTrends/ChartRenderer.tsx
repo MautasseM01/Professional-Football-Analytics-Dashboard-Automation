@@ -1,4 +1,3 @@
-
 import { ResponsiveContainer, LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, AreaChart, Area } from "recharts";
 import { ChartTooltip } from "@/components/ui/chart";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -25,35 +24,36 @@ export const ChartRenderer = ({
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
-  // Enhanced margins with better spacing for proper centering
+  // Enhanced margins with better spacing for down and left positioning
   const getMargins = () => {
     if (isMobile) {
       return { 
-        top: 30,      // Increased top margin for better balance
-        right: 25,    // Adequate right margin
-        left: 45,     // Sufficient left margin for Y-axis labels
-        bottom: 80    // Generous bottom margin for rotated X-axis labels
+        top: 20,      // Reduced top margin since container provides top offset
+        right: 15,    // Reduced right margin 
+        left: 50,     // Increased left margin for better left spacing
+        bottom: 85    // Generous bottom margin for rotated X-axis labels
       };
     }
     return { 
-      top: 40,       // More generous top margin on desktop
-      right: 35,     // Better right margin for larger screens
-      left: 60,      // More space for Y-axis labels
-      bottom: 100    // Ample bottom margin for rotated labels
+      top: 25,       // Reduced top margin on desktop
+      right: 20,     // Reduced right margin for larger screens
+      left: 65,      // Increased left margin for Y-axis labels
+      bottom: 105    // Ample bottom margin for rotated labels
     };
   };
 
   const margins = getMargins();
 
   return (
-    <div className="w-full h-full flex items-center justify-center" style={{ contain: 'layout' }}>
+    <div className="w-full h-full flex items-start justify-start" style={{ contain: 'layout' }}> {/* Changed to items-start and justify-start */}
       <div className="w-full h-full" style={{ 
-        padding: isMobile ? '8px' : '12px', // Responsive inner padding
+        padding: isMobile ? '4px 0px 4px 8px' : '8px 0px 8px 12px', // Asymmetric padding - more left, less right
         minHeight: '100%'
       }}>
         <ResponsiveContainer width="100%" height="100%">
           {chartView === 'line' ? (
             <RechartsLineChart data={matchData} margin={margins}>
+              
               <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "#333" : "#e5e7eb"} opacity={0.3} />
               <XAxis 
                 dataKey="match" 
