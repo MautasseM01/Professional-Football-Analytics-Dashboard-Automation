@@ -57,13 +57,14 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
     }
   }, [rawMatchData, showMovingAverage]);
 
-  // Calculate performance statistics
+  // Calculate performance statistics with consistent return type
   const stats = useMemo(() => {
     try {
       return calculateStats(matchData);
     } catch (err) {
       console.error('Error calculating stats:', err);
-      return { min: 0, max: 0, average: 0, trend: 'stable' as const };
+      // Return consistent structure with avg property
+      return { avg: 0, min: 0, max: 0, trend: 'neutral' as const };
     }
   }, [matchData]);
 

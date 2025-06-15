@@ -10,9 +10,9 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
 import { PlayerSelectionCard } from "@/components/comparison/PlayerSelectionCard";
-import { PerformanceMetricsTable } from "@/components/comparison/PerformanceMetricsTable";
+import { ProfessionalPerformanceTable } from "@/components/comparison/ProfessionalPerformanceTable";
 import { PerformanceRadarChart } from "@/components/comparison/PerformanceRadarChart";
-import { Menu, RefreshCw, Sparkles } from "lucide-react";
+import { Menu, RefreshCw } from "lucide-react";
 
 export default function PlayerComparison() {
   const {
@@ -45,9 +45,6 @@ export default function PlayerComparison() {
         {showSidebar && <DashboardSidebar />}
         
         <div className="flex-1 overflow-auto min-w-0">
-          {/* Prominent Demo Banner */}
-          
-
           <header className="border-b border-club-gold/20 dark:border-club-gold/20 bg-club-black/80 dark:bg-club-black/80 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
             <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
               {/* Left section - Title and page info */}
@@ -56,7 +53,7 @@ export default function PlayerComparison() {
                   Player Comparison
                 </h1>
                 <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
-                  Compare performance metrics between multiple players
+                  Professional performance analysis across multiple players
                 </p>
               </div>
               
@@ -91,8 +88,8 @@ export default function PlayerComparison() {
               <PlayerSelectionCard players={players || []} selectedPlayerIds={selectedPlayerIds} onChange={handlePlayerSelectionChange} loading={loading} />
 
               {selectedPlayers.length > 0 && <>
-                  {/* Performance Metrics Table */}
-                  <PerformanceMetricsTable selectedPlayers={selectedPlayers} loading={loading} />
+                  {/* Professional Performance Metrics Table */}
+                  <ProfessionalPerformanceTable selectedPlayers={selectedPlayers} loading={loading} />
 
                   {/* Radar Chart */}
                   <PerformanceRadarChart selectedPlayers={selectedPlayers} loading={loading} />
