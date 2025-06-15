@@ -40,7 +40,7 @@ export const PassingNetwork = ({
   const [lastTouch, setLastTouch] = useState({ x: 0, y: 0 });
   const [transform, setTransform] = useState({ x: 0, y: 0 });
 
-  // Responsive dimensions calculation with iOS-style aspect ratios
+  // Responsive dimensions calculation
   const getOptimalDimensions = () => {
     if (!containerRef.current) return { width: 0, height: 0 };
     
@@ -48,11 +48,9 @@ export const PassingNetwork = ({
     let width = container.width;
     let height = container.height;
 
-    // iOS Weather app-inspired aspect ratios
     if (breakpoint === 'mobile') {
       width = Math.max(width, 375);
       height = Math.max(height, 280);
-      // Maintain 4:3 aspect ratio for mobile
       if (width / height > 1.33) {
         height = width / 1.33;
       }
@@ -145,26 +143,25 @@ export const PassingNetwork = ({
     triggerHaptic('medium');
   };
 
-  // iOS-style container classes with gradients
+  // Container classes - now transparent to show the football pitch
   const getContainerClasses = () => {
-    const baseClasses = "relative transition-all duration-300 ease-out rounded-2xl overflow-hidden";
+    const baseClasses = "relative transition-all duration-300 ease-out rounded-lg overflow-hidden bg-transparent";
     
     if (breakpoint === 'mobile') {
-      return `${baseClasses} min-h-[280px] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800`;
+      return `${baseClasses} min-h-[280px]`;
     }
-    return `${baseClasses} min-h-[500px] bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-slate-900 dark:to-slate-800`;
+    return `${baseClasses} min-h-[500px]`;
   };
 
   if (isLoading) {
     return (
       <div className={getContainerClasses()}>
-        <div className="absolute inset-0 flex items-center justify-center">
+        <div className="absolute inset-0 flex items-center justify-center bg-club-dark-gray/80 rounded-lg">
           <div className="space-y-4 text-center">
-            {/* iOS-style loading skeleton */}
-            <div className="mx-auto w-16 h-16 bg-white/20 dark:bg-white/10 rounded-full animate-pulse" />
+            <div className="mx-auto w-16 h-16 bg-club-gold/20 rounded-full animate-pulse" />
             <div className="space-y-2">
-              <div className="h-4 bg-white/20 dark:bg-white/10 rounded-full w-32 mx-auto animate-pulse" />
-              <div className="h-3 bg-white/15 dark:bg-white/5 rounded-full w-24 mx-auto animate-pulse" />
+              <div className="h-4 bg-club-gold/20 rounded-full w-32 mx-auto animate-pulse" />
+              <div className="h-3 bg-club-gold/15 rounded-full w-24 mx-auto animate-pulse" />
             </div>
           </div>
         </div>
@@ -174,13 +171,13 @@ export const PassingNetwork = ({
 
   return (
     <div className={getContainerClasses()}>
-      {/* iOS-style control bar */}
+      {/* Control bar */}
       <div className="absolute top-4 right-4 z-20 flex gap-2">
         <Button
           variant="secondary"
           size="sm"
           onClick={handleZoomOut}
-          className="bg-white/90 dark:bg-black/90 backdrop-blur-sm border-0 shadow-lg hover:scale-105 transition-transform"
+          className="bg-club-black/90 border-club-gold/30 text-club-gold hover:bg-club-gold/10 backdrop-blur-sm shadow-lg hover:scale-105 transition-transform"
         >
           <ZoomOut className="w-4 h-4" />
         </Button>
@@ -188,7 +185,7 @@ export const PassingNetwork = ({
           variant="secondary"
           size="sm"
           onClick={handleZoomIn}
-          className="bg-white/90 dark:bg-black/90 backdrop-blur-sm border-0 shadow-lg hover:scale-105 transition-transform"
+          className="bg-club-black/90 border-club-gold/30 text-club-gold hover:bg-club-gold/10 backdrop-blur-sm shadow-lg hover:scale-105 transition-transform"
         >
           <ZoomIn className="w-4 h-4" />
         </Button>
@@ -196,7 +193,7 @@ export const PassingNetwork = ({
           variant="secondary"
           size="sm"
           onClick={handleReset}
-          className="bg-white/90 dark:bg-black/90 backdrop-blur-sm border-0 shadow-lg hover:scale-105 transition-transform"
+          className="bg-club-black/90 border-club-gold/30 text-club-gold hover:bg-club-gold/10 backdrop-blur-sm shadow-lg hover:scale-105 transition-transform"
         >
           <RotateCcw className="w-4 h-4" />
         </Button>
@@ -217,7 +214,7 @@ export const PassingNetwork = ({
         <FootballPitch width={dimensions.width} height={dimensions.height}>
           {players && players.length > 0 ? (
             <>
-              {/* Render passing connections with enhanced styling */}
+              {/* Render passing connections */}
               {connections.map((connection, idx) => {
                 const fromPlayer = players.find(p => p.id === connection.from);
                 const toPlayer = players.find(p => p.id === connection.to);
@@ -245,7 +242,7 @@ export const PassingNetwork = ({
                 );
               })}
               
-              {/* Render player nodes with touch optimization */}
+              {/* Render player nodes */}
               {players.map(player => (
                 <PlayerNode
                   key={`player-${player.id}`}
@@ -259,13 +256,13 @@ export const PassingNetwork = ({
               ))}
             </>
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center text-white/70 bg-black/20 rounded-xl m-4">
+            <div className="absolute inset-0 flex items-center justify-center bg-club-black/50 backdrop-blur-sm rounded-lg m-4">
               <div className="text-center space-y-2">
-                <p className="text-sm sm:text-base">
+                <p className="text-sm sm:text-base text-club-light-gray">
                   {isLoading ? 'Loading network data...' : 'No player data available'}
                 </p>
                 {!isLoading && isMobile && (
-                  <p className="text-xs text-white/50">
+                  <p className="text-xs text-club-light-gray/70">
                     Try rotating your device for better viewing
                   </p>
                 )}
@@ -277,17 +274,17 @@ export const PassingNetwork = ({
 
       {/* Selected player detail card */}
       {selectedPlayer && detailLevel === 'detailed' && (
-        <Card className="absolute bottom-4 left-4 right-4 bg-white/95 dark:bg-black/95 backdrop-blur-md border-0 shadow-2xl rounded-2xl z-30">
+        <Card className="absolute bottom-4 left-4 right-4 bg-club-black/95 border-club-gold/30 backdrop-blur-md shadow-2xl rounded-lg z-30">
           <div className="p-4">
             <div className="flex justify-between items-start">
               <div>
-                <h3 className="font-semibold text-lg">
+                <h3 className="font-semibold text-lg text-club-gold">
                   {players.find(p => String(p.id) === selectedPlayer)?.name}
                 </h3>
-                <p className="text-sm text-gray-600 dark:text-gray-400">
+                <p className="text-sm text-club-light-gray">
                   {players.find(p => String(p.id) === selectedPlayer)?.position}
                 </p>
-                <p className="text-sm font-medium mt-1">
+                <p className="text-sm font-medium mt-1 text-club-light-gray">
                   {players.find(p => String(p.id) === selectedPlayer)?.totalPasses} passes
                 </p>
               </div>
@@ -295,7 +292,7 @@ export const PassingNetwork = ({
                 variant="ghost"
                 size="sm"
                 onClick={() => setDetailLevel('overview')}
-                className="hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="hover:bg-club-gold/10 text-club-light-gray"
               >
                 ✕
               </Button>
