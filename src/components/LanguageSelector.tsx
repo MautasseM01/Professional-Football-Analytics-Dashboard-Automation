@@ -26,7 +26,7 @@ export const LanguageSelector = () => {
         <SelectValue>
           <div className="flex items-center justify-center">
             <span className="text-xs font-medium">
-              {currentLanguage?.code.charAt(0).toUpperCase()}
+              {currentLanguage?.code.toUpperCase()}
             </span>
           </div>
         </SelectValue>
