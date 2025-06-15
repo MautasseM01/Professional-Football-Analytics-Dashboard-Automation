@@ -1,10 +1,9 @@
 
-import { useState, useMemo } from "react";
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
-import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, BarChart3, Medal, Target } from "lucide-react";
+import { TrendingUp, BarChart3, Medal, Target } from "lucide-react";
 import { Player } from "@/types";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -15,26 +14,14 @@ import {
   getHighestValuesInRow, 
   formatPercentage 
 } from "@/utils/comparisonUtils";
+import { useSorting } from "./hooks/useSorting";
+import { SortControls } from "./components/SortControls";
+import { SortableHeader } from "./components/SortableHeader";
+import { MetricConfig } from "./types";
 
 interface ProfessionalPerformanceTableProps {
   selectedPlayers: Player[];
   loading: boolean;
-}
-
-type SortDirection = 'asc' | 'desc' | null;
-type SortableMetric = 'name' | 'distance' | 'passCompletion' | 'shots' | 'tackles';
-
-interface MetricConfig {
-  key: SortableMetric;
-  label: string;
-  shortLabel: string;
-  mobileLabel: string;
-  getValue: (player: Player) => number | null;
-  format: (value: number | null) => string;
-  unit: string;
-  icon: any;
-  description: string;
-  priority: number;
 }
 
 export const ProfessionalPerformanceTable = ({
@@ -43,8 +30,6 @@ export const ProfessionalPerformanceTable = ({
 }: ProfessionalPerformanceTableProps) => {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
-  const [sortMetric, setSortMetric] = useState<SortableMetric | null>(null);
-  const [sortDirection, setSortDirection] = useState<SortDirection>(null);
 
   const metrics: MetricConfig[] = [
     {
@@ -52,7 +37,7 @@ export const ProfessionalPerformanceTable = ({
       label: 'Total Distance',
       shortLabel: 'Distance',
       mobileLabel: 'Dist',
-      getValue: (player) => player.distance,
+      getValue: (player) => player.distance || null,
       format: (value) => value ? `${value.toFixed(1)} km` : 'N/A',
       unit: 'km',
       icon: TrendingUp,
@@ -77,7 +62,7 @@ export const ProfessionalPerformanceTable = ({
       label: 'Shots on Target',
       shortLabel: 'Shots',
       mobileLabel: 'SOT',
-      getValue: (player) => player.shots_on_target,
+      getValue: (player) => player.shots_on_target || null,
       format: (value) => value !== null ? value.toString() : 'N/A',
       unit: '',
       icon: BarChart3,
@@ -89,7 +74,7 @@ export const ProfessionalPerformanceTable = ({
       label: 'Tackles Won',
       shortLabel: 'Tackles',
       mobileLabel: 'Tack',
-      getValue: (player) => player.tackles_won,
+      getValue: (player) => player.tackles_won || null,
       format: (value) => value !== null ? value.toString() : 'N/A',
       unit: '',
       icon: Medal,
@@ -104,73 +89,34 @@ export const ProfessionalPerformanceTable = ({
     
     const screenWidth = window.innerWidth;
     
-    // Mobile: Show high priority metrics only
     if (screenWidth < 640) {
       return metrics.filter(m => m.priority === 1);
     }
     
-    // Tablet: Show high and medium priority
     if (screenWidth < 1024) {
       return metrics.filter(m => m.priority <= 2);
     }
     
-    // Desktop: Show all metrics
     return metrics;
   }, [typeof window !== 'undefined' ? window.innerWidth : 0]);
+
+  // Use the sorting hook
+  const { sortState, handleSort, clearSort, sortedPlayers } = useSorting({
+    players: selectedPlayers,
+    metrics: visibleMetrics
+  });
 
   // Calculate highest values for each metric
   const highestValues = useMemo(() => {
     return visibleMetrics.reduce((acc, metric) => {
       acc[metric.key] = getHighestValuesInRow(selectedPlayers, metric.getValue);
       return acc;
-    }, {} as Record<SortableMetric, Record<number, boolean>>);
+    }, {} as Record<string, Record<number, boolean>>);
   }, [selectedPlayers, visibleMetrics]);
-
-  // Sort players based on selected metric
-  const sortedPlayers = useMemo(() => {
-    if (!sortMetric || !sortDirection) return selectedPlayers;
-
-    const metric = visibleMetrics.find(m => m.key === sortMetric);
-    if (!metric) return selectedPlayers;
-
-    return [...selectedPlayers].sort((a, b) => {
-      if (sortMetric === 'name') {
-        const comparison = a.name.localeCompare(b.name);
-        return sortDirection === 'asc' ? comparison : -comparison;
-      }
-
-      const valueA = metric.getValue(a) ?? -1;
-      const valueB = metric.getValue(b) ?? -1;
-      
-      if (valueA === valueB) return 0;
-      const comparison = valueA > valueB ? 1 : -1;
-      return sortDirection === 'asc' ? comparison : -comparison;
-    });
-  }, [selectedPlayers, sortMetric, sortDirection, visibleMetrics]);
-
-  const handleSort = (metric: SortableMetric) => {
-    if (sortMetric === metric) {
-      setSortDirection(sortDirection === 'asc' ? 'desc' : sortDirection === 'desc' ? null : 'asc');
-      if (sortDirection === 'desc') {
-        setSortMetric(null);
-      }
-    } else {
-      setSortMetric(metric);
-      setSortDirection('desc');
-    }
-  };
-
-  const getSortIcon = (metric: SortableMetric) => {
-    if (sortMetric !== metric) return <ArrowUpDown className="w-3 h-3 opacity-40" />;
-    if (sortDirection === 'asc') return <ArrowUp className="w-3 h-3 text-club-gold" />;
-    if (sortDirection === 'desc') return <ArrowDown className="w-3 h-3 text-club-gold" />;
-    return <ArrowUpDown className="w-3 h-3 opacity-40" />;
-  };
 
   const getPerformanceLevel = (value: number | null, metric: MetricConfig) => {
     if (value === null || value === undefined) return 'none';
     
-    // Simple performance categorization
     if (metric.key === 'passCompletion') {
       if (value >= 90) return 'excellent';
       if (value >= 80) return 'good';
@@ -178,7 +124,6 @@ export const ProfessionalPerformanceTable = ({
       return 'poor';
     }
     
-    // For other metrics, use relative comparison
     const allValues = selectedPlayers
       .map(p => metric.getValue(p))
       .filter(v => v !== null && v !== undefined) as number[];
@@ -208,38 +153,13 @@ export const ProfessionalPerformanceTable = ({
     }
   };
 
-  // Responsive sizing classes
-  const getResponsiveClasses = () => {
-    return {
-      headerText: cn(
-        "text-base font-semibold",
-        "sm:text-lg",
-        "lg:text-xl"
-      ),
-      tablePadding: cn(
-        "p-2",
-        "sm:p-3",
-        "lg:p-4"
-      ),
-      cellPadding: cn(
-        "p-1",
-        "sm:p-2",
-        "lg:p-3"
-      ),
-      fontSize: cn(
-        "text-xs",
-        "sm:text-sm",
-        "lg:text-base"
-      ),
-      iconSize: cn(
-        "w-3 h-3",
-        "sm:w-4 sm:h-4",
-        "lg:w-5 lg:h-5"
-      )
-    };
+  const responsiveClasses = {
+    headerText: cn("text-base font-semibold", "sm:text-lg", "lg:text-xl"),
+    tablePadding: cn("p-2", "sm:p-3", "lg:p-4"),
+    cellPadding: cn("p-1", "sm:p-2", "lg:p-3"),
+    fontSize: cn("text-xs", "sm:text-sm", "lg:text-base"),
+    iconSize: cn("w-3 h-3", "sm:w-4 sm:h-4", "lg:w-5 lg:h-5")
   };
-
-  const responsiveClasses = getResponsiveClasses();
 
   return (
     <Card className={cn(
@@ -262,26 +182,19 @@ export const ProfessionalPerformanceTable = ({
           </div>
           
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            {/* Responsive info badge */}
             {isMobile && (
               <Badge variant="outline" className="text-xs bg-club-gold/10 border-club-gold/30 text-club-gold">
                 Swipe → to see more metrics
               </Badge>
             )}
             
-            {sortMetric && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => {
-                  setSortMetric(null);
-                  setSortDirection(null);
-                }}
-                className="text-xs"
-              >
-                Clear Sort
-              </Button>
-            )}
+            <SortControls
+              currentMetric={sortState.metric}
+              currentDirection={sortState.direction}
+              metrics={visibleMetrics}
+              onSort={handleSort}
+              onClear={clearSort}
+            />
           </div>
         </div>
       </CardHeader>
@@ -293,36 +206,30 @@ export const ProfessionalPerformanceTable = ({
           </div>
         ) : (
           <div className="relative">
-            {/* Native scrollable container with visible scroll bars */}
-            <div 
-              className={cn(
-                "w-full overflow-x-auto",
-                "scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-club-gold/30",
-                "hover:scrollbar-thumb-club-gold/50",
-                // Custom scroll bar styling for all browsers
-                "[&::-webkit-scrollbar]:h-3",
-                "[&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full",
-                "[&::-webkit-scrollbar-thumb]:bg-club-gold/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:bg-clip-content",
-                "[&::-webkit-scrollbar-thumb:hover]:bg-club-gold/50",
-                // Firefox scrollbar
-                "scrollbar-width-thin scrollbar-color-club-gold/30 scrollbar-color-transparent",
-                theme === 'dark' && [
-                  "[&::-webkit-scrollbar-track]:bg-club-dark-gray/50",
-                  "[&::-webkit-scrollbar-thumb]:bg-club-gold/40"
-                ]
-              )}
-              style={{
-                // Ensure scroll bars are always visible
-                scrollbarWidth: 'thin',
-                msOverflowStyle: 'scrollbar'
-              }}
+            <div className={cn(
+              "w-full overflow-x-auto",
+              "scrollbar-thin scrollbar-track-gray-100 scrollbar-thumb-club-gold/30",
+              "hover:scrollbar-thumb-club-gold/50",
+              "[&::-webkit-scrollbar]:h-3",
+              "[&::-webkit-scrollbar-track]:bg-gray-100 [&::-webkit-scrollbar-track]:rounded-full",
+              "[&::-webkit-scrollbar-thumb]:bg-club-gold/30 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:border-2 [&::-webkit-scrollbar-thumb]:border-transparent [&::-webkit-scrollbar-thumb]:bg-clip-content",
+              "[&::-webkit-scrollbar-thumb:hover]:bg-club-gold/50",
+              "scrollbar-width-thin scrollbar-color-club-gold/30 scrollbar-color-transparent",
+              theme === 'dark' && [
+                "[&::-webkit-scrollbar-track]:bg-club-dark-gray/50",
+                "[&::-webkit-scrollbar-thumb]:bg-club-gold/40"
+              ]
+            )}
+            style={{
+              scrollbarWidth: 'thin',
+              msOverflowStyle: 'scrollbar'
+            }}
             >
               <table className={cn(
                 "w-full border-separate border-spacing-0",
-                // Optimized minimum widths for better responsiveness
-                "min-w-[500px]", // Reduced from 600px
-                "sm:min-w-[600px]", // Reduced from 800px
-                "lg:min-w-[800px]" // Reduced from full width
+                "min-w-[500px]",
+                "sm:min-w-[600px]",
+                "lg:min-w-[800px]"
               )}>
                 <thead className="sticky top-0 z-20">
                   <tr className={cn(
@@ -332,69 +239,40 @@ export const ProfessionalPerformanceTable = ({
                       : "border-club-gold/30 bg-gray-50/95",
                     "backdrop-blur-sm"
                   )}>
-                    <th className={cn(
-                      "text-left sticky left-0 z-30",
-                      responsiveClasses.cellPadding,
-                      // Optimized column widths
-                      "w-[140px] sm:w-[160px] lg:w-[180px]", // More specific width control
-                      theme === 'dark' 
-                        ? "text-club-light-gray bg-club-dark-gray/95" 
-                        : "text-gray-900 bg-white/95",
-                      "border-r border-club-gold/20"
-                    )}>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleSort('name')}
-                        className={cn(
-                          "h-auto p-0 font-semibold justify-start gap-1 sm:gap-2",
-                          responsiveClasses.fontSize
-                        )}
-                      >
-                        Player
-                        {getSortIcon('name')}
-                      </Button>
-                    </th>
+                    <SortableHeader
+                      metric="name"
+                      label="Player"
+                      currentMetric={sortState.metric}
+                      currentDirection={sortState.direction}
+                      onSort={handleSort}
+                      className={cn(
+                        "text-left sticky left-0 z-30",
+                        responsiveClasses.cellPadding,
+                        "w-[140px] sm:w-[160px] lg:w-[180px]",
+                        theme === 'dark' 
+                          ? "text-club-light-gray bg-club-dark-gray/95" 
+                          : "text-gray-900 bg-white/95",
+                        "border-r border-club-gold/20"
+                      )}
+                    />
                     
                     {visibleMetrics.map((metric) => (
-                      <th key={metric.key} className={cn(
-                        "text-center",
-                        responsiveClasses.cellPadding,
-                        // More flexible column sizing
-                        "w-[100px] sm:w-[120px] lg:w-[140px]" // Reduced minimum widths
-                      )}>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleSort(metric.key)}
-                          className={cn(
-                            "h-auto p-1 font-semibold flex-col gap-0.5 w-full",
-                            responsiveClasses.fontSize
-                          )}
-                          title={metric.description}
-                        >
-                          <div className="flex items-center gap-1 justify-center">
-                            <metric.icon className={cn(
-                              "text-club-gold",
-                              "w-3 h-3 sm:w-4 sm:h-4"
-                            )} />
-                            <span className={cn(
-                              "font-medium truncate max-w-[80px]", // Prevent text overflow
-                              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                            )}>
-                              {isMobile ? metric.mobileLabel : 
+                      <SortableHeader
+                        key={metric.key}
+                        metric={metric.key}
+                        label={isMobile ? metric.mobileLabel : 
                                window.innerWidth < 1024 ? metric.shortLabel : metric.label}
-                            </span>
-                            {getSortIcon(metric.key)}
-                          </div>
-                          <span className={cn(
-                            "text-gray-500",
-                            "text-xs"
-                          )}>
-                            ({metric.unit || 'count'})
-                          </span>
-                        </Button>
-                      </th>
+                        currentMetric={sortState.metric}
+                        currentDirection={sortState.direction}
+                        onSort={handleSort}
+                        icon={metric.icon}
+                        unit={metric.unit}
+                        description={metric.description}
+                        className={cn(
+                          responsiveClasses.cellPadding,
+                          "w-[100px] sm:w-[120px] lg:w-[140px]"
+                        )}
+                      />
                     ))}
                   </tr>
                 </thead>
@@ -481,7 +359,6 @@ export const ProfessionalPerformanceTable = ({
                                 </Badge>
                               )}
                               
-                              {/* Performance level indicator for larger screens */}
                               {!isHighest && value !== null && !isMobile && (
                                 <div className={cn(
                                   "text-xs opacity-60",
@@ -492,7 +369,6 @@ export const ProfessionalPerformanceTable = ({
                               )}
                             </div>
                             
-                            {/* Performance bar */}
                             {value !== null && (
                               <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200">
                                 <div 
@@ -515,7 +391,6 @@ export const ProfessionalPerformanceTable = ({
               </table>
             </div>
             
-            {/* Enhanced scroll indicators */}
             <div className="absolute bottom-2 right-2 flex items-center gap-2">
               {isMobile && (
                 <div className="bg-club-gold/20 text-club-gold px-2 py-1 rounded text-xs backdrop-blur-sm flex items-center gap-1">
