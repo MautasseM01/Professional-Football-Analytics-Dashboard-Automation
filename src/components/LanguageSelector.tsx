@@ -8,6 +8,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { Globe } from 'lucide-react';
 
 const languages = [
   { code: 'ar', name: 'العربية', flag: '🇸🇦' },
@@ -19,19 +20,17 @@ export const LanguageSelector = () => {
   const { language, setLanguage } = useLanguage();
   const [showBubble, setShowBubble] = useState(false);
 
-  const currentLanguage = languages.find(lang => lang.code === language);
-
   const handleLanguageChange = (newLanguage: string) => {
     setLanguage(newLanguage as any);
     setShowBubble(true);
   };
 
-  // Show initial French bubble when component mounts
+  // Show initial French bubble when component mounts or language is fr
   useEffect(() => {
     if (language === 'fr') {
       setShowBubble(true);
     }
-  }, []);
+  }, [language]);
 
   useEffect(() => {
     if (showBubble) {
@@ -55,24 +54,34 @@ export const LanguageSelector = () => {
     <div className="relative">
       {/* Notification Bubble */}
       {showBubble && (
-        <div className="absolute -top-12 left-1/2 transform -translate-x-1/2 z-[60] animate-fade-in">
-          <div className="bg-club-gold text-club-black px-2 py-1 rounded-md text-xs font-medium shadow-lg border border-club-gold/20">
+        <div className="absolute -top-11 left-1/2 -translate-x-1/2 z-50 animate-fade-in">
+          <div className="relative bg-club-gold text-club-black px-2 py-1 rounded-md text-xs font-medium shadow-lg border border-club-gold/20 select-none">
             {getLanguageCode(language)}
-            {/* Small arrow pointing down */}
-            <div className="absolute top-full left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-club-gold"></div>
+            {/* Arrow below bubble */}
+            <span className="absolute left-1/2 -translate-x-1/2 top-full block w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-club-gold"></span>
           </div>
         </div>
       )}
 
       <Select value={language} onValueChange={handleLanguageChange}>
-        <SelectTrigger className="w-9 h-9 sm:w-10 sm:h-10 text-club-gold border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors bg-club-black/50 hover:border-club-gold/30 [&>svg]:hidden">
+        <SelectTrigger
+          className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center text-club-gold border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors bg-club-black/50 hover:border-club-gold/30 p-0 focus:outline-none focus:ring-0 relative select-none"
+          // Remove the dropdown arrow (hide any svg added by SelectTrigger)
+          style={{ minWidth: 0 }}
+        >
           <SelectValue>
-            <div className="flex items-center justify-center">
-              <span className="text-sm">🌐</span>
+            <div className="flex items-center justify-center w-full h-full">
+              {/* Use Lucide Globe icon. Use same sizing as ThemeToggle */}
+              <Globe
+                size={18}
+                className="text-club-gold"
+                strokeWidth={2}
+                aria-label="Language selector"
+              />
             </div>
           </SelectValue>
         </SelectTrigger>
-        <SelectContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray min-w-[120px] sm:min-w-[140px] z-50">
+        <SelectContent className="bg-club-dark-gray border-club-gold/30 text-club-light-gray min-w-[120px] sm:min-w-[140px] z-[99]">
           {languages.map((lang) => (
             <SelectItem 
               key={lang.code} 
@@ -87,6 +96,18 @@ export const LanguageSelector = () => {
           ))}
         </SelectContent>
       </Select>
+      {/* Hide SelectTrigger's chevron arrow using style */}
+      <style>
+        {`
+          .relative .flex.items-center.justify-center > svg + svg {
+            display: none !important;
+          }
+          /* In case the SelectTrigger adds the arrow elsewhere, hide any direct svg except the first child (which is Globe) */
+          .relative .flex.items-center.justify-center svg:not(:first-child) {
+            display: none !important;
+          }
+        `}
+      </style>
     </div>
   );
 };
