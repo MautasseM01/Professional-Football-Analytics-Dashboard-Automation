@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -137,16 +138,14 @@ const TeamTacticalAnalysis = () => {
         
         <main className="bg-transparent transition-colors duration-300 w-full">
           <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-            {/* Full-width Filters Section */}
-            <div className="bg-club-dark-gray/50 rounded-lg p-3 sm:p-4 border border-club-gold/20">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
-                <h2 className="text-lg sm:text-xl font-semibold text-club-gold flex items-center gap-2">
-                  <Filter size={18} className="sm:size-5" />
-                  Filters
-                </h2>
+            {/* Filters Section */}
+            <div className="bg-club-dark-gray/50 rounded-lg p-4 border border-club-gold/20">
+              <div className="flex items-center gap-2 mb-6">
+                <Filter size={18} className="text-club-gold" />
+                <h2 className="text-lg font-semibold text-club-gold">Filters</h2>
               </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              <div className="space-y-6">
                 {/* Match Selection */}
                 <div className="space-y-2">
                   <Label htmlFor="match-select" className="text-sm font-medium text-club-light-gray">Select Match</Label>
@@ -157,10 +156,7 @@ const TeamTacticalAnalysis = () => {
                   >
                     <SelectTrigger 
                       id="match-select" 
-                      className={cn(
-                        "w-full bg-club-black border-club-gold/30 text-club-light-gray",
-                        isMobile && "min-h-[44px]"
-                      )}
+                      className="w-full bg-club-black border-club-gold/30 text-club-light-gray min-h-[44px]"
                     >
                       <SelectValue placeholder="Select a match" />
                     </SelectTrigger>
@@ -175,7 +171,7 @@ const TeamTacticalAnalysis = () => {
                 </div>
 
                 {/* Pass Direction Filter */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label className="flex items-center gap-2 text-sm font-medium text-club-light-gray">
                     <Filter size={16} />
                     Pass Direction
@@ -184,33 +180,33 @@ const TeamTacticalAnalysis = () => {
                     type="single" 
                     value={passDirectionFilter}
                     onValueChange={(value) => value && setPassDirectionFilter(value)}
-                    className="grid grid-cols-2 gap-2 w-full"
+                    className="flex flex-wrap gap-2 w-full justify-start"
                   >
                     <ToggleGroupItem 
                       value="all" 
                       aria-label="All directions"
-                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                      className="min-h-[44px] min-w-[80px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
                     >
                       All
                     </ToggleGroupItem>
                     <ToggleGroupItem 
                       value="forward" 
                       aria-label="Forward passes"
-                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                      className="min-h-[44px] min-w-[80px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
                     >
                       Forward
                     </ToggleGroupItem>
                     <ToggleGroupItem 
                       value="backward" 
                       aria-label="Backward passes"
-                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                      className="min-h-[44px] min-w-[80px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
                     >
                       Backward
                     </ToggleGroupItem>
                     <ToggleGroupItem 
                       value="sideways" 
                       aria-label="Sideways passes"
-                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                      className="min-h-[44px] min-w-[80px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
                     >
                       Sideways
                     </ToggleGroupItem>
@@ -218,7 +214,7 @@ const TeamTacticalAnalysis = () => {
                 </div>
 
                 {/* Pass Outcome Filter */}
-                <div className="space-y-2">
+                <div className="space-y-3">
                   <Label className="flex items-center gap-2 text-sm font-medium text-club-light-gray">
                     <Filter size={16} />
                     Pass Outcome
@@ -227,26 +223,26 @@ const TeamTacticalAnalysis = () => {
                     type="single" 
                     value={passOutcomeFilter}
                     onValueChange={(value) => value && setPassOutcomeFilter(value)}
-                    className="grid grid-cols-2 gap-2 w-full"
+                    className="flex flex-wrap gap-2 w-full justify-start"
                   >
                     <ToggleGroupItem 
                       value="all" 
                       aria-label="All passes"
-                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                      className="min-h-[44px] min-w-[80px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
                     >
                       All
                     </ToggleGroupItem>
                     <ToggleGroupItem 
                       value="successful" 
                       aria-label="Successful passes"
-                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                      className="min-h-[44px] min-w-[100px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
                     >
                       Successful
                     </ToggleGroupItem>
                     <ToggleGroupItem 
                       value="unsuccessful" 
                       aria-label="Unsuccessful passes"
-                      className="min-h-[44px] data-[state=on]:bg-club-gold/20"
+                      className="min-h-[44px] min-w-[100px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
                     >
                       Unsuccessful
                     </ToggleGroupItem>
@@ -255,8 +251,8 @@ const TeamTacticalAnalysis = () => {
 
                 {/* Error Display */}
                 {imageLoadingError && (
-                  <div className="space-y-2 p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                    <div className="flex items-center gap-2 text-amber-600">
+                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
+                    <div className="flex items-center gap-2 text-amber-600 mb-2">
                       <AlertCircle size={16} />
                       <span className="text-sm font-medium">Image Loading Issues</span>
                     </div>
@@ -275,7 +271,7 @@ const TeamTacticalAnalysis = () => {
               </div>
             </div>
 
-            {/* Full-width Passing Network */}
+            {/* Passing Network */}
             <Card className="bg-club-dark-gray border-club-gold/20 min-h-[500px]">
               <CardHeader className="pb-4">
                 <CardTitle className="text-lg sm:text-xl text-club-gold">Passing Network</CardTitle>
@@ -309,7 +305,7 @@ const TeamTacticalAnalysis = () => {
               </CardContent>
             </Card>
 
-            {/* Full-width Tactical Formation Images Section */}
+            {/* Tactical Formation Images Section */}
             {selectedMatch && (
               <Card className="bg-club-dark-gray border-club-gold/20">
                 <CardHeader className="pb-4">
