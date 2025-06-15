@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { ArrowUpDown, ArrowUp, ArrowDown, TrendingUp, BarChart3, Medal, Target } from "lucide-react";
 import { Player } from "@/types";
@@ -178,91 +179,6 @@ export const ProfessionalPerformanceTable = ({
     }
   };
 
-  // Mobile card view for small screens
-  if (isMobile) {
-    return (
-      <Card className={cn(
-        "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
-        theme === 'dark' 
-          ? "bg-club-dark-gray/60" 
-          : "bg-white/80",
-        "shadow-xl animate-fade-in"
-      )}>
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-3">
-            <TrendingUp className="h-5 w-5 text-club-gold" />
-            <CardTitle className={cn(
-              "text-lg font-semibold",
-              theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-            )}>
-              Performance Metrics
-            </CardTitle>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {loading ? (
-            <TableLoadingSkeleton rows={4} columns={2} />
-          ) : (
-            sortedPlayers.map((player) => (
-              <div
-                key={player.id}
-                className={cn(
-                  "p-4 rounded-xl border transition-all duration-300 hover:shadow-lg",
-                  theme === 'dark' 
-                    ? "bg-club-black/30 border-club-gold/10 hover:border-club-gold/20" 
-                    : "bg-gray-50/50 border-club-gold/20 hover:border-club-gold/30"
-                )}
-              >
-                <div className="flex items-center gap-3 mb-4">
-                  <PlayerAvatar player={player} size="sm" />
-                  <div>
-                    <span className={cn(
-                      "font-semibold text-sm",
-                      theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                    )}>
-                      {player.name}
-                    </span>
-                    <div className="text-xs text-gray-500">{player.position || 'N/A'}</div>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-3">
-                  {metrics.map((metric) => {
-                    const value = metric.getValue(player);
-                    const isHighest = highestValues[metric.key]?.[player.id];
-                    const level = getPerformanceLevel(value, metric);
-                    
-                    return (
-                      <div key={metric.key} className="space-y-1">
-                        <div className="flex items-center gap-1">
-                          <metric.icon className="w-3 h-3 text-gray-500" />
-                          <span className="text-xs text-gray-500">{metric.shortLabel}:</span>
-                        </div>
-                        <div className={cn(
-                          "font-semibold text-sm",
-                          isHighest && "text-club-gold",
-                          !isHighest && getPerformanceLevelColor(level)
-                        )}>
-                          {metric.format(value)}
-                          {isHighest && (
-                            <Badge variant="outline" className="ml-1 text-xs bg-club-gold/20 text-club-gold border-club-gold/30">
-                              Best
-                            </Badge>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            ))
-          )}
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Desktop table view
   return (
     <Card className={cn(
       "border-club-gold/20 overflow-hidden backdrop-blur-sm transition-all duration-300",
@@ -305,157 +221,205 @@ export const ProfessionalPerformanceTable = ({
             <TableLoadingSkeleton rows={6} columns={selectedPlayers.length + 1} />
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className={cn(
-                  "border-b transition-colors",
-                  theme === 'dark' 
-                    ? "border-club-gold/20 bg-club-black/20" 
-                    : "border-club-gold/30 bg-gray-50/50"
-                )}>
-                  <th className={cn(
-                    "text-left p-4 font-semibold sticky left-0 z-10",
-                    theme === 'dark' 
-                      ? "text-club-light-gray bg-club-dark-gray/80" 
-                      : "text-gray-900 bg-white/90"
-                  )}>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleSort('name')}
-                      className="h-auto p-0 font-semibold justify-start gap-2"
-                    >
-                      Player
-                      {getSortIcon('name')}
-                    </Button>
-                  </th>
-                  
-                  {metrics.map((metric) => (
-                    <th key={metric.key} className="text-center p-4 min-w-[140px]">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleSort(metric.key)}
-                        className="h-auto p-1 font-semibold flex-col gap-1 w-full"
-                        title={metric.description}
-                      >
-                        <div className="flex items-center gap-2">
-                          <metric.icon className="w-4 h-4 text-club-gold" />
-                          <span className={cn(
-                            "text-xs font-medium",
-                            theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                          )}>
-                            {metric.label}
-                          </span>
-                          {getSortIcon(metric.key)}
-                        </div>
-                        <span className="text-xs text-gray-500">({metric.unit})</span>
-                      </Button>
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              
-              <tbody>
-                {sortedPlayers.map((player, index) => (
-                  <tr
-                    key={player.id}
-                    className={cn(
-                      "transition-all duration-200 hover:shadow-md",
+          <div className="relative">
+            <ScrollArea className="w-full">
+              <div className="min-w-full overflow-x-auto">
+                <table className="w-full min-w-[800px]">
+                  <thead className="sticky top-0 z-20">
+                    <tr className={cn(
+                      "border-b transition-colors",
                       theme === 'dark' 
-                        ? "border-club-gold/10 hover:bg-club-black/20 even:bg-club-black/10" 
-                        : "border-club-gold/20 hover:bg-gray-50/50 even:bg-gray-25/25",
-                      index % 2 === 0 && "bg-opacity-50"
-                    )}
-                  >
-                    <td className={cn(
-                      "p-4 sticky left-0 z-10 border-r",
-                      theme === 'dark' 
-                        ? "bg-club-dark-gray/80 border-club-gold/10" 
-                        : "bg-white/90 border-club-gold/20"
+                        ? "border-club-gold/20 bg-club-black/90" 
+                        : "border-club-gold/30 bg-gray-50/90",
+                      "backdrop-blur-sm"
                     )}>
-                      <div className="flex items-center gap-3">
-                        <PlayerAvatar player={player} size="sm" />
-                        <div>
-                          <div className={cn(
-                            "font-medium text-sm",
-                            theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
-                          )}>
-                            {player.name}
-                          </div>
-                          <div className="text-xs text-gray-500">
-                            {player.position || 'N/A'}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    
-                    {metrics.map((metric) => {
-                      const value = metric.getValue(player);
-                      const isHighest = highestValues[metric.key]?.[player.id];
-                      const level = getPerformanceLevel(value, metric);
-                      
-                      return (
-                        <td
-                          key={`${player.id}-${metric.key}`}
+                      <th className={cn(
+                        "text-left p-3 font-semibold sticky left-0 z-30 min-w-[160px]",
+                        isMobile ? "text-sm p-2" : "text-base p-4",
+                        theme === 'dark' 
+                          ? "text-club-light-gray bg-club-dark-gray/95" 
+                          : "text-gray-900 bg-white/95",
+                        "border-r border-club-gold/20"
+                      )}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleSort('name')}
                           className={cn(
-                            "text-center p-4 transition-all duration-200 relative",
-                            isHighest && "bg-club-gold/10 border-club-gold/20"
+                            "h-auto p-0 font-semibold justify-start gap-2",
+                            isMobile && "text-sm"
                           )}
                         >
-                          <div className="space-y-1">
-                            <div className={cn(
-                              "font-bold text-sm",
-                              isHighest 
-                                ? "text-club-gold" 
-                                : getPerformanceLevelColor(level)
-                            )}>
-                              {metric.format(value)}
-                            </div>
-                            
-                            {isHighest && (
-                              <Badge 
-                                variant="outline" 
-                                className="text-xs bg-club-gold/20 text-club-gold border-club-gold/30"
-                              >
-                                <Medal className="w-3 h-3 mr-1" />
-                                Best
-                              </Badge>
+                          Player
+                          {getSortIcon('name')}
+                        </Button>
+                      </th>
+                      
+                      {metrics.map((metric) => (
+                        <th key={metric.key} className={cn(
+                          "text-center p-3",
+                          isMobile ? "min-w-[120px] p-2" : "min-w-[140px] p-4"
+                        )}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleSort(metric.key)}
+                            className={cn(
+                              "h-auto p-1 font-semibold flex-col gap-1 w-full",
+                              isMobile && "text-xs gap-0.5"
                             )}
-                            
-                            {/* Performance level indicator */}
-                            {!isHighest && value !== null && (
-                              <div className={cn(
-                                "text-xs opacity-60",
-                                getPerformanceLevelColor(level)
+                            title={metric.description}
+                          >
+                            <div className="flex items-center gap-2 justify-center">
+                              <metric.icon className={cn(
+                                "text-club-gold",
+                                isMobile ? "w-3 h-3" : "w-4 h-4"
+                              )} />
+                              <span className={cn(
+                                "font-medium",
+                                isMobile ? "text-xs" : "text-sm",
+                                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
                               )}>
-                                {level}
-                              </div>
-                            )}
-                          </div>
-                          
-                          {/* Performance bar */}
-                          {value !== null && (
-                            <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200">
-                              <div 
-                                className={cn(
-                                  "h-full transition-all duration-300",
-                                  isHighest ? "bg-club-gold" : getPerformanceLevelColor(level).replace('text-', 'bg-')
-                                )}
-                                style={{
-                                  width: `${Math.min(100, Math.max(10, (value / Math.max(...selectedPlayers.map(p => metric.getValue(p) || 0))) * 100))}%`
-                                }}
-                              />
+                                {isMobile ? metric.shortLabel : metric.label}
+                              </span>
+                              {getSortIcon(metric.key)}
                             </div>
-                          )}
+                            <span className={cn(
+                              "text-gray-500",
+                              isMobile ? "text-xs" : "text-xs"
+                            )}>
+                              ({metric.unit || 'count'})
+                            </span>
+                          </Button>
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  
+                  <tbody>
+                    {sortedPlayers.map((player, index) => (
+                      <tr
+                        key={player.id}
+                        className={cn(
+                          "transition-all duration-200 hover:shadow-md border-b",
+                          theme === 'dark' 
+                            ? "border-club-gold/10 hover:bg-club-black/20 even:bg-club-black/10" 
+                            : "border-club-gold/20 hover:bg-gray-50/50 even:bg-gray-25/25",
+                          index % 2 === 0 && "bg-opacity-50"
+                        )}
+                      >
+                        <td className={cn(
+                          "sticky left-0 z-10 border-r min-w-[160px]",
+                          isMobile ? "p-2" : "p-4",
+                          theme === 'dark' 
+                            ? "bg-club-dark-gray/95 border-club-gold/10" 
+                            : "bg-white/95 border-club-gold/20"
+                        )}>
+                          <div className="flex items-center gap-2">
+                            <PlayerAvatar 
+                              player={player} 
+                              size={isMobile ? "xs" : "sm"} 
+                            />
+                            <div className="min-w-0 flex-1">
+                              <div className={cn(
+                                "font-medium truncate",
+                                isMobile ? "text-sm" : "text-base",
+                                theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+                              )}>
+                                {player.name}
+                              </div>
+                              <div className={cn(
+                                "text-gray-500 truncate",
+                                isMobile ? "text-xs" : "text-sm"
+                              )}>
+                                {player.position || 'N/A'}
+                              </div>
+                            </div>
+                          </div>
                         </td>
-                      );
-                    })}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                        
+                        {metrics.map((metric) => {
+                          const value = metric.getValue(player);
+                          const isHighest = highestValues[metric.key]?.[player.id];
+                          const level = getPerformanceLevel(value, metric);
+                          
+                          return (
+                            <td
+                              key={`${player.id}-${metric.key}`}
+                              className={cn(
+                                "text-center transition-all duration-200 relative",
+                                isMobile ? "p-2" : "p-4",
+                                isHighest && "bg-club-gold/10 border-club-gold/20"
+                              )}
+                            >
+                              <div className="space-y-1">
+                                <div className={cn(
+                                  "font-bold",
+                                  isMobile ? "text-sm" : "text-base",
+                                  isHighest 
+                                    ? "text-club-gold" 
+                                    : getPerformanceLevelColor(level)
+                                )}>
+                                  {metric.format(value)}
+                                </div>
+                                
+                                {isHighest && (
+                                  <Badge 
+                                    variant="outline" 
+                                    className={cn(
+                                      "bg-club-gold/20 text-club-gold border-club-gold/30",
+                                      isMobile ? "text-xs px-1 py-0" : "text-xs"
+                                    )}
+                                  >
+                                    <Medal className={cn(
+                                      "mr-1",
+                                      isMobile ? "w-2 h-2" : "w-3 h-3"
+                                    )} />
+                                    Best
+                                  </Badge>
+                                )}
+                                
+                                {/* Performance level indicator for non-mobile */}
+                                {!isHighest && value !== null && !isMobile && (
+                                  <div className={cn(
+                                    "text-xs opacity-60",
+                                    getPerformanceLevelColor(level)
+                                  )}>
+                                    {level}
+                                  </div>
+                                )}
+                              </div>
+                              
+                              {/* Performance bar */}
+                              {value !== null && (
+                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gray-200">
+                                  <div 
+                                    className={cn(
+                                      "h-full transition-all duration-300",
+                                      isHighest ? "bg-club-gold" : getPerformanceLevelColor(level).replace('text-', 'bg-')
+                                    )}
+                                    style={{
+                                      width: `${Math.min(100, Math.max(10, (value / Math.max(...selectedPlayers.map(p => metric.getValue(p) || 0))) * 100))}%`
+                                    }}
+                                  />
+                                </div>
+                              )}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </ScrollArea>
+            
+            {/* Horizontal scroll indicator for mobile */}
+            {isMobile && (
+              <div className="absolute bottom-2 right-2 bg-club-gold/20 text-club-gold px-2 py-1 rounded text-xs backdrop-blur-sm">
+                ← Scroll →
+              </div>
+            )}
           </div>
         )}
       </CardContent>
