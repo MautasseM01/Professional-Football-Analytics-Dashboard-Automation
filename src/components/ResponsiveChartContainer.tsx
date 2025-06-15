@@ -2,13 +2,12 @@
 import React, { useMemo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useResponsiveBreakpoint } from '@/hooks/use-orientation';
-import { ChartContainer } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
 
 interface ResponsiveChartContainerProps {
   children: React.ReactElement;
   className?: string;
-  config: Record<string, { color: string }>;
+  config?: Record<string, { color: string }>;
   aspectRatio?: number;
   minHeight?: number;
 }
@@ -24,34 +23,35 @@ export const ResponsiveChartContainer = ({
   const breakpoint = useResponsiveBreakpoint();
 
   const responsiveConfig = useMemo(() => {
-    const baseHeight = isMobile ? 260 : 350;
+    const baseHeight = isMobile ? 320 : 400;
     const calculatedMinHeight = minHeight || baseHeight;
     
-    const ratio = aspectRatio || (isMobile ? 1.2 : 2.0);
-    
     return {
-      aspectRatio: ratio,
       minHeight: calculatedMinHeight,
-      margin: isMobile 
-        ? { top: 10, right: 10, bottom: 40, left: 10 }
-        : { top: 20, right: 20, bottom: 50, left: 20 }
+      padding: isMobile 
+        ? { top: 10, right: 10, bottom: 10, left: 10 }
+        : { top: 15, right: 15, bottom: 15, left: 15 }
     };
-  }, [isMobile, aspectRatio, minHeight]);
+  }, [isMobile, minHeight]);
 
   return (
     <div className={cn(
-      "w-full transition-all duration-300 ease-out",
+      "w-full h-full transition-all duration-300 ease-out overflow-hidden",
       "touch-manipulation", // Optimize for touch devices
       className
-    )}>
-      <ChartContainer
-        config={config}
-        aspectRatio={responsiveConfig.aspectRatio}
-        minHeight={responsiveConfig.minHeight}
-        className="w-full"
+    )}
+    style={{
+      minHeight: `${responsiveConfig.minHeight}px`,
+      contain: 'layout style paint'
+    }}>
+      <div 
+        className="w-full h-full"
+        style={{
+          padding: `${responsiveConfig.padding.top}px ${responsiveConfig.padding.right}px ${responsiveConfig.padding.bottom}px ${responsiveConfig.padding.left}px`
+        }}
       >
         {children}
-      </ChartContainer>
+      </div>
     </div>
   );
 };

@@ -3,7 +3,6 @@ import { ResponsiveContainer, LineChart as RechartsLineChart, Line, XAxis, YAxis
 import { ChartTooltip } from "@/components/ui/chart";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ResponsiveChartContainer } from "@/components/ResponsiveChartContainer";
 import { CustomTooltip } from "./CustomTooltip";
 
 interface ChartRendererProps {
@@ -26,33 +25,56 @@ export const ChartRenderer = ({
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
+  // Calculate margins based on screen size and content
+  const getMargins = () => {
+    if (isMobile) {
+      return { 
+        top: 20, 
+        right: 20, 
+        left: 40, 
+        bottom: 70 // Increased for rotated labels
+      };
+    }
+    return { 
+      top: 25, 
+      right: 30, 
+      left: 50, 
+      bottom: 90 // Increased for rotated labels
+    };
+  };
+
+  const margins = getMargins();
+
   return (
-    <ResponsiveChartContainer
-      config={getChartConfig()}
-      aspectRatio={isMobile ? (4/3) : (16/10)}
-      minHeight={isMobile ? 260 : 350}
-    >
+    <div className="w-full h-full" style={{ contain: 'layout' }}>
       <ResponsiveContainer width="100%" height="100%">
         {chartView === 'line' ? (
-          <RechartsLineChart data={matchData} margin={{ top: 10, right: 15, left: 10, bottom: isMobile ? 40 : 50 }}>
+          <RechartsLineChart data={matchData} margin={margins}>
             <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "#333" : "#e5e7eb"} opacity={0.3} />
             <XAxis 
               dataKey="match" 
               stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
-              tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
+              tick={{ 
+                fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", 
+                fontSize: isMobile ? 9 : 11,
+                textAnchor: 'end'
+              }}
               tickLine={false}
               axisLine={false}
               angle={-45}
-              textAnchor="end"
-              interval={isMobile ? 1 : 0}
-              height={isMobile ? 35 : 45}
+              interval={0} // Show all labels
+              height={margins.bottom}
+              minTickGap={0}
             />
             <YAxis 
               stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
-              tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
+              tick={{ 
+                fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", 
+                fontSize: isMobile ? 9 : 11 
+              }}
               tickLine={false}
               axisLine={false}
-              width={isMobile ? 25 : 30}
+              width={margins.left}
             />
             
             <ChartTooltip 
@@ -88,7 +110,7 @@ export const ChartRenderer = ({
             )}
           </RechartsLineChart>
         ) : (
-          <AreaChart data={matchData} margin={{ top: 10, right: 15, left: 10, bottom: isMobile ? 40 : 50 }}>
+          <AreaChart data={matchData} margin={margins}>
             <defs>
               <linearGradient id="metricGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.4}/>
@@ -100,20 +122,27 @@ export const ChartRenderer = ({
             <XAxis 
               dataKey="match" 
               stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
-              tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
+              tick={{ 
+                fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", 
+                fontSize: isMobile ? 9 : 11,
+                textAnchor: 'end'
+              }}
               tickLine={false}
               axisLine={false}
               angle={-45}
-              textAnchor="end"
-              interval={isMobile ? 1 : 0}
-              height={isMobile ? 35 : 45}
+              interval={0} // Show all labels
+              height={margins.bottom}
+              minTickGap={0}
             />
             <YAxis 
               stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
-              tick={{ fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", fontSize: isMobile ? 8 : 10 }}
+              tick={{ 
+                fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", 
+                fontSize: isMobile ? 9 : 11 
+              }}
               tickLine={false}
               axisLine={false}
-              width={isMobile ? 25 : 30}
+              width={margins.left}
             />
             
             <ChartTooltip 
@@ -149,6 +178,6 @@ export const ChartRenderer = ({
           </AreaChart>
         )}
       </ResponsiveContainer>
-    </ResponsiveChartContainer>
+    </div>
   );
 };
