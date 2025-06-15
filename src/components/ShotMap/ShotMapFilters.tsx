@@ -1,4 +1,3 @@
-
 import { 
   Player
 } from "@/types";
@@ -35,6 +34,9 @@ export const ShotMapFilters = ({
   const periods = ["First Half", "Second Half", "Extra Time", "Penalties"];
   const outcomes: ShotOutcome[] = ["Goal", "Shot on Target", "Shot Off Target", "Blocked Shot"];
   
+  // Get the selected player for display
+  const selectedPlayer = players.find(p => p.id === filters.playerId);
+  
   return (
     <div className="space-y-4">
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -65,18 +67,21 @@ export const ShotMapFilters = ({
             }
           >
             <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray w-full h-10 sm:h-9">
-              <SelectValue placeholder="All players" />
+              <SelectValue placeholder="All players">
+                {selectedPlayer ? `${selectedPlayer.number || '?'} ${selectedPlayer.name} - ${selectedPlayer.position}` : "All players"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
               <SelectItem value="all-players">All players</SelectItem>
               {players.map((player) => (
                 <SelectItem key={player.id} value={player.id.toString()}>
-                  {player.name}
+                  {player.number || '?'} {player.name} - {player.position}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
+        
         
         <div className="space-y-2">
           <label className="text-xs sm:text-sm flex items-center gap-1 text-club-light-gray/70">
