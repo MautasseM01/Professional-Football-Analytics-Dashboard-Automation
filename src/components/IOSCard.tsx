@@ -37,6 +37,9 @@ export const IOSCard = ({
       className={cn(
         "relative rounded-2xl border border-club-gold/20 shadow-lg backdrop-blur-xl transition-all duration-300 ease-out",
         "hover:shadow-xl hover:scale-[1.02] active:scale-[0.98] hover:border-club-gold/30",
+        // Light mode specific styling
+        "light:bg-white light:border-gray-200 light:shadow-lg",
+        "light:hover:border-yellow-600/40 light:hover:shadow-xl",
         isInteractive && "cursor-pointer touch-manipulation",
         sizeClasses[size],
         variantClasses[variant],
@@ -48,8 +51,8 @@ export const IOSCard = ({
         {children}
       </div>
       
-      {/* iOS-style shine effect */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-club-gold/5 via-transparent to-transparent opacity-60 pointer-events-none" />
+      {/* iOS-style shine effect - adjusted for light mode */}
+      <div className="absolute inset-0 rounded-2xl bg-gradient-to-tr from-club-gold/5 via-transparent to-transparent opacity-60 pointer-events-none light:from-yellow-600/10" />
     </Card>
   );
 };

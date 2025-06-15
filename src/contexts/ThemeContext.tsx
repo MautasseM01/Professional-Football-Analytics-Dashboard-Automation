@@ -31,13 +31,14 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   useEffect(() => {
     localStorage.setItem('theme', theme);
     
-    // Apply theme class to document element
+    // Remove both theme classes first
+    document.documentElement.classList.remove('light', 'dark', 'light-theme', 'dark-theme');
+    
+    // Apply the appropriate theme classes
     if (theme === 'light') {
-      document.documentElement.classList.add('light-theme');
-      document.documentElement.classList.remove('dark-theme');
+      document.documentElement.classList.add('light', 'light-theme');
     } else {
-      document.documentElement.classList.add('dark-theme');
-      document.documentElement.classList.remove('light-theme');
+      document.documentElement.classList.add('dark', 'dark-theme');
     }
   }, [theme]);
 
