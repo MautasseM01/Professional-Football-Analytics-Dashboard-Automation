@@ -42,8 +42,7 @@ export const BackToTopButton = () => {
   return (
     <div
       className={`
-        fixed bottom-6 z-50 transition-all duration-300 ease-in-out
-        left-80 md:left-[22rem] lg:left-[23rem]
+        fixed bottom-6 right-6 z-50 transition-all duration-300 ease-in-out
         ${isVisible 
           ? 'opacity-100 translate-y-0 pointer-events-auto' 
           : 'opacity-0 translate-y-4 pointer-events-none'
