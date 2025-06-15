@@ -1,9 +1,11 @@
+
 import { useState } from "react";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { PlayerSelector } from "@/components/PlayerSelector";
 import { RoleBasedContent } from "@/components/RoleBasedContent";
+import { BackToTopButton } from "@/components/BackToTopButton";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
@@ -285,6 +287,8 @@ const PlayerDevelopment = () => {
           )}
         </div>
       </main>
+
+      <BackToTopButton />
     </div>
   );
 };
