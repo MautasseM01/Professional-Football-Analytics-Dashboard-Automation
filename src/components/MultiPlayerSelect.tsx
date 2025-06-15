@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Check, ChevronsUpDown, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -154,7 +153,7 @@ export function MultiPlayerSelect({
 
       {/* Selected players badges */}
       {selectedPlayerIds.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
+        <div className="flex flex-wrap gap-2 mt-2 md:grid md:grid-cols-2 md:gap-2 lg:flex lg:flex-wrap lg:gap-2">
           {Array.from(selectedPlayersMap.values()).map(player => (
             <Badge key={player.id} variant="secondary" className="px-3 py-1.5 flex items-center gap-2">
               <PlayerAvatar player={player} size="sm" />
