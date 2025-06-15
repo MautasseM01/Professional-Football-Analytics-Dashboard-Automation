@@ -49,7 +49,7 @@ const PlayerStatsPage = () => {
             {/* Left section - Title and page info */}
             <div className="flex-1 min-w-0">
               <h1 className="text-ios-headline font-bold text-club-gold dark:text-club-gold truncate">
-                Player Analysis
+                {t('nav.individualStats')}
               </h1>
               <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
                 {profile?.role === 'player' ? "View your individual performance statistics and development progress" : "Analyze individual player performance and statistics"}
