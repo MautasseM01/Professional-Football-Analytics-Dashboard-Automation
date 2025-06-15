@@ -2,6 +2,7 @@
 import React, { useMemo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useResponsiveBreakpoint } from '@/hooks/use-orientation';
+import { ChartContainer } from '@/components/ui/chart';
 import { cn } from '@/lib/utils';
 
 interface ResponsiveChartContainerProps {
@@ -22,28 +23,35 @@ export const ResponsiveChartContainer = ({
   const isMobile = useIsMobile();
   const breakpoint = useResponsiveBreakpoint();
 
-  const containerStyles = useMemo(() => {
+  const responsiveConfig = useMemo(() => {
+    const baseHeight = isMobile ? 260 : 350;
+    const calculatedMinHeight = minHeight || baseHeight;
+    
+    const ratio = aspectRatio || (isMobile ? 1.2 : 2.0);
+    
     return {
-      width: '100%',
-      height: '100%',
-      overflow: 'hidden',
-      position: 'relative' as const,
-      containment: 'layout style' as const
+      aspectRatio: ratio,
+      minHeight: calculatedMinHeight,
+      margin: isMobile 
+        ? { top: 10, right: 10, bottom: 40, left: 10 }
+        : { top: 20, right: 20, bottom: 50, left: 20 }
     };
-  }, []);
+  }, [isMobile, aspectRatio, minHeight]);
 
   return (
-    <div 
-      className={cn(
-        "w-full h-full transition-all duration-300 ease-out overflow-hidden",
-        "touch-manipulation select-none", // Optimize for touch devices
-        className
-      )}
-      style={containerStyles}
-    >
-      <div className="w-full h-full p-1">
+    <div className={cn(
+      "w-full transition-all duration-300 ease-out",
+      "touch-manipulation", // Optimize for touch devices
+      className
+    )}>
+      <ChartContainer
+        config={config}
+        aspectRatio={responsiveConfig.aspectRatio}
+        minHeight={responsiveConfig.minHeight}
+        className="w-full"
+      >
         {children}
-      </div>
+      </ChartContainer>
     </div>
   );
 };

@@ -24,39 +24,25 @@ export const PerformanceTrendsChart = ({
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
-  // Calculate dynamic height based on screen size and data
-  const getContainerHeight = () => {
-    if (isMobile) {
-      return matchData.length > 10 ? '280px' : '260px';
-    }
-    return matchData.length > 15 ? '380px' : '350px';
-  };
-
   return (
     <div className="px-4 sm:px-6 pb-6">
       <div 
         className={cn(
-          "w-full rounded-2xl p-3 sm:p-4 transition-all duration-300 overflow-hidden",
+          "w-full rounded-2xl p-3 sm:p-4 transition-all duration-300",
           theme === 'dark' 
             ? "bg-club-black/20 border border-club-gold/10" 
             : "bg-gray-50/30 border border-club-gold/20"
         )}
-        style={{ 
-          height: getContainerHeight(),
-          minHeight: isMobile ? '260px' : '350px',
-          maxHeight: isMobile ? '320px' : '400px'
-        }}
+        style={{ height: isMobile ? '260px' : '350px' }}
       >
-        <div className="w-full h-full overflow-hidden">
-          <ChartRenderer
-            chartView={chartView}
-            matchData={matchData}
-            selectedKPI={selectedKPI}
-            selectedKPILabel={selectedKPILabel}
-            showMovingAverage={showMovingAverage}
-            getChartConfig={getChartConfig}
-          />
-        </div>
+        <ChartRenderer
+          chartView={chartView}
+          matchData={matchData}
+          selectedKPI={selectedKPI}
+          selectedKPILabel={selectedKPILabel}
+          showMovingAverage={showMovingAverage}
+          getChartConfig={getChartConfig}
+        />
       </div>
     </div>
   );
