@@ -1,3 +1,4 @@
+
 import { ResponsiveContainer, LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, AreaChart, Area } from "recharts";
 import { ChartTooltip } from "@/components/ui/chart";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -24,30 +25,30 @@ export const ChartRenderer = ({
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
-  // Enhanced margins with better spacing for down and left positioning
+  // Enhanced margins for right-bottom positioning
   const getMargins = () => {
     if (isMobile) {
       return { 
-        top: 20,      // Reduced top margin since container provides top offset
-        right: 15,    // Reduced right margin 
-        left: 50,     // Increased left margin for better left spacing
-        bottom: 85    // Generous bottom margin for rotated X-axis labels
+        top: 35,      // Increased top margin to push chart down
+        right: 10,    // Reduced right margin to bring chart closer to right edge
+        left: 65,     // Increased left margin to push chart right
+        bottom: 85    // Bottom margin for X-axis labels
       };
     }
     return { 
-      top: 25,       // Reduced top margin on desktop
-      right: 20,     // Reduced right margin for larger screens
-      left: 65,      // Increased left margin for Y-axis labels
-      bottom: 105    // Ample bottom margin for rotated labels
+      top: 45,       // Increased top margin on desktop
+      right: 15,     // Reduced right margin for larger screens
+      left: 80,      // Increased left margin to push chart right
+      bottom: 105    // Bottom margin for rotated labels
     };
   };
 
   const margins = getMargins();
 
   return (
-    <div className="w-full h-full flex items-start justify-start" style={{ contain: 'layout' }}> {/* Changed to items-start and justify-start */}
+    <div className="w-full h-full flex items-end justify-end" style={{ contain: 'layout' }}> {/* Changed to items-end and justify-end */}
       <div className="w-full h-full" style={{ 
-        padding: isMobile ? '4px 0px 4px 8px' : '8px 0px 8px 12px', // Asymmetric padding - more left, less right
+        padding: isMobile ? '4px 0px 8px 12px' : '8px 0px 12px 16px', // Asymmetric padding - more left and bottom
         minHeight: '100%'
       }}>
         <ResponsiveContainer width="100%" height="100%">
@@ -60,7 +61,7 @@ export const ChartRenderer = ({
                 stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
                 tick={{ 
                   fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", 
-                  fontSize: isMobile ? 10 : 12, // Slightly larger font for better readability
+                  fontSize: isMobile ? 10 : 12,
                   textAnchor: 'end'
                 }}
                 tickLine={false}

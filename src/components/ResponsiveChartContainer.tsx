@@ -23,22 +23,22 @@ export const ResponsiveChartContainer = ({
   const breakpoint = useResponsiveBreakpoint();
 
   const responsiveConfig = useMemo(() => {
-    const baseHeight = isMobile ? 360 : 450; // Increased base heights for better spacing
+    const baseHeight = isMobile ? 360 : 450;
     const calculatedMinHeight = minHeight || baseHeight;
     
     return {
       minHeight: calculatedMinHeight,
       padding: isMobile 
-        ? { top: 16, right: 8, bottom: 12, left: 20 } // Asymmetric padding - more top and left, less right
-        : { top: 24, right: 12, bottom: 20, left: 32 }  // More generous top and left padding on desktop
+        ? { top: 8, right: 20, bottom: 16, left: 12 } // Asymmetric padding - more right and bottom, less top and left
+        : { top: 12, right: 32, bottom: 24, left: 20 }  // More generous right and bottom padding on desktop
     };
   }, [isMobile, minHeight]);
 
   return (
     <div className={cn(
       "w-full h-full transition-all duration-300 ease-out overflow-hidden",
-      "flex items-start justify-start", // Changed from center alignment to start alignment
-      "touch-manipulation", // Optimize for touch devices
+      "flex items-end justify-end", // Changed from start alignment to end alignment for right-bottom positioning
+      "touch-manipulation",
       className
     )}
     style={{
@@ -46,7 +46,7 @@ export const ResponsiveChartContainer = ({
       contain: 'layout style paint'
     }}>
       <div 
-        className="w-full h-full flex items-start justify-start" // Changed alignment here too
+        className="w-full h-full flex items-end justify-end" // Changed alignment here too for right-bottom positioning
         style={{
           padding: `${responsiveConfig.padding.top}px ${responsiveConfig.padding.right}px ${responsiveConfig.padding.bottom}px ${responsiveConfig.padding.left}px`
         }}

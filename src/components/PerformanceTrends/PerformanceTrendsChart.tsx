@@ -24,28 +24,28 @@ export const PerformanceTrendsChart = ({
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
-  // Calculate dynamic height based on content and screen size with improved spacing
+  // Calculate dynamic height based on content and screen size
   const calculateContainerHeight = () => {
     if (isMobile) {
-      return Math.max(380, 300 + (matchData.length * 2)); // Increased minimum height for better spacing
+      return Math.max(380, 300 + (matchData.length * 2));
     }
-    return Math.max(500, 420 + (matchData.length * 3)); // Increased minimum height for desktop
+    return Math.max(500, 420 + (matchData.length * 3));
   };
 
-  // Responsive padding based on screen size - adjusted for down and left positioning
+  // Responsive padding for right-bottom positioning
   const getContainerPadding = () => {
     if (isMobile) {
-      return "pt-6 pb-3 pl-6 pr-3"; // More top and left padding, less bottom and right
+      return "pt-2 pb-6 pl-2 pr-6"; // More bottom and right padding, less top and left
     }
-    return "pt-8 pb-6 pl-10 pr-6"; // More generous top and left padding on larger screens
+    return "pt-4 pb-8 pl-4 pr-10"; // More bottom and right padding on larger screens
   };
 
   return (
-    <div className="pl-6 sm:pl-8 pr-2 sm:pr-4 pb-6"> {/* Adjusted outer container - more left, less right padding */}
+    <div className="pl-2 sm:pl-4 pr-6 sm:pr-8 pb-6"> {/* Adjusted outer container - less left, more right padding */}
       <div 
         className={cn(
           "w-full rounded-2xl transition-all duration-300 overflow-hidden",
-          "flex flex-col justify-start items-start", // Changed from justify-center to justify-start and added items-start
+          "flex flex-col justify-end items-end", // Changed to justify-end and items-end for right-bottom alignment
           getContainerPadding(),
           theme === 'dark' 
             ? "bg-club-black/20 border border-club-gold/10" 
@@ -56,10 +56,10 @@ export const PerformanceTrendsChart = ({
           contain: 'layout style paint'
         }}
       >
-        <div className="w-full h-full flex items-start justify-start pt-4 pl-2"> {/* Added top and left offsets */}
+        <div className="w-full h-full flex items-end justify-end pb-4 pr-2"> {/* Added bottom and right offsets */}
           <div className="w-full h-full" style={{ 
             maxHeight: '100%',
-            minHeight: isMobile ? '280px' : '360px' // Ensure minimum chart area
+            minHeight: isMobile ? '280px' : '360px'
           }}>
             <ChartRenderer
               chartView={chartView}
