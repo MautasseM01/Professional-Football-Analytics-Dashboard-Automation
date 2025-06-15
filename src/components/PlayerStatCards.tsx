@@ -17,6 +17,8 @@ import {
   TooltipTrigger 
 } from "@/components/ui/tooltip";
 import { useResponsiveBreakpoint } from "@/hooks/use-orientation";
+import { ErrorFallback } from "./ErrorStates/ErrorFallback";
+import { useMemo } from "react";
 
 interface PlayerStatCardsProps {
   player: Player;
@@ -25,32 +27,49 @@ interface PlayerStatCardsProps {
 export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
   const breakpoint = useResponsiveBreakpoint();
   
-  const passCompletionRate = player.passes_attempted > 0
-    ? ((player.passes_completed / player.passes_attempted) * 100).toFixed(1)
-    : "0";
+  const { passCompletionRate, shotsAccuracy, gridConfig } = useMemo(() => {
+    // Safely calculate pass completion rate
+    const passCompletionRate = player?.passes_attempted && player.passes_attempted > 0
+      ? ((player.passes_completed / player.passes_attempted) * 100).toFixed(1)
+      : "0";
 
-  const shotsAccuracy = player.shots_total > 0
-    ? ((player.shots_on_target / player.shots_total) * 100).toFixed(1)
-    : "0";
+    // Safely calculate shots accuracy
+    const shotsAccuracy = player?.shots_total && player.shots_total > 0
+      ? ((player.shots_on_target / player.shots_total) * 100).toFixed(1)
+      : "0";
 
-  // Intelligent grid configuration based on breakpoint
-  const getGridConfig = () => {
-    switch (breakpoint) {
-      case 'mobile':
-        return { minWidth: '100%', className: 'grid-cols-1' };
-      case 'tablet-portrait':
-        return { minWidth: '280px', className: 'grid-cols-1 xs:grid-cols-2' };
-      case 'tablet-landscape':
-        return { minWidth: '240px', className: 'grid-cols-2 md:grid-cols-3' };
-      case 'desktop':
-        return { minWidth: '220px', className: 'grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' };
-      case 'large':
-      default:
-        return { minWidth: '200px', className: 'grid-cols-5' };
-    }
-  };
+    // Intelligent grid configuration based on breakpoint
+    const getGridConfig = () => {
+      switch (breakpoint) {
+        case 'mobile':
+          return { minWidth: '100%', className: 'grid-cols-1' };
+        case 'tablet-portrait':
+          return { minWidth: '280px', className: 'grid-cols-1 xs:grid-cols-2' };
+        case 'tablet-landscape':
+          return { minWidth: '240px', className: 'grid-cols-2 md:grid-cols-3' };
+        case 'desktop':
+          return { minWidth: '220px', className: 'grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' };
+        case 'large':
+        default:
+          return { minWidth: '200px', className: 'grid-cols-5' };
+      }
+    };
 
-  const gridConfig = getGridConfig();
+    return {
+      passCompletionRate,
+      shotsAccuracy,
+      gridConfig: getGridConfig()
+    };
+  }, [player, breakpoint]);
+
+  if (!player) {
+    return (
+      <ErrorFallback 
+        title="No player data"
+        description="Player statistics are not available"
+      />
+    );
+  }
 
   return (
     <TooltipProvider>
@@ -74,7 +93,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
                   } 
-                  value={player.matches} 
+                  value={player.matches || 0} 
                   icon={<Calendar />} 
                 />
               </div>
@@ -94,7 +113,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
                   } 
-                  value={player.distance} 
+                  value={player.distance || 0} 
                   subValue="kilometers" 
                   icon={<Activity />} 
                 />
@@ -116,7 +135,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                     </div>
                   } 
                   value={`${passCompletionRate}%`} 
-                  subValue={`${player.passes_completed}/${player.passes_attempted} passes`} 
+                  subValue={`${player.passes_completed || 0}/${player.passes_attempted || 0} passes`} 
                   icon={<BarChart />} 
                 />
               </div>
@@ -137,7 +156,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                     </div>
                   } 
                   value={`${shotsAccuracy}%`} 
-                  subValue={`${player.shots_on_target}/${player.shots_total} shots`} 
+                  subValue={`${player.shots_on_target || 0}/${player.shots_total || 0} shots`} 
                   icon={<PieChart />} 
                 />
               </div>

@@ -9,7 +9,7 @@ import { usePerformanceData } from "@/hooks/use-performance-data";
 import { useSwipeGestures } from "@/hooks/use-swipe-gestures";
 import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { ErrorFallback } from "@/components/ErrorStates/ErrorFallback";
 
 import { KPI_OPTIONS } from "./constants";
 import { calculateMovingAverage, calculateStats } from "./utils";
@@ -31,26 +31,40 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
   const isMobile = useIsMobile();
   const { theme } = useTheme();
   
-  const currentMetric = KPI_OPTIONS.find(m => m.value === selectedKPI) || KPI_OPTIONS[0];
+  const currentMetric = useMemo(() => {
+    return KPI_OPTIONS.find(m => m.value === selectedKPI) || KPI_OPTIONS[0];
+  }, [selectedKPI]);
   
   // Get the selected KPI label
-  const selectedKPILabel = KPI_OPTIONS.find(option => option.value === selectedKPI)?.label || "";
+  const selectedKPILabel = useMemo(() => {
+    return KPI_OPTIONS.find(option => option.value === selectedKPI)?.label || "";
+  }, [selectedKPI]);
   
-  // Fetch real performance data
+  // Fetch real performance data with error handling
   const { data: rawMatchData, loading, error } = usePerformanceData(player, selectedKPI, selectedTimePeriod);
 
   // Process match data with moving average if needed
   const matchData = useMemo(() => {
     if (!rawMatchData || rawMatchData.length === 0) return [];
     
-    return showMovingAverage 
-      ? calculateMovingAverage(rawMatchData, 3)
-      : rawMatchData;
+    try {
+      return showMovingAverage 
+        ? calculateMovingAverage(rawMatchData, 3)
+        : rawMatchData;
+    } catch (err) {
+      console.error('Error processing match data:', err);
+      return rawMatchData;
+    }
   }, [rawMatchData, showMovingAverage]);
 
   // Calculate performance statistics
   const stats = useMemo(() => {
-    return calculateStats(matchData);
+    try {
+      return calculateStats(matchData);
+    } catch (err) {
+      console.error('Error calculating stats:', err);
+      return { min: 0, max: 0, average: 0, trend: 'stable' as const };
+    }
   }, [matchData]);
 
   // Enhanced navigation with swipe gestures
@@ -80,6 +94,16 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
     average: { color: "#9CA3AF" }
   });
 
+  // Validate player data
+  if (!player?.id) {
+    return (
+      <ErrorFallback 
+        title="Invalid player data"
+        description="Player information is missing or invalid"
+      />
+    );
+  }
+
   // Show loading state
   if (loading) {
     return <ChartLoadingSkeleton />;
@@ -96,11 +120,10 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
         "shadow-xl transition-all duration-300"
       )}>
         <CardContent className="p-6">
-          <Alert className="border-red-500/20 bg-red-500/10">
-            <AlertDescription className="text-red-600 dark:text-red-400">
-              Failed to load performance data: {error}
-            </AlertDescription>
-          </Alert>
+          <ErrorFallback 
+            title="Performance data error"
+            description={`Failed to load performance data: ${error}`}
+          />
         </CardContent>
       </Card>
     );
@@ -121,18 +144,24 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
           stats={stats}
         />
         <CardContent className="p-6">
-          <Alert className="border-yellow-500/20 bg-yellow-500/10">
-            <AlertDescription className="text-yellow-600 dark:text-yellow-400">
-              No performance data available for the selected time period.
-            </AlertDescription>
-          </Alert>
+          <ErrorFallback 
+            title="No data available"
+            description="No performance data available for the selected time period."
+          />
         </CardContent>
       </Card>
     );
   }
 
   return (
-    <ErrorBoundary>
+    <ErrorBoundary
+      fallback={
+        <ErrorFallback 
+          title="Performance trends error"
+          description="Failed to render performance trends component"
+        />
+      }
+    >
       <Card 
         className={cn(
           "border-club-gold/20 w-full overflow-hidden backdrop-blur-sm transition-all duration-300 hover:shadow-2xl",
