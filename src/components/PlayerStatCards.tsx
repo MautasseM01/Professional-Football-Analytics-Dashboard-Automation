@@ -9,6 +9,10 @@ import {
   Activity,
   Calendar,
   Info,
+  Target,
+  Trophy,
+  Zap,
+  Star
 } from "lucide-react";
 import { 
   Tooltip, 
@@ -27,7 +31,7 @@ interface PlayerStatCardsProps {
 export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
   const breakpoint = useResponsiveBreakpoint();
   
-  const { passCompletionRate, shotsAccuracy, gridConfig } = useMemo(() => {
+  const { passCompletionRate, shotsAccuracy, goalsPlusAssists, gridConfig } = useMemo(() => {
     // Safely calculate pass completion rate
     const passCompletionRate = player?.passes_attempted && player.passes_attempted > 0
       ? ((player.passes_completed / player.passes_attempted) * 100).toFixed(1)
@@ -38,6 +42,9 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
       ? ((player.shots_on_target / player.shots_total) * 100).toFixed(1)
       : "0";
 
+    // Calculate goals + assists
+    const goalsPlusAssists = (player?.goals || 0) + (player?.assists || 0);
+
     // Intelligent grid configuration based on breakpoint
     const getGridConfig = () => {
       switch (breakpoint) {
@@ -46,18 +53,19 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
         case 'tablet-portrait':
           return { minWidth: '280px', className: 'grid-cols-1 xs:grid-cols-2' };
         case 'tablet-landscape':
-          return { minWidth: '240px', className: 'grid-cols-2 md:grid-cols-3' };
+          return { minWidth: '200px', className: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' };
         case 'desktop':
-          return { minWidth: '220px', className: 'grid-cols-3 lg:grid-cols-4 xl:grid-cols-5' };
+          return { minWidth: '180px', className: 'grid-cols-3 lg:grid-cols-4 xl:grid-cols-6' };
         case 'large':
         default:
-          return { minWidth: '200px', className: 'grid-cols-5' };
+          return { minWidth: '160px', className: 'grid-cols-4 lg:grid-cols-6 xl:grid-cols-8' };
       }
     };
 
     return {
       passCompletionRate,
       shotsAccuracy,
+      goalsPlusAssists,
       gridConfig: getGridConfig()
     };
   }, [player, breakpoint]);
@@ -89,7 +97,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
-                      <span>Matches Played</span>
+                      <span>Matches</span>
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
                   } 
@@ -99,7 +107,91 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
               </div>
             </TooltipTrigger>
             <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
-              <p>Total number of matches the player has participated in during the current season.</p>
+              <p>Total matches played this season</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
+                <StatCard 
+                  title={
+                    <div className="flex items-center gap-1.5">
+                      <span>Goals</span>
+                      <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
+                    </div>
+                  } 
+                  value={player.goals || 0} 
+                  subValue={`${((player.goals || 0) / Math.max(player.matches || 1, 1)).toFixed(2)} per match`}
+                  icon={<Target />} 
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
+              <p>Total goals scored and average per match</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
+                <StatCard 
+                  title={
+                    <div className="flex items-center gap-1.5">
+                      <span>Assists</span>
+                      <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
+                    </div>
+                  } 
+                  value={player.assists || 0} 
+                  subValue={`${((player.assists || 0) / Math.max(player.matches || 1, 1)).toFixed(2)} per match`}
+                  icon={<Zap />} 
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
+              <p>Total assists provided and average per match</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
+                <StatCard 
+                  title={
+                    <div className="flex items-center gap-1.5">
+                      <span>G+A</span>
+                      <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
+                    </div>
+                  } 
+                  value={goalsPlusAssists} 
+                  subValue={`${(goalsPlusAssists / Math.max(player.matches || 1, 1)).toFixed(2)} per match`}
+                  icon={<Trophy />} 
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
+              <p>Total goal contributions (Goals + Assists)</p>
+            </TooltipContent>
+          </Tooltip>
+
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
+                <StatCard 
+                  title={
+                    <div className="flex items-center gap-1.5">
+                      <span>Rating</span>
+                      <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
+                    </div>
+                  } 
+                  value={player.match_rating ? Number(player.match_rating).toFixed(1) : "0.0"} 
+                  subValue="Average"
+                  icon={<Star />} 
+                />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
+              <p>Average match rating across all games</p>
             </TooltipContent>
           </Tooltip>
           
@@ -109,18 +201,18 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
-                      <span>Distance Covered</span>
+                      <span>Distance</span>
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
                   } 
-                  value={player.distance || 0} 
-                  subValue="kilometers" 
+                  value={player.distance ? Number(player.distance).toFixed(1) : "0"} 
+                  subValue="km total" 
                   icon={<Activity />} 
                 />
               </div>
             </TooltipTrigger>
             <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
-              <p>Total distance covered by the player during matches, measured in kilometers. Indicates player's mobility and endurance.</p>
+              <p>Total distance covered in all matches</p>
             </TooltipContent>
           </Tooltip>
           
@@ -130,18 +222,18 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
-                      <span>Pass Completion</span>
+                      <span>Pass Accuracy</span>
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
                   } 
                   value={`${passCompletionRate}%`} 
-                  subValue={`${player.passes_completed || 0}/${player.passes_attempted || 0} passes`} 
+                  subValue={`${player.passes_completed || 0}/${player.passes_attempted || 0}`} 
                   icon={<BarChart />} 
                 />
               </div>
             </TooltipTrigger>
             <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
-              <p>Percentage of successful passes relative to total pass attempts. Higher percentage indicates better passing accuracy and decision-making.</p>
+              <p>Pass completion percentage and total attempts</p>
             </TooltipContent>
           </Tooltip>
           
@@ -156,13 +248,13 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                     </div>
                   } 
                   value={`${shotsAccuracy}%`} 
-                  subValue={`${player.shots_on_target || 0}/${player.shots_total || 0} shots`} 
+                  subValue={`${player.shots_on_target || 0}/${player.shots_total || 0}`} 
                   icon={<PieChart />} 
                 />
               </div>
             </TooltipTrigger>
             <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
-              <p>Percentage of shots that were on target compared to total shots taken. Measures a player's shooting precision and efficiency.</p>
+              <p>Shot accuracy percentage and total attempts</p>
             </TooltipContent>
           </Tooltip>
 
@@ -177,7 +269,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
               </div>
             </TooltipTrigger>
             <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
-              <p>Player's disciplinary record including yellow and red cards. Risk levels: SAFE (0-3), AT RISK (4), CRITICAL (5+).</p>
+              <p>Disciplinary record with risk assessment</p>
             </TooltipContent>
           </Tooltip>
         </ResponsiveGrid>

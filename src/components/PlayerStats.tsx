@@ -5,6 +5,9 @@ import { PlayerStatCards } from "./PlayerStatCards";
 import { PlayerPerformanceSection } from "./PlayerPerformanceSection";
 import { PlayerHeatmapSection } from "./PlayerHeatmapSection";
 import { PlayerTackleSuccessSection } from "./PlayerTackleSuccessSection";
+import { GoalsBreakdownCard } from "./GoalsBreakdownCard";
+import { DetailedAttributesCard } from "./DetailedAttributesCard";
+import { MatchByMatchCard } from "./MatchByMatchCard";
 import { ResponsiveLayout } from "./ResponsiveLayout";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { ErrorFallback } from "./ErrorStates/ErrorFallback";
@@ -67,6 +70,42 @@ export const PlayerStats = ({ player }: PlayerStatsProps) => {
           }
         >
           <PlayerPerformanceSection player={player} />
+        </ErrorBoundary>
+
+        {/* Goals & Assists Breakdown */}
+        <ErrorBoundary
+          fallback={
+            <ErrorFallback 
+              title="Goals breakdown error"
+              description="Failed to load goals breakdown"
+            />
+          }
+        >
+          <GoalsBreakdownCard player={player} />
+        </ErrorBoundary>
+
+        {/* Detailed Player Attributes */}
+        <ErrorBoundary
+          fallback={
+            <ErrorFallback 
+              title="Attributes error"
+              description="Failed to load player attributes"
+            />
+          }
+        >
+          <DetailedAttributesCard player={player} />
+        </ErrorBoundary>
+
+        {/* Match by Match Performance */}
+        <ErrorBoundary
+          fallback={
+            <ErrorFallback 
+              title="Match performance error"
+              description="Failed to load match performances"
+            />
+          }
+        >
+          <MatchByMatchCard player={player} />
         </ErrorBoundary>
         
         {/* Player Heatmap Analysis */}
