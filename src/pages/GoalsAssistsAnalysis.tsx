@@ -15,7 +15,7 @@ import { ResponsiveGrid } from "@/components/ResponsiveLayout";
 
 const GoalsAssistsAnalysis = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-  const { players, loading: playersLoading, error: playersError } = useRealPlayers();
+  const { data: players = [], isLoading: playersLoading, error: playersError } = useRealPlayers();
 
   const handlePlayerSelect = (playerId: number) => {
     const player = players.find(p => p.id === playerId);
@@ -37,7 +37,7 @@ const GoalsAssistsAnalysis = () => {
               selectedPlayer={selectedPlayer}
               onPlayerSelect={handlePlayerSelect}
               loading={playersLoading}
-              error={playersError}
+              error={playersError?.message || null}
             />
           </div>
         </div>
