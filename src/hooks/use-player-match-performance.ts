@@ -97,7 +97,7 @@ export const usePlayerMatchPerformance = (
               competition
             )
           `)
-          .order('matches.date', { ascending: false });
+          .order('date', { foreignTable: 'matches', ascending: false });
 
         // Apply filters
         if (player) {

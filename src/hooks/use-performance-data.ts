@@ -58,7 +58,7 @@ export const usePerformanceData = (player: Player | null, metric: string, timePe
             )
           `)
           .eq('player_id', player.id)
-          .order('matches.date', { ascending: false })
+          .order('date', { foreignTable: 'matches', ascending: false })
           .limit(matchLimit);
 
         if (perfError) {

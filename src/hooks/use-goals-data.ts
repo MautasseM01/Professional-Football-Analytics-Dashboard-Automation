@@ -66,7 +66,7 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
               name
             )
           `)
-          .order('matches.date', { ascending: false });
+          .order('date', { foreignTable: 'matches', ascending: false });
 
         // Apply filters
         if (player) {
@@ -94,7 +94,7 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
               opponent
             )
           `)
-          .order('matches.date', { ascending: false });
+          .order('date', { foreignTable: 'matches', ascending: false });
 
         // Apply filters
         if (player) {
