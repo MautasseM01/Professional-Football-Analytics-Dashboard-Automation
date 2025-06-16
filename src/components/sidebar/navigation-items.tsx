@@ -1,4 +1,3 @@
-
 import { 
   LayoutDashboard, 
   UserRound, 
@@ -47,6 +46,12 @@ export const navigationItems: AccessibleNavigationItem[] = [
         name: "Shot Map", 
         href: "/player-analysis/shot-map", 
         translationKey: "nav.shotMap",
+        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
+      },
+      { 
+        name: "Goals & Assists Analysis", 
+        href: "/player-analysis/goals-assists", 
+        translationKey: "nav.goalsAssists",
         allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
       }
     ]

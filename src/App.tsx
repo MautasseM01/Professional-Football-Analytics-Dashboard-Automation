@@ -13,6 +13,7 @@ import PlayerStats from "./pages/PlayerStats";
 import PlayerDevelopment from "./pages/PlayerDevelopment";
 import TeamOverview from "./pages/TeamOverview";
 import ShotMap from "./pages/ShotMap";
+import GoalsAssistsAnalysis from "./pages/GoalsAssistsAnalysis";
 import TeamTacticalAnalysis from "./pages/TeamTacticalAnalysis";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
@@ -41,6 +42,7 @@ const App = () => (
                 <Route path="/player-analysis/comparison" element={<PlayerComparison />} />
                 <Route path="/player-analysis/development" element={<PlayerDevelopment />} />
                 <Route path="/player-analysis/shot-map" element={<ShotMap />} />
+                <Route path="/player-analysis/goals-assists" element={<GoalsAssistsAnalysis />} />
                 
                 {/* Team Performance routes - redirect base path to overview */}
                 <Route path="/team-performance" element={<Navigate to="/team-performance/overview" replace />} />
