@@ -1,3 +1,4 @@
+
 export interface Player {
   id: number;
   name: string;
@@ -15,6 +16,27 @@ export interface Player {
   maxSpeed?: number;
   number?: number; // Added player number field
   sprintDistance?: number; // Added sprint distance field
+  // Enhanced properties from database
+  goals?: number;
+  assists?: number;
+  match_rating?: number;
+  pass_accuracy?: number;
+  minutes_played?: number;
+  last_match_date?: string;
+  aerial_duels_won?: number;
+  aerial_duels_attempted?: number;
+  clearances?: number;
+  interceptions?: number;
+  dribbles_successful?: number;
+  dribbles_attempted?: number;
+  crosses_completed?: number;
+  crosses_attempted?: number;
+  corners_taken?: number;
+  fouls_suffered?: number;
+  fouls_committed?: number;
+  clean_sheets?: number;
+  saves?: number;
+  season?: string;
 }
 
 export interface AuthUser {

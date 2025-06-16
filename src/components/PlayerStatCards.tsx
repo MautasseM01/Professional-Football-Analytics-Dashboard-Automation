@@ -1,4 +1,3 @@
-
 import { Player } from "@/types";
 import { StatCard } from "./StatCard";
 import { DisciplinaryCard } from "./DisciplinaryCard";
@@ -42,7 +41,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
       ? ((player.shots_on_target / player.shots_total) * 100).toFixed(1)
       : "0";
 
-    // Calculate goals + assists
+    // Calculate goals + assists with safe fallbacks
     const goalsPlusAssists = (player?.goals || 0) + (player?.assists || 0);
 
     // Intelligent grid configuration based on breakpoint
