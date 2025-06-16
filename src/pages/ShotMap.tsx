@@ -27,7 +27,7 @@ const ShotMap = () => {
       {showSidebar && <DashboardSidebar />}
       
       <div className="flex-1 overflow-auto min-w-0">
-        <header className="border-b border-club-gold/20 dark:border-club-gold/20 bg-club-black/80 dark:bg-club-black/80 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
+        <header className="border-b border-club-gold/20 dark:border-club-gold/20 bg-club-black/80 dark:bg-club-black/80 backdrop-blur-xl sticky top-0 header-sticky transition-colors duration-300">
           <div className="max-w-[calc(100%-2rem)] mx-auto">
             <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
               {/* Left section - Title and page info */}
@@ -80,7 +80,7 @@ const ShotMap = () => {
           </div>
         </header>
         
-        <main className="bg-transparent transition-colors duration-300 w-full">
+        <main className="bg-transparent transition-colors duration-300 w-full page-content">
           <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
             {/* Filters */}
             <div className="bg-club-dark-gray/50 rounded-lg p-3 sm:p-4">
