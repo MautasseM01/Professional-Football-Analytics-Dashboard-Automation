@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -513,19 +512,6 @@
       --foreground: 0 0% 100%;
       --background: 0 0% 0%;
     }
-  }
-
-  /* Z-index hierarchy to prevent header overlay issues */
-  .header-sticky {
-    z-index: 30 !important;
-  }
-  
-  .floating-controls {
-    z-index: 10 !important;
-  }
-  
-  .page-content {
-    z-index: 1 !important;
   }
 }
 

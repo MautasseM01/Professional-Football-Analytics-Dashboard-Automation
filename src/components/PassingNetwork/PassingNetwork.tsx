@@ -125,8 +125,8 @@ export const PassingNetwork = ({
   return (
     <div className="space-y-4">
       <div className={getContainerClasses()}>
-        {/* Fixed z-index for control bar - should be lower than header (z-20) */}
-        <div className="absolute top-4 right-4 z-10 flex gap-2">
+        {/* iOS-style control bar */}
+        <div className="absolute top-4 right-4 z-20 flex gap-2">
           <Button
             variant="secondary"
             size="sm"
@@ -228,17 +228,17 @@ export const PassingNetwork = ({
           </div>
         </div>
 
-        {/* Player count indicator with fixed z-index */}
+        {/* Player count indicator */}
         {players && players.length > 0 && (
-          <div className="absolute top-4 left-4 z-10 bg-white/90 dark:bg-black/90 backdrop-blur-sm text-gray-800 dark:text-gray-200 px-3 py-2 rounded-full text-sm font-semibold shadow-lg">
+          <div className="absolute top-4 left-4 bg-white/90 dark:bg-black/90 backdrop-blur-sm text-gray-800 dark:text-gray-200 px-3 py-2 rounded-full text-sm font-semibold shadow-lg">
             {players.length} player{players.length !== 1 ? 's' : ''}
           </div>
         )}
       </div>
 
-      {/* Selected player detail card with proper z-index */}
+      {/* Selected player detail card */}
       {selectedPlayer && detailLevel === 'detailed' && (
-        <Card className="bg-white/95 dark:bg-black/95 backdrop-blur-md border-0 shadow-2xl rounded-2xl z-10">
+        <Card className="bg-white/95 dark:bg-black/95 backdrop-blur-md border-0 shadow-2xl rounded-2xl z-30">
           <div className="p-4">
             <div className="flex justify-between items-start">
               <div>
