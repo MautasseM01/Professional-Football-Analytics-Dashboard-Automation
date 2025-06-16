@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Player } from "@/types";
@@ -85,7 +86,8 @@ export const usePlayerAttributes = (player: Player | null) => {
 
         if (playerAttrError) {
           console.error('Player attributes error:', playerAttrError);
-          throw new Error(`Error fetching player attributes: ${playerAttrError.message}`);
+          // Don't throw error if no attributes found, just log warning
+          console.warn(`No attributes found for player ${player.id}: ${playerAttrError.message}`);
         }
 
         // Transform the data to match our interface

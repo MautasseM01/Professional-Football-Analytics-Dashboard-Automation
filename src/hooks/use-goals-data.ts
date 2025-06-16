@@ -55,18 +55,7 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
         // Build goals query
         let goalsQuery = supabase
           .from("goals")
-          .select(`
-            *,
-            matches!inner (
-              id,
-              date,
-              opponent
-            ),
-            players!goals_assisted_by_player_id_fkey (
-              name
-            )
-          `)
-          .order('date', { foreignTable: 'matches', ascending: false });
+          .select('*');
 
         // Apply filters
         if (player) {
@@ -86,15 +75,7 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
         // Build assists query
         let assistsQuery = supabase
           .from("assists")
-          .select(`
-            *,
-            matches!inner (
-              id,
-              date,
-              opponent
-            )
-          `)
-          .order('date', { foreignTable: 'matches', ascending: false });
+          .select('*');
 
         // Apply filters
         if (player) {
@@ -111,41 +92,95 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
           throw assistsError;
         }
 
+        // Fetch matches data separately
+        const uniqueMatchIds = [
+          ...new Set([
+            ...(goalsData || []).map(g => g.match_id),
+            ...(assistsData || []).map(a => a.match_id)
+          ])
+        ];
+
+        let matchesData: any[] = [];
+        if (uniqueMatchIds.length > 0) {
+          const { data: matches, error: matchesError } = await supabase
+            .from("matches")
+            .select('id, date, opponent')
+            .in('id', uniqueMatchIds);
+
+          if (matchesError) {
+            console.error("Error fetching matches:", matchesError);
+          } else {
+            matchesData = matches || [];
+          }
+        }
+
+        // Fetch assist providers (players)
+        const uniqueAssistProviderIds = (goalsData || [])
+          .filter(g => g.assisted_by_player_id)
+          .map(g => g.assisted_by_player_id);
+
+        let assistProvidersData: any[] = [];
+        if (uniqueAssistProviderIds.length > 0) {
+          const { data: assistProviders, error: assistProvidersError } = await supabase
+            .from("players")
+            .select('id, name')
+            .in('id', uniqueAssistProviderIds);
+
+          if (assistProvidersError) {
+            console.error("Error fetching assist providers:", assistProvidersError);
+          } else {
+            assistProvidersData = assistProviders || [];
+          }
+        }
+
         // Transform goals data
-        const transformedGoals: GoalData[] = (goalsData || []).map((goal: any) => ({
-          id: goal.id,
-          player_id: goal.player_id,
-          match_id: goal.match_id,
-          minute: goal.minute,
-          period: goal.period || 'First Half',
-          goal_type: goal.goal_type || 'Open Play',
-          distance_from_goal: goal.distance_from_goal,
-          x_coordinate: goal.x_coordinate,
-          y_coordinate: goal.y_coordinate,
-          body_part: goal.body_part || 'Right Foot',
-          is_header: goal.is_header || false,
-          is_penalty: goal.is_penalty || false,
-          is_free_kick: goal.is_free_kick || false,
-          assisted_by_player_id: goal.assisted_by_player_id,
-          assisted_by_name: goal.players?.name,
-          match_name: `vs ${goal.matches.opponent}`,
-          match_date: goal.matches.date,
-          difficulty_rating: goal.difficulty_rating,
-        }));
+        const transformedGoals: GoalData[] = (goalsData || []).map((goal: any) => {
+          const match = matchesData.find(m => m.id === goal.match_id);
+          const assistProvider = assistProvidersData.find(p => p.id === goal.assisted_by_player_id);
+
+          return {
+            id: goal.id,
+            player_id: goal.player_id,
+            match_id: goal.match_id,
+            minute: goal.minute,
+            period: goal.period || 'First Half',
+            goal_type: goal.goal_type || 'Open Play',
+            distance_from_goal: goal.distance_from_goal,
+            x_coordinate: goal.x_coordinate,
+            y_coordinate: goal.y_coordinate,
+            body_part: goal.body_part || 'Right Foot',
+            is_header: goal.is_header || false,
+            is_penalty: goal.is_penalty || false,
+            is_free_kick: goal.is_free_kick || false,
+            assisted_by_player_id: goal.assisted_by_player_id,
+            assisted_by_name: assistProvider?.name,
+            match_name: match ? `vs ${match.opponent}` : 'Unknown Match',
+            match_date: match?.date || '',
+            difficulty_rating: goal.difficulty_rating,
+          };
+        });
 
         // Transform assists data
-        const transformedAssists: AssistData[] = (assistsData || []).map((assist: any) => ({
-          id: assist.id,
-          player_id: assist.player_id,
-          match_id: assist.match_id,
-          goal_id: assist.goal_id,
-          assist_type: assist.assist_type || 'Pass',
-          pass_type: assist.pass_type || 'Short Pass',
-          distance_of_pass: assist.distance_of_pass,
-          difficulty_rating: assist.difficulty_rating,
-          match_name: `vs ${assist.matches.opponent}`,
-          match_date: assist.matches.date,
-        }));
+        const transformedAssists: AssistData[] = (assistsData || []).map((assist: any) => {
+          const match = matchesData.find(m => m.id === assist.match_id);
+
+          return {
+            id: assist.id,
+            player_id: assist.player_id,
+            match_id: assist.match_id,
+            goal_id: assist.goal_id,
+            assist_type: assist.assist_type || 'Pass',
+            pass_type: assist.pass_type || 'Short Pass',
+            distance_of_pass: assist.distance_of_pass,
+            difficulty_rating: assist.difficulty_rating,
+            match_name: match ? `vs ${match.opponent}` : 'Unknown Match',
+            match_date: match?.date || '',
+          };
+        });
+
+        // Sort by date (most recent first)
+        transformedGoals.sort((a, b) => new Date(b.match_date).getTime() - new Date(a.match_date).getTime());
+        transformedAssists.sort((a, b) => new Date(b.match_date).getTime() - new Date(a.match_date).getTime());
 
         setGoals(transformedGoals);
         setAssists(transformedAssists);

@@ -48,17 +48,8 @@ export const usePerformanceData = (player: Player | null, metric: string, timePe
         // Fetch performance data from player_match_performance table
         const { data: performanceData, error: perfError } = await supabase
           .from("player_match_performance")
-          .select(`
-            *,
-            matches!inner (
-              id,
-              date,
-              opponent,
-              location
-            )
-          `)
+          .select('*')
           .eq('player_id', player.id)
-          .order('date', { foreignTable: 'matches', ascending: false })
           .limit(matchLimit);
 
         if (perfError) {
@@ -72,62 +63,85 @@ export const usePerformanceData = (player: Player | null, metric: string, timePe
           return;
         }
 
+        // Fetch match details separately
+        const matchIds = performanceData.map(p => p.match_id);
+        const { data: matchesData, error: matchesError } = await supabase
+          .from("matches")
+          .select('id, date, opponent, location')
+          .in('id', matchIds)
+          .order('date', { ascending: false });
+
+        if (matchesError) {
+          console.error("Error fetching matches data:", matchesError);
+          throw matchesError;
+        }
+
         // Transform the data based on the requested metric
-        const transformedData: PerformanceDataPoint[] = performanceData.map((perf: any) => {
-          let value = 0;
+        const transformedData: PerformanceDataPoint[] = performanceData
+          .map((perf: any) => {
+            const match = matchesData?.find(m => m.id === perf.match_id);
+            if (!match) return null;
 
-          switch (metric) {
-            case "goals":
-              value = perf.goals || 0;
-              break;
-            case "assists":
-              value = perf.assists || 0;
-              break;
-            case "match_rating":
-              value = Number(perf.match_rating) || 0;
-              break;
-            case "distance":
-              value = Number(perf.distance_covered) || 0;
-              break;
-            case "sprintDistance":
-              value = Number(perf.sprint_distance) || 0;
-              break;
-            case "passes_completed":
-              value = perf.passes_completed || 0;
-              break;
-            case "shots_on_target":
-              value = perf.shots_on_target || 0;
-              break;
-            case "tackles_won":
-              value = perf.tackles_won || 0;
-              break;
-            case "pass_accuracy":
-              value = Number(perf.pass_accuracy) || 0;
-              break;
-            default:
-              value = 0;
-          }
+            let value = 0;
 
-          // Round value appropriately
-          let roundedValue: number;
-          if (metric === "distance" || metric === "sprintDistance") {
-            roundedValue = Number(value.toFixed(2));
-          } else if (metric === "match_rating" || metric === "pass_accuracy") {
-            roundedValue = Number(value.toFixed(1));
-          } else {
-            roundedValue = Math.round(value);
-          }
+            switch (metric) {
+              case "goals":
+                value = perf.goals || 0;
+                break;
+              case "assists":
+                value = perf.assists || 0;
+                break;
+              case "match_rating":
+                value = Number(perf.match_rating) || 0;
+                break;
+              case "distance":
+                value = Number(perf.distance_covered) || 0;
+                break;
+              case "sprintDistance":
+                value = Number(perf.sprint_distance) || 0;
+                break;
+              case "passes_completed":
+                value = perf.passes_completed || 0;
+                break;
+              case "shots_on_target":
+                value = perf.shots_on_target || 0;
+                break;
+              case "tackles_won":
+                value = perf.tackles_won || 0;
+                break;
+              case "pass_accuracy":
+                value = Number(perf.pass_accuracy) || 0;
+                break;
+              default:
+                value = 0;
+            }
 
-          return {
-            match: `vs ${perf.matches.opponent}`,
-            date: new Date(perf.matches.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-            value: roundedValue,
-            matchId: perf.matches.id
-          };
-        });
+            // Round value appropriately
+            let roundedValue: number;
+            if (metric === "distance" || metric === "sprintDistance") {
+              roundedValue = Number(value.toFixed(2));
+            } else if (metric === "match_rating" || metric === "pass_accuracy") {
+              roundedValue = Number(value.toFixed(1));
+            } else {
+              roundedValue = Math.round(value);
+            }
+
+            return {
+              match: `vs ${match.opponent}`,
+              date: new Date(match.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+              value: roundedValue,
+              matchId: match.id
+            };
+          })
+          .filter(item => item !== null)
+          .sort((a, b) => {
+            const matchA = matchesData?.find(m => m.id === a?.matchId);
+            const matchB = matchesData?.find(m => m.id === b?.matchId);
+            return new Date(matchA?.date || 0).getTime() - new Date(matchB?.date || 0).getTime();
+          }) as PerformanceDataPoint[];
 
         console.log(`Performance data for ${metric}:`, transformedData);
-        setData(transformedData.reverse()); // Reverse to show chronological order
+        setData(transformedData);
 
       } catch (err: any) {
         console.error("Error fetching performance data:", err);
