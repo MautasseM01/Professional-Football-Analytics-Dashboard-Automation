@@ -48,7 +48,7 @@ export const useMatchRatings = (matchId?: number, limit?: number) => {
       try {
         console.log('Fetching match ratings data');
 
-        // Build the query
+        // First, get the match ratings with basic match info
         let query = supabase
           .from("match_ratings")
           .select(`
@@ -58,12 +58,6 @@ export const useMatchRatings = (matchId?: number, limit?: number) => {
               date,
               opponent,
               result
-            ),
-            man_of_match:players!match_ratings_man_of_match_player_id_fkey (
-              name
-            ),
-            worst_performer:players!match_ratings_worst_performer_player_id_fkey (
-              name
             )
           `)
           .order('created_at', { ascending: false });
@@ -76,15 +70,43 @@ export const useMatchRatings = (matchId?: number, limit?: number) => {
           query = query.limit(limit);
         }
 
-        const { data, error: fetchError } = await query;
+        const { data: ratingsData, error: fetchError } = await query;
 
         if (fetchError) {
           console.error("Error fetching match ratings:", fetchError);
           throw fetchError;
         }
 
+        if (!ratingsData || ratingsData.length === 0) {
+          setRatings([]);
+          console.log('No match ratings found');
+          return;
+        }
+
+        // Now fetch player names separately to avoid relationship issues
+        const playerIds = [
+          ...ratingsData.map(r => r.man_of_match_player_id).filter(Boolean),
+          ...ratingsData.map(r => r.worst_performer_player_id).filter(Boolean)
+        ];
+
+        let playersMap: Record<number, string> = {};
+        
+        if (playerIds.length > 0) {
+          const { data: playersData, error: playersError } = await supabase
+            .from("players")
+            .select("id, name")
+            .in('id', playerIds);
+
+          if (!playersError && playersData) {
+            playersMap = playersData.reduce((acc, player) => {
+              acc[player.id] = player.name || 'Unknown Player';
+              return acc;
+            }, {} as Record<number, string>);
+          }
+        }
+
         // Transform the data
-        const transformedRatings: MatchRating[] = (data || []).map((rating: any) => ({
+        const transformedRatings: MatchRating[] = ratingsData.map((rating: any) => ({
           id: rating.id,
           match_id: rating.match_id,
           overall_performance: Number(rating.overall_performance) || 0,
@@ -105,8 +127,8 @@ export const useMatchRatings = (matchId?: number, limit?: number) => {
           crowd_impact: Number(rating.crowd_impact) || 0,
           man_of_match_player_id: rating.man_of_match_player_id,
           worst_performer_player_id: rating.worst_performer_player_id,
-          man_of_match_name: rating.man_of_match?.name,
-          worst_performer_name: rating.worst_performer?.name,
+          man_of_match_name: rating.man_of_match_player_id ? playersMap[rating.man_of_match_player_id] : undefined,
+          worst_performer_name: rating.worst_performer_player_id ? playersMap[rating.worst_performer_player_id] : undefined,
           analyst_comments: rating.analyst_comments,
           notes: rating.notes,
           match_date: rating.matches.date,
@@ -120,7 +142,7 @@ export const useMatchRatings = (matchId?: number, limit?: number) => {
         transformedRatings.sort((a, b) => new Date(b.match_date).getTime() - new Date(a.match_date).getTime());
 
         setRatings(transformedRatings);
-        console.log('Match ratings data:', transformedRatings);
+        console.log('Match ratings data loaded successfully:', transformedRatings.length, 'records');
 
       } catch (err: any) {
         console.error("Error fetching match ratings:", err);
