@@ -1,105 +1,84 @@
 
-import { useState, useMemo } from "react";
-import { usePlayerData } from "@/hooks/use-player-data";
-import { DashboardSidebar } from "@/components/DashboardSidebar";
-import { BackToTopButton } from "@/components/BackToTopButton";
-import { useIsMobile } from "@/hooks/use-mobile";
-import { useTheme } from "@/contexts/ThemeContext";
-import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { ThemeToggle } from "@/components/ThemeToggle";
-import { LanguageSelector } from "@/components/LanguageSelector";
-import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
+import { useState } from "react";
+import { DashboardLayout } from "@/components/DashboardLayout";
 import { PlayerSelectionCard } from "@/components/comparison/PlayerSelectionCard";
 import { ProfessionalPerformanceTable } from "@/components/comparison/ProfessionalPerformanceTable";
+import { PerformanceMetricsTable } from "@/components/comparison/PerformanceMetricsTable";
 import { PerformanceRadarChart } from "@/components/comparison/PerformanceRadarChart";
-import { Menu, RefreshCw } from "lucide-react";
+import { Player } from "@/types";
+import { useRealPlayers } from "@/hooks/use-real-players";
 
-export default function PlayerComparison() {
-  const {
-    players,
-    loading,
-    refreshData
-  } = usePlayerData();
-  const [selectedPlayerIds, setSelectedPlayerIds] = useState<number[]>([]);
-  const [showSidebar, setShowSidebar] = useState(true);
-  const isMobile = useIsMobile();
-  const {
-    theme
-  } = useTheme();
-  const handleRefresh = () => {
-    console.log("Manual refresh triggered");
-    refreshData();
-  };
-  const selectedPlayers = useMemo(() => {
-    if (!players?.length || !selectedPlayerIds.length) return [];
-    return players.filter(player => selectedPlayerIds.includes(player.id));
-  }, [players, selectedPlayerIds]);
-  const handlePlayerSelectionChange = (playerIds: number[]) => {
-    // Limit to a maximum of 4 players
-    if (playerIds.length <= 4) {
-      setSelectedPlayerIds(playerIds);
+const PlayerComparison = () => {
+  const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
+  const { isLoading: playersLoading } = useRealPlayers();
+
+  const handlePlayerSelect = (player: Player) => {
+    if (selectedPlayers.length < 4 && !selectedPlayers.some(p => p.id === player.id)) {
+      setSelectedPlayers([...selectedPlayers, player]);
     }
   };
-  return <ErrorBoundary>
-      <div className="flex h-screen bg-gradient-to-br from-slate-900 via-club-black to-slate-900 dark:from-slate-900 dark:via-club-black dark:to-slate-900 text-gray-100 dark:text-gray-100 transition-colors duration-300">
-        {showSidebar && <DashboardSidebar />}
-        
-        <div className="flex-1 overflow-auto min-w-0">
-          <header className="border-b border-club-gold/20 dark:border-club-gold/20 bg-club-black/80 dark:bg-club-black/80 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
-            <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
-              {/* Left section - Title and page info */}
-              <div className="flex-1 min-w-0">
-                <h1 className="text-ios-headline font-bold text-club-gold dark:text-club-gold truncate">
-                  Player Comparison
-                </h1>
-                <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
-                  Professional performance analysis across multiple players
-                </p>
-              </div>
-              
-              {/* Right section - Controls */}
-              <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-shrink-0">
-                {/* Language Selector */}
-                <LanguageSelector />
-                
-                {/* Theme Toggle */}
-                <ThemeToggle />
-                
-                {/* Refresh Button */}
-                <TouchFeedbackButton variant="outline" size="icon" className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" onClick={handleRefresh} title="Refresh data" hapticType="medium">
-                  <RefreshCw size={14} className="sm:hidden text-club-gold" />
-                  <RefreshCw size={16} className="hidden sm:block lg:hidden text-club-gold" />
-                  <RefreshCw size={18} className="hidden lg:block text-club-gold" />
-                </TouchFeedbackButton>
-                
-                {/* Menu Toggle */}
-                <TouchFeedbackButton variant="outline" size="icon" onClick={() => setShowSidebar(!showSidebar)} className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" title="Toggle sidebar" hapticType="light">
-                  <Menu size={16} className="sm:hidden text-club-gold" />
-                  <Menu size={18} className="hidden sm:block lg:hidden text-club-gold" />
-                  <Menu size={20} className="hidden lg:block text-club-gold" />
-                </TouchFeedbackButton>
-              </div>
-            </div>
-          </header>
-          
-          <main className="bg-transparent transition-colors duration-300 w-full">
-            <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-              {/* Player Selection */}
-              <PlayerSelectionCard players={players || []} selectedPlayerIds={selectedPlayerIds} onChange={handlePlayerSelectionChange} loading={loading} />
 
-              {selectedPlayers.length > 0 && <>
-                  {/* Professional Performance Metrics Table */}
-                  <ProfessionalPerformanceTable selectedPlayers={selectedPlayers} loading={loading} />
+  const handlePlayerRemove = (playerId: number) => {
+    setSelectedPlayers(selectedPlayers.filter(player => player.id !== playerId));
+  };
 
-                  {/* Radar Chart */}
-                  <PerformanceRadarChart selectedPlayers={selectedPlayers} loading={loading} />
-                </>}
-            </div>
-          </main>
+  return (
+    <DashboardLayout>
+      <div className="space-y-6 p-4 sm:p-6 lg:p-8">
+        <div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-club-light-gray mb-2">
+            Player Comparison
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
+            Compare up to 4 players across various performance metrics
+          </p>
         </div>
 
-        {/* Back to Top Button */}
-        <BackToTopButton />
+        <PlayerSelectionCard
+          selectedPlayers={selectedPlayers}
+          onPlayerSelect={handlePlayerSelect}
+          onPlayerRemove={handlePlayerRemove}
+        />
+
+        {selectedPlayers.length >= 2 && (
+          <div className="space-y-6">
+            <ProfessionalPerformanceTable 
+              selectedPlayers={selectedPlayers}
+              loading={playersLoading}
+            />
+            
+            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+              <PerformanceMetricsTable 
+                selectedPlayers={selectedPlayers}
+                loading={playersLoading}
+              />
+              
+              <PerformanceRadarChart 
+                selectedPlayers={selectedPlayers}
+                loading={playersLoading}
+              />
+            </div>
+          </div>
+        )}
+
+        {selectedPlayers.length === 1 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500 dark:text-gray-400 text-lg">
+              Select at least one more player to start comparing
+            </p>
+          </div>
+        )}
+
+        {selectedPlayers.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-gray-500 dark:text-gray-400 text-lg">
+              Select players to start comparing their performance
+            </p>
+          </div>
+        )}
       </div>
-    </ErrorBoundary>;
-}
+    </DashboardLayout>
+  );
+};
+
+export default PlayerComparison;
