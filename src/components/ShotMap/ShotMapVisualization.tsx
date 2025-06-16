@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from "react";
 import { FootballPitch } from "./FootballPitch";
 import { ShotPoint } from "./ShotPoint";
@@ -180,8 +179,8 @@ export const ShotMapVisualization = ({ shots, loading, filterLoading }: ShotMapV
       <div className={getContainerClasses()} ref={containerRef}>
         <LoadingOverlay isLoading={filterLoading} />
         
-        {/* iOS-style control bar */}
-        <div className="absolute top-4 right-4 z-30 flex gap-2">
+        {/* iOS-style control bar - Updated z-index to appear under header */}
+        <div className="absolute top-4 right-4 z-10 flex gap-2">
           <Button
             variant="secondary"
             size="sm"
