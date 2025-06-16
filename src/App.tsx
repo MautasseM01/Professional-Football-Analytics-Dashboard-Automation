@@ -15,6 +15,7 @@ import TeamOverview from "./pages/TeamOverview";
 import ShotMap from "./pages/ShotMap";
 import GoalsAssistsAnalysis from "./pages/GoalsAssistsAnalysis";
 import TeamTacticalAnalysis from "./pages/TeamTacticalAnalysis";
+import MatchRatings from "./pages/MatchRatings";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { AccessDenied } from "./components/AccessDenied";
@@ -48,6 +49,9 @@ const App = () => (
                 <Route path="/team-performance" element={<Navigate to="/team-performance/overview" replace />} />
                 <Route path="/team-performance/overview" element={<TeamOverview />} />
                 <Route path="/team-performance/tactical-analysis" element={<TeamTacticalAnalysis />} />
+                
+                {/* Match Ratings route */}
+                <Route path="/match-ratings" element={<MatchRatings />} />
                 
                 <Route path="/reports" element={<Dashboard />} />
                 <Route path="/settings" element={<Dashboard />} />

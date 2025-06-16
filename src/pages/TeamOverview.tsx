@@ -8,6 +8,7 @@ import { BackToTopButton } from "@/components/BackToTopButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
+import { useMatchRatings } from "@/hooks/use-match-ratings";
 import { 
   Users, 
   Trophy, 
@@ -18,11 +19,13 @@ import {
   Clock,
   Award,
   Menu,
-  RefreshCw
+  RefreshCw,
+  Star
 } from "lucide-react";
 
 const TeamOverview = () => {
   const [showSidebar, setShowSidebar] = useState(true);
+  const { ratings, loading: ratingsLoading } = useMatchRatings(undefined, 10);
 
   const handleRefresh = () => {
     console.log("Manual refresh triggered for team overview");
@@ -71,6 +74,11 @@ const TeamOverview = () => {
     if (result.startsWith('D')) return 'bg-yellow-500';
     return 'bg-red-500';
   };
+
+  // Calculate average ratings if available
+  const avgPerformanceRating = ratings && ratings.length > 0 
+    ? ratings.reduce((sum, r) => sum + r.overall_performance, 0) / ratings.length 
+    : 0;
 
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-900 via-club-black to-slate-900 dark:from-slate-900 dark:via-club-black dark:to-slate-900 text-gray-100 dark:text-gray-100 transition-colors duration-300">
@@ -133,7 +141,7 @@ const TeamOverview = () => {
         <main className="bg-transparent transition-colors duration-300 w-full">
           <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
             {/* Season Statistics */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
               <Card className="bg-club-dark-gray border-club-gold/20">
                 <CardContent className="p-responsive-4">
                   <div className="flex items-center gap-2">
@@ -181,6 +189,21 @@ const TeamOverview = () => {
                   </div>
                 </CardContent>
               </Card>
+
+              {/* New Performance Rating Card */}
+              <Card className="bg-club-dark-gray border-club-gold/20">
+                <CardContent className="p-responsive-4">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-5 w-5 text-yellow-500" />
+                    <div>
+                      <p className="text-responsive-sm text-club-light-gray/70">Avg Rating</p>
+                      <p className="text-responsive-2xl font-bold text-yellow-500">
+                        {avgPerformanceRating > 0 ? avgPerformanceRating.toFixed(1) : 'N/A'}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
 
             {/* Main Content Tabs */}
@@ -194,6 +217,9 @@ const TeamOverview = () => {
                 </TabsTrigger>
                 <TabsTrigger value="performance" className="data-[state=active]:bg-club-gold/20 text-responsive-sm">
                   Top Performers
+                </TabsTrigger>
+                <TabsTrigger value="ratings" className="data-[state=active]:bg-club-gold/20 text-responsive-sm">
+                  Match Ratings
                 </TabsTrigger>
               </TabsList>
 
@@ -367,6 +393,68 @@ const TeamOverview = () => {
                         </div>
                       ))}
                     </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              {/* New Match Ratings Tab */}
+              <TabsContent value="ratings" className="space-y-6">
+                <Card className="bg-club-dark-gray border-club-gold/20">
+                  <CardHeader>
+                    <CardTitle className="heading-quaternary text-club-gold flex items-center gap-2 mb-0">
+                      <Star className="h-5 w-5" />
+                      Recent Match Ratings
+                    </CardTitle>
+                    <CardDescription className="text-responsive-sm text-club-light-gray/70">
+                      Performance ratings from recent matches
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {ratingsLoading ? (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">Loading match ratings...</p>
+                      </div>
+                    ) : ratings && ratings.length > 0 ? (
+                      <div className="space-y-3">
+                        {ratings.slice(0, 5).map((rating) => (
+                          <div key={rating.id} className="flex items-center justify-between p-responsive-3 bg-club-black/30 rounded-lg">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium text-club-light-gray">{rating.opponent}</span>
+                                <Badge variant="outline" className="text-responsive-xs">{rating.result}</Badge>
+                                {rating.man_of_match_name && (
+                                  <Badge variant="secondary" className="text-responsive-xs">
+                                    MOTM: {rating.man_of_match_name}
+                                  </Badge>
+                                )}
+                              </div>
+                              <div className="text-responsive-sm text-club-light-gray/70">
+                                {new Date(rating.match_date).toLocaleDateString()}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="text-responsive-lg font-bold text-yellow-500">
+                                {rating.overall_performance.toFixed(1)}
+                              </div>
+                              <div className="text-responsive-xs text-club-light-gray/70">Overall</div>
+                            </div>
+                          </div>
+                        ))}
+                        <div className="pt-4 text-center">
+                          <TouchFeedbackButton 
+                            variant="outline" 
+                            onClick={() => window.location.href = '/match-ratings'}
+                            className="text-club-gold border-club-gold/30 hover:bg-club-gold/10"
+                          >
+                            View Full Match Ratings Analysis
+                          </TouchFeedbackButton>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <p className="text-muted-foreground">No match ratings data available</p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
