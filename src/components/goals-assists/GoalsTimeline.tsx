@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Player } from "@/types";
 import { useGoalsData } from "@/hooks/use-goals-data";
-import { LoadingStates } from "@/components/LoadingStates";
+import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { format } from "date-fns";
 
 interface GoalsTimelineProps {
@@ -13,7 +13,7 @@ interface GoalsTimelineProps {
 export const GoalsTimeline = ({ player }: GoalsTimelineProps) => {
   const { goals, loading, error } = useGoalsData(player);
 
-  if (loading) return <LoadingStates.Card />;
+  if (loading) return <ChartLoadingSkeleton />;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   return (

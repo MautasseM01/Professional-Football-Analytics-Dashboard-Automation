@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Player } from "@/types";
 import { useGoalsData } from "@/hooks/use-goals-data";
-import { LoadingStates } from "@/components/LoadingStates";
+import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { Badge } from "@/components/ui/badge";
 
 interface AssistNetworkProps {
@@ -12,7 +12,7 @@ interface AssistNetworkProps {
 export const AssistNetwork = ({ player }: AssistNetworkProps) => {
   const { goals, assists, loading, error } = useGoalsData(player);
 
-  if (loading) return <LoadingStates.Card />;
+  if (loading) return <ChartLoadingSkeleton />;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   // Count assists received (goals assisted by others)

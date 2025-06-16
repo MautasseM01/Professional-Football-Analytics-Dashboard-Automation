@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Player } from "@/types";
 import { useGoalsData } from "@/hooks/use-goals-data";
 import { useShotsData } from "@/hooks/use-shots-data";
-import { LoadingStates } from "@/components/LoadingStates";
+import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { Badge } from "@/components/ui/badge";
 
 interface GoalCoordinatesHeatmapProps {
@@ -14,7 +14,7 @@ export const GoalCoordinatesHeatmap = ({ player }: GoalCoordinatesHeatmapProps) 
   const { goals, loading: goalsLoading, error: goalsError } = useGoalsData(player);
   const { shots, loading: shotsLoading } = useShotsData();
 
-  if (goalsLoading || shotsLoading) return <LoadingStates.Card />;
+  if (goalsLoading || shotsLoading) return <ChartLoadingSkeleton />;
   if (goalsError) return <div className="text-red-500">Error: {goalsError}</div>;
 
   // Filter shots for this player

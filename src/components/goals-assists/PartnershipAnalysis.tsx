@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Player } from "@/types";
 import { useGoalsData } from "@/hooks/use-goals-data";
-import { LoadingStates } from "@/components/LoadingStates";
+import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { Badge } from "@/components/ui/badge";
 
 interface PartnershipAnalysisProps {
@@ -12,7 +12,7 @@ interface PartnershipAnalysisProps {
 export const PartnershipAnalysis = ({ player }: PartnershipAnalysisProps) => {
   const { goals, assists, loading, error } = useGoalsData(player);
 
-  if (loading) return <LoadingStates.Card />;
+  if (loading) return <ChartLoadingSkeleton />;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   // Partnerships where this player scored and someone assisted
@@ -30,7 +30,7 @@ export const PartnershipAnalysis = ({ player }: PartnershipAnalysisProps) => {
     partner,
     goals: data.goals,
     matches: data.matches.size,
-    efficiency: data.goals / data.matches
+    efficiency: data.matches.size > 0 ? Number((data.goals / data.matches.size).toFixed(2)) : 0
   })).sort((a, b) => b.goals - a.goals);
 
   return (
@@ -59,7 +59,7 @@ export const PartnershipAnalysis = ({ player }: PartnershipAnalysisProps) => {
                     </div>
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <span>{partnership.matches} matches together</span>
-                      <span>{partnership.efficiency.toFixed(2)} goals/match</span>
+                      <span>{partnership.efficiency} goals/match</span>
                     </div>
                   </div>
                 ))}

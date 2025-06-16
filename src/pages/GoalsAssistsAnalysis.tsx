@@ -3,6 +3,7 @@ import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { PlayerSelector } from "@/components/PlayerSelector";
 import { Player } from "@/types";
+import { useRealPlayers } from "@/hooks/use-real-players";
 import { GoalsTimeline } from "@/components/goals-assists/GoalsTimeline";
 import { GoalTypesAnalysis } from "@/components/goals-assists/GoalTypesAnalysis";
 import { BodyPartAnalysis } from "@/components/goals-assists/BodyPartAnalysis";
@@ -14,6 +15,14 @@ import { ResponsiveGrid } from "@/components/ResponsiveLayout";
 
 const GoalsAssistsAnalysis = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const { players, loading: playersLoading, error: playersError } = useRealPlayers();
+
+  const handlePlayerSelect = (playerId: number) => {
+    const player = players.find(p => p.id === playerId);
+    if (player) {
+      setSelectedPlayer(player);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -24,9 +33,11 @@ const GoalsAssistsAnalysis = () => {
           </h1>
           <div className="w-full max-w-md">
             <PlayerSelector
+              players={players}
               selectedPlayer={selectedPlayer}
-              onPlayerSelect={setSelectedPlayer}
-              placeholder="Select a player to analyze goals & assists"
+              onPlayerSelect={handlePlayerSelect}
+              loading={playersLoading}
+              error={playersError}
             />
           </div>
         </div>

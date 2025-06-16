@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Player } from "@/types";
 import { useGoalsData } from "@/hooks/use-goals-data";
-import { LoadingStates } from "@/components/LoadingStates";
+import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
 
 interface GoalTypesAnalysisProps {
@@ -14,7 +14,7 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884D8'];
 export const GoalTypesAnalysis = ({ player }: GoalTypesAnalysisProps) => {
   const { goals, loading, error } = useGoalsData(player);
 
-  if (loading) return <LoadingStates.Card />;
+  if (loading) return <ChartLoadingSkeleton />;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   const goalTypeData = goals.reduce((acc, goal) => {
