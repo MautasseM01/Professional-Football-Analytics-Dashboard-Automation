@@ -66,13 +66,13 @@ export const useMatchRatings = (matchId?: number, limit?: number) => {
               name
             )
           `)
-          .order('matches.date', { ascending: false });
+          .order('created_at', { ascending: false });
 
         // Apply filters
         if (matchId) {
           query = query.eq('match_id', matchId);
         }
-        if (limit) {
+        if (limit && limit < 50) {
           query = query.limit(limit);
         }
 
@@ -115,6 +115,9 @@ export const useMatchRatings = (matchId?: number, limit?: number) => {
           created_at: rating.created_at,
           updated_at: rating.updated_at,
         }));
+
+        // Sort by match date descending
+        transformedRatings.sort((a, b) => new Date(b.match_date).getTime() - new Date(a.match_date).getTime());
 
         setRatings(transformedRatings);
         console.log('Match ratings data:', transformedRatings);

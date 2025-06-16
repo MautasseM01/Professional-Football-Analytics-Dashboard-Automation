@@ -4,8 +4,7 @@ import {
   UserRound, 
   Users, 
   FileBarChart, 
-  Settings,
-  Star
+  Settings
 } from "lucide-react";
 import { AccessibleNavigationItem } from "@/utils/roleAccess";
 
@@ -78,13 +77,6 @@ export const navigationItems: AccessibleNavigationItem[] = [
         allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
       }
     ]
-  },
-  { 
-    name: "Match Ratings", 
-    href: "/match-ratings", 
-    icon: Star,
-    translationKey: "nav.matchRatings",
-    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
   },
   { 
     name: "Reports", 

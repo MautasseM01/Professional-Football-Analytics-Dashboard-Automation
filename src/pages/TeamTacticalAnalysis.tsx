@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -13,11 +14,17 @@ import { Filter, AlertCircle, RefreshCw, Menu } from "lucide-react";
 import { PassingNetwork } from "@/components/PassingNetwork";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
 import { TacticalFormationImageView } from "@/components/TacticalFormationImageView";
+import { MatchRatingsDashboard } from "@/components/match-ratings/MatchRatingsDashboard";
+import { PlayerMatchRatings } from "@/components/match-ratings/PlayerMatchRatings";
+import { PerformanceCorrelation } from "@/components/match-ratings/PerformanceCorrelation";
+import { ManOfMatchTracking } from "@/components/match-ratings/ManOfMatchTracking";
+import { OppositionAnalysis } from "@/components/match-ratings/OppositionAnalysis";
+import { SeasonPerformanceTrends } from "@/components/match-ratings/SeasonPerformanceTrends";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useMatchRatings } from "@/hooks/use-match-ratings";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
 
 export interface Match {
   id: number;
@@ -33,6 +40,7 @@ const TeamTacticalAnalysis = () => {
   const [passDirectionFilter, setPassDirectionFilter] = useState<string>("all");
   const [passOutcomeFilter, setPassOutcomeFilter] = useState<string>("all");
   const [imageLoadingError, setImageLoadingError] = useState<boolean>(false);
+  const [selectedLimit, setSelectedLimit] = useState<number>(10);
   const isMobile = useIsMobile();
 
   const { data: matches, isLoading: isLoadingMatches, refetch: refetchMatches } = useQuery({
@@ -56,6 +64,8 @@ const TeamTacticalAnalysis = () => {
       }
     }
   });
+
+  const { ratings, loading: ratingsLoading, error: ratingsError } = useMatchRatings(undefined, selectedLimit);
 
   useEffect(() => {
     if (matches && matches.length > 0 && !selectedMatch) {
@@ -92,7 +102,7 @@ const TeamTacticalAnalysis = () => {
                   Team Tactical Analysis
                 </h1>
                 <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
-                  Analyze team passing networks and tactical patterns
+                  Analyze team passing networks, tactical patterns, and match ratings
                 </p>
               </div>
               
@@ -249,6 +259,22 @@ const TeamTacticalAnalysis = () => {
                   </ToggleGroup>
                 </div>
 
+                {/* Limit Selection for Match Ratings */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-club-light-gray">Match Ratings Limit</Label>
+                  <Select value={selectedLimit.toString()} onValueChange={(value) => setSelectedLimit(parseInt(value))}>
+                    <SelectTrigger className="w-full bg-club-black border-club-gold/30 text-club-light-gray min-h-[44px]">
+                      <SelectValue placeholder="Limit" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
+                      <SelectItem value="5">5</SelectItem>
+                      <SelectItem value="10">10</SelectItem>
+                      <SelectItem value="20">20</SelectItem>
+                      <SelectItem value="50">All</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {/* Error Display */}
                 {imageLoadingError && (
                   <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
@@ -271,58 +297,100 @@ const TeamTacticalAnalysis = () => {
               </div>
             </div>
 
-            {/* Passing Network */}
-            <Card className="bg-club-dark-gray border-club-gold/20 min-h-[500px]">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-lg sm:text-xl text-club-gold">Passing Network</CardTitle>
-                <CardDescription className="text-sm text-club-light-gray/70">
-                  Player positioning and passing connections
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="h-[600px] p-6">
-                {isLoadingMatches ? (
-                  <LoadingOverlay isLoading={true} />
-                ) : (
-                  selectedMatch ? (
-                    <PassingNetwork 
-                      matchId={selectedMatch} 
-                      passDirectionFilter={passDirectionFilter}
-                      passOutcomeFilter={passOutcomeFilter}
-                    />
-                  ) : (
-                    <div className="flex items-center justify-center h-full text-club-light-gray">
-                      <div className="text-center space-y-2">
-                        <p className="text-lg font-medium">
-                          Select a match to view the passing network
-                        </p>
-                        <p className="text-sm opacity-75">
-                          Choose from the filters above
-                        </p>
-                      </div>
-                    </div>
-                  )
-                )}
-              </CardContent>
-            </Card>
+            {/* Main Content Tabs */}
+            <Tabs defaultValue="tactical" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-8 bg-club-dark-gray">
+                <TabsTrigger value="tactical" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Tactical Analysis</TabsTrigger>
+                <TabsTrigger value="ratings-dashboard" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Ratings Dashboard</TabsTrigger>
+                <TabsTrigger value="player-ratings" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Player Ratings</TabsTrigger>
+                <TabsTrigger value="correlation" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Correlation</TabsTrigger>
+                <TabsTrigger value="motm" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Man of Match</TabsTrigger>
+                <TabsTrigger value="opposition" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Opposition</TabsTrigger>
+                <TabsTrigger value="trends" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Season Trends</TabsTrigger>
+                <TabsTrigger value="formation" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Formation</TabsTrigger>
+              </TabsList>
 
-            {/* Tactical Formation Images Section */}
-            {selectedMatch && (
-              <Card className="bg-club-dark-gray border-club-gold/20">
-                <CardHeader className="pb-4">
-                  <CardTitle className="text-lg sm:text-xl text-club-gold">Tactical Formation Analysis</CardTitle>
-                  <CardDescription className="text-sm text-club-light-gray/70">
-                    Formation diagrams and tactical insights for the selected match
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6">
-                  <TacticalFormationImageView
-                    matchId={selectedMatch}
-                    onImageError={handleImageError}
-                    onImageRetry={handleImageRetry}
-                  />
-                </CardContent>
-              </Card>
-            )}
+              <TabsContent value="tactical" className="space-y-6">
+                {/* Passing Network */}
+                <Card className="bg-club-dark-gray border-club-gold/20 min-h-[500px]">
+                  <CardHeader className="pb-4">
+                    <CardTitle className="text-lg sm:text-xl text-club-gold">Passing Network</CardTitle>
+                    <CardDescription className="text-sm text-club-light-gray/70">
+                      Player positioning and passing connections
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="h-[600px] p-6">
+                    {isLoadingMatches ? (
+                      <LoadingOverlay isLoading={true} />
+                    ) : (
+                      selectedMatch ? (
+                        <PassingNetwork 
+                          matchId={selectedMatch} 
+                          passDirectionFilter={passDirectionFilter}
+                          passOutcomeFilter={passOutcomeFilter}
+                        />
+                      ) : (
+                        <div className="flex items-center justify-center h-full text-club-light-gray">
+                          <div className="text-center space-y-2">
+                            <p className="text-lg font-medium">
+                              Select a match to view the passing network
+                            </p>
+                            <p className="text-sm opacity-75">
+                              Choose from the filters above
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="ratings-dashboard" className="space-y-6">
+                <MatchRatingsDashboard ratings={ratings} />
+              </TabsContent>
+
+              <TabsContent value="player-ratings" className="space-y-6">
+                <PlayerMatchRatings ratings={ratings} />
+              </TabsContent>
+
+              <TabsContent value="correlation" className="space-y-6">
+                <PerformanceCorrelation ratings={ratings} />
+              </TabsContent>
+
+              <TabsContent value="motm" className="space-y-6">
+                <ManOfMatchTracking ratings={ratings} />
+              </TabsContent>
+
+              <TabsContent value="opposition" className="space-y-6">
+                <OppositionAnalysis ratings={ratings} />
+              </TabsContent>
+
+              <TabsContent value="trends" className="space-y-6">
+                <SeasonPerformanceTrends ratings={ratings} />
+              </TabsContent>
+
+              <TabsContent value="formation" className="space-y-6">
+                {/* Tactical Formation Images Section */}
+                {selectedMatch && (
+                  <Card className="bg-club-dark-gray border-club-gold/20">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-lg sm:text-xl text-club-gold">Tactical Formation Analysis</CardTitle>
+                      <CardDescription className="text-sm text-club-light-gray/70">
+                        Formation diagrams and tactical insights for the selected match
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent className="p-4 sm:p-6">
+                      <TacticalFormationImageView
+                        matchId={selectedMatch}
+                        onImageError={handleImageError}
+                        onImageRetry={handleImageRetry}
+                      />
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>
