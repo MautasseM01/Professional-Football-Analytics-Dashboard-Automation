@@ -45,122 +45,65 @@ export const usePerformanceData = (player: Player | null, metric: string, timePe
 
         const matchLimit = getMatchLimit();
 
-        // Fetch matches data
-        const { data: matchesData, error: matchesError } = await supabase
-          .from("matches")
-          .select("*")
-          .order("date", { ascending: false })
+        // Fetch performance data from player_match_performance table
+        const { data: performanceData, error: perfError } = await supabase
+          .from("player_match_performance")
+          .select(`
+            *,
+            matches!inner (
+              id,
+              date,
+              opponent,
+              location
+            )
+          `)
+          .eq('player_id', player.id)
+          .order('matches.date', { ascending: false })
           .limit(matchLimit);
 
-        if (matchesError) {
-          console.error("Error fetching matches:", matchesError);
-          throw matchesError;
+        if (perfError) {
+          console.error("Error fetching performance data:", perfError);
+          throw perfError;
         }
 
-        if (!matchesData || matchesData.length === 0) {
-          console.warn("No matches found in database");
+        if (!performanceData || performanceData.length === 0) {
+          console.warn("No performance data found for player");
           setData([]);
           return;
         }
 
-        console.log("Matches data:", matchesData);
-
-        // Fetch performance data based on metric
-        const performanceData: PerformanceDataPoint[] = [];
-
-        for (let i = 0; i < matchesData.length; i++) {
-          const match = matchesData[i];
+        // Transform the data based on the requested metric
+        const transformedData: PerformanceDataPoint[] = performanceData.map((perf: any) => {
           let value = 0;
 
           switch (metric) {
             case "goals":
-              // Fetch goals from shots table
-              const { data: goalsData, error: goalsError } = await supabase
-                .from("shots")
-                .select("outcome")
-                .eq("player_id", player.id)
-                .eq("match_id", match.id)
-                .eq("outcome", "goal");
-
-              if (goalsError) {
-                console.warn(`Error fetching goals for match ${match.id}:`, goalsError);
-              } else {
-                value = goalsData?.length || 0;
-              }
+              value = perf.goals || 0;
               break;
-
             case "assists":
-              // Fetch assists from shots table (assisted_by field)
-              const { data: assistsData, error: assistsError } = await supabase
-                .from("shots")
-                .select("assisted_by")
-                .eq("match_id", match.id)
-                .eq("assisted_by", player.name);
-
-              if (assistsError) {
-                console.warn(`Error fetching assists for match ${match.id}:`, assistsError);
-              } else {
-                value = assistsData?.length || 0;
-              }
+              value = perf.assists || 0;
               break;
-
             case "match_rating":
-              // Generate realistic match rating based on player performance
-              // Since we don't have match ratings in DB, calculate based on available data
-              const { data: shotsData } = await supabase
-                .from("shots")
-                .select("outcome")
-                .eq("player_id", player.id)
-                .eq("match_id", match.id);
-
-              const goals = shotsData?.filter(shot => shot.outcome === "goal").length || 0;
-              const shots = shotsData?.length || 0;
-              
-              // Base rating + performance modifiers
-              let rating = 6.5; // Base rating
-              rating += goals * 0.8; // +0.8 per goal
-              rating += shots * 0.1; // +0.1 per shot
-              
-              // Add some realistic variation
-              rating += (Math.random() - 0.5) * 1.0;
-              value = Math.max(6.0, Math.min(9.0, rating));
+              value = Number(perf.match_rating) || 0;
               break;
-
             case "distance":
-              value = player.distance || 0;
-              // Add realistic variation for each match
-              value = value * (0.85 + Math.random() * 0.3);
+              value = Number(perf.distance_covered) || 0;
               break;
-
             case "sprintDistance":
-              value = player.sprintDistance || 0;
-              // Add realistic variation for each match
-              value = value * (0.8 + Math.random() * 0.4);
+              value = Number(perf.sprint_distance) || 0;
               break;
-
             case "passes_completed":
-              value = player.passes_completed || 0;
-              // Add realistic variation for each match
-              value = Math.round(value * (0.8 + Math.random() * 0.4));
+              value = perf.passes_completed || 0;
               break;
-
             case "shots_on_target":
-              const { data: shotsOnTargetData } = await supabase
-                .from("shots")
-                .select("outcome")
-                .eq("player_id", player.id)
-                .eq("match_id", match.id)
-                .in("outcome", ["goal", "saved", "on_target"]);
-
-              value = shotsOnTargetData?.length || 0;
+              value = perf.shots_on_target || 0;
               break;
-
             case "tackles_won":
-              value = player.tackles_won || 0;
-              // Add realistic variation for each match
-              value = Math.round(value * (0.7 + Math.random() * 0.6));
+              value = perf.tackles_won || 0;
               break;
-
+            case "pass_accuracy":
+              value = Number(perf.pass_accuracy) || 0;
+              break;
             default:
               value = 0;
           }
@@ -169,29 +112,27 @@ export const usePerformanceData = (player: Player | null, metric: string, timePe
           let roundedValue: number;
           if (metric === "distance" || metric === "sprintDistance") {
             roundedValue = Number(value.toFixed(2));
-          } else if (metric === "match_rating") {
+          } else if (metric === "match_rating" || metric === "pass_accuracy") {
             roundedValue = Number(value.toFixed(1));
           } else {
             roundedValue = Math.round(value);
           }
 
-          performanceData.push({
-            match: `vs ${match.opponent}`,
-            date: new Date(match.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+          return {
+            match: `vs ${perf.matches.opponent}`,
+            date: new Date(perf.matches.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
             value: roundedValue,
-            matchId: match.id
-          });
-        }
+            matchId: perf.matches.id
+          };
+        });
 
-        console.log(`Performance data for ${metric}:`, performanceData);
-        setData(performanceData.reverse()); // Reverse to show chronological order
+        console.log(`Performance data for ${metric}:`, transformedData);
+        setData(transformedData.reverse()); // Reverse to show chronological order
 
       } catch (err: any) {
         console.error("Error fetching performance data:", err);
         setError(err.message);
         toast.error(`Failed to load ${metric} data: ${err.message}`);
-        
-        // Fallback to empty data instead of fake data
         setData([]);
       } finally {
         setLoading(false);

@@ -1,19 +1,16 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase } from "@/integrations/supabase/client";
 import { Player } from "@/types";
-import { useToast } from "@/hooks/use-toast";
+import { toast } from "sonner";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { useErrorHandler } from "@/hooks/use-error-handler";
-import { useSafeAsync } from "@/hooks/use-safe-async";
 
 export const usePlayerData = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { toast } = useToast();
   const { profile } = useUserProfile();
-  const { handleError } = useErrorHandler({ component: 'usePlayerData' });
   const mountedRef = useRef(true);
 
   useEffect(() => {
@@ -23,61 +20,113 @@ export const usePlayerData = () => {
     };
   }, []);
   
-  const fetchPlayersAsync = useCallback(async () => {
+  const fetchPlayers = useCallback(async () => {
     if (!profile) {
-      throw new Error('User profile not loaded');
+      setError('User profile not loaded');
+      setLoading(false);
+      return;
     }
 
     try {
+      setLoading(true);
+      setError(null);
+
+      console.log('Fetching enhanced player data from database');
+      
       const { data, error: fetchError } = await supabase
         .from("players")
-        .select("*");
+        .select(`
+          id,
+          name,
+          position,
+          number,
+          matches,
+          goals,
+          assists,
+          shots_total,
+          shots_on_target,
+          passes_attempted,
+          passes_completed,
+          pass_accuracy,
+          tackles_attempted,
+          tackles_won,
+          distance,
+          sprintDistance,
+          maxSpeed,
+          match_rating,
+          minutes_played,
+          last_match_date,
+          heatmapUrl,
+          reportUrl,
+          season,
+          created_at,
+          updated_at
+        `)
+        .order('name');
       
       if (fetchError) {
+        console.error('Error fetching players:', fetchError);
         throw new Error(`Failed to fetch players: ${fetchError.message}`);
       }
       
       if (!data || data.length === 0) {
-        throw new Error('No player data found');
+        console.warn('No players found in database');
+        setPlayers([]);
+        setSelectedPlayer(null);
+        return;
       }
       
+      // Transform the data to match our Player interface
+      const transformedPlayers: Player[] = data.map(player => ({
+        id: player.id,
+        name: player.name || 'Unknown Player',
+        position: player.position || 'N/A',
+        number: player.number || undefined,
+        matches: Number(player.matches) || 0,
+        distance: Number(player.distance) || 0,
+        passes_attempted: Number(player.passes_attempted) || 0,
+        passes_completed: Number(player.passes_completed) || 0,
+        shots_total: Number(player.shots_total) || 0,
+        shots_on_target: Number(player.shots_on_target) || 0,
+        tackles_attempted: Number(player.tackles_attempted) || 0,
+        tackles_won: Number(player.tackles_won) || 0,
+        heatmapUrl: player.heatmapUrl || '',
+        reportUrl: player.reportUrl || '',
+        maxSpeed: Number(player.maxSpeed) || 0,
+        sprintDistance: Number(player.sprintDistance) || 0,
+      }));
+      
       // Apply role-based filtering
-      let filteredData = data as Player[];
+      let filteredPlayers = transformedPlayers;
       
       if (profile.role === 'player') {
         // Players can only see their own data
-        filteredData = data.slice(0, 1) as Player[];
+        filteredPlayers = transformedPlayers.slice(0, 1);
       }
       
-      return { players: filteredData, selectedPlayer: filteredData[0] || null };
-    } catch (error) {
-      handleError(error instanceof Error ? error : new Error('Unknown error'), 'high');
-      throw error;
-    }
-  }, [profile, handleError]);
+      if (mountedRef.current) {
+        setPlayers(filteredPlayers);
+        if (filteredPlayers.length > 0 && !selectedPlayer) {
+          setSelectedPlayer(filteredPlayers[0]);
+        }
+      }
 
-  const { data, loading, error: asyncError, retry } = useSafeAsync(
-    fetchPlayersAsync,
-    [profile],
-    { component: 'usePlayerData' }
-  );
-
-  useEffect(() => {
-    if (data && mountedRef.current) {
-      setPlayers(data.players);
-      if (data.selectedPlayer) {
-        setSelectedPlayer(data.selectedPlayer);
+    } catch (err: any) {
+      console.error('Error in usePlayerData:', err);
+      if (mountedRef.current) {
+        setError(err.message);
+        toast.error(`Failed to load player data: ${err.message}`);
+      }
+    } finally {
+      if (mountedRef.current) {
+        setLoading(false);
       }
     }
-  }, [data]);
+  }, [profile, selectedPlayer]);
 
   useEffect(() => {
-    if (asyncError) {
-      setError(asyncError.message);
-    } else {
-      setError(null);
-    }
-  }, [asyncError]);
+    fetchPlayers();
+  }, [fetchPlayers]);
   
   useEffect(() => {
     if (!profile) return;
@@ -90,7 +139,7 @@ export const usePlayerData = () => {
         table: 'players' 
       }, () => {
         if (mountedRef.current) {
-          retry();
+          fetchPlayers();
         }
       })
       .subscribe();
@@ -98,24 +147,20 @@ export const usePlayerData = () => {
     return () => {
       playersSubscription.unsubscribe();
     };
-  }, [profile, retry]);
+  }, [profile, fetchPlayers]);
   
   const selectPlayer = useCallback((id: number) => {
     const player = players.find(p => p.id === id);
     if (player) {
       // Check role-based access
       if (profile?.role === 'player' && players.length === 1 && player.id !== players[0].id) {
-        toast({
-          title: "Access Denied",
-          description: "You can only view your own player data.",
-          variant: "destructive",
-        });
+        toast.error("Access Denied: You can only view your own player data.");
         return;
       }
       
       setSelectedPlayer(player);
     }
-  }, [players, profile, toast]);
+  }, [players, profile]);
   
   const canAccessPlayerData = useCallback((playerId: number): boolean => {
     if (!profile) return false;
@@ -140,7 +185,7 @@ export const usePlayerData = () => {
     selectPlayer,
     loading,
     error,
-    refreshData: retry,
+    refreshData: fetchPlayers,
     canAccessPlayerData
   };
 };
