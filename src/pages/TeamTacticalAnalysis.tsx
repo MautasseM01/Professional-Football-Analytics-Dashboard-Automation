@@ -299,15 +299,31 @@ const TeamTacticalAnalysis = () => {
 
             {/* Main Content Tabs */}
             <Tabs defaultValue="tactical" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-2 lg:grid-cols-8 bg-club-dark-gray">
-                <TabsTrigger value="tactical" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Tactical Analysis</TabsTrigger>
-                <TabsTrigger value="ratings-dashboard" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Ratings Dashboard</TabsTrigger>
-                <TabsTrigger value="player-ratings" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Player Ratings</TabsTrigger>
-                <TabsTrigger value="correlation" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Correlation</TabsTrigger>
-                <TabsTrigger value="motm" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Man of Match</TabsTrigger>
-                <TabsTrigger value="opposition" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Opposition</TabsTrigger>
-                <TabsTrigger value="trends" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Season Trends</TabsTrigger>
-                <TabsTrigger value="formation" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold">Formation</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 bg-club-dark-gray gap-1">
+                <TabsTrigger value="tactical" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-2">
+                  Tactical
+                </TabsTrigger>
+                <TabsTrigger value="ratings-dashboard" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-2">
+                  Ratings
+                </TabsTrigger>
+                <TabsTrigger value="player-ratings" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-2">
+                  Players
+                </TabsTrigger>
+                <TabsTrigger value="correlation" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-2">
+                  Correlation
+                </TabsTrigger>
+                <TabsTrigger value="motm" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-2">
+                  MOTM
+                </TabsTrigger>
+                <TabsTrigger value="opposition" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-2">
+                  Opposition
+                </TabsTrigger>
+                <TabsTrigger value="trends" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-2">
+                  Trends
+                </TabsTrigger>
+                <TabsTrigger value="formation" className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-2">
+                  Formation
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="tactical" className="space-y-6">
