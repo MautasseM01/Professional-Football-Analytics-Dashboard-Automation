@@ -43,14 +43,26 @@ export interface PlayerAttributes {
   holdup_play: number;
 }
 
+export interface PositionalAverage {
+  id: number;
+  position: string;
+  finishing: number;
+  pace: number;
+  aerial_duels_won: number;
+  holdup_play: number;
+  work_rate_attacking: number;
+}
+
 export const usePlayerAttributes = (player?: Player | null) => {
   const [attributes, setAttributes] = useState<PlayerAttributes | null>(null);
+  const [positionalAverage, setPositionalAverage] = useState<PositionalAverage | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchPlayerAttributes = useCallback(async () => {
     if (!player) {
       setAttributes(null);
+      setPositionalAverage(null);
       return;
     }
 
@@ -60,6 +72,7 @@ export const usePlayerAttributes = (player?: Player | null) => {
     try {
       console.log('Fetching player attributes for player:', player.id);
 
+      // Fetch player attributes
       const { data: attributesData, error: attributesError } = await supabase
         .from("player_attributes")
         .select('*')
@@ -71,9 +84,21 @@ export const usePlayerAttributes = (player?: Player | null) => {
         throw attributesError;
       }
 
+      // Fetch positional averages
+      const { data: positionalData, error: positionalError } = await supabase
+        .from("positional_averages")
+        .select('*')
+        .eq('position', player.position)
+        .maybeSingle();
+
+      if (positionalError) {
+        console.error("Error fetching positional averages:", positionalError);
+      }
+
       if (!attributesData) {
         console.warn("No attributes found for player:", player.id);
         setAttributes(null);
+        setPositionalAverage(positionalData || null);
         return;
       }
 
@@ -116,8 +141,20 @@ export const usePlayerAttributes = (player?: Player | null) => {
         holdup_play: attributesData.holdup_play || 50,
       };
 
+      const transformedPositionalAverage: PositionalAverage | null = positionalData ? {
+        id: positionalData.id,
+        position: positionalData.position,
+        finishing: positionalData.finishing,
+        pace: positionalData.pace,
+        aerial_duels_won: positionalData.aerial_duels_won,
+        holdup_play: positionalData.holdup_play,
+        work_rate_attacking: positionalData.work_rate_attacking,
+      } : null;
+
       setAttributes(transformedAttributes);
+      setPositionalAverage(transformedPositionalAverage);
       console.log('Player attributes:', transformedAttributes);
+      console.log('Positional averages:', transformedPositionalAverage);
 
     } catch (err: any) {
       console.error("Error fetching player attributes:", err);
@@ -126,7 +163,7 @@ export const usePlayerAttributes = (player?: Player | null) => {
     } finally {
       setLoading(false);
     }
-  }, [player?.id]);
+  }, [player?.id, player?.position]);
 
   useEffect(() => {
     fetchPlayerAttributes();
@@ -136,5 +173,5 @@ export const usePlayerAttributes = (player?: Player | null) => {
     return fetchPlayerAttributes();
   }, [fetchPlayerAttributes]);
 
-  return { attributes, loading, error, refetch };
+  return { attributes, positionalAverage, loading, error, refetch };
 };

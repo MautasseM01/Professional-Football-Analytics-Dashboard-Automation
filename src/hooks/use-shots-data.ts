@@ -2,14 +2,16 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Player } from "@/types";
+import { ShotFilters } from "@/types/shot";
 import { toast } from "sonner";
 
 export interface ShotData {
   id: number;
   player_id: number;
+  player_name?: string;
   match_id: number;
   minute: number;
-  period: string;
+  period: "First Half" | "Second Half" | "Extra Time" | "Penalties";
   outcome: string;
   x_coordinate: number;
   y_coordinate: number;
@@ -21,7 +23,10 @@ export interface ShotData {
 
 export const useShotsData = (player?: Player | null) => {
   const [shots, setShots] = useState<ShotData[]>([]);
+  const [matches, setMatches] = useState<{ id: number; name: string }[]>([]);
+  const [filters, setFilters] = useState<ShotFilters>({});
   const [loading, setLoading] = useState(false);
+  const [filterLoading, setFilterLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const fetchShotsData = useCallback(async () => {
@@ -46,12 +51,22 @@ export const useShotsData = (player?: Player | null) => {
         throw shotsError;
       }
 
+      // Fetch matches for filters
+      const { data: matchesData, error: matchesError } = await supabase
+        .from("matches")
+        .select('id, opponent, date')
+        .order('date', { ascending: false });
+
+      if (matchesError) {
+        console.error("Error fetching matches:", matchesError);
+      }
+
       const transformedShots: ShotData[] = (shotsData || []).map((shot: any) => ({
         id: shot.id,
         player_id: shot.player_id,
         match_id: shot.match_id,
         minute: shot.minute,
-        period: shot.period || 'First Half',
+        period: shot.period || 'First Half' as const,
         outcome: shot.outcome || 'Miss',
         x_coordinate: shot.x_coordinate || 0,
         y_coordinate: shot.y_coordinate || 0,
@@ -61,7 +76,13 @@ export const useShotsData = (player?: Player | null) => {
         date: shot.date || '',
       }));
 
+      const transformedMatches = (matchesData || []).map(match => ({
+        id: match.id,
+        name: `vs ${match.opponent} (${match.date})`
+      }));
+
       setShots(transformedShots);
+      setMatches(transformedMatches);
       console.log('Shots data:', transformedShots);
 
     } catch (err: any) {
@@ -73,6 +94,18 @@ export const useShotsData = (player?: Player | null) => {
     }
   }, [player?.id]);
 
+  const updateFilters = useCallback((newFilters: Partial<ShotFilters>) => {
+    setFilterLoading(true);
+    setFilters(prev => ({ ...prev, ...newFilters }));
+    setTimeout(() => setFilterLoading(false), 300);
+  }, []);
+
+  const resetFilters = useCallback(() => {
+    setFilterLoading(true);
+    setFilters({});
+    setTimeout(() => setFilterLoading(false), 300);
+  }, []);
+
   useEffect(() => {
     fetchShotsData();
   }, [fetchShotsData]);
@@ -81,5 +114,5 @@ export const useShotsData = (player?: Player | null) => {
     return fetchShotsData();
   }, [fetchShotsData]);
 
-  return { shots, loading, error, refetch };
+  return { shots, matches, filters, updateFilters, resetFilters, loading, filterLoading, error, refetch };
 };
