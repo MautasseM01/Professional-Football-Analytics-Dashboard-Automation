@@ -11,10 +11,13 @@ import { useHeatmapData, TimePeriod } from "@/hooks/use-heatmap-data";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
+
 interface HeatmapCardProps {
   player: Player;
 }
+
 type ViewMode = 'standard' | 'compact' | 'focus';
+
 export const HeatmapCard = ({
   player
 }: HeatmapCardProps) => {
@@ -83,6 +86,7 @@ export const HeatmapCard = ({
   };
   const viewConfig = getViewModeConfig();
   const ViewIcon = viewConfig.icon;
+
   const handlePointerDown = useCallback((e: React.PointerEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -95,6 +99,7 @@ export const HeatmapCard = ({
       containerRef.current.setPointerCapture(e.pointerId);
     }
   }, []);
+
   const handlePointerMove = useCallback((e: React.PointerEvent) => {
     if (!isDragging) return;
     e.preventDefault();
@@ -109,12 +114,14 @@ export const HeatmapCard = ({
       y: e.clientY
     });
   }, [isDragging, lastPanPoint]);
+
   const handlePointerUp = useCallback((e: React.PointerEvent) => {
     setIsDragging(false);
     if (containerRef.current) {
       containerRef.current.releasePointerCapture(e.pointerId);
     }
   }, []);
+
   const handleWheel = useCallback((e: React.WheelEvent) => {
     if (e.ctrlKey || e.metaKey) {
       e.preventDefault();
@@ -122,8 +129,10 @@ export const HeatmapCard = ({
       setZoomLevel(prev => Math.max(0.5, Math.min(3, prev * delta)));
     }
   }, []);
+
   const handleZoomIn = () => setZoomLevel(prev => Math.min(prev * 1.2, 3));
   const handleZoomOut = () => setZoomLevel(prev => Math.max(prev / 1.2, 0.5));
+
   const handleResetZoom = () => {
     setZoomLevel(1);
     setPanOffset({
@@ -131,6 +140,7 @@ export const HeatmapCard = ({
       y: 0
     });
   };
+
   const handleFullscreen = () => {
     if (!isFullscreen) {
       if (containerRef.current?.requestFullscreen) {
@@ -143,16 +153,18 @@ export const HeatmapCard = ({
     }
     setIsFullscreen(!isFullscreen);
   };
+
   if (loading) {
     return <Card className={cn("relative overflow-hidden transition-all duration-300 w-full", theme === 'dark' ? "bg-club-dark-gray/50 border-club-gold/20" : "bg-white/90 border-club-gold/30")}>
         <LoadingOverlay isLoading={loading} />
         <CardContent className="p-6 min-h-[400px]" />
       </Card>;
   }
+
   return <TooltipProvider>
       <Card className={cn("overflow-hidden transition-all duration-300 w-full relative", theme === 'dark' ? "bg-club-dark-gray/50 border-club-gold/20" : "bg-white/90 border-club-gold/30")}>
-        {/* Enhanced View Toggle Button - Mobile Floating */}
-        {isMobile && <div className="absolute top-4 right-4 z-20">
+        {/* Enhanced View Toggle Button - Mobile Floating - Updated z-index to appear under header */}
+        {isMobile && <div className="absolute top-4 right-4 z-10">
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button variant="outline" size="lg" onClick={cycleViewMode} className={cn("h-12 w-12 rounded-full shadow-lg border-2 transition-all backdrop-blur-md", theme === 'dark' ? "bg-club-black/80 border-club-gold/40 hover:border-club-gold/60 text-club-light-gray hover:bg-club-black/90" : "bg-white/95 border-club-gold/50 hover:border-club-gold/70 text-gray-900 hover:bg-white")}>
