@@ -1,26 +1,89 @@
 
-// Enhanced KPI options with club gold theming - now includes all 8 metrics
-export const KPI_OPTIONS = [
-  { value: "distance", label: "Total Distance (km)", color: "#D4AF37", shortLabel: "Distance" },
-  { value: "sprintDistance", label: "Sprint Distance (km)", color: "#D4AF37", shortLabel: "Sprint" },
-  { value: "passes_completed", label: "Passes Completed", color: "#D4AF37", shortLabel: "Passes" },
-  { value: "shots_on_target", label: "Shots on Target", color: "#D4AF37", shortLabel: "Shots" },
-  { value: "tackles_won", label: "Tackles Won", color: "#D4AF37", shortLabel: "Tackles" },
-  { value: "goals", label: "Goals", color: "#D4AF37", shortLabel: "Goals" },
-  { value: "assists", label: "Assists", color: "#D4AF37", shortLabel: "Assists" },
-  { value: "match_rating", label: "Match Rating", color: "#D4AF37", shortLabel: "Rating" }
-];
+import { MapPin, Zap, Award, Target, Users, Activity, Focus, BarChart3, Percent, Hand, MousePointer } from "lucide-react";
 
-// Enhanced time period options
-export const TIME_PERIOD_OPTIONS = [
-  { value: "last3", label: "Last 3 Matches", shortLabel: "3M" },
-  { value: "last5", label: "Last 5 Matches", shortLabel: "5M" },
-  { value: "last10", label: "Last 10 Matches", shortLabel: "10M" },
-  { value: "season", label: "Season to Date", shortLabel: "Season" }
-];
+export const KPI_OPTIONS = [{
+  value: "distance_covered",
+  label: "Total Distance (km)",
+  unit: "km",
+  icon: MapPin
+}, {
+  value: "sprint_distance",
+  label: "Sprint Distance (km)",
+  unit: "km",
+  icon: Zap
+}, {
+  value: "match_rating",
+  label: "Match Rating",
+  unit: "/10",
+  icon: Award
+}, {
+  value: "goals",
+  label: "Goals",
+  unit: "",
+  icon: Target
+}, {
+  value: "assists",
+  label: "Assists",
+  unit: "",
+  icon: Users
+}, {
+  value: "passes_completed",
+  label: "Passes Completed",
+  unit: "",
+  icon: Activity
+}, {
+  value: "shots_on_target",
+  label: "Shots on Target",
+  unit: "",
+  icon: Focus
+}, {
+  value: "tackles_won",
+  label: "Tackles Won",
+  unit: "",
+  icon: BarChart3
+}, {
+  value: "pass_accuracy",
+  label: "Pass Accuracy",
+  unit: "%",
+  icon: Percent
+}, {
+  value: "dribbles_successful",
+  label: "Successful Dribbles",
+  unit: "",
+  icon: Hand
+}, {
+  value: "touches",
+  label: "Touches",
+  unit: "",
+  icon: MousePointer
+}, {
+  value: "max_speed",
+  label: "Max Speed",
+  unit: "km/h",
+  icon: Zap
+}];
 
-// Chart view options
-export const CHART_VIEW_OPTIONS = [
-  { value: "line", label: "Line Chart" },
-  { value: "area", label: "Area Chart" }
-];
+export const TIME_PERIOD_OPTIONS = [{
+  value: "last3",
+  label: "Last 3 Matches"
+}, {
+  value: "last5",
+  label: "Last 5 Matches"
+}, {
+  value: "last10",
+  label: "Last 10 Matches"
+}, {
+  value: "season",
+  label: "Season to Date"
+}];
+
+export const CHART_VIEW_OPTIONS = [{
+  value: "area",
+  label: "Area Chart"
+}, {
+  value: "line",
+  label: "Line Chart"
+}, {
+  value: "bar",
+  label: "Bar Chart"
+}];

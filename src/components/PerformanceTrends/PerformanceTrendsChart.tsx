@@ -1,8 +1,9 @@
 
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, LineChart, Line, BarChart, Bar } from "recharts";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { ChartRenderer } from "./ChartRenderer";
+import { CustomTooltip } from "./CustomTooltip";
 
 interface PerformanceTrendsChartProps {
   chartView: string;
@@ -24,49 +25,156 @@ export const PerformanceTrendsChart = ({
   const { theme } = useTheme();
   const isMobile = useIsMobile();
 
-  // Calculate dynamic height based on content and screen size
-  const calculateContainerHeight = () => {
-    if (isMobile) {
-      return Math.max(380, 300 + (matchData.length * 2));
-    }
-    return Math.max(500, 420 + (matchData.length * 3));
-  };
-
-  // Asymmetric padding to position chart towards bottom-left
-  const getContainerPadding = () => {
-    if (isMobile) {
-      return "pt-6 pr-6 pb-2 pl-2"; // More top/right, less bottom/left
-    }
-    return "pt-8 pr-8 pb-2 pl-2"; // More pronounced on desktop
-  };
+  const CustomTooltipWrapper = (props: any) => (
+    <CustomTooltip 
+      {...props}
+      selectedKPI={selectedKPI}
+      selectedKPILabel={selectedKPILabel}
+      showMovingAverage={showMovingAverage}
+    />
+  );
 
   return (
-    <div className="px-4 sm:px-6 pb-6">
-      <div 
-        className={cn(
-          "w-full rounded-2xl transition-all duration-300 overflow-hidden",
-          "flex justify-start items-end", // Position content to bottom-left
-          getContainerPadding(),
-          theme === 'dark' 
-            ? "bg-club-black/20 border border-club-gold/10" 
-            : "bg-gray-50/30 border border-club-gold/20"
+    <div className="h-80">
+      <ResponsiveContainer width="100%" height="100%">
+        {chartView === "area" ? (
+          <AreaChart data={matchData}>
+            <defs>
+              <linearGradient id="metricGradient" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="5%" stopColor="#D4AF37" stopOpacity={0.4} />
+                <stop offset="95%" stopColor="#D4AF37" stopOpacity={0.05} />
+              </linearGradient>
+            </defs>
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              stroke={theme === 'dark' ? "#333" : "#e5e7eb"} 
+              opacity={0.3} 
+            />
+            <XAxis 
+              dataKey="match" 
+              stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
+              tick={{
+                fill: theme === 'dark' ? "#9CA3AF" : "#6B7280",
+                fontSize: 12
+              }}
+              angle={-45}
+              textAnchor="end"
+              height={80}
+            />
+            <YAxis 
+              stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
+              tick={{
+                fill: theme === 'dark' ? "#9CA3AF" : "#6B7280",
+                fontSize: 12
+              }}
+            />
+            <CustomTooltipWrapper />
+            <Area 
+              type="monotone" 
+              dataKey="value" 
+              stroke="#D4AF37" 
+              strokeWidth={2} 
+              fill="url(#metricGradient)"
+              dot={{
+                fill: "#D4AF37",
+                strokeWidth: 2,
+                r: 4
+              }}
+            />
+            {showMovingAverage && (
+              <Area 
+                type="monotone" 
+                dataKey="movingAvg" 
+                stroke="#9CA3AF" 
+                strokeDasharray="5 5" 
+                strokeWidth={2} 
+                fill="transparent" 
+                dot={false} 
+              />
+            )}
+          </AreaChart>
+        ) : chartView === "line" ? (
+          <LineChart data={matchData}>
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              stroke={theme === 'dark' ? "#333" : "#e5e7eb"} 
+              opacity={0.3} 
+            />
+            <XAxis 
+              dataKey="match" 
+              stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
+              tick={{
+                fill: theme === 'dark' ? "#9CA3AF" : "#6B7280",
+                fontSize: 12
+              }}
+              angle={-45}
+              textAnchor="end"
+              height={80}
+            />
+            <YAxis 
+              stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
+              tick={{
+                fill: theme === 'dark' ? "#9CA3AF" : "#6B7280",
+                fontSize: 12
+              }}
+            />
+            <CustomTooltipWrapper />
+            <Line 
+              type="monotone" 
+              dataKey="value" 
+              stroke="#D4AF37" 
+              strokeWidth={2}
+              dot={{
+                fill: "#D4AF37",
+                strokeWidth: 2,
+                r: 4
+              }}
+            />
+            {showMovingAverage && (
+              <Line 
+                type="monotone" 
+                dataKey="movingAvg" 
+                stroke="#9CA3AF" 
+                strokeDasharray="5 5" 
+                strokeWidth={2} 
+                dot={false} 
+              />
+            )}
+          </LineChart>
+        ) : (
+          <BarChart data={matchData}>
+            <CartesianGrid 
+              strokeDasharray="3 3" 
+              stroke={theme === 'dark' ? "#333" : "#e5e7eb"} 
+              opacity={0.3} 
+            />
+            <XAxis 
+              dataKey="match" 
+              stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
+              tick={{
+                fill: theme === 'dark' ? "#9CA3AF" : "#6B7280",
+                fontSize: 12
+              }}
+              angle={-45}
+              textAnchor="end"
+              height={80}
+            />
+            <YAxis 
+              stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"}
+              tick={{
+                fill: theme === 'dark' ? "#9CA3AF" : "#6B7280",
+                fontSize: 12
+              }}
+            />
+            <CustomTooltipWrapper />
+            <Bar 
+              dataKey="value" 
+              fill="#D4AF37" 
+              radius={[4, 4, 0, 0]} 
+            />
+          </BarChart>
         )}
-        style={{ 
-          height: `${calculateContainerHeight()}px`,
-          contain: 'layout style paint'
-        }}
-      >
-        <div className="w-full h-full">
-          <ChartRenderer
-            chartView={chartView}
-            matchData={matchData}
-            selectedKPI={selectedKPI}
-            selectedKPILabel={selectedKPILabel}
-            showMovingAverage={showMovingAverage}
-            getChartConfig={getChartConfig}
-          />
-        </div>
-      </div>
+      </ResponsiveContainer>
     </div>
   );
 };
