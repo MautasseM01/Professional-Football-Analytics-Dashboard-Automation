@@ -1,6 +1,6 @@
 
 import { Player } from "@/types";
-import { EnhancedPerformanceChart } from "./PerformanceTrends/EnhancedPerformanceChart";
+import { PerformanceTrendsCard } from "./PerformanceTrends/PerformanceTrendsCard";
 import { ResponsiveLayout } from "./ResponsiveLayout";
 import { ErrorBoundary } from "./ErrorBoundary";
 import { ErrorFallback } from "./ErrorStates/ErrorFallback";
@@ -20,7 +20,7 @@ export const PlayerPerformanceSection = ({ player }: PlayerPerformanceSectionPro
       }
     >
       <ResponsiveLayout className="space-y-4 sm:space-y-6">
-        <EnhancedPerformanceChart player={player} />
+        <PerformanceTrendsCard player={player} />
       </ResponsiveLayout>
     </ErrorBoundary>
   );
