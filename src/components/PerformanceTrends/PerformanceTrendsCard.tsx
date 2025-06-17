@@ -356,11 +356,11 @@ export const PerformanceTrendsCard = ({
           <div className="space-y-2">
             <Label className="text-sm font-medium">Time Period</Label>
             <Select value={selectedTimePeriod} onValueChange={setSelectedTimePeriod}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className={cn("w-full transition-all duration-200", theme === 'dark' ? "bg-club-dark-gray/50 border-club-gold/20 text-club-light-gray hover:border-club-gold/40" : "bg-white/70 border-club-gold/30 text-gray-900 hover:border-club-gold/50")}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                {TIME_PERIOD_OPTIONS.map(option => <SelectItem key={option.value} value={option.value}>
+              <SelectContent className={cn("z-50 backdrop-blur-md border-club-gold/30", theme === 'dark' ? "bg-club-dark-gray/95 text-club-light-gray" : "bg-white/95 text-gray-900")}>
+                {TIME_PERIOD_OPTIONS.map(option => <SelectItem key={option.value} value={option.value} className={cn("flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150", "focus:bg-club-gold/20 hover:bg-club-gold/10")}>
                     {option.label}
                   </SelectItem>)}
               </SelectContent>
@@ -370,11 +370,11 @@ export const PerformanceTrendsCard = ({
           <div className="space-y-2">
             <Label className="text-sm font-medium">Chart View</Label>
             <Select value={chartView} onValueChange={setChartView}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className={cn("w-full transition-all duration-200", theme === 'dark' ? "bg-club-dark-gray/50 border-club-gold/20 text-club-light-gray hover:border-club-gold/40" : "bg-white/70 border-club-gold/30 text-gray-900 hover:border-club-gold/50")}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                {CHART_VIEW_OPTIONS.map(option => <SelectItem key={option.value} value={option.value}>
+              <SelectContent className={cn("z-50 backdrop-blur-md border-club-gold/30", theme === 'dark' ? "bg-club-dark-gray/95 text-club-light-gray" : "bg-white/95 text-gray-900")}>
+                {CHART_VIEW_OPTIONS.map(option => <SelectItem key={option.value} value={option.value} className={cn("flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150", "focus:bg-club-gold/20 hover:bg-club-gold/10")}>
                     {option.label}
                   </SelectItem>)}
               </SelectContent>
