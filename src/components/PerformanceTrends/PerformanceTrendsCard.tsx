@@ -9,13 +9,15 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tool
 import { usePlayerMatchPerformance } from "@/hooks/use-player-match-performance";
 import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { ErrorFallback } from "@/components/ErrorStates/ErrorFallback";
-import { TrendingUp, TrendingDown, Minus, Activity, Target, Users, Zap, Loader, MapPin, Eye, Award, BarChart3, Focus } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Activity, Target, Users, Zap, Loader, MapPin, Eye, Award, BarChart3, Focus, Percent, Hand, MousePointer } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+
 interface PerformanceTrendsCardProps {
   player: Player;
 }
+
 const KPI_OPTIONS = [{
   value: "distance_covered",
   label: "Total Distance (km)",
@@ -56,7 +58,28 @@ const KPI_OPTIONS = [{
   label: "Tackles Won",
   unit: "",
   icon: BarChart3
+}, {
+  value: "pass_accuracy",
+  label: "Pass Accuracy",
+  unit: "%",
+  icon: Percent
+}, {
+  value: "dribbles_successful",
+  label: "Successful Dribbles",
+  unit: "",
+  icon: Hand
+}, {
+  value: "touches",
+  label: "Touches",
+  unit: "",
+  icon: MousePointer
+}, {
+  value: "max_speed",
+  label: "Max Speed",
+  unit: "km/h",
+  icon: Zap
 }];
+
 const TIME_PERIOD_OPTIONS = [{
   value: "last3",
   label: "Last 3 Matches"
@@ -70,6 +93,7 @@ const TIME_PERIOD_OPTIONS = [{
   value: "season",
   label: "Season to Date"
 }];
+
 const CHART_VIEW_OPTIONS = [{
   value: "area",
   label: "Area Chart"
@@ -77,6 +101,7 @@ const CHART_VIEW_OPTIONS = [{
   value: "line",
   label: "Line Chart"
 }];
+
 export const PerformanceTrendsCard = ({
   player
 }: PerformanceTrendsCardProps) => {
@@ -125,6 +150,18 @@ export const PerformanceTrendsCard = ({
         case "tackles_won":
           value = perf.tackles_won || 0;
           break;
+        case "pass_accuracy":
+          value = Number(perf.pass_accuracy) || 0;
+          break;
+        case "dribbles_successful":
+          value = perf.dribbles_successful || 0;
+          break;
+        case "touches":
+          value = perf.touches || 0;
+          break;
+        case "max_speed":
+          value = Number(perf.max_speed) || 0;
+          break;
         default:
           value = 0;
       }
@@ -150,6 +187,14 @@ export const PerformanceTrendsCard = ({
               return p.shots_on_target || 0;
             case "tackles_won":
               return p.tackles_won || 0;
+            case "pass_accuracy":
+              return Number(p.pass_accuracy) || 0;
+            case "dribbles_successful":
+              return p.dribbles_successful || 0;
+            case "touches":
+              return p.touches || 0;
+            case "max_speed":
+              return Number(p.max_speed) || 0;
             default:
               return 0;
           }
@@ -162,8 +207,8 @@ export const PerformanceTrendsCard = ({
           month: 'short',
           day: 'numeric'
         }),
-        value: selectedKPI.includes("distance") ? Number(value.toFixed(2)) : Number(value.toFixed(1)),
-        movingAvg: movingAvg ? selectedKPI.includes("distance") ? Number(movingAvg.toFixed(2)) : Number(movingAvg.toFixed(1)) : null,
+        value: selectedKPI.includes("distance") || selectedKPI === "max_speed" ? Number(value.toFixed(2)) : Number(value.toFixed(1)),
+        movingAvg: movingAvg ? (selectedKPI.includes("distance") || selectedKPI === "max_speed" ? Number(movingAvg.toFixed(2)) : Number(movingAvg.toFixed(1))) : null,
         opponent: perf.opponent,
         result: perf.result
       };
@@ -191,9 +236,9 @@ export const PerformanceTrendsCard = ({
     let trend: 'up' | 'down' | 'neutral' = 'neutral';
     if (recentAvg > previousAvg * 1.1) trend = 'up';else if (recentAvg < previousAvg * 0.9) trend = 'down';
     return {
-      avg: selectedKPI.includes("distance") ? Number(avg.toFixed(2)) : Number(avg.toFixed(1)),
-      max: selectedKPI.includes("distance") ? Number(max.toFixed(2)) : Number(max.toFixed(1)),
-      min: selectedKPI.includes("distance") ? Number(min.toFixed(2)) : Number(min.toFixed(1)),
+      avg: selectedKPI.includes("distance") || selectedKPI === "max_speed" ? Number(avg.toFixed(2)) : Number(avg.toFixed(1)),
+      max: selectedKPI.includes("distance") || selectedKPI === "max_speed" ? Number(max.toFixed(2)) : Number(max.toFixed(1)),
+      min: selectedKPI.includes("distance") || selectedKPI === "max_speed" ? Number(min.toFixed(2)) : Number(min.toFixed(1)),
       trend
     };
   }, [chartData, selectedKPI]);
