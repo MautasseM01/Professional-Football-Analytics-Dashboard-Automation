@@ -327,7 +327,7 @@ const TeamTacticalAnalysis = () => {
 
               <TabsContent value="overview" className="space-y-6">
                 {ratingsLoading ? (
-                  <LoadingOverlay message="Loading match ratings analysis..." />
+                  <LoadingOverlay isLoading={true} />
                 ) : ratingsError ? (
                   <Card className="bg-club-dark-gray/50 border-club-gold/20">
                     <CardContent className="py-12">
@@ -354,7 +354,7 @@ const TeamTacticalAnalysis = () => {
 
               <TabsContent value="trends" className="space-y-6">
                 {ratingsLoading ? (
-                  <LoadingOverlay message="Loading seasonal performance trends..." />
+                  <LoadingOverlay isLoading={true} />
                 ) : (
                   <SeasonPerformanceTrends ratings={ratings || []} />
                 )}
@@ -364,8 +364,8 @@ const TeamTacticalAnalysis = () => {
                 {selectedMatch ? (
                   <PassingNetwork 
                     matchId={selectedMatch}
-                    directionFilter={passDirectionFilter}
-                    outcomeFilter={passOutcomeFilter}
+                    passDirectionFilter={passDirectionFilter}
+                    passOutcomeFilter={passOutcomeFilter}
                   />
                 ) : (
                   <Card className="bg-club-dark-gray/50 border-club-gold/20">
@@ -396,9 +396,8 @@ const TeamTacticalAnalysis = () => {
                 {selectedMatch ? (
                   <TacticalFormationImageView 
                     matchId={selectedMatch}
-                    onError={handleImageError}
-                    onRetry={handleImageRetry}
-                    hasError={imageLoadingError}
+                    onImageError={handleImageError}
+                    onImageRetry={handleImageRetry}
                   />
                 ) : (
                   <Card className="bg-club-dark-gray/50 border-club-gold/20">
