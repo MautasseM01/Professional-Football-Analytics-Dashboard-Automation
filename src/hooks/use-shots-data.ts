@@ -2,7 +2,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Player } from "@/types";
-import { ShotFilters } from "@/types/shot";
+import { ShotFilters, ShotOutcome } from "@/types/shot";
 import { toast } from "sonner";
 
 export interface ShotData {
@@ -12,7 +12,7 @@ export interface ShotData {
   match_id: number;
   minute: number;
   period: "First Half" | "Second Half" | "Extra Time" | "Penalties";
-  outcome: string;
+  outcome: ShotOutcome;
   x_coordinate: number;
   y_coordinate: number;
   distance?: number;
