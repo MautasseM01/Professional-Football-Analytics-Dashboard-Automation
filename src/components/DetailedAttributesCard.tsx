@@ -1,259 +1,151 @@
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
 import { Player } from "@/types";
 import { usePlayerAttributes } from "@/hooks/use-player-attributes";
-import { Badge } from "@/components/ui/badge";
-import { TrendingUp, User, Zap, Brain, Shield, Star } from "lucide-react";
 import { ChartLoadingSkeleton } from "@/components/LoadingStates";
-import { ErrorFallback } from "@/components/ErrorStates/ErrorFallback";
-import { cn } from "@/lib/utils";
-import { useTheme } from "@/contexts/ThemeContext";
-import { ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, Legend } from "recharts";
 
 interface DetailedAttributesCardProps {
   player: Player;
 }
 
+interface AttributeBarProps {
+  label: string;
+  value: number;
+  maxValue?: number;
+  color?: string;
+}
+
+const AttributeBar = ({ label, value, maxValue = 100, color = "bg-primary" }: AttributeBarProps) => (
+  <div className="space-y-1">
+    <div className="flex justify-between text-sm">
+      <span className="text-club-light-gray light:text-gray-700">{label}</span>
+      <span className="font-medium text-club-gold light:text-yellow-600">{value}</span>
+    </div>
+    <Progress value={(value / maxValue) * 100} className="h-2" />
+  </div>
+);
+
+const AttributeSection = ({ title, attributes }: { title: string; attributes: Array<{label: string; value: number}> }) => (
+  <div className="space-y-3">
+    <h4 className="font-semibold text-club-gold light:text-yellow-600 border-b border-club-gold/30 light:border-yellow-600/30 pb-1">
+      {title}
+    </h4>
+    <div className="space-y-2">
+      {attributes.map((attr, index) => (
+        <AttributeBar key={index} label={attr.label} value={attr.value} />
+      ))}
+    </div>
+  </div>
+);
+
 export const DetailedAttributesCard = ({ player }: DetailedAttributesCardProps) => {
   const { attributes, positionalAverage, loading, error } = usePlayerAttributes(player);
-  const { theme } = useTheme();
 
-  if (loading) {
-    return <ChartLoadingSkeleton />;
-  }
+  if (loading) return <ChartLoadingSkeleton />;
+  if (error) return <div className="text-red-500">Error: {error}</div>;
+  if (!attributes) return <div className="text-club-light-gray light:text-gray-600">No detailed attributes available</div>;
 
-  if (error) {
-    return (
-      <Card className={cn(
-        "border-club-gold/20",
-        theme === 'dark' ? "bg-club-dark-gray" : "bg-white"
-      )}>
-        <CardContent className="p-6">
-          <ErrorFallback 
-            title="Attributes data error"
-            description={`Failed to load player attributes: ${error}`}
-          />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  if (!attributes) {
-    return (
-      <Card className={cn(
-        "border-club-gold/20",
-        theme === 'dark' ? "bg-club-dark-gray" : "bg-white"
-      )}>
-        <CardContent className="p-6">
-          <ErrorFallback 
-            title="No attributes data"
-            description="Player attributes are not available"
-          />
-        </CardContent>
-      </Card>
-    );
-  }
-
-  // Prepare radar chart data
-  const radarData = [
-    { attribute: "Pace", player: attributes.pace, average: positionalAverage?.pace || 50 },
-    { attribute: "Finishing", player: attributes.finishing, average: positionalAverage?.finishing || 50 },
-    { attribute: "Passing", player: attributes.passing, average: 50 },
-    { attribute: "Dribbling", player: attributes.dribbling, average: 50 },
-    { attribute: "Tackling", player: attributes.tackling, average: 50 },
-    { attribute: "Strength", player: attributes.strength, average: 50 },
-    { attribute: "Vision", player: attributes.vision, average: 50 },
-    { attribute: "Mental", player: attributes.mental_strength, average: 50 }
+  const physicalAttributes = [
+    { label: "Pace", value: attributes.pace },
+    { label: "Speed", value: attributes.speed },
+    { label: "Acceleration", value: attributes.acceleration },
+    { label: "Agility", value: attributes.agility },
+    { label: "Strength", value: attributes.strength },
+    { label: "Stamina", value: attributes.stamina },
+    { label: "Jumping", value: attributes.jumping },
   ];
 
-  const getAttributeColor = (value: number) => {
-    if (value >= 80) return "text-green-500";
-    if (value >= 70) return "text-club-gold";
-    if (value >= 60) return "text-blue-400";
-    if (value >= 50) return "text-gray-400";
-    return "text-red-400";
-  };
+  const technicalAttributes = [
+    { label: "Finishing", value: attributes.finishing },
+    { label: "Heading", value: attributes.heading },
+    { label: "Crossing", value: attributes.crossing },
+    { label: "Passing", value: attributes.passing },
+    { label: "Ball Control", value: attributes.ball_control },
+    { label: "Dribbling", value: attributes.dribbling },
+    { label: "Tackling", value: attributes.tackling },
+    { label: "Marking", value: attributes.marking },
+  ];
 
-  const getAttributeBadge = (value: number) => {
-    if (value >= 80) return "Excellent";
-    if (value >= 70) return "Good";
-    if (value >= 60) return "Average";
-    if (value >= 50) return "Below Average";
-    return "Poor";
+  const mentalAttributes = [
+    { label: "Positioning", value: attributes.positioning },
+    { label: "Vision", value: attributes.vision },
+    { label: "Decision Making", value: attributes.decision_making },
+    { label: "Mental Strength", value: attributes.mental_strength },
+    { label: "Leadership", value: attributes.leadership },
+    { label: "Communication", value: attributes.communication },
+  ];
+
+  const workRateAttributes = [
+    { label: "Attacking Work Rate", value: attributes.work_rate_attacking },
+    { label: "Defensive Work Rate", value: attributes.work_rate_defensive },
+    { label: "Aerial Duels Won", value: attributes.aerial_duels_won },
+    { label: "Hold-up Play", value: attributes.holdup_play },
+  ];
+
+  const getAttributeColor = (value: number, positionalAvg?: number) => {
+    if (!positionalAvg) return "";
+    if (value > positionalAvg + 10) return "text-green-500";
+    if (value < positionalAvg - 10) return "text-red-500";
+    return "";
   };
 
   return (
-    <Card className={cn(
-      "border-club-gold/20 transition-all duration-300",
-      theme === 'dark' 
-        ? "bg-club-dark-gray hover:bg-club-dark-gray/80" 
-        : "bg-white hover:bg-gray-50"
-    )}>
+    <Card className="bg-club-black/80 border-club-gold/30 light:bg-white light:border-gray-200">
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-club-gold">
-          <User className="w-5 h-5" />
-          Player Attributes
+        <CardTitle className="flex items-center justify-between text-club-gold light:text-yellow-600">
+          <span>Player Attributes</span>
+          <div className="flex gap-2">
+            <Badge variant="secondary" className="bg-club-gold/20 text-club-gold light:bg-yellow-600/20 light:text-yellow-700">
+              {attributes.preferred_foot} Footed
+            </Badge>
+            <Badge variant="outline" className="border-club-gold/30 text-club-light-gray light:border-gray-300 light:text-gray-600">
+              ★{attributes.skill_moves_rating} Skills
+            </Badge>
+            <Badge variant="outline" className="border-club-gold/30 text-club-light-gray light:border-gray-300 light:text-gray-600">
+              ★{attributes.weak_foot_rating} Weak Foot
+            </Badge>
+          </div>
         </CardTitle>
-        <CardDescription className="text-club-light-gray/70 light:text-gray-600">
-          Comprehensive skill assessment and comparison
-        </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6">
-        {/* Radar Chart */}
-        <div className="h-80">
-          <ResponsiveContainer width="100%" height="100%">
-            <RadarChart data={radarData}>
-              <PolarGrid stroke={theme === 'dark' ? '#374151' : '#e5e7eb'} />
-              <PolarAngleAxis 
-                dataKey="attribute" 
-                tick={{ 
-                  fontSize: 12, 
-                  fill: theme === 'dark' ? '#d1d5db' : '#374151' 
-                }} 
-              />
-              <PolarRadiusAxis 
-                angle={90} 
-                domain={[0, 100]} 
-                tick={{ 
-                  fontSize: 10, 
-                  fill: theme === 'dark' ? '#9ca3af' : '#6b7280' 
-                }} 
-              />
-              <Radar
-                name="Player"
-                dataKey="player"
-                stroke="#D4AF37"
-                fill="#D4AF37"
-                fillOpacity={0.2}
-                strokeWidth={2}
-              />
-              {positionalAverage && (
-                <Radar
-                  name="Position Average"
-                  dataKey="average"
-                  stroke="#9ca3af"
-                  fill="#9ca3af"
-                  fillOpacity={0.1}
-                  strokeWidth={1}
-                  strokeDasharray="5 5"
-                />
-              )}
-              <Legend 
-                wrapperStyle={{ 
-                  fontSize: '12px', 
-                  color: theme === 'dark' ? '#d1d5db' : '#374151' 
-                }} 
-              />
-            </RadarChart>
-          </ResponsiveContainer>
-        </div>
-
-        {/* Detailed Attributes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Physical Attributes */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-club-light-gray light:text-gray-900 flex items-center gap-2">
-              <Zap className="w-4 h-4" />
-              Physical
-            </h3>
-            <div className="space-y-2">
-              {[
-                { label: "Pace", value: attributes.pace },
-                { label: "Acceleration", value: attributes.acceleration },
-                { label: "Strength", value: attributes.strength },
-                { label: "Stamina", value: attributes.stamina },
-                { label: "Agility", value: attributes.agility },
-                { label: "Jumping", value: attributes.jumping }
-              ].map(({ label, value }) => (
-                <div key={label} className="flex justify-between items-center">
-                  <span className="text-sm text-club-light-gray/80 light:text-gray-700">{label}</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-sm font-semibold ${getAttributeColor(value)}`}>
-                      {value}
+      <CardContent>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-6">
+            <AttributeSection title="Physical Attributes" attributes={physicalAttributes} />
+            <AttributeSection title="Technical Attributes" attributes={technicalAttributes} />
+          </div>
+          <div className="space-y-6">
+            <AttributeSection title="Mental Attributes" attributes={mentalAttributes} />
+            <AttributeSection title="Work Rate & Style" attributes={workRateAttributes} />
+            
+            {positionalAverage && (
+              <div className="space-y-3">
+                <h4 className="font-semibold text-club-gold light:text-yellow-600 border-b border-club-gold/30 light:border-yellow-600/30 pb-1">
+                  Position Comparison ({player.position})
+                </h4>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-club-light-gray light:text-gray-700">Finishing vs Average:</span>
+                    <span className={`font-medium ${getAttributeColor(attributes.finishing, positionalAverage.finishing)}`}>
+                      {attributes.finishing} ({attributes.finishing > positionalAverage.finishing ? '+' : ''}{attributes.finishing - positionalAverage.finishing})
                     </span>
-                    <Badge variant="secondary" className="text-xs">
-                      {getAttributeBadge(value)}
-                    </Badge>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-club-light-gray light:text-gray-700">Pace vs Average:</span>
+                    <span className={`font-medium ${getAttributeColor(attributes.pace, positionalAverage.pace)}`}>
+                      {attributes.pace} ({attributes.pace > positionalAverage.pace ? '+' : ''}{attributes.pace - positionalAverage.pace})
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-club-light-gray light:text-gray-700">Aerial Duels vs Average:</span>
+                    <span className={`font-medium ${getAttributeColor(attributes.aerial_duels_won, positionalAverage.aerial_duels_won)}`}>
+                      {attributes.aerial_duels_won} ({attributes.aerial_duels_won > positionalAverage.aerial_duels_won ? '+' : ''}{attributes.aerial_duels_won - positionalAverage.aerial_duels_won})
+                    </span>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Technical Attributes */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-club-light-gray light:text-gray-900 flex items-center gap-2">
-              <Star className="w-4 h-4" />
-              Technical
-            </h3>
-            <div className="space-y-2">
-              {[
-                { label: "Finishing", value: attributes.finishing },
-                { label: "Passing", value: attributes.passing },
-                { label: "Ball Control", value: attributes.ball_control },
-                { label: "Dribbling", value: attributes.dribbling },
-                { label: "Crossing", value: attributes.crossing },
-                { label: "Vision", value: attributes.vision }
-              ].map(({ label, value }) => (
-                <div key={label} className="flex justify-between items-center">
-                  <span className="text-sm text-club-light-gray/80 light:text-gray-700">{label}</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-sm font-semibold ${getAttributeColor(value)}`}>
-                      {value}
-                    </span>
-                    <Badge variant="secondary" className="text-xs">
-                      {getAttributeBadge(value)}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Mental & Defensive */}
-          <div className="space-y-3">
-            <h3 className="text-sm font-semibold text-club-light-gray light:text-gray-900 flex items-center gap-2">
-              <Brain className="w-4 h-4" />
-              Mental & Defensive
-            </h3>
-            <div className="space-y-2">
-              {[
-                { label: "Decision Making", value: attributes.decision_making },
-                { label: "Mental Strength", value: attributes.mental_strength },
-                { label: "Leadership", value: attributes.leadership },
-                { label: "Tackling", value: attributes.tackling },
-                { label: "Marking", value: attributes.marking },
-                { label: "Positioning", value: attributes.positioning }
-              ].map(({ label, value }) => (
-                <div key={label} className="flex justify-between items-center">
-                  <span className="text-sm text-club-light-gray/80 light:text-gray-700">{label}</span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-sm font-semibold ${getAttributeColor(value)}`}>
-                      {value}
-                    </span>
-                    <Badge variant="secondary" className="text-xs">
-                      {getAttributeBadge(value)}
-                    </Badge>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Additional Info */}
-        <div className="flex flex-wrap gap-4 pt-4 border-t border-club-gold/20">
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-club-light-gray/70 light:text-gray-600">Preferred Foot:</span>
-            <Badge variant="outline">{attributes.preferred_foot}</Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-club-light-gray/70 light:text-gray-600">Weak Foot:</span>
-            <Badge variant="outline">{attributes.weak_foot_rating}/5</Badge>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-club-light-gray/70 light:text-gray-600">Skill Moves:</span>
-            <Badge variant="outline">{attributes.skill_moves_rating}/5</Badge>
+              </div>
+            )}
           </div>
         </div>
       </CardContent>

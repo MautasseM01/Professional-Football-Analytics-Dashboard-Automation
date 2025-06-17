@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Player } from "@/types";
 import { useGoalsData } from "@/hooks/use-goals-data";
 import { useShotsData } from "@/hooks/use-shots-data";
+import { usePlayerAttributes } from "@/hooks/use-player-attributes";
 import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { Badge } from "@/components/ui/badge";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
@@ -14,20 +15,33 @@ interface GoalCoordinatesHeatmapProps {
 export const GoalCoordinatesHeatmap = ({ player }: GoalCoordinatesHeatmapProps) => {
   const { goals, loading: goalsLoading, error: goalsError } = useGoalsData(player);
   const { shots, loading: shotsLoading } = useShotsData();
+  const { attributes, loading: attributesLoading } = usePlayerAttributes(player);
 
-  if (goalsLoading || shotsLoading) return <ChartLoadingSkeleton />;
+  if (goalsLoading || shotsLoading || attributesLoading) return <ChartLoadingSkeleton />;
   if (goalsError) return <div className="text-red-500">Error: {goalsError}</div>;
 
   // Filter shots for this player
   const playerShots = shots.filter(shot => shot.player_id === player.id);
   const playerGoals = playerShots.filter(shot => shot.outcome === 'Goal');
 
+  // Calculate shooting efficiency based on attributes
+  const shootingEfficiency = attributes ? 
+    Math.round((attributes.finishing + attributes.positioning + attributes.decision_making) / 3) : 0;
+
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
+        <CardTitle className="flex items-center gap-2 flex-wrap">
           Goal Locations Heatmap
-          <Badge variant="secondary">{playerGoals.length} goals mapped</Badge>
+          <div className="flex gap-2">
+            <Badge variant="secondary">{playerGoals.length} goals mapped</Badge>
+            {attributes && (
+              <>
+                <Badge variant="outline">Finishing: {attributes.finishing}</Badge>
+                <Badge variant="outline">Efficiency: {shootingEfficiency}</Badge>
+              </>
+            )}
+          </div>
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -57,18 +71,22 @@ export const GoalCoordinatesHeatmap = ({ player }: GoalCoordinatesHeatmapProps) 
                 <rect x="5" y="25" width="35" height="50" fill="none" stroke="#fff" strokeWidth="1"/>
                 <rect x="110" y="25" width="35" height="50" fill="none" stroke="#fff" strokeWidth="1"/>
                 
-                {/* Goals plotted */}
+                {/* Goals plotted with enhanced visualization */}
                 {playerGoals.map((goal, index) => {
                   // Convert coordinates to pitch position (assuming x: 0-100, y: 0-100)
                   const x = (goal.x_coordinate / 100) * 140 + 5;
                   const y = (goal.y_coordinate / 100) * 90 + 5;
+                  
+                  // Size goals based on player's finishing attribute
+                  const goalSize = attributes ? 
+                    2 + (attributes.finishing / 100) * 2 : 3;
                   
                   return (
                     <circle
                       key={index}
                       cx={x}
                       cy={y}
-                      r="3"
+                      r={goalSize}
                       fill="#22c55e"
                       stroke="#fff"
                       strokeWidth="1"
@@ -77,17 +95,21 @@ export const GoalCoordinatesHeatmap = ({ player }: GoalCoordinatesHeatmapProps) 
                   );
                 })}
                 
-                {/* All shots (non-goals) */}
+                {/* All shots (non-goals) with attribute-based styling */}
                 {playerShots.filter(shot => shot.outcome !== 'Goal').map((shot, index) => {
                   const x = (shot.x_coordinate / 100) * 140 + 5;
                   const y = (shot.y_coordinate / 100) * 90 + 5;
+                  
+                  // Vary shot visualization based on attributes
+                  const shotSize = attributes ? 
+                    1.5 + (attributes.positioning / 100) * 1 : 2;
                   
                   return (
                     <circle
                       key={`shot-${index}`}
                       cx={x}
                       cy={y}
-                      r="2"
+                      r={shotSize}
                       fill="#ef4444"
                       opacity="0.4"
                     />
@@ -97,7 +119,7 @@ export const GoalCoordinatesHeatmap = ({ player }: GoalCoordinatesHeatmapProps) 
             </div>
           </AspectRatio>
 
-          {/* Legend */}
+          {/* Enhanced Legend with attribute context */}
           <div className="flex items-center justify-center gap-4 sm:gap-6 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-green-500"></div>
@@ -109,8 +131,8 @@ export const GoalCoordinatesHeatmap = ({ player }: GoalCoordinatesHeatmapProps) 
             </div>
           </div>
 
-          {/* Stats */}
-          <div className="grid grid-cols-3 gap-2 sm:gap-4 text-center pt-4 border-t">
+          {/* Enhanced Stats with attribute insights */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4 text-center pt-4 border-t">
             <div>
               <div className="text-base sm:text-lg font-bold text-green-600">{playerGoals.length}</div>
               <div className="text-xs text-muted-foreground">Goals</div>
@@ -125,7 +147,38 @@ export const GoalCoordinatesHeatmap = ({ player }: GoalCoordinatesHeatmapProps) 
               </div>
               <div className="text-xs text-muted-foreground">Conversion</div>
             </div>
+            {attributes && (
+              <div>
+                <div className="text-base sm:text-lg font-bold text-orange-600">{shootingEfficiency}</div>
+                <div className="text-xs text-muted-foreground">Shot Quality</div>
+              </div>
+            )}
           </div>
+
+          {/* Player shooting profile based on attributes */}
+          {attributes && (
+            <div className="bg-club-black/20 light:bg-gray-50 rounded-lg p-3 mt-4">
+              <h4 className="font-semibold text-club-gold light:text-yellow-600 mb-2">Shooting Profile</h4>
+              <div className="grid grid-cols-2 gap-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-club-light-gray light:text-gray-700">Finishing:</span>
+                  <span className="font-medium">{attributes.finishing}/100</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-club-light-gray light:text-gray-700">Positioning:</span>
+                  <span className="font-medium">{attributes.positioning}/100</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-club-light-gray light:text-gray-700">Preferred Foot:</span>
+                  <span className="font-medium">{attributes.preferred_foot}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-club-light-gray light:text-gray-700">Weak Foot:</span>
+                  <span className="font-medium">★{attributes.weak_foot_rating}</span>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>
