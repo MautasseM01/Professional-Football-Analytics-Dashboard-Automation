@@ -125,8 +125,8 @@ export const PassingNetwork = ({
   return (
     <div className="space-y-4">
       <div className={getContainerClasses()}>
-        {/* iOS-style control bar */}
-        <div className="absolute top-4 right-4 z-20 flex gap-2">
+        {/* iOS-style control bar - Updated z-index to appear under header */}
+        <div className="absolute top-4 right-4 z-10 flex gap-2">
           <Button
             variant="secondary"
             size="sm"
