@@ -16,15 +16,15 @@ import { ResponsiveGrid } from "@/components/ResponsiveLayout";
 import { BackToTopButton } from "@/components/BackToTopButton";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { Button } from "@/components/ui/button";
-import { RefreshCw, Menu } from "lucide-react";
+import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { RefreshCw, Menu, RotateCcw } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 
 const GoalsAssistsAnalysis = () => {
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const { data: players = [], isLoading: playersLoading, error: playersError, refetch: refetchPlayers } = useRealPlayers();
   const { goals, assists, loading: goalsLoading, refetch: refetchGoals } = useGoalsData(selectedPlayer);
@@ -55,126 +55,127 @@ const GoalsAssistsAnalysis = () => {
     }
   };
 
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
   return (
-    <div className="min-h-screen bg-gradient-to-br from-club-black via-club-dark-gray to-club-black text-white w-full">
-      <div className="flex h-screen overflow-hidden w-full">
-        <DashboardSidebar />
-        
-        {/* Main content area */}
-        <main className={cn(
-          "flex-1 overflow-auto transition-all duration-300 ease-in-out flex flex-col",
-          isMobile && "pt-16"
-        )}>
-          {/* Header bar aligned with sidebar */}
-          <div className="border-b border-club-gold/20 bg-club-black/95 backdrop-blur-sm px-4 py-4 flex items-center justify-between min-h-[73px] flex-shrink-0 sticky top-0 z-20">
-            <div className="flex items-center gap-4">
-              {/* Mobile menu toggle */}
-              {isMobile && (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={toggleSidebar}
-                  className="text-club-gold hover:text-club-gold/80 hover:bg-club-gold/10"
-                >
-                  <Menu size={20} />
-                </Button>
-              )}
-              
-              <div className="flex flex-col">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold">
-                  Goals & Assists Analysis
-                </h1>
-                <p className="text-sm text-club-light-gray/80 hidden sm:block">
-                  Comprehensive analysis of goals and assists performance
-                </p>
-              </div>
+    <div className="flex h-screen bg-gradient-to-br from-slate-900 via-club-black to-slate-900 dark:from-slate-900 dark:via-club-black dark:to-slate-900 light:from-gray-50 light:via-white light:to-gray-50 text-gray-100 dark:text-gray-100 light:text-gray-900 transition-colors duration-300">
+      {showSidebar && <DashboardSidebar />}
+      
+      <div className="flex-1 overflow-auto min-w-0">
+        <header className="border-b border-club-gold/20 dark:border-club-gold/20 light:border-gray-200 bg-club-black/80 dark:bg-club-black/80 light:bg-white/95 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
+          <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
+            {/* Left section - Title and page info */}
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-club-gold dark:text-club-gold light:text-yellow-600 truncate">
+                Goals & Assists Analysis
+              </h2>
+              <p className="text-ios-caption text-gray-400 dark:text-gray-400 light:text-gray-600 truncate">
+                Comprehensive analysis of goals and assists performance
+              </p>
             </div>
             
-            {/* Header controls */}
-            <div className="flex items-center gap-2">
+            {/* Right section - Controls */}
+            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-shrink-0">
+              {/* Language Selector */}
               <LanguageSelector />
+              
+              {/* Theme Toggle */}
               <ThemeToggle />
-              <Button
+              
+              {/* Refresh Button */}
+              <TouchFeedbackButton
                 variant="outline"
                 size="icon"
+                className="bg-club-black/50 dark:bg-club-black/50 light:bg-white/90 border-club-gold/30 dark:border-club-gold/30 light:border-gray-300 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 light:hover:bg-yellow-600/20 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm"
                 onClick={handleRefresh}
-                disabled={isRefreshing}
-                className="text-club-gold border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors h-9 w-9 sm:h-10 sm:w-10 bg-club-black/50 hover:border-club-gold/30"
                 title="Refresh data"
+                hapticType="medium"
+                disabled={isRefreshing}
               >
-                <RefreshCw size={16} className={cn("sm:hidden", isRefreshing && "animate-spin")} />
-                <RefreshCw size={18} className={cn("hidden sm:block", isRefreshing && "animate-spin")} />
-              </Button>
+                <RefreshCw size={14} className={`sm:hidden text-club-gold light:text-yellow-600 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <RefreshCw size={16} className={`hidden sm:block lg:hidden text-club-gold light:text-yellow-600 ${isRefreshing ? 'animate-spin' : ''}`} />
+                <RefreshCw size={18} className={`hidden lg:block text-club-gold light:text-yellow-600 ${isRefreshing ? 'animate-spin' : ''}`} />
+              </TouchFeedbackButton>
               
-              {/* Mobile menu toggle for small screens */}
-              {isMobile && (
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={toggleSidebar}
-                  className="text-club-gold border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors h-9 w-9 bg-club-black/50 hover:border-club-gold/30"
-                >
-                  <Menu size={20} />
-                </Button>
-              )}
+              {/* Menu Toggle */}
+              <TouchFeedbackButton
+                variant="outline"
+                size="icon"
+                onClick={() => setShowSidebar(!showSidebar)}
+                className="bg-club-black/50 dark:bg-club-black/50 light:bg-white/90 border-club-gold/30 dark:border-club-gold/30 light:border-gray-300 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 light:hover:bg-yellow-600/20 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm"
+                title="Toggle sidebar"
+                hapticType="light"
+              >
+                <Menu size={16} className="sm:hidden text-club-gold light:text-yellow-600" />
+                <Menu size={18} className="hidden sm:block lg:hidden text-club-gold light:text-yellow-600" />
+                <Menu size={20} className="hidden lg:block text-club-gold light:text-yellow-600" />
+              </TouchFeedbackButton>
             </div>
           </div>
-          
-          {/* Page content */}
-          <div className="flex-1 overflow-auto">
-            <div className="w-full max-w-7xl mx-auto space-y-4 sm:space-y-6 p-4 sm:p-6">
-              {/* Player Selection */}
-              <div className="w-full max-w-md">
-                <PlayerSelector
-                  players={players}
-                  selectedPlayer={selectedPlayer}
-                  onPlayerSelect={handlePlayerSelect}
-                  loading={playersLoading}
-                  error={playersError?.message || null}
-                />
+        </header>
+        
+        <main className="bg-transparent transition-colors duration-300 w-full">
+          <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+            {/* Mobile landscape orientation message */}
+            {isMobile && (
+              <Alert className="bg-blue-500/10 light:bg-blue-600/20 border-blue-500/30 light:border-blue-600/40">
+                <RotateCcw className="h-4 w-4" />
+                <AlertDescription className="text-club-light-gray light:text-gray-700 text-sm">
+                  For better chart viewing, try rotating your device to landscape mode.
+                </AlertDescription>
+              </Alert>
+            )}
+
+            {/* Player Selector */}
+            <PlayerSelector
+              players={players}
+              selectedPlayer={selectedPlayer}
+              onPlayerSelect={handlePlayerSelect}
+              loading={playersLoading}
+              error={playersError?.message || null}
+            />
+
+            {/* Goals & Assists Analysis Content */}
+            {selectedPlayer && (
+              <div className="space-y-4 sm:space-y-6">
+                {/* Goals Timeline */}
+                <GoalsTimeline player={selectedPlayer} />
+                
+                {/* Goal Analysis Row */}
+                <ResponsiveGrid minCardWidth="320px">
+                  <GoalTypesAnalysis player={selectedPlayer} />
+                  <BodyPartAnalysis player={selectedPlayer} />
+                </ResponsiveGrid>
+
+                {/* Assist Analysis Row */}
+                <ResponsiveGrid minCardWidth="320px">
+                  <AssistNetwork player={selectedPlayer} />
+                  <AssistTypesBreakdown player={selectedPlayer} />
+                </ResponsiveGrid>
+
+                {/* Advanced Analysis */}
+                <ResponsiveGrid minCardWidth="400px">
+                  <GoalCoordinatesHeatmap player={selectedPlayer} />
+                  <PartnershipAnalysis player={selectedPlayer} />
+                </ResponsiveGrid>
               </div>
+            )}
 
-              {selectedPlayer && (
-                <div className="space-y-4 sm:space-y-6">
-                  {/* Goals Timeline */}
-                  <GoalsTimeline player={selectedPlayer} />
-                  
-                  {/* Goal Analysis Row */}
-                  <ResponsiveGrid minCardWidth="320px">
-                    <GoalTypesAnalysis player={selectedPlayer} />
-                    <BodyPartAnalysis player={selectedPlayer} />
-                  </ResponsiveGrid>
-
-                  {/* Assist Analysis Row */}
-                  <ResponsiveGrid minCardWidth="320px">
-                    <AssistNetwork player={selectedPlayer} />
-                    <AssistTypesBreakdown player={selectedPlayer} />
-                  </ResponsiveGrid>
-
-                  {/* Advanced Analysis */}
-                  <ResponsiveGrid minCardWidth="400px">
-                    <GoalCoordinatesHeatmap player={selectedPlayer} />
-                    <PartnershipAnalysis player={selectedPlayer} />
-                  </ResponsiveGrid>
-                </div>
-              )}
-
-              {!selectedPlayer && (
-                <div className="text-center py-12">
-                  <p className="text-club-light-gray/80 text-lg">
-                    Select a player to view their goals and assists analysis
+            {/* No player selected message */}
+            {!selectedPlayer && !playersLoading && (
+              <div className="flex items-center justify-center min-h-[50vh] text-center px-4">
+                <div className="space-y-2">
+                  <p className="text-base sm:text-lg text-club-light-gray light:text-gray-700">
+                    No player selected
+                  </p>
+                  <p className="text-xs sm:text-sm text-club-light-gray/60 light:text-gray-600">
+                    Please select a player to view their goals and assists analysis
                   </p>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </main>
       </div>
-      
+
       <BackToTopButton />
     </div>
   );
