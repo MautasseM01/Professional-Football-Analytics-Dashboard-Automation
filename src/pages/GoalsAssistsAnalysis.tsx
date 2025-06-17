@@ -96,6 +96,8 @@ const GoalsAssistsAnalysis = () => {
             
             {/* Header controls */}
             <div className="flex items-center gap-2">
+              <LanguageSelector />
+              <ThemeToggle />
               <Button
                 variant="outline"
                 size="icon"
@@ -108,11 +110,17 @@ const GoalsAssistsAnalysis = () => {
                 <RefreshCw size={18} className={cn("hidden sm:block", isRefreshing && "animate-spin")} />
               </Button>
               
-              {/* Desktop controls */}
-              <div className="hidden lg:flex items-center gap-2">
-                <LanguageSelector />
-                <ThemeToggle />
-              </div>
+              {/* Mobile menu toggle for small screens */}
+              {isMobile && (
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={toggleSidebar}
+                  className="text-club-gold border-club-gold/20 hover:bg-club-gold/10 hover:text-club-gold transition-colors h-9 w-9 bg-club-black/50 hover:border-club-gold/30"
+                >
+                  <Menu size={20} />
+                </Button>
+              )}
             </div>
           </div>
           
