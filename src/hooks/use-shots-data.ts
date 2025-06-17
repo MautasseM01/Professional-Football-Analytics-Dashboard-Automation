@@ -1,135 +1,85 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Shot, ShotFilters, ShotOutcome } from "@/types/shot";
 import { Player } from "@/types";
-import { toast } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
-export const useShotsData = () => {
-  const [shots, setShots] = useState<Shot[]>([]);
-  const [filteredShots, setFilteredShots] = useState<Shot[]>([]);
-  const [filters, setFilters] = useState<ShotFilters>({});
-  const [matches, setMatches] = useState<{ id: number; name: string }[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [filterLoading, setFilterLoading] = useState(false);
+export interface ShotData {
+  id: number;
+  player_id: number;
+  match_id: number;
+  minute: number;
+  period: string;
+  outcome: string;
+  x_coordinate: number;
+  y_coordinate: number;
+  distance?: number;
+  assisted_by?: string;
+  match_name: string;
+  date: string;
+}
+
+export const useShotsData = (player?: Player | null) => {
+  const [shots, setShots] = useState<ShotData[]>([]);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch shots data
+  const fetchShotsData = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      console.log('Fetching shots data');
+
+      let query = supabase
+        .from("shots")
+        .select('*');
+
+      if (player) {
+        query = query.eq('player_id', player.id);
+      }
+
+      const { data: shotsData, error: shotsError } = await query;
+
+      if (shotsError) {
+        console.error("Error fetching shots:", shotsError);
+        throw shotsError;
+      }
+
+      const transformedShots: ShotData[] = (shotsData || []).map((shot: any) => ({
+        id: shot.id,
+        player_id: shot.player_id,
+        match_id: shot.match_id,
+        minute: shot.minute,
+        period: shot.period || 'First Half',
+        outcome: shot.outcome || 'Miss',
+        x_coordinate: shot.x_coordinate || 0,
+        y_coordinate: shot.y_coordinate || 0,
+        distance: shot.distance,
+        assisted_by: shot.assisted_by,
+        match_name: shot.match_name || 'Unknown Match',
+        date: shot.date || '',
+      }));
+
+      setShots(transformedShots);
+      console.log('Shots data:', transformedShots);
+
+    } catch (err: any) {
+      console.error("Error fetching shots data:", err);
+      setError(err.message);
+      toast.error(`Failed to load shots data: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  }, [player?.id]);
+
   useEffect(() => {
-    const fetchShots = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    fetchShotsData();
+  }, [fetchShotsData]);
 
-        const { data, error: fetchError } = await supabase
-          .from("shots")
-          .select("*, players(name)")
-          .order("match_id", { ascending: false })
-          .order("minute", { ascending: true });
+  const refetch = useCallback(() => {
+    return fetchShotsData();
+  }, [fetchShotsData]);
 
-        if (fetchError) {
-          throw new Error(`Error fetching shots data: ${fetchError.message}`);
-        }
-
-        // Process the data to include player name from the join and ensure types are correct
-        const processedData: Shot[] = data?.map(shot => ({
-          id: shot.id,
-          player_id: shot.player_id,
-          player_name: shot.players?.name || "Unknown Player",
-          match_id: shot.match_id,
-          match_name: shot.match_name,
-          x_coordinate: shot.x_coordinate,
-          y_coordinate: shot.y_coordinate,
-          minute: shot.minute,
-          // Ensure period is cast to the correct type
-          period: shot.period as "First Half" | "Second Half" | "Extra Time" | "Penalties",
-          outcome: shot.outcome as ShotOutcome,
-          assisted_by: shot.assisted_by || undefined,
-          distance: shot.distance || undefined,
-          date: shot.date
-        })) || [];
-
-        setShots(processedData);
-        setFilteredShots(processedData);
-
-        // Extract unique matches for the filter
-        const uniqueMatches = Array.from(
-          new Set(processedData.map(shot => shot.match_id))
-        ).map(id => {
-          const shot = processedData.find(s => s.match_id === id);
-          return {
-            id: id as number,
-            name: shot?.match_name || `Match ${id}`
-          };
-        });
-
-        setMatches(uniqueMatches);
-      } catch (err: any) {
-        console.error("Error in useShotsData:", err);
-        setError(err.message);
-        toast("Data fetch error", {
-          description: `Could not load shots data: ${err.message}`,
-        });
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchShots();
-  }, []);
-
-  // Apply filters whenever filters change
-  useEffect(() => {
-    const applyFilters = () => {
-      let result = [...shots];
-
-      if (filters.playerId) {
-        result = result.filter(shot => shot.player_id === filters.playerId);
-      }
-
-      if (filters.matchId) {
-        result = result.filter(shot => shot.match_id === filters.matchId);
-      }
-
-      if (filters.period) {
-        result = result.filter(shot => shot.period === filters.period);
-      }
-
-      if (filters.outcome) {
-        result = result.filter(shot => shot.outcome === filters.outcome);
-      }
-
-      setFilteredShots(result);
-    };
-
-    applyFilters();
-  }, [filters, shots]);
-
-  // Update filters
-  const updateFilters = (newFilters: Partial<ShotFilters>) => {
-    setFilterLoading(true);
-    setFilters(prev => ({ ...prev, ...newFilters }));
-    // Add a small delay to simulate network request and ensure the loading state is visible
-    setTimeout(() => setFilterLoading(false), 500);
-  };
-
-  // Reset filters
-  const resetFilters = () => {
-    setFilterLoading(true);
-    setFilters({});
-    // Add a small delay to simulate network request and ensure the loading state is visible
-    setTimeout(() => setFilterLoading(false), 500);
-  };
-
-  return {
-    shots: filteredShots,
-    allShots: shots,
-    matches,
-    filters,
-    updateFilters,
-    resetFilters,
-    loading,
-    filterLoading,
-    error
-  };
+  return { shots, loading, error, refetch };
 };

@@ -18,11 +18,13 @@ export interface GoalData {
   is_header: boolean;
   is_penalty: boolean;
   is_free_kick: boolean;
+  is_volley: boolean;
   assisted_by_player_id?: number;
   assisted_by_name?: string;
   match_name: string;
   match_date: string;
   difficulty_rating?: number;
+  description?: string;
 }
 
 export interface AssistData {
@@ -64,7 +66,7 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
         goalsQuery = goalsQuery.eq('match_id', matchId);
       }
 
-      const { data: goalsData, error: goalsError } = await goalsQuery;
+      const { data: goalsData, error: goalsError } = await goalsQuery.order('created_at', { ascending: false });
 
       if (goalsError) {
         console.error("Error fetching goals:", goalsError);
@@ -84,14 +86,14 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
         assistsQuery = assistsQuery.eq('match_id', matchId);
       }
 
-      const { data: assistsData, error: assistsError } = await assistsQuery;
+      const { data: assistsData, error: assistsError } = await assistsQuery.order('created_at', { ascending: false });
 
       if (assistsError) {
         console.error("Error fetching assists:", assistsError);
         throw assistsError;
       }
 
-      // Fetch matches data separately
+      // Fetch matches data for goal context
       const uniqueMatchIds = [
         ...new Set([
           ...(goalsData || []).map(g => g.match_id),
@@ -103,7 +105,7 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
       if (uniqueMatchIds.length > 0) {
         const { data: matches, error: matchesError } = await supabase
           .from("matches")
-          .select('id, date, opponent')
+          .select('id, date, opponent, result')
           .in('id', uniqueMatchIds);
 
         if (matchesError) {
@@ -113,7 +115,7 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
         }
       }
 
-      // Fetch assist providers (players)
+      // Fetch assist providers (players) for goals
       const uniqueAssistProviderIds = (goalsData || [])
         .filter(g => g.assisted_by_player_id)
         .map(g => g.assisted_by_player_id);
@@ -151,11 +153,13 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
           is_header: goal.is_header || false,
           is_penalty: goal.is_penalty || false,
           is_free_kick: goal.is_free_kick || false,
+          is_volley: goal.is_volley || false,
           assisted_by_player_id: goal.assisted_by_player_id,
           assisted_by_name: assistProvider?.name,
           match_name: match ? `vs ${match.opponent}` : 'Unknown Match',
           match_date: match?.date || '',
           difficulty_rating: goal.difficulty_rating,
+          description: goal.description,
         };
       });
 
@@ -176,10 +180,6 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
           match_date: match?.date || '',
         };
       });
-
-      // Sort by date (most recent first)
-      transformedGoals.sort((a, b) => new Date(b.match_date).getTime() - new Date(a.match_date).getTime());
-      transformedAssists.sort((a, b) => new Date(b.match_date).getTime() - new Date(a.match_date).getTime());
 
       setGoals(transformedGoals);
       setAssists(transformedAssists);
