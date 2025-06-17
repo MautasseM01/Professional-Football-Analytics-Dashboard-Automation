@@ -37,6 +37,15 @@ export interface PlayerAttributes {
   holdup_play: number;
 }
 
+export interface PositionalAverage {
+  position: string;
+  finishing: number;
+  aerial_duels_won: number;
+  holdup_play: number;
+  pace: number;
+  work_rate_attacking: number;
+}
+
 export const usePlayerAttributes = (player?: Player | null) => {
   const [attributes, setAttributes] = useState<PlayerAttributes | null>(null);
   const [loading, setLoading] = useState(false);
