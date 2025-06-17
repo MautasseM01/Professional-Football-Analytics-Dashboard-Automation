@@ -7,7 +7,10 @@ import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { usePlayerMatchPerformance } from "@/hooks/use-player-match-performance";
 import { ChartLoadingSkeleton } from "@/components/LoadingStates";
-import { TrendingUp, Activity, Target, Users, Zap } from "lucide-react";
+import { ErrorFallback } from "@/components/ErrorStates/ErrorFallback";
+import { TrendingUp, Activity, Target, Users, Zap, Loader } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { useTheme } from "@/contexts/ThemeContext";
 
 interface EnhancedPerformanceChartProps {
   player: Player;
@@ -17,14 +20,74 @@ export const EnhancedPerformanceChart = ({ player }: EnhancedPerformanceChartPro
   const [selectedMetric, setSelectedMetric] = useState("match_rating");
   const [chartType, setChartType] = useState<"line" | "bar">("line");
   const { performances, loading, error } = usePlayerMatchPerformance(player, undefined, 15);
+  const { theme } = useTheme();
 
-  if (loading) return <ChartLoadingSkeleton />;
-  if (error) return <div className="text-red-500">Error: {error}</div>;
+  if (loading) {
+    return (
+      <Card className={cn(
+        "border-club-gold/20",
+        theme === 'dark' ? "bg-club-dark-gray" : "bg-white"
+      )}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-club-gold">
+            <TrendingUp className="w-5 h-5" />
+            Performance Trends
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center space-y-2">
+            <Loader className="h-8 w-8 text-club-gold animate-spin" />
+            <p className="text-sm text-club-light-gray">Loading performance trends...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (error) {
+    return (
+      <Card className={cn(
+        "border-club-gold/20",
+        theme === 'dark' ? "bg-club-dark-gray" : "bg-white"
+      )}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-club-gold">
+            <TrendingUp className="w-5 h-5" />
+            Performance Trends
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <ErrorFallback 
+            title="Performance trends error"
+            description={`Failed to load performance trends: ${error}`}
+          />
+        </CardContent>
+      </Card>
+    );
+  }
+
   if (!performances || performances.length === 0) {
     return (
-      <Card>
-        <CardContent className="py-12">
-          <p className="text-center text-muted-foreground">No performance data available</p>
+      <Card className={cn(
+        "border-club-gold/20",
+        theme === 'dark' ? "bg-club-dark-gray" : "bg-white"
+      )}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-club-gold">
+            <TrendingUp className="w-5 h-5" />
+            Performance Trends
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-center py-12">
+          <div className="space-y-4">
+            <TrendingUp className="w-12 h-12 mx-auto text-club-light-gray/40 light:text-gray-400" />
+            <div>
+              <p className="text-club-light-gray light:text-gray-700">No performance data available</p>
+              <p className="text-sm text-club-light-gray/60 light:text-gray-500 mt-1">
+                No match performance data to create trends analysis
+              </p>
+            </div>
+          </div>
         </CardContent>
       </Card>
     );
@@ -84,10 +147,15 @@ export const EnhancedPerformanceChart = ({ player }: EnhancedPerformanceChartPro
   };
 
   return (
-    <Card>
+    <Card className={cn(
+      "border-club-gold/20 transition-all duration-300",
+      theme === 'dark' 
+        ? "bg-club-dark-gray hover:bg-club-dark-gray/80" 
+        : "bg-white hover:bg-gray-50"
+    )}>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="flex items-center gap-2">
+          <CardTitle className="flex items-center gap-2 text-club-gold">
             {selectedMetricOption?.icon && <selectedMetricOption.icon className="h-5 w-5" />}
             Performance Trends
           </CardTitle>
