@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line } from "recharts";
+import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, LineChart, Line, BarChart, Bar } from "recharts";
 import { usePlayerMatchPerformance } from "@/hooks/use-player-match-performance";
 import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { ErrorFallback } from "@/components/ErrorStates/ErrorFallback";
@@ -100,6 +100,9 @@ const CHART_VIEW_OPTIONS = [{
 }, {
   value: "line",
   label: "Line Chart"
+}, {
+  value: "bar",
+  label: "Bar Chart"
 }];
 
 export const PerformanceTrendsCard = ({
@@ -396,8 +399,6 @@ export const PerformanceTrendsCard = ({
               <Switch id="movingAverage" checked={showMovingAverage} onCheckedChange={setShowMovingAverage} className="data-[state=checked]:bg-club-gold" />
             </div>
           </div>
-          
-          
         </div>
 
         {/* Statistics Display */}
@@ -454,7 +455,7 @@ export const PerformanceTrendsCard = ({
               r: 4
             }} />
                 {showMovingAverage && <Area type="monotone" dataKey="movingAvg" stroke="#9CA3AF" strokeDasharray="5 5" strokeWidth={2} fill="transparent" dot={false} />}
-              </AreaChart> : <LineChart data={chartData}>
+              </AreaChart> : chartView === "line" ? <LineChart data={chartData}>
                 <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "#333" : "#e5e7eb"} opacity={0.3} />
                 <XAxis dataKey="match" stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"} tick={{
               fill: theme === 'dark' ? "#9CA3AF" : "#6B7280",
@@ -471,7 +472,19 @@ export const PerformanceTrendsCard = ({
               r: 4
             }} />
                 {showMovingAverage && <Line type="monotone" dataKey="movingAvg" stroke="#9CA3AF" strokeDasharray="5 5" strokeWidth={2} dot={false} />}
-              </LineChart>}
+              </LineChart> : <BarChart data={chartData}>
+                <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "#333" : "#e5e7eb"} opacity={0.3} />
+                <XAxis dataKey="match" stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"} tick={{
+              fill: theme === 'dark' ? "#9CA3AF" : "#6B7280",
+              fontSize: 12
+            }} angle={-45} textAnchor="end" height={80} />
+                <YAxis stroke={theme === 'dark' ? "#9CA3AF" : "#6B7280"} tick={{
+              fill: theme === 'dark' ? "#9CA3AF" : "#6B7280",
+              fontSize: 12
+            }} />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar dataKey="value" fill="#D4AF37" radius={[4, 4, 0, 0]} />
+              </BarChart>}
           </ResponsiveContainer>
         </div>
       </CardContent>
