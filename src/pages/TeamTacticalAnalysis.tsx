@@ -181,6 +181,23 @@ const TeamTacticalAnalysis = () => {
                   </Select>
                 </div>
 
+                {/* Data Limit Selection for Match Ratings */}
+                <div className="space-y-2">
+                  <Label className="text-sm font-medium text-club-light-gray">Analysis Depth</Label>
+                  <Select value={selectedLimit.toString()} onValueChange={(value) => setSelectedLimit(parseInt(value))}>
+                    <SelectTrigger className="w-full bg-club-black border-club-gold/30 text-club-light-gray min-h-[44px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
+                      <SelectItem value="5">Last 5 matches</SelectItem>
+                      <SelectItem value="10">Last 10 matches</SelectItem>
+                      <SelectItem value="15">Last 15 matches</SelectItem>
+                      <SelectItem value="20">Last 20 matches</SelectItem>
+                      <SelectItem value="50">All matches</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+
                 {/* Pass Direction Filter */}
                 <div className="space-y-3">
                   <Label className="flex items-center gap-2 text-sm font-medium text-club-light-gray">
@@ -195,29 +212,25 @@ const TeamTacticalAnalysis = () => {
                   >
                     <ToggleGroupItem 
                       value="all" 
-                      aria-label="All directions"
-                      className="min-h-[44px] min-w-[80px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
+                      className="bg-club-black border-club-gold/30 text-club-light-gray data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold min-h-[44px] px-4"
                     >
-                      All
+                      All Directions
                     </ToggleGroupItem>
                     <ToggleGroupItem 
                       value="forward" 
-                      aria-label="Forward passes"
-                      className="min-h-[44px] min-w-[80px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
+                      className="bg-club-black border-club-gold/30 text-club-light-gray data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold min-h-[44px] px-4"
                     >
                       Forward
                     </ToggleGroupItem>
                     <ToggleGroupItem 
                       value="backward" 
-                      aria-label="Backward passes"
-                      className="min-h-[44px] min-w-[80px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
+                      className="bg-club-black border-club-gold/30 text-club-light-gray data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold min-h-[44px] px-4"
                     >
                       Backward
                     </ToggleGroupItem>
                     <ToggleGroupItem 
                       value="sideways" 
-                      aria-label="Sideways passes"
-                      className="min-h-[44px] min-w-[80px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
+                      className="bg-club-black border-club-gold/30 text-club-light-gray data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold min-h-[44px] px-4"
                     >
                       Sideways
                     </ToggleGroupItem>
@@ -238,246 +251,164 @@ const TeamTacticalAnalysis = () => {
                   >
                     <ToggleGroupItem 
                       value="all" 
-                      aria-label="All passes"
-                      className="min-h-[44px] min-w-[80px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
+                      className="bg-club-black border-club-gold/30 text-club-light-gray data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold min-h-[44px] px-4"
                     >
-                      All
+                      All Outcomes
                     </ToggleGroupItem>
                     <ToggleGroupItem 
-                      value="successful" 
-                      aria-label="Successful passes"
-                      className="min-h-[44px] min-w-[100px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
+                      value="completed" 
+                      className="bg-club-black border-club-gold/30 text-club-light-gray data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold min-h-[44px] px-4"
                     >
-                      Successful
+                      Completed
                     </ToggleGroupItem>
                     <ToggleGroupItem 
-                      value="unsuccessful" 
-                      aria-label="Unsuccessful passes"
-                      className="min-h-[44px] min-w-[100px] flex-1 sm:flex-none data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold border-club-gold/30"
+                      value="incomplete" 
+                      className="bg-club-black border-club-gold/30 text-club-light-gray data-[state=on]:bg-club-gold/20 data-[state=on]:text-club-gold min-h-[44px] px-4"
                     >
-                      Unsuccessful
+                      Incomplete
                     </ToggleGroupItem>
                   </ToggleGroup>
                 </div>
+              </CardContent>
+            </Card>
 
-                {/* Limit Selection for Match Ratings */}
-                <div className="space-y-2">
-                  <Label className="text-sm font-medium text-club-light-gray">Match Ratings Limit</Label>
-                  <Select value={selectedLimit.toString()} onValueChange={(value) => setSelectedLimit(parseInt(value))}>
-                    <SelectTrigger className="w-full bg-club-black border-club-gold/30 text-club-light-gray min-h-[44px]">
-                      <SelectValue placeholder="Limit" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-                      <SelectItem value="5">5</SelectItem>
-                      <SelectItem value="10">10</SelectItem>
-                      <SelectItem value="20">20</SelectItem>
-                      <SelectItem value="50">All</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
+            {/* Main Analysis Tabs */}
+            <Tabs defaultValue="overview" className="space-y-6">
+              <TabsList className="bg-club-dark-gray/50 border-club-gold/20 flex-wrap h-auto p-1">
+                <TabsTrigger 
+                  value="overview" 
+                  className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-responsive-sm px-3 py-2"
+                >
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="trends" 
+                  className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-responsive-sm px-3 py-2"
+                >
+                  Season Trends
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="network" 
+                  className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-responsive-sm px-3 py-2"
+                >
+                  Passing Network
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="players" 
+                  className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-responsive-sm px-3 py-2"
+                >
+                  Player Ratings
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="correlation" 
+                  className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-responsive-sm px-3 py-2"
+                >
+                  Correlations
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="motm" 
+                  className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-responsive-sm px-3 py-2"
+                >
+                  MOTM Tracking
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="opposition" 
+                  className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-responsive-sm px-3 py-2"
+                >
+                  Opposition
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="formation" 
+                  className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-responsive-sm px-3 py-2"
+                >
+                  Formation
+                </TabsTrigger>
+              </TabsList>
 
-                {/* Error Display */}
-                {imageLoadingError && (
-                  <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg">
-                    <div className="flex items-center gap-2 text-amber-600 mb-2">
-                      <AlertCircle size={16} />
-                      <span className="text-sm font-medium">Image Loading Issues</span>
-                    </div>
-                    <TouchFeedbackButton
-                      onClick={handleImageRetry}
-                      variant="outline"
-                      size="sm"
-                      className="w-full min-h-[44px] text-sm"
-                      hapticType="medium"
-                    >
-                      <RefreshCw size={14} className="mr-2" />
-                      Retry Loading Images
-                    </TouchFeedbackButton>
-                  </div>
+              <TabsContent value="overview" className="space-y-6">
+                {ratingsLoading ? (
+                  <LoadingOverlay message="Loading match ratings analysis..." />
+                ) : ratingsError ? (
+                  <Card className="bg-club-dark-gray/50 border-club-gold/20">
+                    <CardContent className="py-12">
+                      <div className="text-center space-y-4">
+                        <AlertCircle className="h-12 w-12 mx-auto text-red-500" />
+                        <div>
+                          <h3 className="text-lg font-semibold text-red-500">Failed to Load Data</h3>
+                          <p className="text-club-light-gray/70">{ratingsError}</p>
+                        </div>
+                        <TouchFeedbackButton 
+                          onClick={handleRefresh}
+                          variant="outline"
+                          className="border-club-gold/30 text-club-gold hover:bg-club-gold/10"
+                        >
+                          Retry
+                        </TouchFeedbackButton>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ) : (
+                  <MatchRatingsDashboard ratings={ratings || []} />
                 )}
-              </CardContent>
-            </Card>
+              </TabsContent>
 
-            {/* Main Content Tabs */}
-            <Card className="bg-club-dark-gray/50 border-club-gold/20">
-              <CardContent className="p-4 sm:p-6">
-                <Tabs defaultValue="tactical" className="w-full">
-                  {/* Tab Navigation with proper spacing */}
-                  <div className="mb-6 sm:mb-8">
-                    <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 lg:grid-cols-8 bg-club-black/30 gap-1 p-1 h-auto min-h-[48px]">
-                      <TabsTrigger 
-                        value="tactical" 
-                        className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-3 text-club-light-gray h-auto min-h-[40px] whitespace-nowrap"
-                      >
-                        Tactical
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="ratings-dashboard" 
-                        className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-3 text-club-light-gray h-auto min-h-[40px] whitespace-nowrap"
-                      >
-                        Ratings
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="player-ratings" 
-                        className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-3 text-club-light-gray h-auto min-h-[40px] whitespace-nowrap"
-                      >
-                        Players
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="correlation" 
-                        className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-3 text-club-light-gray h-auto min-h-[40px] whitespace-nowrap"
-                      >
-                        Correlation
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="motm" 
-                        className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-3 text-club-light-gray h-auto min-h-[40px] whitespace-nowrap"
-                      >
-                        MOTM
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="opposition" 
-                        className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-3 text-club-light-gray h-auto min-h-[40px] whitespace-nowrap"
-                      >
-                        Opposition
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="trends" 
-                        className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-3 text-club-light-gray h-auto min-h-[40px] whitespace-nowrap"
-                      >
-                        Trends
-                      </TabsTrigger>
-                      <TabsTrigger 
-                        value="formation" 
-                        className="data-[state=active]:bg-club-gold/20 data-[state=active]:text-club-gold text-xs sm:text-sm px-2 py-3 text-club-light-gray h-auto min-h-[40px] whitespace-nowrap"
-                      >
-                        Formation
-                      </TabsTrigger>
-                    </TabsList>
-                  </div>
+              <TabsContent value="trends" className="space-y-6">
+                {ratingsLoading ? (
+                  <LoadingOverlay message="Loading seasonal performance trends..." />
+                ) : (
+                  <SeasonPerformanceTrends ratings={ratings || []} />
+                )}
+              </TabsContent>
 
-                  {/* Tab Content with clear separation */}
-                  <div className="w-full">
-                    <TabsContent value="tactical" className="space-y-6 mt-0">
-                      {/* Passing Network */}
-                      <Card className="bg-club-black/30 border-club-gold/20 min-h-[500px]">
-                        <CardHeader className="pb-4">
-                          <CardTitle className="text-lg sm:text-xl text-club-gold">Passing Network</CardTitle>
-                          <CardDescription className="text-sm text-club-light-gray/70">
-                            Player positioning and passing connections
-                          </CardDescription>
-                        </CardHeader>
-                        <CardContent className="h-[600px] p-6">
-                          {isLoadingMatches ? (
-                            <LoadingOverlay isLoading={true} />
-                          ) : (
-                            selectedMatch ? (
-                              <PassingNetwork 
-                                matchId={selectedMatch} 
-                                passDirectionFilter={passDirectionFilter}
-                                passOutcomeFilter={passOutcomeFilter}
-                              />
-                            ) : (
-                              <div className="flex items-center justify-center h-full text-club-light-gray">
-                                <div className="text-center space-y-2">
-                                  <p className="text-lg font-medium">
-                                    Select a match to view the passing network
-                                  </p>
-                                  <p className="text-sm opacity-75">
-                                    Choose from the filters above
-                                  </p>
-                                </div>
-                              </div>
-                            )
-                          )}
-                        </CardContent>
-                      </Card>
-                    </TabsContent>
+              <TabsContent value="network" className="space-y-6">
+                {selectedMatch ? (
+                  <PassingNetwork 
+                    matchId={selectedMatch}
+                    directionFilter={passDirectionFilter}
+                    outcomeFilter={passOutcomeFilter}
+                  />
+                ) : (
+                  <Card className="bg-club-dark-gray/50 border-club-gold/20">
+                    <CardContent className="py-12">
+                      <p className="text-center text-club-light-gray/70">Please select a match to view passing network</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
 
-                    <TabsContent value="ratings-dashboard" className="space-y-6 mt-0">
-                      {ratingsLoading ? (
-                        <LoadingOverlay isLoading={true} />
-                      ) : ratingsError ? (
-                        <Card className="bg-club-black/30 border-club-gold/20">
-                          <CardContent className="py-12">
-                            <p className="text-center text-red-400">Error loading ratings: {ratingsError}</p>
-                          </CardContent>
-                        </Card>
-                      ) : (
-                        <MatchRatingsDashboard ratings={ratings || []} />
-                      )}
-                    </TabsContent>
+              <TabsContent value="players" className="space-y-6">
+                <PlayerMatchRatings ratings={ratings || []} />
+              </TabsContent>
 
-                    <TabsContent value="player-ratings" className="space-y-6 mt-0">
-                      {ratingsLoading ? (
-                        <LoadingOverlay isLoading={true} />
-                      ) : (
-                        <PlayerMatchRatings ratings={ratings || []} />
-                      )}
-                    </TabsContent>
+              <TabsContent value="correlation" className="space-y-6">
+                <PerformanceCorrelation ratings={ratings || []} />
+              </TabsContent>
 
-                    <TabsContent value="correlation" className="space-y-6 mt-0">
-                      {ratingsLoading ? (
-                        <LoadingOverlay isLoading={true} />
-                      ) : (
-                        <PerformanceCorrelation ratings={ratings || []} />
-                      )}
-                    </TabsContent>
+              <TabsContent value="motm" className="space-y-6">
+                <ManOfMatchTracking ratings={ratings || []} />
+              </TabsContent>
 
-                    <TabsContent value="motm" className="space-y-6 mt-0">
-                      {ratingsLoading ? (
-                        <LoadingOverlay isLoading={true} />
-                      ) : (
-                        <ManOfMatchTracking ratings={ratings || []} />
-                      )}
-                    </TabsContent>
+              <TabsContent value="opposition" className="space-y-6">
+                <OppositionAnalysis ratings={ratings || []} />
+              </TabsContent>
 
-                    <TabsContent value="opposition" className="space-y-6 mt-0">
-                      {ratingsLoading ? (
-                        <LoadingOverlay isLoading={true} />
-                      ) : (
-                        <OppositionAnalysis ratings={ratings || []} />
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="trends" className="space-y-6 mt-0">
-                      {ratingsLoading ? (
-                        <LoadingOverlay isLoading={true} />
-                      ) : (
-                        <SeasonPerformanceTrends ratings={ratings || []} />
-                      )}
-                    </TabsContent>
-
-                    <TabsContent value="formation" className="space-y-6 mt-0">
-                      {/* Tactical Formation Images Section */}
-                      {selectedMatch ? (
-                        <Card className="bg-club-black/30 border-club-gold/20">
-                          <CardHeader className="pb-4">
-                            <CardTitle className="text-lg sm:text-xl text-club-gold">Tactical Formation Analysis</CardTitle>
-                            <CardDescription className="text-sm text-club-light-gray/70">
-                              Formation diagrams and tactical insights for the selected match
-                            </CardDescription>
-                          </CardHeader>
-                          <CardContent className="p-4 sm:p-6">
-                            <TacticalFormationImageView
-                              matchId={selectedMatch}
-                              onImageError={handleImageError}
-                              onImageRetry={handleImageRetry}
-                            />
-                          </CardContent>
-                        </Card>
-                      ) : (
-                        <Card className="bg-club-black/30 border-club-gold/20">
-                          <CardContent className="py-12">
-                            <p className="text-center text-club-light-gray">Select a match to view formation analysis</p>
-                          </CardContent>
-                        </Card>
-                      )}
-                    </TabsContent>
-                  </div>
-                </Tabs>
-              </CardContent>
-            </Card>
+              <TabsContent value="formation" className="space-y-6">
+                {selectedMatch ? (
+                  <TacticalFormationImageView 
+                    matchId={selectedMatch}
+                    onError={handleImageError}
+                    onRetry={handleImageRetry}
+                    hasError={imageLoadingError}
+                  />
+                ) : (
+                  <Card className="bg-club-dark-gray/50 border-club-gold/20">
+                    <CardContent className="py-12">
+                      <p className="text-center text-club-light-gray/70">Please select a match to view tactical formation</p>
+                    </CardContent>
+                  </Card>
+                )}
+              </TabsContent>
+            </Tabs>
           </div>
         </main>
       </div>
