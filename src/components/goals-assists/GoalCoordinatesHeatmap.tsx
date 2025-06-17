@@ -5,7 +5,7 @@ import { useGoalsData } from "@/hooks/use-goals-data";
 import { useShotsData } from "@/hooks/use-shots-data";
 import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { Badge } from "@/components/ui/badge";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
+import { ResponsiveChartContainer } from "@/components/ResponsiveChartContainer";
 
 interface GoalCoordinatesHeatmapProps {
   player: Player;
@@ -32,70 +32,81 @@ export const GoalCoordinatesHeatmap = ({ player }: GoalCoordinatesHeatmapProps) 
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {/* Football Pitch Visualization with AspectRatio for responsiveness */}
-          <AspectRatio ratio={1.5} className="w-full">
-            <div className="relative bg-green-100 rounded-lg p-2 sm:p-4 w-full h-full">
-              {/* Responsive SVG that scales with container */}
-              <svg 
-                className="w-full h-full" 
-                viewBox="0 0 150 100" 
-                preserveAspectRatio="xMidYMid meet"
-              >
-                {/* Pitch markings */}
-                {/* Pitch outline */}
-                <rect x="5" y="5" width="140" height="90" fill="none" stroke="#fff" strokeWidth="1"/>
-                
-                {/* Center circle */}
-                <circle cx="75" cy="50" r="15" fill="none" stroke="#fff" strokeWidth="1"/>
-                <line x1="75" y1="5" x2="75" y2="95" stroke="#fff" strokeWidth="1"/>
-                
-                {/* Goal areas */}
-                <rect x="5" y="35" width="18" height="30" fill="none" stroke="#fff" strokeWidth="1"/>
-                <rect x="127" y="35" width="18" height="30" fill="none" stroke="#fff" strokeWidth="1"/>
-                
-                {/* Penalty areas */}
-                <rect x="5" y="25" width="35" height="50" fill="none" stroke="#fff" strokeWidth="1"/>
-                <rect x="110" y="25" width="35" height="50" fill="none" stroke="#fff" strokeWidth="1"/>
-                
-                {/* Goals plotted */}
-                {playerGoals.map((goal, index) => {
-                  // Convert coordinates to pitch position (assuming x: 0-100, y: 0-100)
-                  const x = (goal.x_coordinate / 100) * 140 + 5;
-                  const y = (goal.y_coordinate / 100) * 90 + 5;
+          {/* Football Pitch Visualization with ResponsiveChartContainer */}
+          <div className="w-full max-w-full overflow-hidden">
+            <ResponsiveChartContainer 
+              className="w-full"
+              minHeight={300}
+              aspectRatio={1.5}
+            >
+              <div className="relative bg-green-100 rounded-lg p-2 sm:p-4 w-full h-full min-h-[300px]">
+                {/* Responsive SVG that scales with container */}
+                <svg 
+                  className="w-full h-full max-w-full max-h-full" 
+                  viewBox="0 0 150 100" 
+                  preserveAspectRatio="xMidYMid meet"
+                  style={{ 
+                    display: 'block',
+                    maxWidth: '100%',
+                    height: 'auto'
+                  }}
+                >
+                  {/* Pitch markings */}
+                  {/* Pitch outline */}
+                  <rect x="5" y="5" width="140" height="90" fill="none" stroke="#fff" strokeWidth="1"/>
                   
-                  return (
-                    <circle
-                      key={index}
-                      cx={x}
-                      cy={y}
-                      r="3"
-                      fill="#22c55e"
-                      stroke="#fff"
-                      strokeWidth="1"
-                      opacity="0.8"
-                    />
-                  );
-                })}
-                
-                {/* All shots (non-goals) */}
-                {playerShots.filter(shot => shot.outcome !== 'Goal').map((shot, index) => {
-                  const x = (shot.x_coordinate / 100) * 140 + 5;
-                  const y = (shot.y_coordinate / 100) * 90 + 5;
+                  {/* Center circle */}
+                  <circle cx="75" cy="50" r="15" fill="none" stroke="#fff" strokeWidth="1"/>
+                  <line x1="75" y1="5" x2="75" y2="95" stroke="#fff" strokeWidth="1"/>
                   
-                  return (
-                    <circle
-                      key={`shot-${index}`}
-                      cx={x}
-                      cy={y}
-                      r="2"
-                      fill="#ef4444"
-                      opacity="0.4"
-                    />
-                  );
-                })}
-              </svg>
-            </div>
-          </AspectRatio>
+                  {/* Goal areas */}
+                  <rect x="5" y="35" width="18" height="30" fill="none" stroke="#fff" strokeWidth="1"/>
+                  <rect x="127" y="35" width="18" height="30" fill="none" stroke="#fff" strokeWidth="1"/>
+                  
+                  {/* Penalty areas */}
+                  <rect x="5" y="25" width="35" height="50" fill="none" stroke="#fff" strokeWidth="1"/>
+                  <rect x="110" y="25" width="35" height="50" fill="none" stroke="#fff" strokeWidth="1"/>
+                  
+                  {/* Goals plotted */}
+                  {playerGoals.map((goal, index) => {
+                    // Convert coordinates to pitch position (assuming x: 0-100, y: 0-100)
+                    const x = (goal.x_coordinate / 100) * 140 + 5;
+                    const y = (goal.y_coordinate / 100) * 90 + 5;
+                    
+                    return (
+                      <circle
+                        key={index}
+                        cx={x}
+                        cy={y}
+                        r="3"
+                        fill="#22c55e"
+                        stroke="#fff"
+                        strokeWidth="1"
+                        opacity="0.8"
+                      />
+                    );
+                  })}
+                  
+                  {/* All shots (non-goals) */}
+                  {playerShots.filter(shot => shot.outcome !== 'Goal').map((shot, index) => {
+                    const x = (shot.x_coordinate / 100) * 140 + 5;
+                    const y = (shot.y_coordinate / 100) * 90 + 5;
+                    
+                    return (
+                      <circle
+                        key={`shot-${index}`}
+                        cx={x}
+                        cy={y}
+                        r="2"
+                        fill="#ef4444"
+                        opacity="0.4"
+                      />
+                    );
+                  })}
+                </svg>
+              </div>
+            </ResponsiveChartContainer>
+          </div>
 
           {/* Legend */}
           <div className="flex items-center justify-center gap-4 sm:gap-6 text-sm">
