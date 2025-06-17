@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/types";
-import { Trophy, DollarSign, AlertTriangle } from "lucide-react";
+import { Trophy, DollarSign, AlertTriangle, Users, Target, BarChart3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
 interface ManagementDashboardProps {
@@ -10,218 +10,154 @@ interface ManagementDashboardProps {
 }
 
 export const ManagementDashboard = ({ profile }: ManagementDashboardProps) => {
-  const teamPerformance = {
-    leaguePosition: 6,
-    points: 28,
-    form: ["W", "L", "D", "W", "L"],
-    goalsScored: 24,
-    goalsConceded: 18,
-    seasonObjectives: [
-      { objective: "Mid-table Finish", status: "on-track" },
-      { objective: "Regional Cup Quarter Final", status: "achieved" },
-      { objective: "Youth Development Program", status: "on-track" }
-    ]
-  };
-
-  const squadInvestment = {
-    totalValueEur: 150,
-    valueChange: 8,
-    contractsExpiring: 5,
-    keyStats: [
-      { label: "Avg Age", value: "26.2" },
-      { label: "Local Players", value: "14" },
-      { label: "New Signings", value: "4" }
-    ]
-  };
-
-  const riskDashboard = [
-    { area: "Player Registration", level: "medium", description: "3 players awaiting documentation" },
-    { area: "Training Attendance", level: "low", description: "Good overall attendance rates" },
-    { area: "Injury Prevention", level: "medium", description: "Limited physio coverage" },
-    { area: "Financial Compliance", level: "high", description: "Budget constraints affecting operations" }
-  ];
-
   return (
-    <div className="space-y-6">
-      <h1 className="text-2xl font-bold text-club-gold">
-        Welcome back, {profile.full_name || "Director"}
-      </h1>
-      
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Team Performance Summary */}
-        <Card className="bg-club-dark-gray border-club-gold/20">
+    <div className="space-y-3 xs:space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
+      {/* Welcome Header */}
+      <div className="flex flex-col gap-2">
+        <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-club-gold px-1">
+          Management Dashboard
+        </h1>
+        <p className="text-sm xs:text-base sm:text-lg text-club-light-gray/70 px-1">
+          Strategic oversight and team management
+        </p>
+      </div>
+
+      {/* Main Stats Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+        {/* Team Performance */}
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold">
-              <Trophy className="mr-2 h-5 w-5" />
-              Team Performance Summary
+            <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
+              <Trophy className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              Team Performance
             </CardTitle>
-            <CardDescription className="text-club-light-gray/70">
-              Current season status and objectives
+            <CardDescription className="text-club-light-gray/70 text-xs sm:text-sm">
+              Current league standings
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Key metrics */}
-            <div className="grid grid-cols-3 gap-2 text-center">
-              <div className="bg-club-black/40 rounded py-3 px-2">
-                <div className="text-xl font-bold text-club-gold">{teamPerformance.leaguePosition}th</div>
-                <div className="text-xs text-club-light-gray/70">Position</div>
-              </div>
-              <div className="bg-club-black/40 rounded py-3 px-2">
-                <div className="text-xl font-bold text-club-gold">{teamPerformance.points}</div>
+          <CardContent className="space-y-3">
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">6th</div>
+              <div className="text-xs sm:text-sm text-club-light-gray/70">League Position</div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-center">
+              <div className="bg-club-black/40 rounded py-2 px-1">
+                <div className="text-lg font-bold text-club-gold">28</div>
                 <div className="text-xs text-club-light-gray/70">Points</div>
               </div>
-              <div className="bg-club-black/40 rounded py-3 px-2">
-                <div className="text-club-gold flex justify-center gap-1">
-                  {teamPerformance.form.map((result, i) => (
-                    <span key={i} className={
-                      `text-xs font-bold px-1 rounded 
-                      ${result === 'W' ? 'bg-green-600/80' : 
-                        result === 'D' ? 'bg-amber-600/80' : 
-                        'bg-red-600/80'}`
-                    }>
-                      {result}
-                    </span>
-                  ))}
-                </div>
-                <div className="text-xs text-club-light-gray/70 mt-1">Form</div>
+              <div className="bg-club-black/40 rounded py-2 px-1">
+                <div className="text-lg font-bold text-club-gold">+6</div>
+                <div className="text-xs text-club-light-gray/70">Goal Diff</div>
               </div>
-            </div>
-            
-            {/* Goals */}
-            <div className="flex justify-between px-2 py-3 bg-club-black/40 rounded">
-              <div className="text-center">
-                <div className="text-lg font-bold text-club-gold">{teamPerformance.goalsScored}</div>
-                <div className="text-xs text-club-light-gray/70">Goals Scored</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-club-gold">{teamPerformance.goalsConceded}</div>
-                <div className="text-xs text-club-light-gray/70">Goals Conceded</div>
-              </div>
-              <div className="text-center">
-                <div className="text-lg font-bold text-club-gold">+{teamPerformance.goalsScored - teamPerformance.goalsConceded}</div>
-                <div className="text-xs text-club-light-gray/70">Goal Difference</div>
-              </div>
-            </div>
-            
-            {/* Season objectives */}
-            <div>
-              <h4 className="text-sm font-medium text-club-light-gray mb-2">Season Objectives</h4>
-              <ul className="space-y-2">
-                {teamPerformance.seasonObjectives.map((objective, index) => (
-                  <li key={index} className="flex justify-between items-center bg-club-black/40 p-2 rounded">
-                    <span className="text-club-light-gray">{objective.objective}</span>
-                    <Badge className={
-                      objective.status === 'achieved' ? 'bg-green-600/80' :
-                      objective.status === 'on-track' ? 'bg-amber-600/80' :
-                      'bg-red-600/80'
-                    }>
-                      {objective.status === 'achieved' ? 'Achieved' :
-                       objective.status === 'on-track' ? 'On Track' :
-                       'At Risk'}
-                    </Badge>
-                  </li>
-                ))}
-              </ul>
             </div>
           </CardContent>
         </Card>
 
-        {/* Squad Investment Overview */}
-        <Card className="bg-club-dark-gray border-club-gold/20">
+        {/* Squad Investment */}
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold">
-              <DollarSign className="mr-2 h-5 w-5" />
-              Squad Investment Overview
+            <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
+              <DollarSign className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              Squad Value
             </CardTitle>
-            <CardDescription className="text-club-light-gray/70">
-              Financial and contract status
+            <CardDescription className="text-club-light-gray/70 text-xs sm:text-sm">
+              Total investment
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {/* Squad value */}
-            <div className="bg-club-black/40 rounded p-3 flex justify-between items-center">
-              <div>
-                <div className="text-sm text-club-light-gray/70">Squad Value</div>
-                <div className="font-bold text-xl text-club-gold">€{squadInvestment.totalValueEur}K</div>
-              </div>
-              <Badge className={
-                squadInvestment.valueChange >= 0 ? 'bg-green-600/80' : 'bg-red-600/80'
-              }>
-                {squadInvestment.valueChange >= 0 ? '+' : ''}{squadInvestment.valueChange}% YoY
-              </Badge>
-            </div>
-            
-            {/* Key squad stats */}
-            <div className="grid grid-cols-3 gap-2">
-              {squadInvestment.keyStats.map((stat, index) => (
-                <div key={index} className="bg-club-black/40 p-2 rounded text-center">
-                  <div className="text-club-gold font-bold">{stat.value}</div>
-                  <div className="text-xs text-club-light-gray/70">{stat.label}</div>
-                </div>
-              ))}
-            </div>
-            
-            {/* Contract status */}
-            <div className="bg-club-black/40 rounded p-3">
-              <div className="flex justify-between mb-2">
-                <h4 className="text-sm font-medium text-club-light-gray">Contract Status</h4>
-                <Badge variant="outline" className="border-amber-500/50 text-amber-400">
-                  {squadInvestment.contractsExpiring} Expiring
-                </Badge>
-              </div>
-              <Button variant="outline" size="sm" className="border-club-gold/20 hover:bg-club-gold/10 w-full">
-                View Contract Details
-              </Button>
-            </div>
-            
+          <CardContent className="space-y-3">
             <div className="text-center">
-              <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10">
-                View Full Financial Report
-              </Button>
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">€150K</div>
+              <div className="text-xs sm:text-sm text-club-light-gray/70">Squad Value</div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-center">
+              <div className="bg-club-black/40 rounded py-2 px-1">
+                <div className="text-lg font-bold text-green-500">+8%</div>
+                <div className="text-xs text-club-light-gray/70">YoY Growth</div>
+              </div>
+              <div className="bg-club-black/40 rounded py-2 px-1">
+                <div className="text-lg font-bold text-amber-500">5</div>
+                <div className="text-xs text-club-light-gray/70">Expiring</div>
+              </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Risk Dashboard */}
-        <Card className="bg-club-dark-gray border-club-gold/20">
+        {/* Risk Management */}
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
           <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold">
-              <AlertTriangle className="mr-2 h-5 w-5" />
-              Administrative Dashboard
+            <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
+              <AlertTriangle className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+              Risk Overview
             </CardTitle>
-            <CardDescription className="text-club-light-gray/70">
-              Key administrative and operational concerns
+            <CardDescription className="text-club-light-gray/70 text-xs sm:text-sm">
+              Administrative status
             </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="text-center">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-amber-500">3</div>
+              <div className="text-xs sm:text-sm text-club-light-gray/70">Active Risks</div>
+            </div>
+            <div className="grid grid-cols-2 gap-2 text-center">
+              <div className="bg-club-black/40 rounded py-2 px-1">
+                <div className="text-lg font-bold text-red-500">1</div>
+                <div className="text-xs text-club-light-gray/70">High Risk</div>
+              </div>
+              <div className="bg-club-black/40 rounded py-2 px-1">
+                <div className="text-lg font-bold text-amber-500">2</div>
+                <div className="text-xs text-club-light-gray/70">Medium Risk</div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Additional Management Information */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+        {/* Season Objectives */}
+        <Card className="bg-club-dark-gray border-club-gold/20">
+          <CardHeader>
+            <CardTitle className="flex items-center text-club-gold">
+              <Target className="mr-2 h-5 w-5" />
+              Season Objectives
+            </CardTitle>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-3">
-              {riskDashboard.map((risk, index) => (
-                <li key={index} className="bg-club-black/40 p-3 rounded-md border-l-4"
-                  style={{
-                    borderLeftColor: risk.level === 'high' ? 'rgb(220, 38, 38)' : 
-                                    risk.level === 'medium' ? 'rgb(217, 119, 6)' : 
-                                    'rgb(22, 163, 74)'
-                  }}>
-                  <div className="flex justify-between mb-1">
-                    <h4 className="font-medium text-club-light-gray">{risk.area}</h4>
-                    <Badge className={
-                      risk.level === 'high' ? 'bg-red-600/80' :
-                      risk.level === 'medium' ? 'bg-amber-600/80' :
-                      'bg-green-600/80'
-                    }>
-                      {risk.level}
-                    </Badge>
-                  </div>
-                  <p className="text-sm text-club-light-gray/70">{risk.description}</p>
-                </li>
-              ))}
-            </ul>
-            
-            <div className="text-center mt-4">
-              <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10">
-                View Detailed Administrative Report
-              </Button>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center bg-club-black/40 p-3 rounded">
+                <span className="text-club-light-gray">Mid-table Finish</span>
+                <Badge className="bg-green-600/80">On Track</Badge>
+              </div>
+              <div className="flex justify-between items-center bg-club-black/40 p-3 rounded">
+                <span className="text-club-light-gray">Regional Cup Quarter Final</span>
+                <Badge className="bg-green-600/80">Achieved</Badge>
+              </div>
+              <div className="flex justify-between items-center bg-club-black/40 p-3 rounded">
+                <span className="text-club-light-gray">Youth Development Program</span>
+                <Badge className="bg-amber-600/80">On Track</Badge>
+              </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Management Actions */}
+        <Card className="bg-club-dark-gray border-club-gold/20">
+          <CardHeader>
+            <CardTitle className="flex items-center text-club-gold">
+              <BarChart3 className="mr-2 h-5 w-5" />
+              Management Actions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <Button variant="outline" className="w-full border-club-gold/20 hover:bg-club-gold/10">
+              View Financial Report
+            </Button>
+            <Button variant="outline" className="w-full border-club-gold/20 hover:bg-club-gold/10">
+              Contract Management
+            </Button>
+            <Button variant="outline" className="w-full border-club-gold/20 hover:bg-club-gold/10">
+              Administrative Dashboard
+            </Button>
           </CardContent>
         </Card>
       </div>
