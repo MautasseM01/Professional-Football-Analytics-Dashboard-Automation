@@ -47,11 +47,18 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
   const [error, setError] = useState<string | null>(null);
 
   const fetchGoalsData = useCallback(async () => {
+    if (!player && !matchId) {
+      setGoals([]);
+      setAssists([]);
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      console.log('Fetching goals and assists data');
+      console.log('Fetching goals and assists data for player:', player?.id, 'match:', matchId);
 
       // Build goals query
       let goalsQuery = supabase
@@ -70,7 +77,7 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
 
       if (goalsError) {
         console.error("Error fetching goals:", goalsError);
-        throw goalsError;
+        throw new Error(`Failed to fetch goals: ${goalsError.message}`);
       }
 
       // Build assists query
@@ -90,14 +97,20 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
 
       if (assistsError) {
         console.error("Error fetching assists:", assistsError);
-        throw assistsError;
+        throw new Error(`Failed to fetch assists: ${assistsError.message}`);
       }
 
-      // Fetch matches data for goal context
+      // Handle empty data gracefully
+      const safeGoalsData = goalsData || [];
+      const safeAssistsData = assistsData || [];
+
+      console.log(`Found ${safeGoalsData.length} goals and ${safeAssistsData.length} assists`);
+
+      // Fetch matches data for context only if we have goals or assists
       const uniqueMatchIds = [
         ...new Set([
-          ...(goalsData || []).map(g => g.match_id),
-          ...(assistsData || []).map(a => a.match_id)
+          ...safeGoalsData.map(g => g.match_id),
+          ...safeAssistsData.map(a => a.match_id)
         ])
       ];
 
@@ -110,13 +123,15 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
 
         if (matchesError) {
           console.error("Error fetching matches:", matchesError);
+          // Don't throw here, just log the error and continue with empty matches
+          matchesData = [];
         } else {
           matchesData = matches || [];
         }
       }
 
-      // Fetch assist providers (players) for goals
-      const uniqueAssistProviderIds = (goalsData || [])
+      // Fetch assist providers only if we have goals with assist providers
+      const uniqueAssistProviderIds = safeGoalsData
         .filter(g => g.assisted_by_player_id)
         .map(g => g.assisted_by_player_id);
 
@@ -129,13 +144,15 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
 
         if (assistProvidersError) {
           console.error("Error fetching assist providers:", assistProvidersError);
+          // Don't throw here, just log the error and continue with empty assist providers
+          assistProvidersData = [];
         } else {
           assistProvidersData = assistProviders || [];
         }
       }
 
-      // Transform goals data
-      const transformedGoals: GoalData[] = (goalsData || []).map((goal: any) => {
+      // Transform goals data with safe defaults
+      const transformedGoals: GoalData[] = safeGoalsData.map((goal: any) => {
         const match = matchesData.find(m => m.id === goal.match_id);
         const assistProvider = assistProvidersData.find(p => p.id === goal.assisted_by_player_id);
 
@@ -143,7 +160,7 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
           id: goal.id,
           player_id: goal.player_id,
           match_id: goal.match_id,
-          minute: goal.minute,
+          minute: goal.minute || 0,
           period: goal.period || 'First Half',
           goal_type: goal.goal_type || 'Open Play',
           distance_from_goal: goal.distance_from_goal,
@@ -163,8 +180,8 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
         };
       });
 
-      // Transform assists data
-      const transformedAssists: AssistData[] = (assistsData || []).map((assist: any) => {
+      // Transform assists data with safe defaults
+      const transformedAssists: AssistData[] = safeAssistsData.map((assist: any) => {
         const match = matchesData.find(m => m.id === assist.match_id);
 
         return {
@@ -184,13 +201,16 @@ export const useGoalsData = (player?: Player | null, matchId?: number) => {
       setGoals(transformedGoals);
       setAssists(transformedAssists);
 
-      console.log('Goals data:', transformedGoals);
-      console.log('Assists data:', transformedAssists);
+      console.log('Successfully loaded goals data:', transformedGoals.length);
+      console.log('Successfully loaded assists data:', transformedAssists.length);
 
     } catch (err: any) {
       console.error("Error fetching goals/assists data:", err);
-      setError(err.message);
-      toast.error(`Failed to load goals/assists data: ${err.message}`);
+      const errorMessage = err.message || 'Unknown error occurred';
+      setError(errorMessage);
+      setGoals([]);
+      setAssists([]);
+      toast.error(`Failed to load goals/assists data: ${errorMessage}`);
     } finally {
       setLoading(false);
     }

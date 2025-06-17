@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Player } from "@/types";
 import { useGoalsData } from "@/hooks/use-goals-data";
-import { Target, Zap, Clock, MapPin } from "lucide-react";
+import { Target, Zap, Clock, MapPin, Loader } from "lucide-react";
 import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { ErrorFallback } from "@/components/ErrorStates/ErrorFallback";
 import { cn } from "@/lib/utils";
@@ -17,7 +17,28 @@ export const GoalsBreakdownCard = ({ player }: GoalsBreakdownCardProps) => {
   const { theme } = useTheme();
 
   if (loading) {
-    return <ChartLoadingSkeleton />;
+    return (
+      <Card className={cn(
+        "border-club-gold/20",
+        theme === 'dark' ? "bg-club-dark-gray" : "bg-white"
+      )}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-club-gold">
+            <Target className="w-5 h-5" />
+            Goals & Assists Breakdown
+          </CardTitle>
+          <CardDescription className="text-club-light-gray/70 light:text-gray-600">
+            Detailed analysis of scoring and assist patterns
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center py-12">
+          <div className="flex flex-col items-center space-y-2">
+            <Loader className="h-8 w-8 text-club-gold animate-spin" />
+            <p className="text-sm text-club-light-gray">Loading goals and assists data...</p>
+          </div>
+        </CardContent>
+      </Card>
+    );
   }
 
   if (error) {
@@ -26,6 +47,12 @@ export const GoalsBreakdownCard = ({ player }: GoalsBreakdownCardProps) => {
         "border-club-gold/20",
         theme === 'dark' ? "bg-club-dark-gray" : "bg-white"
       )}>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-club-gold">
+            <Target className="w-5 h-5" />
+            Goals & Assists Breakdown
+          </CardTitle>
+        </CardHeader>
         <CardContent className="p-6">
           <ErrorFallback 
             title="Goals data error"
@@ -107,7 +134,10 @@ export const GoalsBreakdownCard = ({ player }: GoalsBreakdownCardProps) => {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-club-light-gray/60 light:text-gray-500">No goals recorded yet</p>
+            <div className="text-center py-8 bg-club-black/10 light:bg-gray-50 rounded-lg">
+              <Target className="w-12 h-12 mx-auto text-club-light-gray/40 light:text-gray-400 mb-2" />
+              <p className="text-sm text-club-light-gray/60 light:text-gray-500">No goals recorded yet</p>
+            </div>
           )}
         </div>
 
@@ -149,11 +179,14 @@ export const GoalsBreakdownCard = ({ player }: GoalsBreakdownCardProps) => {
               </div>
             </div>
           ) : (
-            <p className="text-sm text-club-light-gray/60 light:text-gray-500">No assists recorded yet</p>
+            <div className="text-center py-8 bg-club-black/10 light:bg-gray-50 rounded-lg">
+              <Zap className="w-12 h-12 mx-auto text-club-light-gray/40 light:text-gray-400 mb-2" />
+              <p className="text-sm text-club-light-gray/60 light:text-gray-500">No assists recorded yet</p>
+            </div>
           )}
         </div>
 
-        {/* Assist Providers */}
+        {/* Assist Providers - Only show if there are goals with assists */}
         {uniqueAssisters.length > 0 && (
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-club-light-gray light:text-gray-900 flex items-center gap-2">
