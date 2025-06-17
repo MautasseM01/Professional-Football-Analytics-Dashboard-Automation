@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Player } from "@/types";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,7 +9,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tool
 import { usePlayerMatchPerformance } from "@/hooks/use-player-match-performance";
 import { ChartLoadingSkeleton } from "@/components/LoadingStates";
 import { ErrorFallback } from "@/components/ErrorStates/ErrorFallback";
-import { TrendingUp, TrendingDown, Minus, Activity, Target, Users, Zap, Loader } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Activity, Target, Users, Zap, Loader, MapPin, Eye, Award, BarChart3, Focus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -20,14 +19,14 @@ interface PerformanceTrendsCardProps {
 }
 
 const KPI_OPTIONS = [
-  { value: "distance_covered", label: "Total Distance (km)", unit: "km" },
-  { value: "sprint_distance", label: "Sprint Distance (km)", unit: "km" },
-  { value: "match_rating", label: "Match Rating", unit: "/10" },
-  { value: "goals", label: "Goals", unit: "" },
-  { value: "assists", label: "Assists", unit: "" },
-  { value: "passes_completed", label: "Passes Completed", unit: "" },
-  { value: "shots_on_target", label: "Shots on Target", unit: "" },
-  { value: "tackles_won", label: "Tackles Won", unit: "" },
+  { value: "distance_covered", label: "Total Distance (km)", unit: "km", icon: MapPin },
+  { value: "sprint_distance", label: "Sprint Distance (km)", unit: "km", icon: Zap },
+  { value: "match_rating", label: "Match Rating", unit: "/10", icon: Award },
+  { value: "goals", label: "Goals", unit: "", icon: Target },
+  { value: "assists", label: "Assists", unit: "", icon: Users },
+  { value: "passes_completed", label: "Passes Completed", unit: "", icon: Activity },
+  { value: "shots_on_target", label: "Shots on Target", unit: "", icon: Focus },
+  { value: "tackles_won", label: "Tackles Won", unit: "", icon: BarChart3 },
 ];
 
 const TIME_PERIOD_OPTIONS = [
@@ -279,15 +278,42 @@ export const PerformanceTrendsCard = ({ player }: PerformanceTrendsCardProps) =>
           <div className="space-y-2">
             <Label className="text-sm font-medium">Performance Metric</Label>
             <Select value={selectedKPI} onValueChange={setSelectedKPI}>
-              <SelectTrigger className="w-full">
+              <SelectTrigger className={cn(
+                "w-full transition-all duration-200",
+                theme === 'dark' 
+                  ? "bg-club-dark-gray/50 border-club-gold/20 text-club-light-gray hover:border-club-gold/40" 
+                  : "bg-white/70 border-club-gold/30 text-gray-900 hover:border-club-gold/50"
+              )}>
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
-                {KPI_OPTIONS.map(option => (
-                  <SelectItem key={option.value} value={option.value}>
-                    {option.label}
-                  </SelectItem>
-                ))}
+              <SelectContent className={cn(
+                "z-50 backdrop-blur-md border-club-gold/30",
+                theme === 'dark' 
+                  ? "bg-club-dark-gray/95 text-club-light-gray" 
+                  : "bg-white/95 text-gray-900"
+              )}>
+                {KPI_OPTIONS.map(option => {
+                  const IconComponent = option.icon;
+                  return (
+                    <SelectItem 
+                      key={option.value} 
+                      value={option.value}
+                      className={cn(
+                        "flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-150",
+                        "focus:bg-club-gold/20 hover:bg-club-gold/10",
+                        selectedKPI === option.value && "bg-club-gold/20 text-club-gold"
+                      )}
+                    >
+                      <div className="flex items-center gap-3">
+                        <IconComponent className={cn(
+                          "w-4 h-4",
+                          selectedKPI === option.value ? "text-club-gold" : "text-gray-500"
+                        )} />
+                        <span>{option.label}</span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
               </SelectContent>
             </Select>
           </div>
