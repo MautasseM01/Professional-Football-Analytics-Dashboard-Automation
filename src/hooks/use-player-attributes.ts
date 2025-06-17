@@ -72,7 +72,7 @@ export const usePlayerAttributes = (player?: Player | null) => {
     try {
       console.log('Fetching player attributes for player:', player.id);
 
-      // Fetch player attributes
+      // Fetch player attributes - use maybeSingle to handle no data gracefully
       const { data: attributesData, error: attributesError } = await supabase
         .from("player_attributes")
         .select('*')
@@ -84,7 +84,7 @@ export const usePlayerAttributes = (player?: Player | null) => {
         throw attributesError;
       }
 
-      // Fetch positional averages
+      // Fetch positional averages - use maybeSingle to handle no data gracefully
       const { data: positionalData, error: positionalError } = await supabase
         .from("positional_averages")
         .select('*')
@@ -93,6 +93,7 @@ export const usePlayerAttributes = (player?: Player | null) => {
 
       if (positionalError) {
         console.error("Error fetching positional averages:", positionalError);
+        // Don't throw here, just log the error as positional data is optional
       }
 
       if (!attributesData) {
