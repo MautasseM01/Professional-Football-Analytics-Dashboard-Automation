@@ -22,20 +22,20 @@ const PlayerComparison = () => {
     setSelectedPlayers(selectedPlayers.filter(player => player.id !== playerId));
   };
 
+  const handleRefresh = () => {
+    console.log("Manual refresh triggered for player comparison");
+    // Reset selections on refresh
+    setSelectedPlayers([]);
+  };
+
   return (
-    <DashboardLayout>
+    <DashboardLayout 
+      title="Player Comparison"
+      description="Compare up to 4 players across various performance metrics"
+      onRefresh={handleRefresh}
+    >
       <div className="container-responsive min-h-screen bg-gradient-to-br from-slate-900 via-club-black to-slate-900 dark:from-slate-900 dark:via-club-black dark:to-slate-900 light:from-gray-50 light:via-white light:to-gray-50">
         <div className="space-y-6 py-6 sm:py-8">
-          {/* Page Header */}
-          <div className="space-y-2">
-            <h1 className="heading-primary text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold dark:text-club-gold light:text-yellow-600">
-              Player Comparison
-            </h1>
-            <p className="body-normal text-club-light-gray/80 dark:text-gray-400 light:text-gray-600 text-sm sm:text-base">
-              Compare up to 4 players across various performance metrics
-            </p>
-          </div>
-
           {/* Player Selection Card */}
           <PlayerSelectionCard
             selectedPlayers={selectedPlayers}

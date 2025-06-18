@@ -5,33 +5,93 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "./LanguageSelector";
 import { ThemeToggle } from "./ThemeToggle";
+import { TouchFeedbackButton } from "./TouchFeedbackButton";
+import { Menu, RefreshCw } from "lucide-react";
+import { useState } from "react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
+  title?: string;
+  description?: string;
+  onRefresh?: () => void;
 }
 
-export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
+export const DashboardLayout: React.FC<DashboardLayoutProps> = ({ 
+  children, 
+  title = "Dashboard",
+  description = "Overview",
+  onRefresh
+}) => {
   const isMobile = useIsMobile();
+  const [showSidebar, setShowSidebar] = useState(true);
+
+  const handleRefresh = () => {
+    console.log("Manual refresh triggered");
+    if (onRefresh) {
+      onRefresh();
+    }
+  };
 
   return (
     <div className="flex h-screen bg-club-black text-white overflow-hidden w-full">
-      <DashboardSidebar />
+      {showSidebar && <DashboardSidebar />}
       
       {/* Main content area */}
       <main className={cn(
         "flex-1 overflow-auto transition-all duration-300 ease-in-out flex flex-col",
         isMobile && "pt-16" // Add top padding for mobile hamburger button
       )}>
-        {/* Header bar aligned with sidebar */}
-        <div className="border-b border-club-gold/20 bg-club-black px-4 py-4 flex items-center justify-between min-h-[73px] flex-shrink-0">
-          <div className="flex-1" />
-          
-          {/* Top-right controls - only show on desktop, mobile controls are in sidebar */}
-          <div className="hidden lg:flex items-center gap-2">
-            <LanguageSelector />
-            <ThemeToggle />
+        {/* Header bar */}
+        <header className="border-b border-club-gold/20 dark:border-club-gold/20 bg-club-black/80 dark:bg-club-black/80 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
+          <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4 sm:py-[20px]">
+            {/* Left section - Title and page info */}
+            <div className="flex-1 min-w-0">
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-club-gold dark:text-club-gold truncate">
+                {title}
+              </h1>
+              <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
+                {description}
+              </p>
+            </div>
+            
+            {/* Right section - Controls */}
+            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-shrink-0">
+              {/* Language Selector */}
+              <LanguageSelector />
+              
+              {/* Theme Toggle */}
+              <ThemeToggle />
+              
+              {/* Refresh Button */}
+              <TouchFeedbackButton 
+                variant="outline" 
+                size="icon" 
+                className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" 
+                onClick={handleRefresh} 
+                title="Refresh data" 
+                hapticType="medium"
+              >
+                <RefreshCw size={14} className="sm:hidden text-club-gold" />
+                <RefreshCw size={16} className="hidden sm:block lg:hidden text-club-gold" />
+                <RefreshCw size={18} className="hidden lg:block text-club-gold" />
+              </TouchFeedbackButton>
+              
+              {/* Menu Toggle */}
+              <TouchFeedbackButton 
+                variant="outline" 
+                size="icon" 
+                onClick={() => setShowSidebar(!showSidebar)} 
+                className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" 
+                title="Toggle sidebar" 
+                hapticType="light"
+              >
+                <Menu size={16} className="sm:hidden text-club-gold" />
+                <Menu size={18} className="hidden sm:block lg:hidden text-club-gold" />
+                <Menu size={20} className="hidden lg:block text-club-gold" />
+              </TouchFeedbackButton>
+            </div>
           </div>
-        </div>
+        </header>
         
         {/* Page content */}
         <div className="flex-1 overflow-auto">
