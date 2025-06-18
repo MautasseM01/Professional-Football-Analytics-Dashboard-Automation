@@ -24,58 +24,64 @@ const PlayerComparison = () => {
 
   return (
     <DashboardLayout>
-      <div className="space-y-6 p-4 sm:p-6 lg:p-8">
-        <div>
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-club-light-gray mb-2">
-            Player Comparison
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400 text-sm sm:text-base">
-            Compare up to 4 players across various performance metrics
-          </p>
-        </div>
+      <div className="container-responsive min-h-screen bg-gradient-to-br from-slate-900 via-club-black to-slate-900 dark:from-slate-900 dark:via-club-black dark:to-slate-900 light:from-gray-50 light:via-white light:to-gray-50">
+        <div className="space-y-6 py-6 sm:py-8">
+          {/* Page Header */}
+          <div className="space-y-2">
+            <h1 className="heading-primary text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold dark:text-club-gold light:text-yellow-600">
+              Player Comparison
+            </h1>
+            <p className="body-normal text-club-light-gray/80 dark:text-gray-400 light:text-gray-600 text-sm sm:text-base">
+              Compare up to 4 players across various performance metrics
+            </p>
+          </div>
 
-        <PlayerSelectionCard
-          selectedPlayers={selectedPlayers}
-          onPlayerSelect={handlePlayerSelect}
-          onPlayerRemove={handlePlayerRemove}
-        />
+          {/* Player Selection Card */}
+          <PlayerSelectionCard
+            selectedPlayers={selectedPlayers}
+            onPlayerSelect={handlePlayerSelect}
+            onPlayerRemove={handlePlayerRemove}
+          />
 
-        {selectedPlayers.length >= 2 && (
-          <div className="space-y-6">
-            <ProfessionalPerformanceTable 
-              selectedPlayers={selectedPlayers}
-              loading={playersLoading}
-            />
-            
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              <PerformanceMetricsTable 
+          {/* Comparison Content */}
+          {selectedPlayers.length >= 2 && (
+            <div className="space-y-6">
+              <ProfessionalPerformanceTable 
                 selectedPlayers={selectedPlayers}
                 loading={playersLoading}
               />
               
-              <PerformanceRadarChart 
-                selectedPlayers={selectedPlayers}
-                loading={playersLoading}
-              />
+              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                <PerformanceMetricsTable 
+                  selectedPlayers={selectedPlayers}
+                  loading={playersLoading}
+                />
+                
+                <PerformanceRadarChart 
+                  selectedPlayers={selectedPlayers}
+                  loading={playersLoading}
+                />
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {selectedPlayers.length === 1 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400 text-lg">
-              Select at least one more player to start comparing
-            </p>
-          </div>
-        )}
+          {/* Empty States */}
+          {selectedPlayers.length === 1 && (
+            <div className="text-center py-12">
+              <p className="body-normal text-club-light-gray/70 dark:text-gray-400 light:text-gray-500 text-lg">
+                Select at least one more player to start comparing
+              </p>
+            </div>
+          )}
 
-        {selectedPlayers.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400 text-lg">
-              Select players to start comparing their performance
-            </p>
-          </div>
-        )}
+          {selectedPlayers.length === 0 && (
+            <div className="text-center py-12">
+              <p className="body-normal text-club-light-gray/70 dark:text-gray-400 light:text-gray-500 text-lg">
+                Select players to start comparing their performance
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </DashboardLayout>
   );
