@@ -39,25 +39,34 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
       {/* Main content area */}
       <main className={cn(
         "flex-1 overflow-auto transition-all duration-300 ease-in-out flex flex-col",
-        isMobile && "pt-16" // Add top padding for mobile hamburger button
+        isMobile && "pt-0" // Remove top padding for mobile
       )}>
         {/* Header bar */}
         <header className="border-b border-club-gold/20 dark:border-club-gold/20 bg-club-black/80 dark:bg-club-black/80 backdrop-blur-xl sticky top-0 z-20 transition-colors duration-300">
-          <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4 sm:py-[20px]">
+          <div className="flex justify-between items-center px-2 sm:px-4 lg:px-6 py-3 sm:py-4 gap-2 min-h-[64px] sm:min-h-[72px]">
             {/* Left section - Title and page info */}
-            <div className="flex-1 min-w-0">
-              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-club-gold dark:text-club-gold truncate">
+            <div className="flex-1 min-w-0 overflow-hidden">
+              <h1 className={cn(
+                "font-bold text-club-gold dark:text-club-gold truncate",
+                "text-base sm:text-lg lg:text-xl xl:text-2xl"
+              )}>
                 {title}
               </h1>
-              <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
+              <p className={cn(
+                "text-gray-400 dark:text-gray-400 truncate",
+                "text-xs sm:text-sm lg:text-base",
+                "leading-tight"
+              )}>
                 {description}
               </p>
             </div>
             
             {/* Right section - Controls */}
-            <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-3 flex-shrink-0">
-              {/* Language Selector */}
-              <LanguageSelector />
+            <div className="flex items-center gap-1 sm:gap-2 lg:gap-3 flex-shrink-0">
+              {/* Language Selector - Hidden on very small screens */}
+              <div className="hidden xs:block">
+                <LanguageSelector />
+              </div>
               
               {/* Theme Toggle */}
               <ThemeToggle />
@@ -66,14 +75,19 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
               <TouchFeedbackButton 
                 variant="outline" 
                 size="icon" 
-                className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" 
+                className={cn(
+                  "bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30",
+                  "hover:bg-club-gold/10 dark:hover:bg-club-gold/10 backdrop-blur-sm",
+                  "h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10"
+                )}
                 onClick={handleRefresh} 
                 title="Refresh data" 
                 hapticType="medium"
               >
-                <RefreshCw size={14} className="sm:hidden text-club-gold" />
-                <RefreshCw size={16} className="hidden sm:block lg:hidden text-club-gold" />
-                <RefreshCw size={18} className="hidden lg:block text-club-gold" />
+                <RefreshCw className={cn(
+                  "text-club-gold",
+                  "w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5"
+                )} />
               </TouchFeedbackButton>
               
               {/* Menu Toggle */}
@@ -81,13 +95,18 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
                 variant="outline" 
                 size="icon" 
                 onClick={() => setShowSidebar(!showSidebar)} 
-                className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" 
+                className={cn(
+                  "bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30",
+                  "hover:bg-club-gold/10 dark:hover:bg-club-gold/10 backdrop-blur-sm",
+                  "h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10"
+                )}
                 title="Toggle sidebar" 
                 hapticType="light"
               >
-                <Menu size={16} className="sm:hidden text-club-gold" />
-                <Menu size={18} className="hidden sm:block lg:hidden text-club-gold" />
-                <Menu size={20} className="hidden lg:block text-club-gold" />
+                <Menu className={cn(
+                  "text-club-gold",
+                  "w-3 h-3 sm:w-4 sm:h-4 lg:w-5 lg:h-5"
+                )} />
               </TouchFeedbackButton>
             </div>
           </div>

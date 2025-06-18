@@ -1,3 +1,4 @@
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -267,6 +268,68 @@
     @apply text-yellow-600 !important;
   }
 
+  /* Professional Golden Scrollbar Styling */
+  .professional-scrollbar {
+    /* Firefox */
+    scrollbar-width: thin;
+  }
+
+  /* Webkit browsers (Chrome, Safari, Edge Chromium) */
+  .professional-scrollbar::-webkit-scrollbar {
+    height: 8px;
+    width: 8px;
+  }
+
+  .professional-scrollbar::-webkit-scrollbar-track {
+    background: rgba(26, 26, 26, 0.3);
+    border-radius: 12px;
+    margin: 4px;
+  }
+
+  .professional-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #D4AF37 0%, #F4D03F 50%, #D4AF37 100%);
+    border-radius: 12px;
+    border: 1px solid rgba(212, 175, 55, 0.2);
+    box-shadow: 
+      0 2px 4px rgba(212, 175, 55, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+
+  .professional-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #E6C547 0%, #F7DC6F 50%, #E6C547 100%);
+    box-shadow: 
+      0 3px 6px rgba(212, 175, 55, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  }
+
+  .professional-scrollbar::-webkit-scrollbar-thumb:active {
+    background: linear-gradient(135deg, #C9A332 0%, #F1C40F 50%, #C9A332 100%);
+  }
+
+  .professional-scrollbar::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  /* Light theme scrollbar adjustments */
+  .light-theme .professional-scrollbar::-webkit-scrollbar-track {
+    background: rgba(245, 245, 245, 0.8);
+  }
+
+  .light-theme .professional-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(135deg, #B8860B 0%, #DAA520 50%, #B8860B 100%);
+    border: 1px solid rgba(184, 134, 11, 0.3);
+    box-shadow: 
+      0 2px 4px rgba(184, 134, 11, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  }
+
+  .light-theme .professional-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(135deg, #CD853F 0%, #F0E68C 50%, #CD853F 100%);
+    box-shadow: 
+      0 3px 6px rgba(184, 134, 11, 0.4),
+      inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  }
+
   /* Enhanced global scrollbar hiding while maintaining functionality */
   * {
     /* Firefox */
@@ -293,6 +356,21 @@
 
   *::-webkit-scrollbar-corner {
     display: none;
+  }
+
+  /* Override for professional scrollbar containers */
+  .professional-scrollbar::-webkit-scrollbar {
+    display: block !important;
+    width: 8px !important;
+    height: 8px !important;
+  }
+
+  .professional-scrollbar::-webkit-scrollbar-track {
+    display: block !important;
+  }
+
+  .professional-scrollbar::-webkit-scrollbar-thumb {
+    display: block !important;
   }
 
   /* Ensure scroll functionality is maintained */
