@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { useLanguage } from "@/contexts/LanguageProvider";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { TestModeIndicator } from "@/components/TestModeIndicator";
 import { PlayerDashboard } from "@/components/dashboards/PlayerDashboard";
