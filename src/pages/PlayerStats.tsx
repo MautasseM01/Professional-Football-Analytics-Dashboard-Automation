@@ -3,7 +3,7 @@ import { useState } from "react";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { usePlayerData } from "@/hooks/use-player-data";
 import { useUserProfile } from "@/hooks/use-user-profile";
-import { useLanguage } from "@/contexts/LanguageProvider";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { PlayerStats } from "@/components/PlayerStats";
 import { PlayerSelector } from "@/components/PlayerSelector";
 import { RoleBasedContent } from "@/components/RoleBasedContent";
