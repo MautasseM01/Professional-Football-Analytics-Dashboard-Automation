@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Select,
@@ -7,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { useLanguage } from '@/contexts/LanguageProvider';
+import { useLanguage } from '@/contexts/LanguageContext';
 import { Globe } from 'lucide-react';
 
 const languages = [

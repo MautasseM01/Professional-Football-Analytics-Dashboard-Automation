@@ -1,19 +1,104 @@
-
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { User } from '@supabase/supabase-js';
-import { toast } from '@/hooks/use-toast';
+import { AuthUser, UserRole } from '../types';
+import { useToast } from '@/hooks/use-toast';
 
-interface AuthContextType {
-  user: User | null;
+type AuthContextType = {
+  user: AuthUser | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
+  signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
-  signInWithGoogle: () => Promise<void>;
-}
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(false); // Changed to false for instant load
+  const { toast } = useToast();
+
+  useEffect(() => {
+    // Instantly provide mock user for demo purposes - no delays
+    const mockUser: AuthUser = {
+      id: 'demo-user-id',
+      email: 'demo@example.com',
+      user_metadata: {
+        name: 'Demo User'
+      }
+    };
+
+    setUser(mockUser);
+    setLoading(false);
+    console.log('Demo mode: Instant authentication enabled');
+
+    // Still set up auth state listener for when authentication is re-enabled
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        console.log("Auth state changed:", event, session);
+        if (session?.user) {
+          setUser({
+            id: session.user.id,
+            email: session.user.email,
+            user_metadata: session.user.user_metadata
+          });
+        } else {
+          // Keep mock user for demo
+          setUser(mockUser);
+        }
+        setLoading(false);
+      }
+    );
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [toast]);
+
+  const signIn = async (email: string, password: string) => {
+    console.log("Demo mode: Sign in simulated");
+    toast({
+      title: "Demo Mode",
+      description: "Authentication is disabled for demo purposes.",
+    });
+  };
+
+  const signInWithGoogle = async () => {
+    console.log("Demo mode: Google sign in simulated");
+    toast({
+      title: "Demo Mode",
+      description: "Google authentication is disabled for demo purposes.",
+    });
+  };
+
+  const signOut = async () => {
+    console.log("Demo mode: Sign out simulated");
+    toast({
+      title: "Demo Mode",
+      description: "Sign out is disabled for demo purposes.",
+    });
+  };
+
+  const signUp = async (email: string, password: string) => {
+    console.log("Demo mode: Sign up simulated");
+    toast({
+      title: "Demo Mode",
+      description: "Registration is disabled for demo purposes.",
+    });
+  };
+
+  const value = {
+    user,
+    loading,
+    signIn,
+    signInWithGoogle,
+    signOut,
+    signUp,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
@@ -21,115 +106,4 @@ export const useAuth = () => {
     throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
-};
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const getSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      setUser(data?.session?.user ?? null);
-      setLoading(false);
-    };
-
-    getSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const signIn = async (email: string, password: string) => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) throw error;
-    } catch (error: any) {
-      toast({
-        title: "Authentication failed",
-        description: error.message,
-        duration: 4000,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signUp = async (email: string, password: string) => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signUp({ 
-        email, 
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/`
-        }
-      });
-      if (error) throw error;
-      toast({
-        title: "Registration successful",
-        description: "Please check your email to verify your account",
-        duration: 4000,
-      });
-    } catch (error: any) {
-      toast({
-        title: "Registration failed",
-        description: error.message,
-        duration: 4000,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signInWithGoogle = async () => {
-    try {
-      const { error } = await supabase.auth.signInWithOAuth({ 
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/`
-        }
-      });
-      if (error) throw error;
-    } catch (error: any) {
-      toast({
-        title: "Google sign-in failed",
-        description: error.message,
-        duration: 4000,
-      });
-    }
-  };
-
-  const signOut = async () => {
-    setLoading(true);
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-    } catch (error: any) {
-      toast({
-        title: "Sign out failed",
-        description: error.message,
-        duration: 4000,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const value: AuthContextType = { user, loading, signIn, signOut, signUp, signInWithGoogle };
-
-  return (
-    <AuthContext.Provider value={value}>
-      {!loading && children}
-    </AuthContext.Provider>
-  );
 };
