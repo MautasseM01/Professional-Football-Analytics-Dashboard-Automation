@@ -63,10 +63,8 @@ export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
             
             {/* Right section - Controls */}
             <div className="flex items-center gap-1 sm:gap-2 lg:gap-3 flex-shrink-0">
-              {/* Language Selector - Hidden on very small screens */}
-              <div className="hidden xs:block">
-                <LanguageSelector />
-              </div>
+              {/* Language Selector - Always visible */}
+              <LanguageSelector />
               
               {/* Theme Toggle */}
               <ThemeToggle />
