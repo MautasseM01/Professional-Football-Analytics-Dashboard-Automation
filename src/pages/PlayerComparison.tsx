@@ -3,7 +3,6 @@ import { useState } from "react";
 import { DashboardLayout } from "@/components/DashboardLayout";
 import { PlayerSelectionCard } from "@/components/comparison/PlayerSelectionCard";
 import { ProfessionalPerformanceTable } from "@/components/comparison/ProfessionalPerformanceTable";
-import { PerformanceMetricsTable } from "@/components/comparison/PerformanceMetricsTable";
 import { PerformanceRadarChart } from "@/components/comparison/PerformanceRadarChart";
 import { Player } from "@/types";
 import { useRealPlayers } from "@/hooks/use-real-players";
@@ -51,16 +50,13 @@ const PlayerComparison = () => {
                 loading={playersLoading}
               />
               
-              <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-                <PerformanceMetricsTable 
-                  selectedPlayers={selectedPlayers}
-                  loading={playersLoading}
-                />
-                
-                <PerformanceRadarChart 
-                  selectedPlayers={selectedPlayers}
-                  loading={playersLoading}
-                />
+              <div className="flex justify-center">
+                <div className="w-full max-w-2xl">
+                  <PerformanceRadarChart 
+                    selectedPlayers={selectedPlayers}
+                    loading={playersLoading}
+                  />
+                </div>
               </div>
             </div>
           )}
