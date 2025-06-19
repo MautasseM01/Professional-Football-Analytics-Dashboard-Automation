@@ -6,6 +6,7 @@ import { PlayerSelector } from "@/components/PlayerSelector";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, AlertTriangle, Target, TrendingUp } from "lucide-react";
 import { ResponsiveGrid } from "../ResponsiveLayout";
+import SuspensionRiskWidget from "../SuspensionRiskWidget";
 
 interface CoachDashboardProps {
   profile: UserProfile;
@@ -82,6 +83,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
           </CardContent>
         </Card>
       </ResponsiveGrid>
+
+      {/* Suspension Risk Widget */}
+      <SuspensionRiskWidget />
 
       {/* Compliance Alerts for Team */}
       <Card className="bg-club-dark-gray border-club-gold/20">
