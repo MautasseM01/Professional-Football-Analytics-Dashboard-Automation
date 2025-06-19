@@ -10,32 +10,41 @@ export const BackToTopButton = () => {
   useEffect(() => {
     // Find the main content scroll container
     const findScrollContainer = () => {
-      // Look for the main content area that has overflow-auto
-      const mainElement = document.querySelector('main');
-      if (mainElement) {
-        // Check if main itself has scroll
-        const mainStyles = window.getComputedStyle(mainElement);
-        if (mainStyles.overflow === 'auto' || mainStyles.overflowY === 'auto') {
-          return mainElement;
-        }
-        
-        // Look for a child with overflow-auto
-        const scrollableChild = mainElement.querySelector('[class*="overflow-auto"]');
-        if (scrollableChild) {
-          return scrollableChild as HTMLElement;
+      // Look for the main scrollable content area with flex-1 overflow-auto
+      const scrollableElements = document.querySelectorAll('.overflow-auto');
+      
+      for (const element of scrollableElements) {
+        const styles = window.getComputedStyle(element);
+        // Find element that has flex-1 and overflow-auto (main content area)
+        if (element.classList.contains('flex-1') || 
+            styles.flex === '1 1 0%' || 
+            styles.flexGrow === '1') {
+          return element as HTMLElement;
         }
       }
       
-      // Fallback to window
+      // Fallback: look for main element with overflow-auto
+      const mainElement = document.querySelector('main.overflow-auto');
+      if (mainElement) {
+        return mainElement as HTMLElement;
+      }
+      
+      // Last fallback: look for any div with flex-1 overflow-auto
+      const flexOverflowElement = document.querySelector('div.flex-1.overflow-auto');
+      if (flexOverflowElement) {
+        return flexOverflowElement as HTMLElement;
+      }
+      
       return null;
     };
 
     const toggleVisibility = () => {
       const container = scrollContainerRef.current;
       if (container) {
-        // For element scroll, check scrollTop
         const scrolled = container.scrollTop;
-        const threshold = container.scrollHeight / 2; // Halfway down
+        const scrollHeight = container.scrollHeight;
+        const clientHeight = container.clientHeight;
+        const threshold = (scrollHeight - clientHeight) / 2; // Halfway through scrollable content
         setIsVisible(scrolled > threshold);
       } else {
         // Fallback to window scroll
@@ -45,30 +54,38 @@ export const BackToTopButton = () => {
       }
     };
 
-    // Initialize scroll container
-    scrollContainerRef.current = findScrollContainer();
-    
-    const container = scrollContainerRef.current;
-    
-    if (container) {
-      // Add scroll listener to the container element
-      container.addEventListener('scroll', toggleVisibility);
+    // Initialize scroll container with a small delay to ensure DOM is ready
+    const initializeContainer = () => {
+      scrollContainerRef.current = findScrollContainer();
       
-      // Initial check
-      toggleVisibility();
+      const container = scrollContainerRef.current;
       
-      return () => {
-        container.removeEventListener('scroll', toggleVisibility);
-      };
-    } else {
-      // Fallback to window scroll
-      window.addEventListener('scroll', toggleVisibility);
-      toggleVisibility();
-      
-      return () => {
-        window.removeEventListener('scroll', toggleVisibility);
-      };
-    }
+      if (container) {
+        container.addEventListener('scroll', toggleVisibility);
+        toggleVisibility(); // Initial check
+        
+        return () => {
+          container.removeEventListener('scroll', toggleVisibility);
+        };
+      } else {
+        // Fallback to window scroll
+        window.addEventListener('scroll', toggleVisibility);
+        toggleVisibility();
+        
+        return () => {
+          window.removeEventListener('scroll', toggleVisibility);
+        };
+      }
+    };
+
+    // Use a small timeout to ensure the DOM is fully rendered
+    const timeoutId = setTimeout(initializeContainer, 100);
+    const cleanup = initializeContainer();
+
+    return () => {
+      clearTimeout(timeoutId);
+      if (cleanup) cleanup();
+    };
   }, []);
 
   const scrollToTop = () => {
