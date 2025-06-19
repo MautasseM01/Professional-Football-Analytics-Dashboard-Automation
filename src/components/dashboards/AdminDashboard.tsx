@@ -2,6 +2,7 @@
 import { UserProfile } from "@/types";
 import { useComplianceData } from "@/hooks/use-compliance-data";
 import { usePlayersAtRisk } from "@/hooks/use-players-at-risk";
+import { MarketingComplianceBanner } from "../MarketingComplianceBanner";
 import { ComplianceAlertBanner } from "./admin/ComplianceAlertBanner";
 import { ComplianceMetricsCards } from "./admin/ComplianceMetricsCards";
 import { ComplianceOverviewCard } from "./admin/ComplianceOverviewCard";
@@ -21,6 +22,9 @@ export const AdminDashboard = ({ profile }: AdminDashboardProps) => {
 
   return (
     <div className="space-y-3 xs:space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
+      {/* Marketing Compliance Banner */}
+      <MarketingComplianceBanner />
+
       {/* Welcome Header */}
       <div className="flex flex-col gap-2">
         <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-club-gold px-1">

@@ -2,6 +2,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/types";
+import { MarketingComplianceBanner } from "../MarketingComplianceBanner";
 import { Trophy, DollarSign, AlertTriangle, Users, Target, BarChart3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -12,6 +13,9 @@ interface ManagementDashboardProps {
 export const ManagementDashboard = ({ profile }: ManagementDashboardProps) => {
   return (
     <div className="space-y-3 xs:space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
+      {/* Marketing Compliance Banner */}
+      <MarketingComplianceBanner />
+
       {/* Welcome Header */}
       <div className="flex flex-col gap-2">
         <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-club-gold px-1">
@@ -66,7 +70,7 @@ export const ManagementDashboard = ({ profile }: ManagementDashboardProps) => {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="text-center">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">€150K</div>
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">£150K</div>
               <div className="text-xs sm:text-sm text-club-light-gray/70">Squad Value</div>
             </div>
             <div className="grid grid-cols-2 gap-2 text-center">

@@ -3,6 +3,7 @@ import { usePlayerData } from "@/hooks/use-player-data";
 import { UserProfile } from "@/types";
 import { PlayerStats } from "@/components/PlayerStats";
 import { PlayerSelector } from "@/components/PlayerSelector";
+import { MarketingComplianceBanner } from "../MarketingComplianceBanner";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Users, AlertTriangle, Target, TrendingUp } from "lucide-react";
 import { ResponsiveGrid } from "../ResponsiveLayout";
@@ -16,6 +17,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
 
   return (
     <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
+      {/* Marketing Compliance Banner */}
+      <MarketingComplianceBanner />
+
       <div className="mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold mb-2">
           Coach Dashboard
