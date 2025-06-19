@@ -1,35 +1,89 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ChevronUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export const BackToTopButton = () => {
   const [isVisible, setIsVisible] = useState(false);
+  const scrollContainerRef = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    // Find the main content scroll container
+    const findScrollContainer = () => {
+      // Look for the main content area that has overflow-auto
+      const mainElement = document.querySelector('main');
+      if (mainElement) {
+        // Check if main itself has scroll
+        const mainStyles = window.getComputedStyle(mainElement);
+        if (mainStyles.overflow === 'auto' || mainStyles.overflowY === 'auto') {
+          return mainElement;
+        }
+        
+        // Look for a child with overflow-auto
+        const scrollableChild = mainElement.querySelector('[class*="overflow-auto"]');
+        if (scrollableChild) {
+          return scrollableChild as HTMLElement;
+        }
+      }
+      
+      // Fallback to window
+      return null;
+    };
+
     const toggleVisibility = () => {
-      // Show button when user scrolls down past 200px
-      if (window.scrollY > 200) {
-        setIsVisible(true);
+      const container = scrollContainerRef.current;
+      if (container) {
+        // For element scroll, check scrollTop
+        const scrolled = container.scrollTop;
+        const threshold = container.scrollHeight / 2; // Halfway down
+        setIsVisible(scrolled > threshold);
       } else {
-        setIsVisible(false);
+        // Fallback to window scroll
+        const scrolled = window.scrollY;
+        const threshold = document.documentElement.scrollHeight / 2;
+        setIsVisible(scrolled > threshold);
       }
     };
 
-    // Add scroll event listener
-    window.addEventListener('scroll', toggleVisibility);
-
-    // Cleanup function to remove event listener
-    return () => {
-      window.removeEventListener('scroll', toggleVisibility);
-    };
+    // Initialize scroll container
+    scrollContainerRef.current = findScrollContainer();
+    
+    const container = scrollContainerRef.current;
+    
+    if (container) {
+      // Add scroll listener to the container element
+      container.addEventListener('scroll', toggleVisibility);
+      
+      // Initial check
+      toggleVisibility();
+      
+      return () => {
+        container.removeEventListener('scroll', toggleVisibility);
+      };
+    } else {
+      // Fallback to window scroll
+      window.addEventListener('scroll', toggleVisibility);
+      toggleVisibility();
+      
+      return () => {
+        window.removeEventListener('scroll', toggleVisibility);
+      };
+    }
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    } else {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
