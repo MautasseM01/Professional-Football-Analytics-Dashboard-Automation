@@ -4,6 +4,7 @@ import { useComplianceData } from "@/hooks/use-compliance-data";
 import { usePlayersAtRisk } from "@/hooks/use-players-at-risk";
 import { ComplianceAlertBanner } from "./admin/ComplianceAlertBanner";
 import { ComplianceMetricsCards } from "./admin/ComplianceMetricsCards";
+import { ComplianceOverviewCard } from "./admin/ComplianceOverviewCard";
 import { PlayersAtRiskSection } from "./admin/PlayersAtRiskSection";
 import { UserManagementCard } from "./admin/UserManagementCard";
 import { SystemAdministrationCard } from "./admin/SystemAdministrationCard";
@@ -38,6 +39,9 @@ export const AdminDashboard = ({ profile }: AdminDashboardProps) => {
         complianceData={complianceData} 
         isLoading={complianceLoading} 
       />
+
+      {/* NEW: Compliance Overview Card */}
+      <ComplianceOverviewCard />
 
       {/* Players at Risk Section */}
       <PlayersAtRiskSection 
