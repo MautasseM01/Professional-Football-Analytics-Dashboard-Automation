@@ -9,6 +9,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
 import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
 import { useMatchRatings } from "@/hooks/use-match-ratings";
+import TeamDisciplineTimeline from "@/components/TeamDisciplineTimeline";
 import { 
   Users, 
   Trophy, 
@@ -205,6 +206,9 @@ const TeamOverview = () => {
                 </CardContent>
               </Card>
             </div>
+
+            {/* Team Discipline Timeline - NEW COMPONENT */}
+            <TeamDisciplineTimeline />
 
             {/* Main Content Tabs */}
             <Tabs defaultValue="results" className="space-y-6">
