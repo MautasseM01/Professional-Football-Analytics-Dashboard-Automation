@@ -1,10 +1,11 @@
+
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
 interface DisciplinaryEvent {
   id: number;
   card_type: string;
-  match_date: string;
+  match_date: date;
   competition: string;
   match_id?: number;
   match_name?: string;
