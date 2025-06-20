@@ -952,7 +952,7 @@ export type Database = {
           fouls_suffered?: number | null
           goals?: number | null
           heatmapUrl?: string | null
-          id: number
+          id?: number
           interceptions?: number | null
           last_match_date?: string | null
           match_rating?: number | null

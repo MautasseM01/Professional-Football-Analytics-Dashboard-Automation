@@ -1,95 +1,114 @@
 
 import { 
-  LayoutDashboard, 
-  UserRound, 
+  BarChart3, 
   Users, 
-  FileBarChart, 
-  Settings
+  TrendingUp, 
+  FileText, 
+  Settings, 
+  Home,
+  UserCheck,
+  Target,
+  Activity,
+  Map,
+  Zap,
+  Shield,
+  Upload
 } from "lucide-react";
-import { AccessibleNavigationItem } from "@/utils/roleAccess";
+import { UserRole } from "@/types";
 
-export type { AccessibleNavigationItem as NavigationItem };
+export interface NavigationItem {
+  name: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  current: boolean;
+  allowedRoles: UserRole[];
+  subItems?: {
+    name: string;
+    href: string;
+    allowedRoles: UserRole[];
+  }[];
+}
 
-export const navigationItems: AccessibleNavigationItem[] = [
-  { 
-    name: "Dashboard Home", 
-    href: "/dashboard", 
-    icon: LayoutDashboard,
-    translationKey: "nav.dashboard",
-    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player', 'unassigned']
+export const navigationItems: NavigationItem[] = [
+  {
+    name: 'Dashboard',
+    href: '/dashboard',
+    icon: Home,
+    current: false,
+    allowedRoles: ['player', 'coach', 'analyst', 'performance_director', 'management', 'admin'],
   },
-  { 
-    name: "Player Analysis", 
-    href: "/player-analysis", 
-    icon: UserRound,
-    translationKey: "nav.playerAnalysis",
-    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player'],
+  {
+    name: 'Player Analysis',
+    href: '/player-analysis',
+    icon: UserCheck,
+    current: false,
+    allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
     subItems: [
-      { 
-        name: "Individual Player Stats", 
-        href: "/player-analysis/stats", 
-        translationKey: "nav.individualStats",
-        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']
+      {
+        name: 'Player Stats',
+        href: '/player-analysis/stats',
+        allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
       },
-      { 
-        name: "Player Comparison", 
-        href: "/player-analysis/comparison", 
-        translationKey: "nav.playerComparison",
-        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
+      {
+        name: 'Player Comparison',
+        href: '/player-analysis/comparison',
+        allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
       },
-      { 
-        name: "Player Development", 
-        href: "/player-analysis/development", 
-        translationKey: "nav.playerDevelopment",
-        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']
+      {
+        name: 'Player Development',
+        href: '/player-analysis/development',
+        allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
       },
-      { 
-        name: "Shot Map", 
-        href: "/player-analysis/shot-map", 
-        translationKey: "nav.shotMap",
-        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
+      {
+        name: 'Shot Map',
+        href: '/player-analysis/shot-map',
+        allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
       },
-      { 
-        name: "Goals & Assists Analysis", 
-        href: "/player-analysis/goals-assists", 
-        translationKey: "nav.goalsAssists",
-        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
-      }
-    ]
+      {
+        name: 'Goals & Assists',
+        href: '/player-analysis/goals-assists',
+        allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+      },
+    ],
   },
-  { 
-    name: "Team Performance", 
-    href: "/team-performance", 
+  {
+    name: 'Team Performance',
+    href: '/team-performance',
     icon: Users,
-    translationKey: "nav.teamPerformance",
-    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach'],
+    current: false,
+    allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
     subItems: [
-      { 
-        name: "Team Overview", 
-        href: "/team-performance/overview", 
-        translationKey: "nav.teamOverview",
-        allowedRoles: ['admin', 'management', 'performance_director', 'coach']
+      {
+        name: 'Team Overview',
+        href: '/team-performance/overview',
+        allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
       },
-      { 
-        name: "Team Tactical Analysis", 
-        href: "/team-performance/tactical-analysis", 
-        translationKey: "nav.tacticalAnalysis",
-        allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach']
-      }
-    ]
+      {
+        name: 'Tactical Analysis',
+        href: '/team-performance/tactical-analysis',
+        allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+      },
+    ],
   },
-  { 
-    name: "Reports", 
-    href: "/reports", 
-    icon: FileBarChart,
-    translationKey: "nav.reports",
-    allowedRoles: ['admin', 'management', 'analyst']
+  {
+    name: 'Match Data Import',
+    href: '/match-data-import',
+    icon: Upload,
+    current: false,
+    allowedRoles: ['coach', 'analyst', 'management', 'admin'],
   },
-  { 
-    name: "Settings", 
-    href: "/settings", 
+  {
+    name: 'Reports',
+    href: '/reports',
+    icon: FileText,
+    current: false,
+    allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+  },
+  {
+    name: 'Settings',
+    href: '/settings',
     icon: Settings,
-    translationKey: "nav.settings",
-    allowedRoles: ['admin', 'management', 'performance_director', 'analyst', 'coach', 'player']
+    current: false,
+    allowedRoles: ['player', 'coach', 'analyst', 'performance_director', 'management', 'admin'],
   },
 ];

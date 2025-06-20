@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +15,7 @@ import TeamOverview from "./pages/TeamOverview";
 import ShotMap from "./pages/ShotMap";
 import GoalsAssistsAnalysis from "./pages/GoalsAssistsAnalysis";
 import TeamTacticalAnalysis from "./pages/TeamTacticalAnalysis";
+import MatchDataImport from "./pages/MatchDataImport";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { AccessDenied } from "./components/AccessDenied";
@@ -50,6 +52,7 @@ const App = () => (
                 
                 <Route path="/reports" element={<Dashboard />} />
                 <Route path="/settings" element={<Dashboard />} />
+                <Route path="/match-data-import" element={<MatchDataImport />} />
                 
                 {/* 404 Not Found */}
                 <Route path="*" element={<NotFound />} />
