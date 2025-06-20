@@ -1,6 +1,6 @@
 import { Player } from "@/types";
 import { StatCard } from "./StatCard";
-import { EnhancedDisciplinaryCard } from "./EnhancedDisciplinaryCard";
+import { DisciplinaryCard } from "./DisciplinaryCard";
 import { ResponsiveGrid } from "./ResponsiveLayout";
 import { 
   BarChart, 
@@ -257,12 +257,20 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
             </TooltipContent>
           </Tooltip>
 
-          {/* Enhanced Disciplinary Card - Full Width */}
-          <div className={`
-            col-span-full transition-all duration-300 ease-in-out
-          `}>
-            <EnhancedDisciplinaryCard playerId={player.id} />
-          </div>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className={`
+                w-full h-full min-w-0 transition-all duration-300 ease-in-out
+                ${breakpoint === 'tablet-portrait' ? 'col-span-2' : ''}
+                ${breakpoint === 'tablet-landscape' ? 'col-span-1' : ''}
+              `}>
+                <DisciplinaryCard playerId={player.id} />
+              </div>
+            </TooltipTrigger>
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
+              <p>Disciplinary record with risk assessment</p>
+            </TooltipContent>
+          </Tooltip>
         </ResponsiveGrid>
       </div>
     </TooltipProvider>
