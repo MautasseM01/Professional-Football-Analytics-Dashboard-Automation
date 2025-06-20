@@ -48,6 +48,7 @@ export const canAccessRoute = (route: string, userRole: UserRole | undefined): b
     '/player-analysis/shot-map': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
     '/team-performance': ['admin', 'management', 'coach', 'performance_director'],
     '/team-performance/tactical-analysis': ['admin', 'management', 'coach', 'analyst', 'performance_director'],
+    '/team-performance/points-deductions': ['admin', 'management', 'coach'],
     '/reports': ['admin', 'management', 'analyst'],
     '/settings': ['admin', 'management', 'coach', 'analyst', 'performance_director', 'player']
   };
@@ -87,5 +88,9 @@ export const canSeeOwnDataOnly = (userRole: UserRole | undefined): boolean => {
 };
 
 export const canAccessComplianceFeatures = (userRole: UserRole | undefined): boolean => {
+  return hasAccess(userRole, ['admin', 'management', 'coach']);
+};
+
+export const canAccessPointsDeductions = (userRole: UserRole | undefined): boolean => {
   return hasAccess(userRole, ['admin', 'management', 'coach']);
 };

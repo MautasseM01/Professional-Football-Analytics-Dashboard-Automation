@@ -12,7 +12,8 @@ import {
   Map,
   Zap,
   Shield,
-  Upload
+  Upload,
+  AlertTriangle
 } from "lucide-react";
 import { UserRole } from "@/types";
 
@@ -99,6 +100,12 @@ export const navigationItems: NavigationItem[] = [
         href: '/team-performance/tactical-analysis',
         allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
         translationKey: 'nav.tacticalAnalysis',
+      },
+      {
+        name: 'Points Deductions',
+        href: '/team-performance/points-deductions',
+        allowedRoles: ['coach', 'management', 'admin'],
+        translationKey: 'nav.pointsDeductions',
       },
     ],
   },

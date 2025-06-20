@@ -16,6 +16,7 @@ import ShotMap from "./pages/ShotMap";
 import GoalsAssistsAnalysis from "./pages/GoalsAssistsAnalysis";
 import TeamTacticalAnalysis from "./pages/TeamTacticalAnalysis";
 import MatchDataImport from "./pages/MatchDataImport";
+import PointsDeductionTracker from "./pages/PointsDeductionTracker";
 import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 import { AccessDenied } from "./components/AccessDenied";
@@ -49,6 +50,7 @@ const App = () => (
                 <Route path="/team-performance" element={<Navigate to="/team-performance/overview" replace />} />
                 <Route path="/team-performance/overview" element={<TeamOverview />} />
                 <Route path="/team-performance/tactical-analysis" element={<TeamTacticalAnalysis />} />
+                <Route path="/team-performance/points-deductions" element={<PointsDeductionTracker />} />
                 
                 <Route path="/reports" element={<Dashboard />} />
                 <Route path="/settings" element={<Dashboard />} />
