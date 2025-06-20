@@ -22,10 +22,12 @@ export interface NavigationItem {
   icon: React.ComponentType<{ className?: string }>;
   current: boolean;
   allowedRoles: UserRole[];
+  translationKey: string;
   subItems?: {
     name: string;
     href: string;
     allowedRoles: UserRole[];
+    translationKey: string;
   }[];
 }
 
@@ -36,6 +38,7 @@ export const navigationItems: NavigationItem[] = [
     icon: Home,
     current: false,
     allowedRoles: ['player', 'coach', 'analyst', 'performance_director', 'management', 'admin'],
+    translationKey: 'nav.dashboard',
   },
   {
     name: 'Player Analysis',
@@ -43,31 +46,37 @@ export const navigationItems: NavigationItem[] = [
     icon: UserCheck,
     current: false,
     allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+    translationKey: 'nav.playerAnalysis',
     subItems: [
       {
         name: 'Player Stats',
         href: '/player-analysis/stats',
         allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+        translationKey: 'nav.playerStats',
       },
       {
         name: 'Player Comparison',
         href: '/player-analysis/comparison',
         allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+        translationKey: 'nav.playerComparison',
       },
       {
         name: 'Player Development',
         href: '/player-analysis/development',
         allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+        translationKey: 'nav.playerDevelopment',
       },
       {
         name: 'Shot Map',
         href: '/player-analysis/shot-map',
         allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+        translationKey: 'nav.shotMap',
       },
       {
         name: 'Goals & Assists',
         href: '/player-analysis/goals-assists',
         allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+        translationKey: 'nav.goalsAssists',
       },
     ],
   },
@@ -77,16 +86,19 @@ export const navigationItems: NavigationItem[] = [
     icon: Users,
     current: false,
     allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+    translationKey: 'nav.teamPerformance',
     subItems: [
       {
         name: 'Team Overview',
         href: '/team-performance/overview',
         allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+        translationKey: 'nav.teamOverview',
       },
       {
         name: 'Tactical Analysis',
         href: '/team-performance/tactical-analysis',
         allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+        translationKey: 'nav.tacticalAnalysis',
       },
     ],
   },
@@ -96,6 +108,7 @@ export const navigationItems: NavigationItem[] = [
     icon: Upload,
     current: false,
     allowedRoles: ['coach', 'analyst', 'management', 'admin'],
+    translationKey: 'nav.matchDataImport',
   },
   {
     name: 'Reports',
@@ -103,6 +116,7 @@ export const navigationItems: NavigationItem[] = [
     icon: FileText,
     current: false,
     allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+    translationKey: 'nav.reports',
   },
   {
     name: 'Settings',
@@ -110,5 +124,6 @@ export const navigationItems: NavigationItem[] = [
     icon: Settings,
     current: false,
     allowedRoles: ['player', 'coach', 'analyst', 'performance_director', 'management', 'admin'],
+    translationKey: 'nav.settings',
   },
 ];
