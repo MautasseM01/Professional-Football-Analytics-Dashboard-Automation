@@ -411,7 +411,7 @@ Mike Johnson,7,Forward,75,2024-01-15,Arsenal FC,Premier League,Manchester United
                   <div className="bg-red-900/20 border border-red-600/30 rounded-lg p-4">
                     <ul className="text-sm text-red-400 space-y-1">
                       {uploadState.details.map((detail, index) => (
-                        <li key={index">• {detail}</li>
+                        <li key={index}>• {detail}</li>
                       ))}
                     </ul>
                   </div>
@@ -444,7 +444,7 @@ Mike Johnson,7,Forward,75,2024-01-15,Arsenal FC,Premier League,Manchester United
               <p>• Contact support if you encounter persistent upload issues</p>
             </div>
           </CardContent>
-        </div>
+        </Card>
       </div>
     </DashboardLayout>
   );
