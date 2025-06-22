@@ -22,7 +22,7 @@ export const StatCard = ({
       light:bg-white light:border-gray-200 light:hover:border-yellow-600/50
       ${className}
     `}>
-      <CardContent className="p-4 sm:p-5 lg:p-6 h-full flex flex-col justify-between min-h-[140px] px-[24px]">
+      <CardContent className="p-4 sm:p-5 lg:p-6 h-full flex flex-col justify-between min-h-[40px] px-[24px]">
         <div className="min-w-0 flex-1 space-y-3">
           <div className="flex items-start justify-between gap-2">
             <div className="text-sm text-gray-300 light:text-gray-700 font-medium leading-tight min-w-0 flex-1">
