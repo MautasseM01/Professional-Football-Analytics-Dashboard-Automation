@@ -86,13 +86,13 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
           className={`
             ${gridConfig.className}
             auto-rows-fr
-            gap-2
+            gap-4 sm:gap-5 lg:gap-6
             transition-all duration-300 ease-in-out
           `}
         >
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full min-w-0 transition-all duration-300 ease-in-out">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -112,7 +112,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full min-w-0 transition-all duration-300 ease-in-out">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -133,7 +133,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full min-w-0 transition-all duration-300 ease-in-out">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -154,7 +154,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full min-w-0 transition-all duration-300 ease-in-out">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -175,7 +175,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
 
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full min-w-0 transition-all duration-300 ease-in-out">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -196,7 +196,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full min-w-0 transition-all duration-300 ease-in-out">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -217,7 +217,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full min-w-0 transition-all duration-300 ease-in-out">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
@@ -238,7 +238,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
           
           <Tooltip>
             <TooltipTrigger asChild>
-              <div className="w-full min-w-0 transition-all duration-300 ease-in-out">
+              <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
                     <div className="flex items-center gap-1.5">
