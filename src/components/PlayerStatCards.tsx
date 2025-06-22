@@ -1,4 +1,3 @@
-
 import { Player } from "@/types";
 import { StatCard } from "./StatCard";
 import { EnhancedDisciplinaryCard } from "./EnhancedDisciplinaryCard";
@@ -49,16 +48,16 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
     const getGridConfig = () => {
       switch (breakpoint) {
         case 'mobile':
-          return { minWidth: '100%', className: 'grid-cols-2' };
+          return { minWidth: '100%', className: 'grid-cols-1' };
         case 'tablet-portrait':
-          return { minWidth: '150px', className: 'grid-cols-2 xs:grid-cols-4' };
+          return { minWidth: '280px', className: 'grid-cols-1 xs:grid-cols-2' };
         case 'tablet-landscape':
-          return { minWidth: '140px', className: 'grid-cols-4 md:grid-cols-8' };
+          return { minWidth: '200px', className: 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' };
         case 'desktop':
-          return { minWidth: '130px', className: 'grid-cols-4 lg:grid-cols-8' };
+          return { minWidth: '180px', className: 'grid-cols-3 lg:grid-cols-4 xl:grid-cols-6' };
         case 'large':
         default:
-          return { minWidth: '120px', className: 'grid-cols-8' };
+          return { minWidth: '160px', className: 'grid-cols-4 lg:grid-cols-6 xl:grid-cols-8' };
       }
     };
 
@@ -81,14 +80,13 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
 
   return (
     <TooltipProvider>
-      <div className="w-full transition-all duration-300 ease-in-out space-y-6">
-        {/* Main Statistics Cards */}
+      <div className="w-full transition-all duration-300 ease-in-out">
         <ResponsiveGrid 
           minCardWidth={gridConfig.minWidth}
           className={`
             ${gridConfig.className}
             auto-rows-fr
-            gap-3
+            gap-4 sm:gap-5 lg:gap-6
             transition-all duration-300 ease-in-out
           `}
         >
@@ -97,7 +95,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
               <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <span>Matches</span>
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
@@ -107,7 +105,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Total matches played this season</p>
             </TooltipContent>
           </Tooltip>
@@ -117,7 +115,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
               <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <span>Goals</span>
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
@@ -128,7 +126,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Total goals scored and average per match</p>
             </TooltipContent>
           </Tooltip>
@@ -138,7 +136,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
               <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <span>Assists</span>
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
@@ -149,7 +147,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Total assists provided and average per match</p>
             </TooltipContent>
           </Tooltip>
@@ -159,7 +157,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
               <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <span>G+A</span>
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
@@ -170,7 +168,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Total goal contributions (Goals + Assists)</p>
             </TooltipContent>
           </Tooltip>
@@ -180,7 +178,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
               <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <span>Rating</span>
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
@@ -191,7 +189,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Average match rating across all games</p>
             </TooltipContent>
           </Tooltip>
@@ -201,7 +199,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
               <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <span>Distance</span>
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
@@ -212,7 +210,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Total distance covered in all matches</p>
             </TooltipContent>
           </Tooltip>
@@ -222,7 +220,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
               <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <span>Pass Accuracy</span>
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
@@ -233,7 +231,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Pass completion percentage and total attempts</p>
             </TooltipContent>
           </Tooltip>
@@ -243,7 +241,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
               <div className="w-full h-full min-w-0 transition-all duration-300 ease-in-out">
                 <StatCard 
                   title={
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1.5">
                       <span>Shot Accuracy</span>
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
@@ -254,16 +252,18 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                 />
               </div>
             </TooltipTrigger>
-            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs">
+            <TooltipContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-w-xs text-xs sm:text-sm">
               <p>Shot accuracy percentage and total attempts</p>
             </TooltipContent>
           </Tooltip>
-        </ResponsiveGrid>
 
-        {/* Enhanced Disciplinary Card - Separated Section */}
-        <div className="w-full">
-          <EnhancedDisciplinaryCard playerId={player.id} />
-        </div>
+          {/* Enhanced Disciplinary Card - Full Width */}
+          <div className={`
+            col-span-full transition-all duration-300 ease-in-out
+          `}>
+            <EnhancedDisciplinaryCard playerId={player.id} />
+          </div>
+        </ResponsiveGrid>
       </div>
     </TooltipProvider>
   );

@@ -29,11 +29,11 @@ export const DisciplinaryRiskPanel = ({
   const getRiskIcon = () => {
     switch (riskLevel) {
       case 'CRITICAL':
-        return <AlertTriangle className="w-4 h-4 text-red-500" />;
+        return <AlertTriangle className="w-5 h-5 text-red-500" />;
       case 'AT RISK':
-        return <Shield className="w-4 h-4 text-amber-500" />;
+        return <Shield className="w-5 h-5 text-amber-500" />;
       default:
-        return <Shield className="w-4 h-4 text-green-500" />;
+        return <Shield className="w-5 h-5 text-green-500" />;
     }
   };
 
@@ -49,81 +49,86 @@ export const DisciplinaryRiskPanel = ({
   };
 
   return (
-    <div className="space-y-4">
-      {/* Risk Status */}
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+    <Card className="bg-club-dark-gray border-club-gold/20">
+      <CardHeader>
+        <CardTitle className="text-club-gold flex items-center gap-2">
           {getRiskIcon()}
-          <span className="text-club-light-gray text-sm">Current Status</span>
-        </div>
-        <Badge className={`${getRiskBadgeColor()} text-xs py-0 px-2`}>
-          {riskLevel}
-        </Badge>
-      </div>
-
-      {/* Suspension Progress */}
-      <div className="space-y-2">
+          Risk Assessment
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-6 space-y-6">
+        {/* Risk Status */}
         <div className="flex items-center justify-between">
-          <span className="text-club-light-gray text-sm">Cards to Suspension</span>
-          <span className="text-club-gold font-medium text-sm">
-            {cardsUntilSuspension > 0 ? `${cardsUntilSuspension} more` : 'At threshold'}
-          </span>
+          <span className="text-club-light-gray">Current Status</span>
+          <Badge className={getRiskBadgeColor()}>
+            {riskLevel}
+          </Badge>
         </div>
-        <Progress 
-          value={suspensionProgress} 
-          className="h-2 bg-club-black"
-        />
-        <div className="flex justify-between text-xs text-club-light-gray/60">
-          <span>0 cards</span>
-          <span>5 cards (suspension)</span>
-        </div>
-      </div>
 
-      {/* Fair Play Rating */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <span className="text-club-light-gray text-sm">Fair Play Rating</span>
-          <div className="flex items-center gap-2">
-            <span className="text-club-gold font-medium text-sm">{fairPlayRating}/10</span>
-            {fairPlayComparison > 0 ? (
-              <TrendingUp className="w-3 h-3 text-green-500" />
-            ) : (
-              <TrendingUp className="w-3 h-3 text-red-500 rotate-180" />
-            )}
+        {/* Suspension Progress */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-club-light-gray text-sm">Cards to Suspension</span>
+            <span className="text-club-gold font-medium">
+              {cardsUntilSuspension > 0 ? `${cardsUntilSuspension} more` : 'At threshold'}
+            </span>
+          </div>
+          <Progress 
+            value={suspensionProgress} 
+            className="h-2 bg-club-black"
+          />
+          <div className="flex justify-between text-xs text-club-light-gray/60">
+            <span>0 cards</span>
+            <span>5 cards (suspension)</span>
           </div>
         </div>
-        <div className="text-xs text-club-light-gray/60">
-          Team average: {teamAverageFairPlay}/10 
-          <span className={fairPlayComparison > 0 ? 'text-green-500' : 'text-red-500'}>
-            {' '}({fairPlayComparison > 0 ? '+' : ''}{fairPlayComparison.toFixed(1)})
-          </span>
-        </div>
-      </div>
 
-      {/* Key Statistics */}
-      <div className="grid grid-cols-2 gap-3 pt-3 border-t border-club-gold/10">
-        <div className="text-center">
-          <div className="text-lg font-bold text-club-gold">{totalCards}</div>
-          <div className="text-xs text-club-light-gray/60">Total Cards</div>
-        </div>
-        <div className="text-center">
-          <div className="text-lg font-bold text-club-gold">{missedMatches}</div>
-          <div className="text-xs text-club-light-gray/60">Matches Missed</div>
-        </div>
-      </div>
-
-      {/* Upcoming Risks */}
-      {cardsUntilSuspension <= 1 && cardsUntilSuspension > 0 && (
-        <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
-          <div className="flex items-center gap-2 text-amber-400 text-sm font-medium mb-1">
-            <AlertTriangle className="w-4 h-4" />
-            Warning: Next card triggers suspension
+        {/* Fair Play Rating */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="text-club-light-gray text-sm">Fair Play Rating</span>
+            <div className="flex items-center gap-2">
+              <span className="text-club-gold font-medium">{fairPlayRating}/10</span>
+              {fairPlayComparison > 0 ? (
+                <TrendingUp className="w-4 h-4 text-green-500" />
+              ) : (
+                <TrendingUp className="w-4 h-4 text-red-500 rotate-180" />
+              )}
+            </div>
           </div>
-          <p className="text-xs text-amber-300/80">
-            Upcoming key matches: Arsenal (H), Liverpool (A), Champions League QF
-          </p>
+          <div className="text-xs text-club-light-gray/60">
+            Team average: {teamAverageFairPlay}/10 
+            <span className={fairPlayComparison > 0 ? 'text-green-500' : 'text-red-500'}>
+              {' '}({fairPlayComparison > 0 ? '+' : ''}{fairPlayComparison.toFixed(1)})
+            </span>
+          </div>
         </div>
-      )}
-    </div>
+
+        {/* Key Statistics */}
+        <div className="grid grid-cols-2 gap-4 pt-4 border-t border-club-gold/10">
+          <div className="text-center">
+            <div className="text-xl font-bold text-club-gold">{totalCards}</div>
+            <div className="text-xs text-club-light-gray/60">Total Cards</div>
+          </div>
+          <div className="text-center">
+            <div className="text-xl font-bold text-club-gold">{missedMatches}</div>
+            <div className="text-xs text-club-light-gray/60">Matches Missed</div>
+          </div>
+        </div>
+
+        {/* Upcoming Risks */}
+        {cardsUntilSuspension <= 1 && cardsUntilSuspension > 0 && (
+          <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-3">
+            <div className="flex items-center gap-2 text-amber-400 text-sm font-medium mb-1">
+              <AlertTriangle className="w-4 h-4" />
+              Warning: Next card triggers suspension
+            </div>
+            <p className="text-xs text-amber-300/80">
+              Upcoming key matches: Arsenal (H), Liverpool (A), Champions League QF
+            </p>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 };
