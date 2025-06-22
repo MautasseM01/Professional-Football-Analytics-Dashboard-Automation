@@ -46,17 +46,17 @@ export const EnhancedDisciplinaryCard = ({ playerId }: EnhancedDisciplinaryCardP
   if (isLoading) {
     return (
       <Card className="bg-club-black border-club-gold/20">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-club-gold flex items-center gap-2 text-base">
-            <AlertTriangle className="w-4 h-4" />
+        <CardHeader>
+          <CardTitle className="text-club-gold flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5" />
             Disciplinary Profile
           </CardTitle>
         </CardHeader>
-        <CardContent className="p-4">
-          <div className="space-y-3">
-            <Skeleton className="h-6 w-32 bg-club-gold/10" />
+        <CardContent className="p-6">
+          <div className="space-y-4">
+            <Skeleton className="h-8 w-32 bg-club-gold/10" />
             <Skeleton className="h-4 w-48 bg-club-gold/10" />
-            <Skeleton className="h-16 w-full bg-club-gold/10" />
+            <Skeleton className="h-20 w-full bg-club-gold/10" />
           </div>
         </CardContent>
       </Card>
@@ -66,9 +66,9 @@ export const EnhancedDisciplinaryCard = ({ playerId }: EnhancedDisciplinaryCardP
   if (!disciplinaryData) {
     return (
       <Card className="bg-club-black border-club-gold/20">
-        <CardContent className="p-4 text-center">
-          <AlertTriangle className="w-6 h-6 mx-auto text-club-gold/50 mb-2" />
-          <p className="text-club-light-gray text-sm">No disciplinary data available</p>
+        <CardContent className="p-6 text-center">
+          <AlertTriangle className="w-8 h-8 mx-auto text-club-gold/50 mb-2" />
+          <p className="text-club-light-gray">No disciplinary data available</p>
         </CardContent>
       </Card>
     );
@@ -76,96 +76,103 @@ export const EnhancedDisciplinaryCard = ({ playerId }: EnhancedDisciplinaryCardP
 
   return (
     <Card className="bg-club-black border-club-gold/20">
-      <CardHeader className="pb-3">
+      <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle className="text-club-gold flex items-center gap-2 text-base">
-            <AlertTriangle className="w-4 h-4" />
+          <CardTitle className="text-club-gold flex items-center gap-2">
+            <AlertTriangle className="w-5 h-5" />
             Disciplinary Profile
           </CardTitle>
           <Button
             variant="outline"
             size="sm"
             onClick={handleExportData}
-            className="bg-club-dark-gray border-club-gold/30 text-club-gold hover:bg-club-gold/10 h-7 px-2 text-xs"
+            className="bg-club-dark-gray border-club-gold/30 text-club-gold hover:bg-club-gold/10"
           >
-            <Download className="w-3 h-3 mr-1" />
+            <Download className="w-4 h-4 mr-2" />
             Export
           </Button>
         </div>
       </CardHeader>
-      <CardContent className="p-4 pt-0">
+      <CardContent className="p-6">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-club-dark-gray h-8">
+          <TabsList className="grid w-full grid-cols-3 bg-club-dark-gray">
             <TabsTrigger 
               value="overview" 
-              className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black text-xs py-1"
+              className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
             >
-              <BarChart3 className="w-3 h-3 mr-1" />
+              <BarChart3 className="w-4 h-4 mr-2" />
               Overview
             </TabsTrigger>
             <TabsTrigger 
               value="timeline"
-              className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black text-xs py-1"
+              className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
             >
-              <Clock className="w-3 h-3 mr-1" />
+              <Clock className="w-4 h-4 mr-2" />
               Timeline
             </TabsTrigger>
             <TabsTrigger 
               value="risk"
-              className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black text-xs py-1"
+              className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
             >
-              <AlertTriangle className="w-3 h-3 mr-1" />
+              <AlertTriangle className="w-4 h-4 mr-2" />
               Risk
             </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="overview" className="mt-4">
-            <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-3 bg-club-dark-gray/50 rounded-lg">
-                <div className="text-lg font-bold text-club-gold mb-1">
-                  {disciplinaryData.totalCards}
+          <TabsContent value="overview" className="mt-6">
+            <div className="grid grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="text-center p-4 bg-club-dark-gray/50 rounded-lg">
+                  <div className="text-2xl font-bold text-club-gold mb-1">
+                    {disciplinaryData.totalCards}
+                  </div>
+                  <div className="text-sm text-club-light-gray/70">Total Cards</div>
                 </div>
-                <div className="text-xs text-club-light-gray/70">Total Cards</div>
-              </div>
-              
-              <div className="text-center p-3 bg-club-dark-gray/50 rounded-lg">
-                <div className="text-lg font-bold text-club-gold mb-1">
-                  {disciplinaryData.fairPlayRating}/10
+                
+                <div className="flex justify-center gap-2">
+                  {Array.from({ length: disciplinaryData.yellowCards }).map((_, i) => (
+                    <div key={`yellow-${i}`} className="bg-[#FCD34D] text-black text-xs font-bold w-6 h-8 rounded-sm flex items-center justify-center border border-gray-300">
+                      Y
+                    </div>
+                  ))}
+                  {Array.from({ length: disciplinaryData.redCards }).map((_, i) => (
+                    <div key={`red-${i}`} className="bg-[#EF4444] text-black text-xs font-bold w-6 h-8 rounded-sm flex items-center justify-center border border-gray-300">
+                      R
+                    </div>
+                  ))}
                 </div>
-                <div className="text-xs text-club-light-gray/70">Fair Play</div>
               </div>
-              
-              <div className="text-center p-3 bg-club-dark-gray/50 rounded-lg">
-                <div className="text-lg font-bold text-club-gold mb-1">
-                  {disciplinaryData.missedMatches}
-                </div>
-                <div className="text-xs text-club-light-gray/70">Missed Matches</div>
-              </div>
-            </div>
 
-            {/* Card visualization */}
-            <div className="flex justify-center gap-1 mt-4">
-              {Array.from({ length: disciplinaryData.yellowCards }).map((_, i) => (
-                <div key={`yellow-${i}`} className="bg-[#FCD34D] text-black text-xs font-bold w-5 h-6 rounded-sm flex items-center justify-center border border-gray-300">
-                  Y
+              <div className="space-y-3">
+                <div className="flex justify-between">
+                  <span className="text-club-light-gray text-sm">Status</span>
+                  <span className={`text-sm font-medium ${disciplinaryData.riskColor}`}>
+                    {disciplinaryData.riskLevel}
+                  </span>
                 </div>
-              ))}
-              {Array.from({ length: disciplinaryData.redCards }).map((_, i) => (
-                <div key={`red-${i}`} className="bg-[#EF4444] text-black text-xs font-bold w-5 h-6 rounded-sm flex items-center justify-center border border-gray-300">
-                  R
+                
+                <div className="flex justify-between">
+                  <span className="text-club-light-gray text-sm">Fair Play</span>
+                  <span className="text-club-gold text-sm font-medium">
+                    {disciplinaryData.fairPlayRating}/10
+                  </span>
                 </div>
-              ))}
-              {disciplinaryData.totalCards === 0 && (
-                <span className="text-green-500 text-sm">Clean Record</span>
-              )}
+                
+                <div className="flex justify-between">
+                  <span className="text-club-light-gray text-sm">Missed Matches</span>
+                  <span className="text-club-gold text-sm font-medium">
+                    {disciplinaryData.missedMatches}
+                  </span>
+                </div>
+              </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="timeline" className="mt-4">
+          <TabsContent value="timeline" className="mt-6">
             <DisciplinaryTimeline events={disciplinaryData.events} />
           </TabsContent>
 
-          <TabsContent value="risk" className="mt-4">
+          <TabsContent value="risk" className="mt-6">
             <DisciplinaryRiskPanel 
               riskLevel={disciplinaryData.riskLevel}
               riskColor={disciplinaryData.riskColor}
