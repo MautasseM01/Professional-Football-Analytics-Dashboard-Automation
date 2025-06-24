@@ -1,7 +1,8 @@
 
-import { Card, CardContent } from "@/components/ui/card";
+import { StatCard } from "@/components/StatCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Shield, Users, Activity } from "lucide-react";
+import { ResponsiveGrid } from "@/components/ResponsiveLayout";
 
 interface ComplianceMetricsCardsProps {
   complianceData: any;
@@ -11,54 +12,42 @@ interface ComplianceMetricsCardsProps {
 export const ComplianceMetricsCards = ({ complianceData, isLoading }: ComplianceMetricsCardsProps) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Skeleton className="h-24 bg-club-gold/10" />
-        <Skeleton className="h-24 bg-club-gold/10" />
-        <Skeleton className="h-24 bg-club-gold/10" />
-      </div>
+      <ResponsiveGrid minCardWidth="200px" className="grid-cols-1 md:grid-cols-3">
+        <Skeleton className="h-32 bg-club-gold/10" />
+        <Skeleton className="h-32 bg-club-gold/10" />
+        <Skeleton className="h-32 bg-club-gold/10" />
+      </ResponsiveGrid>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <ResponsiveGrid minCardWidth="200px" className="grid-cols-1 md:grid-cols-3">
       {/* System Status Card */}
-      <Card className="border-club-gold/20 bg-green-500/10 border-green-500/20">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-club-light-gray/70">System Status</p>
-              <p className="text-2xl font-bold text-green-500">Online</p>
-            </div>
-            <Shield className="h-8 w-8 text-club-gold/30" />
-          </div>
-        </CardContent>
-      </Card>
+      <StatCard
+        title="System Status"
+        value="Online"
+        subValue="All systems operational"
+        icon={<Shield className="w-4 h-4 sm:w-5 sm:h-5" />}
+        className="border-green-500/20 bg-green-500/10"
+      />
 
       {/* Player Analytics Card */}
-      <Card className="border-club-gold/20 bg-blue-500/10 border-blue-500/20">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-club-light-gray/70">Player Analytics</p>
-              <p className="text-2xl font-bold text-blue-500">Active</p>
-            </div>
-            <Users className="h-8 w-8 text-club-gold/30" />
-          </div>
-        </CardContent>
-      </Card>
+      <StatCard
+        title="Player Analytics"
+        value="Active"
+        subValue="Data processing live"
+        icon={<Users className="w-4 h-4 sm:w-5 sm:h-5" />}
+        className="border-blue-500/20 bg-blue-500/10"
+      />
 
       {/* Core Features Card */}
-      <Card className="border-club-gold/20 bg-green-500/10 border-green-500/20">
-        <CardContent className="pt-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-club-light-gray/70">Core Features</p>
-              <p className="text-2xl font-bold text-green-500">Ready</p>
-            </div>
-            <Activity className="h-8 w-8 text-club-gold/30" />
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+      <StatCard
+        title="Core Features"
+        value="Ready"
+        subValue="All features enabled"
+        icon={<Activity className="w-4 h-4 sm:w-5 sm:h-5" />}
+        className="border-green-500/20 bg-green-500/10"
+      />
+    </ResponsiveGrid>
   );
 };

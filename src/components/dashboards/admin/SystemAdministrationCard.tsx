@@ -12,9 +12,9 @@ export const SystemAdministrationCard = () => {
   ];
 
   return (
-    <Card className="bg-club-dark-gray border-club-gold/20">
-      <CardHeader className="pb-2">
-        <CardTitle className="flex items-center text-club-gold">
+    <Card className="bg-club-dark-gray border-club-gold/20 h-full">
+      <CardHeader className="pb-3">
+        <CardTitle className="flex items-center text-club-gold text-lg">
           <Settings className="mr-2 h-5 w-5" />
           System Administration
         </CardTitle>
@@ -27,16 +27,28 @@ export const SystemAdministrationCard = () => {
         <div className="space-y-3">
           <h4 className="text-sm font-medium text-club-light-gray">Quick Settings</h4>
           <div className="grid grid-cols-2 gap-2">
-            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10">
+            <Button 
+              variant="outline" 
+              className="border-club-gold/20 hover:bg-club-gold/10 min-h-[44px] text-sm"
+            >
               System Config
             </Button>
-            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10">
+            <Button 
+              variant="outline" 
+              className="border-club-gold/20 hover:bg-club-gold/10 min-h-[44px] text-sm"
+            >
               Permissions
             </Button>
-            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10">
+            <Button 
+              variant="outline" 
+              className="border-club-gold/20 hover:bg-club-gold/10 min-h-[44px] text-sm"
+            >
               Notifications
             </Button>
-            <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10">
+            <Button 
+              variant="outline" 
+              className="border-club-gold/20 hover:bg-club-gold/10 min-h-[44px] text-sm"
+            >
               API Access
             </Button>
           </div>
@@ -44,19 +56,23 @@ export const SystemAdministrationCard = () => {
         
         {/* Audit trail */}
         <div>
-          <h4 className="text-sm font-medium text-club-light-gray mb-2">Recent Activities</h4>
-          <ul className="space-y-2">
+          <h4 className="text-sm font-medium text-club-light-gray mb-3">Recent Activities</h4>
+          <div className="space-y-2 max-h-40 overflow-y-auto">
             {recentActivities.map((activity, index) => (
-              <li key={index} className="bg-club-black/40 p-2 rounded">
-                <div className="flex justify-between text-xs text-club-light-gray/70">
-                  <span>{activity.action}</span>
-                  <span>{activity.time}</span>
+              <div key={index} className="bg-club-black/40 p-3 rounded">
+                <div className="flex justify-between items-start mb-1">
+                  <span className="text-xs font-medium text-club-gold">{activity.action}</span>
+                  <span className="text-xs text-club-light-gray/70">{activity.time}</span>
                 </div>
-                <p className="text-sm text-club-light-gray">{activity.details}</p>
-              </li>
+                <p className="text-sm text-club-light-gray leading-tight">{activity.details}</p>
+              </div>
             ))}
-          </ul>
-          <Button variant="ghost" size="sm" className="w-full mt-2 hover:bg-club-gold/10">
+          </div>
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="w-full mt-3 hover:bg-club-gold/10 min-h-[44px]"
+          >
             View Full Audit Log
           </Button>
         </div>
