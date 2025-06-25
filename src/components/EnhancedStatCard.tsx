@@ -42,6 +42,7 @@ export const EnhancedStatCard = ({
 }: EnhancedStatCardProps) => {
   const [displayValue, setDisplayValue] = useState(animateCounter ? 0 : value);
   const [showHover, setShowHover] = useState(false);
+  const [hoverPosition, setHoverPosition] = useState({ top: true, left: true });
 
   useEffect(() => {
     if (animateCounter && typeof value === 'number') {
@@ -63,6 +64,29 @@ export const EnhancedStatCard = ({
       return () => clearInterval(timer);
     }
   }, [value, animateCounter]);
+
+  const handleMouseEnter = (e: React.MouseEvent) => {
+    if (!hoverDetails) return;
+    
+    setShowHover(true);
+    
+    // Calculate position to ensure tooltip stays within viewport
+    const rect = e.currentTarget.getBoundingClientRect();
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    const tooltipWidth = 256; // w-64 = 16rem = 256px
+    const tooltipHeight = 150; // estimated height
+    
+    const spaceRight = viewportWidth - rect.right;
+    const spaceLeft = rect.left;
+    const spaceBelow = viewportHeight - rect.bottom;
+    const spaceAbove = rect.top;
+    
+    setHoverPosition({
+      top: spaceBelow >= tooltipHeight || spaceBelow > spaceAbove,
+      left: spaceRight >= tooltipWidth || spaceRight > spaceLeft
+    });
+  };
 
   const getTrendIcon = () => {
     if (!trend) return null;
@@ -88,6 +112,24 @@ export const EnhancedStatCard = ({
     }
   };
 
+  const getTooltipPosition = () => {
+    let positionClasses = "absolute z-50 w-64";
+    
+    if (hoverPosition.top) {
+      positionClasses += " top-full mt-2";
+    } else {
+      positionClasses += " bottom-full mb-2";
+    }
+    
+    if (hoverPosition.left) {
+      positionClasses += " left-0";
+    } else {
+      positionClasses += " right-0";
+    }
+    
+    return positionClasses;
+  };
+
   return (
     <div className="relative">
       <Card 
@@ -100,7 +142,7 @@ export const EnhancedStatCard = ({
           ${className}
         `)}
         onClick={onClick}
-        onMouseEnter={() => setShowHover(true)}
+        onMouseEnter={handleMouseEnter}
         onMouseLeave={() => setShowHover(false)}
       >
         <CardContent className="p-4 sm:p-5 lg:p-6 h-full flex flex-col justify-between min-h-[140px]">
@@ -154,7 +196,7 @@ export const EnhancedStatCard = ({
 
       {/* Hover Details Tooltip */}
       {showHover && hoverDetails && (
-        <div className="absolute z-50 top-full left-0 mt-2 w-64 p-3 bg-club-dark-gray light:bg-white border border-club-gold/20 light:border-gray-200 rounded-lg shadow-lg">
+        <div className={`${getTooltipPosition()} p-3 bg-club-dark-gray light:bg-white border border-club-gold/20 light:border-gray-200 rounded-lg shadow-lg backdrop-blur-sm`}>
           <h4 className="text-sm font-semibold text-club-gold light:text-yellow-600 mb-2">
             {hoverDetails.title}
           </h4>

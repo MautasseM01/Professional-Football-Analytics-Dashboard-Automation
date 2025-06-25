@@ -178,6 +178,15 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
               percentage: 12,
               label: 'vs last season'
             }}
+            hoverDetails={{
+              title: 'Goals Breakdown',
+              items: [
+                { label: 'Home Goals', value: 15 },
+                { label: 'Away Goals', value: 9 },
+                { label: 'Set Pieces', value: 8 },
+                { label: 'Open Play', value: 16 }
+              ]
+            }}
           />
 
           <EnhancedStatCard
@@ -211,6 +220,16 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
               direction: 'up',
               label: 'Good momentum'
             }}
+            hoverDetails={{
+              title: 'Recent Form Analysis',
+              items: [
+                { label: 'Wins', value: 2 },
+                { label: 'Draws', value: 1 },
+                { label: 'Losses', value: 0 },
+                { label: 'Goals For', value: 6 },
+                { label: 'Goals Against', value: 2 }
+              ]
+            }}
           />
 
           <EnhancedStatCard
@@ -223,6 +242,16 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
               direction: 'up',
               percentage: 8,
               label: 'vs last season'
+            }}
+            hoverDetails={{
+              title: 'Season Performance',
+              items: [
+                { label: 'Matches Played', value: 20 },
+                { label: 'Wins', value: 15 },
+                { label: 'Draws', value: 3 },
+                { label: 'Losses', value: 2 },
+                { label: 'Points', value: 48 }
+              ]
             }}
           />
         </ResponsiveGrid>
