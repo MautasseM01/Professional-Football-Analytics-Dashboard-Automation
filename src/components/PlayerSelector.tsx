@@ -19,12 +19,10 @@ import {
   Search, 
   Filter, 
   ArrowLeft, 
-  ArrowRight, 
-  Star,
+  ArrowRight,
   UserPlus,
   ClipboardList,
-  MessageCircle,
-  GitCompare
+  MessageCircle
 } from "lucide-react";
 import { ErrorFallback } from "@/components/ErrorStates/ErrorFallback";
 import { DataLoadingSkeleton } from "@/components/LoadingStates/DataLoadingSkeleton";
@@ -39,7 +37,6 @@ interface PlayerSelectorProps {
   error?: string | null;
 }
 
-type FilterStatus = 'all' | 'available' | 'injured' | 'suspended';
 type FilterPosition = 'all' | 'goalkeeper' | 'defender' | 'midfielder' | 'forward';
 
 export const PlayerSelector = ({ 
@@ -52,25 +49,23 @@ export const PlayerSelector = ({
   const { profile } = useUserProfile();
   const [selectError, setSelectError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
-  const [statusFilter, setStatusFilter] = useState<FilterStatus>('all');
   const [positionFilter, setPositionFilter] = useState<FilterPosition>('all');
   const [showFilters, setShowFilters] = useState(false);
-  const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [selectedForComparison, setSelectedForComparison] = useState<number[]>([]);
 
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (!players?.length || !selectedPlayer) return;
+      if (!filteredPlayers?.length || !selectedPlayer) return;
 
-      const currentIndex = players.findIndex(p => p.id === selectedPlayer.id);
+      const currentIndex = filteredPlayers.findIndex(p => p.id === selectedPlayer.id);
       
       if (e.key === 'ArrowLeft' && currentIndex > 0) {
         e.preventDefault();
-        onPlayerSelect(players[currentIndex - 1].id);
-      } else if (e.key === 'ArrowRight' && currentIndex < players.length - 1) {
+        onPlayerSelect(filteredPlayers[currentIndex - 1].id);
+      } else if (e.key === 'ArrowRight' && currentIndex < filteredPlayers.length - 1) {
         e.preventDefault();
-        onPlayerSelect(players[currentIndex + 1].id);
+        onPlayerSelect(filteredPlayers[currentIndex + 1].id);
       }
     };
 
@@ -78,28 +73,11 @@ export const PlayerSelector = ({
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [players, selectedPlayer, onPlayerSelect]);
 
-  // Mock status data - in real app, this would come from the API
-  const getPlayerStatus = useCallback((player: Player) => {
-    // Mock logic - replace with real data
-    const random = player.id % 10;
-    if (random === 0) return 'injured';
-    if (random === 1) return 'suspended';
-    return 'available';
-  }, []);
-
-  const getPlayerForm = useCallback((player: Player) => {
-    // Mock form indicator based on recent performance
-    const rating = player.match_rating || 0;
-    if (rating >= 7.5) return 'good';
-    if (rating >= 6.5) return 'average';
-    return 'poor';
-  }, []);
-
   const filteredPlayers = useMemo(() => {
     if (!players?.length) return [];
 
     return players.filter(player => {
-      // Search filter
+      // Search filter using actual player name from database
       if (searchQuery.trim()) {
         const query = searchQuery.toLowerCase();
         const matchesSearch = 
@@ -109,13 +87,7 @@ export const PlayerSelector = ({
         if (!matchesSearch) return false;
       }
 
-      // Status filter
-      if (statusFilter !== 'all') {
-        const playerStatus = getPlayerStatus(player);
-        if (playerStatus !== statusFilter) return false;
-      }
-
-      // Position filter
+      // Position filter using actual position field from database
       if (positionFilter !== 'all') {
         const position = player.position?.toLowerCase() || '';
         switch (positionFilter) {
@@ -136,7 +108,7 @@ export const PlayerSelector = ({
 
       return true;
     });
-  }, [players, searchQuery, statusFilter, positionFilter, getPlayerStatus]);
+  }, [players, searchQuery, positionFilter]);
 
   const handlePlayerSelect = (value: string) => {
     try {
@@ -149,50 +121,21 @@ export const PlayerSelector = ({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to select player';
       setSelectError(errorMessage);
+      toast.error(errorMessage);
     }
-  };
-
-  const toggleFavorite = (playerId: number) => {
-    const newFavorites = new Set(favorites);
-    if (newFavorites.has(playerId)) {
-      newFavorites.delete(playerId);
-      toast.success("Removed from favorites");
-    } else {
-      newFavorites.add(playerId);
-      toast.success("Added to favorites");
-    }
-    setFavorites(newFavorites);
   };
 
   const handleQuickAction = (action: string, player: Player) => {
     switch (action) {
       case 'starting-xi':
-        toast.info(`Added ${player.name} to Starting XI`);
+        toast.info(`Adding ${player.name} to Starting XI - Feature coming soon`);
         break;
       case 'training-data':
-        toast.info(`Opening training data for ${player.name}`);
+        toast.info(`Training data for ${player.name} - Feature coming soon`);
         break;
       case 'contact':
-        toast.info(`Opening contact details for ${player.name}`);
+        toast.info(`Contact details for ${player.name} - Feature coming soon`);
         break;
-    }
-  };
-
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'available': return 'bg-green-500';
-      case 'injured': return 'bg-red-500';
-      case 'suspended': return 'bg-yellow-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getFormColor = (form: string) => {
-    switch (form) {
-      case 'good': return 'text-green-500';
-      case 'average': return 'text-amber-500';
-      case 'poor': return 'text-red-500';
-      default: return 'text-gray-500';
     }
   };
 
@@ -274,10 +217,9 @@ export const PlayerSelector = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => toast.info("Opening player comparison...")}
+                  onClick={() => toast.info("Player comparison - Feature coming soon")}
                   className="flex items-center gap-2"
                 >
-                  <GitCompare className="h-4 w-4" />
                   Compare ({selectedForComparison.length})
                 </Button>
               )}
@@ -308,26 +250,9 @@ export const PlayerSelector = ({
             />
           </div>
 
-          {/* Filters */}
+          {/* Position Filter */}
           {showFilters && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-club-black/40 light:bg-gray-50 rounded-lg">
-              <div>
-                <label className="text-sm font-medium text-club-light-gray light:text-gray-700 mb-2 block">
-                  Status
-                </label>
-                <Select value={statusFilter} onValueChange={(value: FilterStatus) => setStatusFilter(value)}>
-                  <SelectTrigger className="bg-club-black/80 light:bg-white border-club-gold/30 light:border-gray-300">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Players</SelectItem>
-                    <SelectItem value="available">Available</SelectItem>
-                    <SelectItem value="injured">Injured</SelectItem>
-                    <SelectItem value="suspended">Suspended</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              
+            <div className="p-4 bg-club-black/40 light:bg-gray-50 rounded-lg">
               <div>
                 <label className="text-sm font-medium text-club-light-gray light:text-gray-700 mb-2 block">
                   Position
@@ -361,9 +286,6 @@ export const PlayerSelector = ({
                 if (!player?.id || !player?.name) return null;
                 
                 const isSelected = selectedPlayer?.id === player.id;
-                const playerStatus = getPlayerStatus(player);
-                const playerForm = getPlayerForm(player);
-                const isFavorite = favorites.has(player.id);
                 
                 return (
                   <SelectItem 
@@ -381,28 +303,24 @@ export const PlayerSelector = ({
                     `}
                   >
                     <div className="flex items-center gap-3">
-                      {/* Player Avatar with Status Indicator */}
+                      {/* Player Avatar */}
                       <div className="relative flex-shrink-0">
                         <div className="w-10 h-10 bg-club-gold/20 light:bg-yellow-600/20 rounded-full flex items-center justify-center">
                           <span className="text-sm font-bold text-club-gold light:text-yellow-600">
                             {player.number || '?'}
                           </span>
                         </div>
-                        {/* Status indicator */}
-                        <div className={`absolute -top-1 -right-1 w-4 h-4 ${getStatusColor(playerStatus)} rounded-full border-2 border-club-black light:border-white`} />
                       </div>
                       
                       {/* Player Info */}
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2">
                           <span className="font-medium text-club-light-gray light:text-gray-900 truncate">{player.name}</span>
-                          {isFavorite && <Star className="w-4 h-4 text-yellow-500 fill-current" />}
-                          <div className={`w-2 h-2 rounded-full ${getFormColor(playerForm)}`} title={`Form: ${playerForm}`} />
                         </div>
                         <div className="flex items-center gap-2 text-xs text-club-light-gray/70 light:text-gray-600">
                           <span>{player.position}</span>
-                          <Badge variant="outline" className={`px-1 py-0 text-xs ${getStatusColor(playerStatus)} text-white border-0`}>
-                            {playerStatus}
+                          <Badge variant="outline" className="px-1 py-0 text-xs bg-green-500 text-white border-0">
+                            Available
                           </Badge>
                         </div>
                       </div>
@@ -454,9 +372,9 @@ export const PlayerSelector = ({
             </div>
           )}
 
-          {/* Quick Actions for Selected Player */}
+          {/* Quick Actions for Selected Player - Simplified */}
           {selectedPlayer && (
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-2 p-4 bg-club-black/40 light:bg-gray-50 rounded-lg">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-2 p-4 bg-club-black/40 light:bg-gray-50 rounded-lg">
               <Button
                 variant="outline"
                 size="sm"
@@ -485,16 +403,6 @@ export const PlayerSelector = ({
               >
                 <MessageCircle className="w-4 h-4" />
                 Contact
-              </Button>
-              
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => toggleFavorite(selectedPlayer.id)}
-                className="flex items-center gap-2"
-              >
-                <Star className={`w-4 h-4 ${favorites.has(selectedPlayer.id) ? 'text-yellow-500 fill-current' : ''}`} />
-                {favorites.has(selectedPlayer.id) ? 'Unfavorite' : 'Favorite'}
               </Button>
             </div>
           )}
