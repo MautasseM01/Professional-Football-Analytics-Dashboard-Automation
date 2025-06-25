@@ -27,7 +27,7 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
 
   if (loading) return <ChartLoadingSkeleton />;
 
-  // Calculate overall rating based on position using real attributes
+  // Calculate overall rating based on position
   const calculateOverallRating = () => {
     if (!attributes) return 0;
     
@@ -36,56 +36,56 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
     if (position.includes('goalkeeper') || position.includes('gk')) {
       // Goalkeeper-specific calculation
       return Math.round((
-        (attributes.positioning || 50) * 0.3 +
-        (attributes.mental_strength || 50) * 0.25 +
-        (attributes.decision_making || 50) * 0.25 +
-        (attributes.communication || 50) * 0.2
+        attributes.positioning * 0.3 +
+        attributes.mental_strength * 0.25 +
+        attributes.decision_making * 0.25 +
+        attributes.communication * 0.2
       ));
     } else if (position.includes('defender') || position.includes('cb') || position.includes('lb') || position.includes('rb')) {
       // Defender calculation
       return Math.round((
-        (attributes.tackling || 50) * 0.25 +
-        (attributes.marking || 50) * 0.25 +
-        (attributes.positioning || 50) * 0.2 +
-        (attributes.strength || 50) * 0.15 +
-        (attributes.passing || 50) * 0.15
+        attributes.tackling * 0.25 +
+        attributes.marking * 0.25 +
+        attributes.positioning * 0.2 +
+        attributes.strength * 0.15 +
+        attributes.passing * 0.15
       ));
     } else if (position.includes('midfielder') || position.includes('cm') || position.includes('dm') || position.includes('am')) {
       // Midfielder calculation
       return Math.round((
-        (attributes.passing || 50) * 0.3 +
-        (attributes.vision || 50) * 0.25 +
-        (attributes.ball_control || 50) * 0.2 +
-        (attributes.decision_making || 50) * 0.15 +
-        (attributes.stamina || 50) * 0.1
+        attributes.passing * 0.3 +
+        attributes.vision * 0.25 +
+        attributes.ball_control * 0.2 +
+        attributes.decision_making * 0.15 +
+        attributes.stamina * 0.1
       ));
     } else {
       // Forward/Attacker calculation
       return Math.round((
-        (attributes.finishing || 50) * 0.3 +
-        (attributes.pace || 50) * 0.25 +
-        (attributes.dribbling || 50) * 0.2 +
-        (attributes.positioning || 50) * 0.15 +
-        (attributes.ball_control || 50) * 0.1
+        attributes.finishing * 0.3 +
+        attributes.pace * 0.25 +
+        attributes.dribbling * 0.2 +
+        attributes.positioning * 0.15 +
+        attributes.ball_control * 0.1
       ));
     }
   };
 
   const overallRating = calculateOverallRating();
 
-  // Get top 3 attributes from real data
+  // Get top 3 attributes
   const getTopAttributes = () => {
     if (!attributes) return [];
     
     const attributeList = [
-      { name: 'Pace', value: attributes.pace || 0 },
-      { name: 'Finishing', value: attributes.finishing || 0 },
-      { name: 'Passing', value: attributes.passing || 0 },
-      { name: 'Dribbling', value: attributes.dribbling || 0 },
-      { name: 'Tackling', value: attributes.tackling || 0 },
-      { name: 'Positioning', value: attributes.positioning || 0 },
-      { name: 'Vision', value: attributes.vision || 0 },
-      { name: 'Strength', value: attributes.strength || 0 },
+      { name: 'Pace', value: attributes.pace },
+      { name: 'Finishing', value: attributes.finishing },
+      { name: 'Passing', value: attributes.passing },
+      { name: 'Dribbling', value: attributes.dribbling },
+      { name: 'Tackling', value: attributes.tackling },
+      { name: 'Positioning', value: attributes.positioning },
+      { name: 'Vision', value: attributes.vision },
+      { name: 'Strength', value: attributes.strength },
     ];
     
     return attributeList
@@ -102,7 +102,7 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
     return "text-gray-500";
   };
 
-  // Form indicator based on actual match rating
+  // Mock data for coaching-specific information
   const getFormIndicator = () => {
     const rating = player.match_rating || 0;
     if (rating >= 7.5) return { color: 'bg-green-500', label: 'Excellent Form' };
@@ -110,7 +110,27 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
     return { color: 'bg-red-500', label: 'Poor Form' };
   };
 
+  const getContractStatus = () => {
+    // Mock contract data
+    return {
+      expiryDate: '2025-06-30',
+      status: 'Active',
+      daysRemaining: 180
+    };
+  };
+
+  const getInjuryHistory = () => {
+    // Mock injury data
+    return {
+      recentInjuries: 2,
+      daysOut: 14,
+      riskLevel: 'Low'
+    };
+  };
+
   const formIndicator = getFormIndicator();
+  const contractStatus = getContractStatus();
+  const injuryHistory = getInjuryHistory();
 
   return (
     <Card className="bg-club-black/80 border-club-gold/30 light:bg-white light:border-gray-200">
@@ -140,14 +160,14 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
                     Overall: {overallRating}
                   </Badge>
                   <Badge variant="outline" className="border-club-gold/30 text-club-light-gray light:border-gray-300 light:text-gray-600">
-                    {attributes.preferred_foot || 'Right'} Footed
+                    {attributes.preferred_foot} Footed
                   </Badge>
                 </div>
               )}
             </div>
           </div>
 
-          {/* Stats Grid - Using Real Database Fields */}
+          {/* Stats Grid */}
           <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="text-center p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
               <div className="text-lg sm:text-xl font-bold text-club-gold light:text-yellow-600">
@@ -179,7 +199,7 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
           </div>
         </div>
 
-        {/* Player Information Based on Real Database Fields */}
+        {/* Coaching-Specific Information */}
         <div className="mt-6 pt-4 border-t border-club-gold/30 light:border-gray-200">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Form Indicator */}
@@ -194,24 +214,24 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
               </div>
             </div>
 
-            {/* Minutes Played */}
+            {/* Contract Status */}
             <div className="flex items-center gap-3 p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
-              <Clock className="w-5 h-5 text-club-gold light:text-yellow-600" />
+              <FileText className="w-5 h-5 text-club-gold light:text-yellow-600" />
               <div>
-                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Minutes</div>
+                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Contract</div>
                 <div className="text-xs text-club-light-gray/70 light:text-gray-600">
-                  {player.minutes_played || 0} mins
+                  {contractStatus.daysRemaining} days left
                 </div>
               </div>
             </div>
 
-            {/* Last Match */}
+            {/* Injury Status */}
             <div className="flex items-center gap-3 p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
-              <Calendar className="w-5 h-5 text-club-gold light:text-yellow-600" />
+              <Shield className="w-5 h-5 text-club-gold light:text-yellow-600" />
               <div>
-                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Last Match</div>
+                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Injury Risk</div>
                 <div className="text-xs text-club-light-gray/70 light:text-gray-600">
-                  {player.last_match_date || 'N/A'}
+                  {injuryHistory.riskLevel} Risk
                 </div>
               </div>
             </div>
@@ -222,14 +242,14 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
               <div>
                 <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Discipline</div>
                 <div className="text-xs text-club-light-gray/70 light:text-gray-600">
-                  Clean Record
+                  {disciplinaryData?.yellowCards || 0}Y {disciplinaryData?.redCards || 0}R
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Top Attributes Section - Using Real Data */}
+        {/* Top Attributes Section */}
         {attributes && topAttributes.length > 0 && (
           <div className="mt-6 pt-4 border-t border-club-gold/30 light:border-gray-200">
             <h4 className="font-semibold text-club-gold light:text-yellow-600 mb-3">
@@ -249,20 +269,20 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
           </div>
         )}
 
-        {/* Player Style Information - Using Real Database Fields */}
+        {/* Player Style Information */}
         {attributes && (
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span className="text-club-light-gray light:text-gray-700">Work Rate:</span>
                 <span className="font-medium text-club-light-gray light:text-gray-900">
-                  {attributes.work_rate_attacking || 50}/100 ATT | {attributes.work_rate_defensive || 50}/100 DEF
+                  {attributes.work_rate_attacking}/100 ATT | {attributes.work_rate_defensive}/100 DEF
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-club-light-gray light:text-gray-700">Skill Moves:</span>
                 <span className="font-medium text-club-light-gray light:text-gray-900">
-                  ★{attributes.skill_moves_rating || 3} | Weak Foot: ★{attributes.weak_foot_rating || 3}
+                  ★{attributes.skill_moves_rating} | Weak Foot: ★{attributes.weak_foot_rating}
                 </span>
               </div>
             </div>
@@ -271,20 +291,20 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
               <div className="flex justify-between">
                 <span className="text-club-light-gray light:text-gray-700">Leadership:</span>
                 <span className="font-medium text-club-light-gray light:text-gray-900">
-                  {attributes.leadership || 50}/100
+                  {attributes.leadership}/100
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-club-light-gray light:text-gray-700">Mental Strength:</span>
                 <span className="font-medium text-club-light-gray light:text-gray-900">
-                  {attributes.mental_strength || 50}/100
+                  {attributes.mental_strength}/100
                 </span>
               </div>
             </div>
           </div>
         )}
 
-        {/* Quick Action Buttons - Simplified */}
+        {/* Quick Action Buttons */}
         <div className="mt-6 pt-4 border-t border-club-gold/30 light:border-gray-200">
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" className="flex items-center gap-2">

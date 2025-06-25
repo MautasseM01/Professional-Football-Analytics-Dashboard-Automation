@@ -1,4 +1,3 @@
-
 import { useState, useMemo } from "react";
 import { Check, ChevronsUpDown, Search, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -43,8 +42,7 @@ export function MultiPlayerSelect({
     const query = searchQuery.toLowerCase();
     return players.filter(player => 
       player.name?.toLowerCase().includes(query) ||
-      player.position?.toLowerCase().includes(query) ||
-      player.number?.toString().includes(query)
+      player.position?.toLowerCase().includes(query)
     );
   }, [players, searchQuery]);
 
@@ -80,16 +78,6 @@ export function MultiPlayerSelect({
 
   const selectionCountText = `${selectedPlayerIds.length}/${maxSelections} selected`;
 
-  if (loading) {
-    return (
-      <div className="w-full p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
-        <span className="text-sm text-club-light-gray/70 light:text-gray-600">
-          Loading players...
-        </span>
-      </div>
-    );
-  }
-
   return (
     <div className="flex flex-col gap-2">
       <Popover open={open} onOpenChange={setOpen}>
@@ -98,7 +86,7 @@ export function MultiPlayerSelect({
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between bg-club-black/80 light:bg-white border-club-gold/30 light:border-gray-300"
+            className="w-full justify-between"
             disabled={loading}
           >
             {selectedPlayerIds.length === 0
@@ -107,25 +95,20 @@ export function MultiPlayerSelect({
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-full p-0 bg-club-black light:bg-white border-club-gold/30 light:border-gray-200" align="start">
-          <Command shouldFilter={false} className="bg-club-black light:bg-white">
-            <div className="flex items-center border-b border-club-gold/20 light:border-gray-200 px-3">
+        <PopoverContent className="w-full p-0" align="start">
+          <Command shouldFilter={false}>
+            <div className="flex items-center border-b px-3">
               <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
               <CommandInput 
                 placeholder="Search players..." 
                 value={searchQuery}
                 onValueChange={setSearchQuery}
-                className="bg-transparent border-0 focus:ring-0 text-club-light-gray light:text-gray-900"
               />
             </div>
-            <CommandList className="bg-club-black light:bg-white">
-              <CommandEmpty className="text-club-light-gray/70 light:text-gray-600">
-                No players found
-              </CommandEmpty>
+            <CommandList>
+              <CommandEmpty>No players found</CommandEmpty>
               <CommandGroup>
                 {filteredPlayers?.map((player) => {
-                  if (!player?.id || !player?.name) return null;
-                  
                   const isSelected = selectedPlayerIds.includes(player.id);
                   const isDisabled = selectedPlayerIds.length >= maxSelections && !isSelected;
                   
@@ -135,7 +118,6 @@ export function MultiPlayerSelect({
                       value={`${player.id}`}
                       disabled={isDisabled}
                       onSelect={() => handleSelect(player.id)}
-                      className="text-club-light-gray light:text-gray-900 hover:bg-club-gold/20 light:hover:bg-yellow-600/10"
                     >
                       <Check
                         className={`mr-2 h-4 w-4 ${
@@ -148,14 +130,14 @@ export function MultiPlayerSelect({
                           <div>
                             <span>{player.name}</span>
                             {player.position && (
-                              <span className="ml-2 text-xs text-club-light-gray/70 light:text-gray-500">
+                              <span className="ml-2 text-xs text-muted-foreground">
                                 ({player.position})
                               </span>
                             )}
                           </div>
                         </div>
                         {isDisabled && (
-                          <span className="text-xs text-club-light-gray/50 light:text-gray-400">
+                          <span className="text-xs text-muted-foreground">
                             Max {maxSelections} players
                           </span>
                         )}
@@ -171,22 +153,18 @@ export function MultiPlayerSelect({
 
       {/* Selected players badges */}
       {selectedPlayerIds.length > 0 && (
-        <div className="flex flex-wrap gap-2 mt-2">
+        <div className="flex flex-wrap gap-2 mt-2 md:grid md:grid-cols-2 md:gap-2 lg:flex lg:flex-wrap lg:gap-2">
           {Array.from(selectedPlayersMap.values()).map(player => (
-            <Badge 
-              key={player.id} 
-              variant="secondary" 
-              className="px-3 py-1.5 flex items-center gap-2 bg-club-gold/20 light:bg-yellow-600/20 text-club-light-gray light:text-gray-900"
-            >
+            <Badge key={player.id} variant="secondary" className="px-3 py-1.5 flex items-center gap-2">
               <PlayerAvatar player={player} size="sm" />
-              <span className="text-sm">{player.name}</span>
+              {player.name}
               <Button
                 variant="ghost"
                 size="sm"
-                className="h-4 w-4 p-0 ml-1 hover:bg-red-500/20"
+                className="h-5 w-5 p-0 ml-1"
                 onClick={(e) => handleRemovePlayer(player.id, e)}
               >
-                <X className="h-3 w-3 text-red-500" />
+                <X className="h-3 w-3" />
                 <span className="sr-only">Remove {player.name}</span>
               </Button>
             </Badge>
