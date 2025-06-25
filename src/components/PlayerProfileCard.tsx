@@ -1,9 +1,21 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Player } from "@/types";
 import { usePlayerAttributes } from "@/hooks/use-player-attributes";
+import { usePlayerDisciplinary } from "@/hooks/use-player-disciplinary";
 import { PlayerAvatar } from "./PlayerAvatar";
 import { ChartLoadingSkeleton } from "./LoadingStates";
+import { 
+  Calendar, 
+  AlertTriangle, 
+  TrendingUp, 
+  TrendingDown, 
+  FileText,
+  Shield,
+  Activity,
+  Clock
+} from "lucide-react";
 
 interface PlayerProfileCardProps {
   player: Player;
@@ -11,6 +23,7 @@ interface PlayerProfileCardProps {
 
 export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
   const { attributes, loading } = usePlayerAttributes(player);
+  const { data: disciplinaryData } = usePlayerDisciplinary(player.id);
 
   if (loading) return <ChartLoadingSkeleton />;
 
@@ -89,10 +102,45 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
     return "text-gray-500";
   };
 
+  // Mock data for coaching-specific information
+  const getFormIndicator = () => {
+    const rating = player.match_rating || 0;
+    if (rating >= 7.5) return { color: 'bg-green-500', label: 'Excellent Form' };
+    if (rating >= 6.5) return { color: 'bg-amber-500', label: 'Average Form' };
+    return { color: 'bg-red-500', label: 'Poor Form' };
+  };
+
+  const getContractStatus = () => {
+    // Mock contract data
+    return {
+      expiryDate: '2025-06-30',
+      status: 'Active',
+      daysRemaining: 180
+    };
+  };
+
+  const getInjuryHistory = () => {
+    // Mock injury data
+    return {
+      recentInjuries: 2,
+      daysOut: 14,
+      riskLevel: 'Low'
+    };
+  };
+
+  const formIndicator = getFormIndicator();
+  const contractStatus = getContractStatus();
+  const injuryHistory = getInjuryHistory();
+
   return (
     <Card className="bg-club-black/80 border-club-gold/30 light:bg-white light:border-gray-200">
       <CardHeader>
-        <CardTitle className="text-club-gold light:text-yellow-600">Player Profile</CardTitle>
+        <CardTitle className="text-club-gold light:text-yellow-600 flex items-center justify-between">
+          <span>Player Profile</span>
+          <div className="flex items-center gap-2">
+            <div className={`w-3 h-3 rounded-full ${formIndicator.color}`} title={formIndicator.label} />
+          </div>
+        </CardTitle>
       </CardHeader>
       <CardContent>
         <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
@@ -151,6 +199,56 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
           </div>
         </div>
 
+        {/* Coaching-Specific Information */}
+        <div className="mt-6 pt-4 border-t border-club-gold/30 light:border-gray-200">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Form Indicator */}
+            <div className="flex items-center gap-3 p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
+              <Activity className="w-5 h-5 text-club-gold light:text-yellow-600" />
+              <div>
+                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Current Form</div>
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${formIndicator.color}`} />
+                  <span className="text-xs text-club-light-gray/70 light:text-gray-600">{formIndicator.label}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Contract Status */}
+            <div className="flex items-center gap-3 p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
+              <FileText className="w-5 h-5 text-club-gold light:text-yellow-600" />
+              <div>
+                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Contract</div>
+                <div className="text-xs text-club-light-gray/70 light:text-gray-600">
+                  {contractStatus.daysRemaining} days left
+                </div>
+              </div>
+            </div>
+
+            {/* Injury Status */}
+            <div className="flex items-center gap-3 p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
+              <Shield className="w-5 h-5 text-club-gold light:text-yellow-600" />
+              <div>
+                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Injury Risk</div>
+                <div className="text-xs text-club-light-gray/70 light:text-gray-600">
+                  {injuryHistory.riskLevel} Risk
+                </div>
+              </div>
+            </div>
+
+            {/* Disciplinary Record */}
+            <div className="flex items-center gap-3 p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-club-gold light:text-yellow-600" />
+              <div>
+                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Discipline</div>
+                <div className="text-xs text-club-light-gray/70 light:text-gray-600">
+                  {disciplinaryData?.yellowCards || 0}Y {disciplinaryData?.redCards || 0}R
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Top Attributes Section */}
         {attributes && topAttributes.length > 0 && (
           <div className="mt-6 pt-4 border-t border-club-gold/30 light:border-gray-200">
@@ -205,6 +303,24 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
             </div>
           </div>
         )}
+
+        {/* Quick Action Buttons */}
+        <div className="mt-6 pt-4 border-t border-club-gold/30 light:border-gray-200">
+          <div className="flex flex-wrap gap-2">
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <Calendar className="w-4 h-4" />
+              View Schedule
+            </Button>
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Performance Trends
+            </Button>
+            <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Training History
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
