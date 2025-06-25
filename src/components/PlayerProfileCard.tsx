@@ -14,7 +14,8 @@ import {
   FileText,
   Shield,
   Activity,
-  Clock
+  Clock,
+  User
 } from "lucide-react";
 
 interface PlayerProfileCardProps {
@@ -27,46 +28,57 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
 
   if (loading) return <ChartLoadingSkeleton />;
 
+  if (!player) {
+    return (
+      <Card className="bg-club-black/80 border-club-gold/30 light:bg-white light:border-gray-200">
+        <CardContent className="p-6 text-center">
+          <User className="w-12 h-12 mx-auto text-club-light-gray/50 light:text-gray-400 mb-4" />
+          <p className="text-club-light-gray/70 light:text-gray-600">No player selected</p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   // Calculate overall rating based on position
   const calculateOverallRating = () => {
-    if (!attributes) return 0;
+    if (!attributes) return player.match_rating ? Math.round(player.match_rating * 10) : 0;
     
     const position = player.position?.toLowerCase() || '';
     
     if (position.includes('goalkeeper') || position.includes('gk')) {
       // Goalkeeper-specific calculation
       return Math.round((
-        attributes.positioning * 0.3 +
-        attributes.mental_strength * 0.25 +
-        attributes.decision_making * 0.25 +
-        attributes.communication * 0.2
+        (attributes.positioning || 50) * 0.3 +
+        (attributes.mental_strength || 50) * 0.25 +
+        (attributes.decision_making || 50) * 0.25 +
+        (attributes.communication || 50) * 0.2
       ));
     } else if (position.includes('defender') || position.includes('cb') || position.includes('lb') || position.includes('rb')) {
       // Defender calculation
       return Math.round((
-        attributes.tackling * 0.25 +
-        attributes.marking * 0.25 +
-        attributes.positioning * 0.2 +
-        attributes.strength * 0.15 +
-        attributes.passing * 0.15
+        (attributes.tackling || 50) * 0.25 +
+        (attributes.marking || 50) * 0.25 +
+        (attributes.positioning || 50) * 0.2 +
+        (attributes.strength || 50) * 0.15 +
+        (attributes.passing || 50) * 0.15
       ));
     } else if (position.includes('midfielder') || position.includes('cm') || position.includes('dm') || position.includes('am')) {
       // Midfielder calculation
       return Math.round((
-        attributes.passing * 0.3 +
-        attributes.vision * 0.25 +
-        attributes.ball_control * 0.2 +
-        attributes.decision_making * 0.15 +
-        attributes.stamina * 0.1
+        (attributes.passing || 50) * 0.3 +
+        (attributes.vision || 50) * 0.25 +
+        (attributes.ball_control || 50) * 0.2 +
+        (attributes.decision_making || 50) * 0.15 +
+        (attributes.stamina || 50) * 0.1
       ));
     } else {
       // Forward/Attacker calculation
       return Math.round((
-        attributes.finishing * 0.3 +
-        attributes.pace * 0.25 +
-        attributes.dribbling * 0.2 +
-        attributes.positioning * 0.15 +
-        attributes.ball_control * 0.1
+        (attributes.finishing || 50) * 0.3 +
+        (attributes.pace || 50) * 0.25 +
+        (attributes.dribbling || 50) * 0.2 +
+        (attributes.positioning || 50) * 0.15 +
+        (attributes.ball_control || 50) * 0.1
       ));
     }
   };
@@ -78,15 +90,15 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
     if (!attributes) return [];
     
     const attributeList = [
-      { name: 'Pace', value: attributes.pace },
-      { name: 'Finishing', value: attributes.finishing },
-      { name: 'Passing', value: attributes.passing },
-      { name: 'Dribbling', value: attributes.dribbling },
-      { name: 'Tackling', value: attributes.tackling },
-      { name: 'Positioning', value: attributes.positioning },
-      { name: 'Vision', value: attributes.vision },
-      { name: 'Strength', value: attributes.strength },
-    ];
+      { name: 'Pace', value: attributes.pace || 0 },
+      { name: 'Finishing', value: attributes.finishing || 0 },
+      { name: 'Passing', value: attributes.passing || 0 },
+      { name: 'Dribbling', value: attributes.dribbling || 0 },
+      { name: 'Tackling', value: attributes.tackling || 0 },
+      { name: 'Positioning', value: attributes.positioning || 0 },
+      { name: 'Vision', value: attributes.vision || 0 },
+      { name: 'Strength', value: attributes.strength || 0 },
+    ].filter(attr => attr.value > 0);
     
     return attributeList
       .sort((a, b) => b.value - a.value)
@@ -102,16 +114,17 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
     return "text-gray-500";
   };
 
-  // Mock data for coaching-specific information
+  // Enhanced coaching information
   const getFormIndicator = () => {
     const rating = player.match_rating || 0;
-    if (rating >= 7.5) return { color: 'bg-green-500', label: 'Excellent Form' };
-    if (rating >= 6.5) return { color: 'bg-amber-500', label: 'Average Form' };
-    return { color: 'bg-red-500', label: 'Poor Form' };
+    if (rating >= 7.5) return { color: 'bg-green-500', label: 'Excellent Form', dot: 'bg-green-500' };
+    if (rating >= 6.5) return { color: 'bg-blue-500', label: 'Good Form', dot: 'bg-blue-500' };
+    if (rating >= 5.0) return { color: 'bg-amber-500', label: 'Average Form', dot: 'bg-amber-500' };
+    return { color: 'bg-red-500', label: 'Poor Form', dot: 'bg-red-500' };
   };
 
   const getContractStatus = () => {
-    // Mock contract data
+    // Mock contract data - in real app would come from database
     return {
       expiryDate: '2025-06-30',
       status: 'Active',
@@ -120,10 +133,10 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
   };
 
   const getInjuryHistory = () => {
-    // Mock injury data
+    // Mock injury data - in real app would come from database
     return {
-      recentInjuries: 2,
-      daysOut: 14,
+      recentInjuries: 0,
+      daysOut: 0,
       riskLevel: 'Low'
     };
   };
@@ -138,7 +151,7 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
         <CardTitle className="text-club-gold light:text-yellow-600 flex items-center justify-between">
           <span>Player Profile</span>
           <div className="flex items-center gap-2">
-            <div className={`w-3 h-3 rounded-full ${formIndicator.color}`} title={formIndicator.label} />
+            <div className={`w-3 h-3 rounded-full ${formIndicator.dot}`} title={formIndicator.label} />
           </div>
         </CardTitle>
       </CardHeader>
@@ -149,21 +162,21 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
             <PlayerAvatar player={player} size="lg" />
             <div className="text-center sm:text-left">
               <h3 className="text-xl font-bold text-club-light-gray light:text-gray-900">
-                {player.name}
+                {player.name || 'Unknown Player'}
               </h3>
               <p className="text-club-light-gray/80 light:text-gray-600">
-                {player.position} {player.number && `• #${player.number}`}
+                {player.position || 'Unknown Position'} {player.number && `• #${player.number}`}
               </p>
-              {attributes && (
-                <div className="flex items-center gap-2 mt-2">
-                  <Badge variant="secondary" className={`${getRatingColor(overallRating)} bg-club-gold/20 light:bg-yellow-600/20`}>
-                    Overall: {overallRating}
-                  </Badge>
+              <div className="flex items-center gap-2 mt-2">
+                <Badge variant="secondary" className={`${getRatingColor(overallRating)} bg-club-gold/20 light:bg-yellow-600/20`}>
+                  Overall: {overallRating}
+                </Badge>
+                {attributes?.preferred_foot && (
                   <Badge variant="outline" className="border-club-gold/30 text-club-light-gray light:border-gray-300 light:text-gray-600">
                     {attributes.preferred_foot} Footed
                   </Badge>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           </div>
 
@@ -208,7 +221,7 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
               <div>
                 <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Current Form</div>
                 <div className="flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${formIndicator.color}`} />
+                  <div className={`w-2 h-2 rounded-full ${formIndicator.dot}`} />
                   <span className="text-xs text-club-light-gray/70 light:text-gray-600">{formIndicator.label}</span>
                 </div>
               </div>
@@ -229,7 +242,7 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
             <div className="flex items-center gap-3 p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
               <Shield className="w-5 h-5 text-club-gold light:text-yellow-600" />
               <div>
-                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Injury Risk</div>
+                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Fitness</div>
                 <div className="text-xs text-club-light-gray/70 light:text-gray-600">
                   {injuryHistory.riskLevel} Risk
                 </div>
@@ -250,7 +263,7 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
         </div>
 
         {/* Top Attributes Section */}
-        {attributes && topAttributes.length > 0 && (
+        {topAttributes.length > 0 && (
           <div className="mt-6 pt-4 border-t border-club-gold/30 light:border-gray-200">
             <h4 className="font-semibold text-club-gold light:text-yellow-600 mb-3">
               Top Attributes
@@ -276,13 +289,13 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
               <div className="flex justify-between">
                 <span className="text-club-light-gray light:text-gray-700">Work Rate:</span>
                 <span className="font-medium text-club-light-gray light:text-gray-900">
-                  {attributes.work_rate_attacking}/100 ATT | {attributes.work_rate_defensive}/100 DEF
+                  {attributes.work_rate_attacking || 50}/100 ATT | {attributes.work_rate_defensive || 50}/100 DEF
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-club-light-gray light:text-gray-700">Skill Moves:</span>
                 <span className="font-medium text-club-light-gray light:text-gray-900">
-                  ★{attributes.skill_moves_rating} | Weak Foot: ★{attributes.weak_foot_rating}
+                  ★{attributes.skill_moves_rating || 3} | Weak Foot: ★{attributes.weak_foot_rating || 3}
                 </span>
               </div>
             </div>
@@ -291,13 +304,13 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
               <div className="flex justify-between">
                 <span className="text-club-light-gray light:text-gray-700">Leadership:</span>
                 <span className="font-medium text-club-light-gray light:text-gray-900">
-                  {attributes.leadership}/100
+                  {attributes.leadership || 50}/100
                 </span>
               </div>
               <div className="flex justify-between">
                 <span className="text-club-light-gray light:text-gray-700">Mental Strength:</span>
                 <span className="font-medium text-club-light-gray light:text-gray-900">
-                  {attributes.mental_strength}/100
+                  {attributes.mental_strength || 50}/100
                 </span>
               </div>
             </div>

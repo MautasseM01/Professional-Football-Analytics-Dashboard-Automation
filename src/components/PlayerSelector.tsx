@@ -24,7 +24,8 @@ import {
   UserPlus,
   ClipboardList,
   MessageCircle,
-  GitCompare
+  GitCompare,
+  AlertTriangle
 } from "lucide-react";
 import { ErrorFallback } from "@/components/ErrorStates/ErrorFallback";
 import { DataLoadingSkeleton } from "@/components/LoadingStates/DataLoadingSkeleton";
@@ -58,43 +59,24 @@ export const PlayerSelector = ({
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [selectedForComparison, setSelectedForComparison] = useState<number[]>([]);
 
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (!players?.length || !selectedPlayer) return;
-
-      const currentIndex = players.findIndex(p => p.id === selectedPlayer.id);
-      
-      if (e.key === 'ArrowLeft' && currentIndex > 0) {
-        e.preventDefault();
-        onPlayerSelect(players[currentIndex - 1].id);
-      } else if (e.key === 'ArrowRight' && currentIndex < players.length - 1) {
-        e.preventDefault();
-        onPlayerSelect(players[currentIndex + 1].id);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [players, selectedPlayer, onPlayerSelect]);
-
-  // Mock status data - in real app, this would come from the API
-  const getPlayerStatus = useCallback((player: Player) => {
-    // Mock logic - replace with real data
-    const random = player.id % 10;
-    if (random === 0) return 'injured';
-    if (random === 1) return 'suspended';
+  // Mock status logic - simplified for demo purposes
+  const getPlayerStatus = useCallback((player: Player): FilterStatus => {
+    // Simple mock logic based on player ID for demo
+    const statusMod = player.id % 20;
+    if (statusMod === 1 || statusMod === 2) return 'injured';
+    if (statusMod === 3) return 'suspended';
     return 'available';
   }, []);
 
   const getPlayerForm = useCallback((player: Player) => {
-    // Mock form indicator based on recent performance
     const rating = player.match_rating || 0;
-    if (rating >= 7.5) return 'good';
-    if (rating >= 6.5) return 'average';
+    if (rating >= 7.5) return 'excellent';
+    if (rating >= 6.5) return 'good';
+    if (rating >= 5.0) return 'average';
     return 'poor';
   }, []);
 
+  // Enhanced filtering logic
   const filteredPlayers = useMemo(() => {
     if (!players?.length) return [];
 
@@ -123,13 +105,13 @@ export const PlayerSelector = ({
             if (!position.includes('goalkeeper') && !position.includes('gk')) return false;
             break;
           case 'defender':
-            if (!position.includes('defender') && !position.includes('back')) return false;
+            if (!position.includes('defender') && !position.includes('back') && !position.includes('cb') && !position.includes('lb') && !position.includes('rb')) return false;
             break;
           case 'midfielder':
-            if (!position.includes('midfielder') && !position.includes('mid')) return false;
+            if (!position.includes('midfielder') && !position.includes('mid') && !position.includes('cm') && !position.includes('dm') && !position.includes('am')) return false;
             break;
           case 'forward':
-            if (!position.includes('forward') && !position.includes('striker') && !position.includes('winger')) return false;
+            if (!position.includes('forward') && !position.includes('striker') && !position.includes('winger') && !position.includes('lw') && !position.includes('rw')) return false;
             break;
         }
       }
@@ -137,6 +119,26 @@ export const PlayerSelector = ({
       return true;
     });
   }, [players, searchQuery, statusFilter, positionFilter, getPlayerStatus]);
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!filteredPlayers?.length || !selectedPlayer) return;
+
+      const currentIndex = filteredPlayers.findIndex(p => p.id === selectedPlayer.id);
+      
+      if (e.key === 'ArrowLeft' && currentIndex > 0) {
+        e.preventDefault();
+        onPlayerSelect(filteredPlayers[currentIndex - 1].id);
+      } else if (e.key === 'ArrowRight' && currentIndex < filteredPlayers.length - 1) {
+        e.preventDefault();
+        onPlayerSelect(filteredPlayers[currentIndex + 1].id);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [filteredPlayers, selectedPlayer, onPlayerSelect]);
 
   const handlePlayerSelect = (value: string) => {
     try {
@@ -149,6 +151,7 @@ export const PlayerSelector = ({
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to select player';
       setSelectError(errorMessage);
+      toast.error(errorMessage);
     }
   };
 
@@ -167,18 +170,20 @@ export const PlayerSelector = ({
   const handleQuickAction = (action: string, player: Player) => {
     switch (action) {
       case 'starting-xi':
-        toast.info(`Added ${player.name} to Starting XI`);
+        toast.success(`${player.name} would be added to Starting XI`);
         break;
       case 'training-data':
-        toast.info(`Opening training data for ${player.name}`);
+        toast.info(`Training data for ${player.name} would be opened`);
         break;
       case 'contact':
-        toast.info(`Opening contact details for ${player.name}`);
+        toast.info(`Contact details for ${player.name} would be opened`);
         break;
+      default:
+        toast.info(`Action ${action} for ${player.name}`);
     }
   };
 
-  const getStatusColor = (status: string) => {
+  const getStatusColor = (status: FilterStatus) => {
     switch (status) {
       case 'available': return 'bg-green-500';
       case 'injured': return 'bg-red-500';
@@ -189,11 +194,19 @@ export const PlayerSelector = ({
 
   const getFormColor = (form: string) => {
     switch (form) {
-      case 'good': return 'text-green-500';
+      case 'excellent': return 'text-green-500';
+      case 'good': return 'text-blue-500';
       case 'average': return 'text-amber-500';
       case 'poor': return 'text-red-500';
       default: return 'text-gray-500';
     }
+  };
+
+  const clearFilters = () => {
+    setSearchQuery("");
+    setStatusFilter('all');
+    setPositionFilter('all');
+    toast.info("Filters cleared");
   };
 
   // Handle errors
@@ -207,14 +220,14 @@ export const PlayerSelector = ({
     );
   }
 
-  // Don't show selector if user is a player (they can only see their own data)
+  // Don't show selector if user is a player
   if (profile?.role === 'player') {
     if (loading) {
       return <DataLoadingSkeleton count={1} />;
     }
 
     return (
-      <Card className="bg-club-black/90 dark:bg-club-dark-bg light:bg-white border-club-gold/20 light:border-gray-200">
+      <Card className="bg-club-black/90 border-club-gold/20 light:bg-white light:border-gray-200">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center text-club-gold light:text-yellow-600 text-lg">
             <User className="mr-2 h-5 w-5" />
@@ -251,9 +264,13 @@ export const PlayerSelector = ({
     );
   }
 
+  const currentPlayerIndex = selectedPlayer ? filteredPlayers.findIndex(p => p.id === selectedPlayer.id) : -1;
+  const canGoNext = currentPlayerIndex >= 0 && currentPlayerIndex < filteredPlayers.length - 1;
+  const canGoPrevious = currentPlayerIndex > 0;
+
   return (
     <div className="space-y-4">
-      <Card className="bg-club-black/90 dark:bg-club-dark-bg light:bg-white border-club-gold/20 light:border-gray-200">
+      <Card className="bg-club-black/90 border-club-gold/20 light:bg-white light:border-gray-200">
         <CardHeader className="pb-3">
           <CardTitle className="flex items-center justify-between text-club-gold light:text-yellow-600 text-lg">
             <div className="flex items-center">
@@ -274,7 +291,7 @@ export const PlayerSelector = ({
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => toast.info("Opening player comparison...")}
+                  onClick={() => toast.info("Player comparison feature coming soon")}
                   className="flex items-center gap-2"
                 >
                   <GitCompare className="h-4 w-4" />
@@ -287,8 +304,9 @@ export const PlayerSelector = ({
         
         <CardContent className="space-y-4">
           {selectError && (
-            <div className="mb-3 p-2 bg-red-500/10 border border-red-500/20 rounded text-red-600 text-sm">
-              {selectError}
+            <div className="mb-3 p-3 bg-red-500/10 border border-red-500/20 rounded-lg flex items-center gap-2">
+              <AlertTriangle className="h-4 w-4 text-red-500" />
+              <span className="text-red-600 text-sm">{selectError}</span>
             </div>
           )}
 
@@ -306,6 +324,16 @@ export const PlayerSelector = ({
                 }
               }}
             />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="sm"
+                className="absolute right-2 top-1/2 transform -translate-y-1/2 h-6 w-6 p-0"
+                onClick={() => setSearchQuery('')}
+              >
+                ×
+              </Button>
+            )}
           </div>
 
           {/* Filters */}
@@ -345,6 +373,17 @@ export const PlayerSelector = ({
                   </SelectContent>
                 </Select>
               </div>
+              
+              <div className="md:col-span-2 flex justify-end">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={clearFilters}
+                  className="flex items-center gap-2"
+                >
+                  Clear Filters
+                </Button>
+              </div>
             </div>
           )}
 
@@ -357,82 +396,87 @@ export const PlayerSelector = ({
               <SelectValue placeholder="Choose a player" />
             </SelectTrigger>
             <SelectContent className="bg-club-black light:bg-white border-club-gold/30 light:border-gray-200 text-club-light-gray light:text-gray-900 max-h-80">
-              {filteredPlayers.map((player) => {
-                if (!player?.id || !player?.name) return null;
-                
-                const isSelected = selectedPlayer?.id === player.id;
-                const playerStatus = getPlayerStatus(player);
-                const playerForm = getPlayerForm(player);
-                const isFavorite = favorites.has(player.id);
-                
-                return (
-                  <SelectItem 
-                    key={`player-${player.id}`}
-                    value={player.id.toString()}
-                    className={`
-                      relative pl-6 pr-3 py-3 cursor-pointer transition-all duration-200
-                      hover:bg-club-gold/20 light:hover:bg-yellow-600/10
-                      focus:bg-club-gold/20 light:focus:bg-yellow-600/10
-                      data-[highlighted]:bg-club-gold/20 light:data-[highlighted]:bg-yellow-600/10
-                      ${isSelected 
-                        ? 'bg-club-gold/10 light:bg-yellow-600/10 border-l-4 border-l-club-gold light:border-l-yellow-600' 
-                        : 'border-l-4 border-l-transparent'
-                      }
-                    `}
-                  >
-                    <div className="flex items-center gap-3">
-                      {/* Player Avatar with Status Indicator */}
-                      <div className="relative flex-shrink-0">
-                        <div className="w-10 h-10 bg-club-gold/20 light:bg-yellow-600/20 rounded-full flex items-center justify-center">
-                          <span className="text-sm font-bold text-club-gold light:text-yellow-600">
-                            {player.number || '?'}
-                          </span>
+              {filteredPlayers.length === 0 ? (
+                <div className="p-4 text-center text-club-light-gray/70 light:text-gray-600">
+                  No players match your current filters
+                </div>
+              ) : (
+                filteredPlayers.map((player) => {
+                  if (!player?.id || !player?.name) return null;
+                  
+                  const isSelected = selectedPlayer?.id === player.id;
+                  const playerStatus = getPlayerStatus(player);
+                  const playerForm = getPlayerForm(player);
+                  const isFavorite = favorites.has(player.id);
+                  
+                  return (
+                    <SelectItem 
+                      key={`player-${player.id}`}
+                      value={player.id.toString()}
+                      className={`
+                        relative pl-6 pr-3 py-3 cursor-pointer transition-all duration-200
+                        hover:bg-club-gold/20 light:hover:bg-yellow-600/10
+                        focus:bg-club-gold/20 light:focus:bg-yellow-600/10
+                        data-[highlighted]:bg-club-gold/20 light:data-[highlighted]:bg-yellow-600/10
+                        ${isSelected 
+                          ? 'bg-club-gold/10 light:bg-yellow-600/10 border-l-4 border-l-club-gold light:border-l-yellow-600' 
+                          : 'border-l-4 border-l-transparent'
+                        }
+                      `}
+                    >
+                      <div className="flex items-center gap-3">
+                        {/* Player Avatar with Status Indicator */}
+                        <div className="relative flex-shrink-0">
+                          <div className="w-10 h-10 bg-club-gold/20 light:bg-yellow-600/20 rounded-full flex items-center justify-center">
+                            <span className="text-sm font-bold text-club-gold light:text-yellow-600">
+                              {player.number || '?'}
+                            </span>
+                          </div>
+                          {/* Status indicator */}
+                          <div className={`absolute -top-1 -right-1 w-4 h-4 ${getStatusColor(playerStatus)} rounded-full border-2 border-club-black light:border-white`} />
                         </div>
-                        {/* Status indicator */}
-                        <div className={`absolute -top-1 -right-1 w-4 h-4 ${getStatusColor(playerStatus)} rounded-full border-2 border-club-black light:border-white`} />
+                        
+                        {/* Player Info */}
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <span className="font-medium text-club-light-gray light:text-gray-900 truncate">{player.name}</span>
+                            {isFavorite && <Star className="w-4 h-4 text-yellow-500 fill-current" />}
+                            <div className={`w-2 h-2 rounded-full ${getFormColor(playerForm)}`} title={`Form: ${playerForm}`} />
+                          </div>
+                          <div className="flex items-center gap-2 text-xs text-club-light-gray/70 light:text-gray-600">
+                            <span>{player.position}</span>
+                            <Badge variant="outline" className={`px-1 py-0 text-xs ${getStatusColor(playerStatus)} text-white border-0`}>
+                              {playerStatus}
+                            </Badge>
+                          </div>
+                        </div>
                       </div>
-                      
-                      {/* Player Info */}
-                      <div className="flex-1 min-w-0">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-club-light-gray light:text-gray-900 truncate">{player.name}</span>
-                          {isFavorite && <Star className="w-4 h-4 text-yellow-500 fill-current" />}
-                          <div className={`w-2 h-2 rounded-full ${getFormColor(playerForm)}`} title={`Form: ${playerForm}`} />
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-club-light-gray/70 light:text-gray-600">
-                          <span>{player.position}</span>
-                          <Badge variant="outline" className={`px-1 py-0 text-xs ${getStatusColor(playerStatus)} text-white border-0`}>
-                            {playerStatus}
-                          </Badge>
-                        </div>
-                      </div>
-                    </div>
-                  </SelectItem>
-                );
-              })}
+                    </SelectItem>
+                  );
+                })
+              )}
             </SelectContent>
           </Select>
 
           {/* Navigation Controls */}
-          {selectedPlayer && (
+          {selectedPlayer && filteredPlayers.length > 0 && (
             <div className="flex items-center justify-between">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  const currentIndex = filteredPlayers.findIndex(p => p.id === selectedPlayer.id);
-                  if (currentIndex > 0) {
-                    onPlayerSelect(filteredPlayers[currentIndex - 1].id);
+                  if (canGoPrevious) {
+                    onPlayerSelect(filteredPlayers[currentPlayerIndex - 1].id);
                   }
                 }}
-                disabled={!selectedPlayer || filteredPlayers.findIndex(p => p.id === selectedPlayer.id) === 0}
+                disabled={!canGoPrevious}
                 className="flex items-center gap-2"
               >
                 <ArrowLeft className="w-4 h-4" />
                 Previous
               </Button>
 
-              <span className="text-sm text-club-light-gray/70 light:text-gray-600">
+              <span className="text-sm text-club-light-gray/70 light:text-gray-600 px-4">
                 Use ← → keys to navigate
               </span>
 
@@ -440,12 +484,11 @@ export const PlayerSelector = ({
                 variant="outline"
                 size="sm"
                 onClick={() => {
-                  const currentIndex = filteredPlayers.findIndex(p => p.id === selectedPlayer.id);
-                  if (currentIndex < filteredPlayers.length - 1) {
-                    onPlayerSelect(filteredPlayers[currentIndex + 1].id);
+                  if (canGoNext) {
+                    onPlayerSelect(filteredPlayers[currentPlayerIndex + 1].id);
                   }
                 }}
-                disabled={!selectedPlayer || filteredPlayers.findIndex(p => p.id === selectedPlayer.id) === filteredPlayers.length - 1}
+                disabled={!canGoNext}
                 className="flex items-center gap-2"
               >
                 Next
@@ -464,7 +507,8 @@ export const PlayerSelector = ({
                 className="flex items-center gap-2"
               >
                 <UserPlus className="w-4 h-4" />
-                Add to XI
+                <span className="hidden sm:inline">Add to XI</span>
+                <span className="sm:hidden">XI</span>
               </Button>
               
               <Button
@@ -474,7 +518,8 @@ export const PlayerSelector = ({
                 className="flex items-center gap-2"
               >
                 <ClipboardList className="w-4 h-4" />
-                Training
+                <span className="hidden sm:inline">Training</span>
+                <span className="sm:hidden">Train</span>
               </Button>
               
               <Button
@@ -484,7 +529,8 @@ export const PlayerSelector = ({
                 className="flex items-center gap-2"
               >
                 <MessageCircle className="w-4 h-4" />
-                Contact
+                <span className="hidden sm:inline">Contact</span>
+                <span className="sm:hidden">Call</span>
               </Button>
               
               <Button
@@ -494,7 +540,8 @@ export const PlayerSelector = ({
                 className="flex items-center gap-2"
               >
                 <Star className={`w-4 h-4 ${favorites.has(selectedPlayer.id) ? 'text-yellow-500 fill-current' : ''}`} />
-                {favorites.has(selectedPlayer.id) ? 'Unfavorite' : 'Favorite'}
+                <span className="hidden sm:inline">{favorites.has(selectedPlayer.id) ? 'Unfavorite' : 'Favorite'}</span>
+                <span className="sm:hidden">★</span>
               </Button>
             </div>
           )}
