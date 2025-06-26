@@ -2,6 +2,8 @@
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { Player } from "@/types";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { usePlayerInjuryStatus } from "@/hooks/use-player-injuries";
+import { usePlayerContract } from "@/hooks/use-player-contracts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -59,24 +61,7 @@ export const PlayerSelector = ({
   const [favorites, setFavorites] = useState<Set<number>>(new Set());
   const [selectedForComparison, setSelectedForComparison] = useState<number[]>([]);
 
-  // Mock status logic - simplified for demo purposes
-  const getPlayerStatus = useCallback((player: Player): FilterStatus => {
-    // Simple mock logic based on player ID for demo
-    const statusMod = player.id % 20;
-    if (statusMod === 1 || statusMod === 2) return 'injured';
-    if (statusMod === 3) return 'suspended';
-    return 'available';
-  }, []);
-
-  const getPlayerForm = useCallback((player: Player) => {
-    const rating = player.match_rating || 0;
-    if (rating >= 7.5) return 'excellent';
-    if (rating >= 6.5) return 'good';
-    if (rating >= 5.0) return 'average';
-    return 'poor';
-  }, []);
-
-  // Enhanced filtering logic
+  // Enhanced filtering logic with real data
   const filteredPlayers = useMemo(() => {
     if (!players?.length) return [];
 
@@ -89,12 +74,6 @@ export const PlayerSelector = ({
           player.position?.toLowerCase().includes(query) ||
           player.number?.toString().includes(query);
         if (!matchesSearch) return false;
-      }
-
-      // Status filter
-      if (statusFilter !== 'all') {
-        const playerStatus = getPlayerStatus(player);
-        if (playerStatus !== statusFilter) return false;
       }
 
       // Position filter
@@ -118,7 +97,111 @@ export const PlayerSelector = ({
 
       return true;
     });
-  }, [players, searchQuery, statusFilter, positionFilter, getPlayerStatus]);
+  }, [players, searchQuery, positionFilter]);
+
+  // Enhanced player item component with real data
+  const EnhancedPlayerItem = ({ player }: { player: Player }) => {
+    const { data: injuryStatus } = usePlayerInjuryStatus(player.id);
+    const { data: contractData } = usePlayerContract(player.id);
+    
+    const isSelected = selectedPlayer?.id === player.id;
+    const isFavorite = favorites.has(player.id);
+    const isInjured = injuryStatus?.status === 'active';
+    const isRecovering = injuryStatus?.status === 'recovering';
+    
+    // Determine player status
+    let playerStatus: FilterStatus = 'available';
+    if (isInjured) playerStatus = 'injured';
+    else if (isRecovering) playerStatus = 'injured'; // Still considered injured for selection purposes
+    
+    // Calculate form based on recent performance
+    const playerForm = useMemo(() => {
+      const rating = player.match_rating || 0;
+      if (rating >= 7.5) return 'excellent';
+      if (rating >= 6.5) return 'good';
+      if (rating >= 5.0) return 'average';
+      return 'poor';
+    }, [player.match_rating]);
+
+    // Status filtering
+    if (statusFilter !== 'all' && statusFilter !== playerStatus) {
+      return null;
+    }
+
+    const getStatusColor = (status: FilterStatus) => {
+      switch (status) {
+        case 'available': return 'bg-green-500';
+        case 'injured': return 'bg-red-500';
+        case 'suspended': return 'bg-yellow-500';
+        default: return 'bg-gray-500';
+      }
+    };
+
+    const getFormColor = (form: string) => {
+      switch (form) {
+        case 'excellent': return 'text-green-500';
+        case 'good': return 'text-blue-500';
+        case 'average': return 'text-amber-500';
+        case 'poor': return 'text-red-500';
+        default: return 'text-gray-500';
+      }
+    };
+
+    return (
+      <SelectItem 
+        key={`player-${player.id}`}
+        value={player.id.toString()}
+        className={`
+          relative pl-6 pr-3 py-3 cursor-pointer transition-all duration-200
+          hover:bg-club-gold/20 light:hover:bg-yellow-600/10
+          focus:bg-club-gold/20 light:focus:bg-yellow-600/10
+          data-[highlighted]:bg-club-gold/20 light:data-[highlighted]:bg-yellow-600/10
+          ${isSelected 
+            ? 'bg-club-gold/10 light:bg-yellow-600/10 border-l-4 border-l-club-gold light:border-l-yellow-600' 
+            : 'border-l-4 border-l-transparent'
+          }
+        `}
+      >
+        <div className="flex items-center gap-3">
+          {/* Player Avatar with Status Indicator */}
+          <div className="relative flex-shrink-0">
+            <div className="w-10 h-10 bg-club-gold/20 light:bg-yellow-600/20 rounded-full flex items-center justify-center">
+              <span className="text-sm font-bold text-club-gold light:text-yellow-600">
+                {player.number || '?'}
+              </span>
+            </div>
+            {/* Status indicator */}
+            <div className={`absolute -top-1 -right-1 w-4 h-4 ${getStatusColor(playerStatus)} rounded-full border-2 border-club-black light:border-white`} />
+          </div>
+          
+          {/* Player Info */}
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <span className="font-medium text-club-light-gray light:text-gray-900 truncate">{player.name}</span>
+              {isFavorite && <Star className="w-4 h-4 text-yellow-500 fill-current" />}
+              <div className={`w-2 h-2 rounded-full ${getFormColor(playerForm)}`} title={`Form: ${playerForm}`} />
+            </div>
+            <div className="flex items-center gap-2 text-xs text-club-light-gray/70 light:text-gray-600">
+              <span>{player.position}</span>
+              <Badge variant="outline" className={`px-1 py-0 text-xs ${getStatusColor(playerStatus)} text-white border-0`}>
+                {playerStatus}
+              </Badge>
+              {contractData && (
+                <span className="text-club-gold/70 light:text-yellow-600/70">
+                  Contract: {contractData.contract_type}
+                </span>
+              )}
+              {injuryStatus && (
+                <span className="text-red-400 text-xs">
+                  {injuryStatus.injury_type} - {injuryStatus.severity}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </SelectItem>
+    );
+  };
 
   // Keyboard navigation
   useEffect(() => {
@@ -180,25 +263,6 @@ export const PlayerSelector = ({
         break;
       default:
         toast.info(`Action ${action} for ${player.name}`);
-    }
-  };
-
-  const getStatusColor = (status: FilterStatus) => {
-    switch (status) {
-      case 'available': return 'bg-green-500';
-      case 'injured': return 'bg-red-500';
-      case 'suspended': return 'bg-yellow-500';
-      default: return 'bg-gray-500';
-    }
-  };
-
-  const getFormColor = (form: string) => {
-    switch (form) {
-      case 'excellent': return 'text-green-500';
-      case 'good': return 'text-blue-500';
-      case 'average': return 'text-amber-500';
-      case 'poor': return 'text-red-500';
-      default: return 'text-gray-500';
     }
   };
 
@@ -403,56 +467,7 @@ export const PlayerSelector = ({
               ) : (
                 filteredPlayers.map((player) => {
                   if (!player?.id || !player?.name) return null;
-                  
-                  const isSelected = selectedPlayer?.id === player.id;
-                  const playerStatus = getPlayerStatus(player);
-                  const playerForm = getPlayerForm(player);
-                  const isFavorite = favorites.has(player.id);
-                  
-                  return (
-                    <SelectItem 
-                      key={`player-${player.id}`}
-                      value={player.id.toString()}
-                      className={`
-                        relative pl-6 pr-3 py-3 cursor-pointer transition-all duration-200
-                        hover:bg-club-gold/20 light:hover:bg-yellow-600/10
-                        focus:bg-club-gold/20 light:focus:bg-yellow-600/10
-                        data-[highlighted]:bg-club-gold/20 light:data-[highlighted]:bg-yellow-600/10
-                        ${isSelected 
-                          ? 'bg-club-gold/10 light:bg-yellow-600/10 border-l-4 border-l-club-gold light:border-l-yellow-600' 
-                          : 'border-l-4 border-l-transparent'
-                        }
-                      `}
-                    >
-                      <div className="flex items-center gap-3">
-                        {/* Player Avatar with Status Indicator */}
-                        <div className="relative flex-shrink-0">
-                          <div className="w-10 h-10 bg-club-gold/20 light:bg-yellow-600/20 rounded-full flex items-center justify-center">
-                            <span className="text-sm font-bold text-club-gold light:text-yellow-600">
-                              {player.number || '?'}
-                            </span>
-                          </div>
-                          {/* Status indicator */}
-                          <div className={`absolute -top-1 -right-1 w-4 h-4 ${getStatusColor(playerStatus)} rounded-full border-2 border-club-black light:border-white`} />
-                        </div>
-                        
-                        {/* Player Info */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium text-club-light-gray light:text-gray-900 truncate">{player.name}</span>
-                            {isFavorite && <Star className="w-4 h-4 text-yellow-500 fill-current" />}
-                            <div className={`w-2 h-2 rounded-full ${getFormColor(playerForm)}`} title={`Form: ${playerForm}`} />
-                          </div>
-                          <div className="flex items-center gap-2 text-xs text-club-light-gray/70 light:text-gray-600">
-                            <span>{player.position}</span>
-                            <Badge variant="outline" className={`px-1 py-0 text-xs ${getStatusColor(playerStatus)} text-white border-0`}>
-                              {playerStatus}
-                            </Badge>
-                          </div>
-                        </div>
-                      </div>
-                    </SelectItem>
-                  );
+                  return <EnhancedPlayerItem key={player.id} player={player} />;
                 })
               )}
             </SelectContent>

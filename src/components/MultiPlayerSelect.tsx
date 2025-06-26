@@ -18,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Player } from "@/types";
 import { PlayerAvatar } from "./PlayerAvatar";
+import { usePlayerInjuryStatus } from "@/hooks/use-player-injuries";
 
 interface MultiPlayerSelectProps {
   players: Player[];
@@ -26,6 +27,53 @@ interface MultiPlayerSelectProps {
   loading?: boolean;
   maxSelections?: number;
 }
+
+const PlayerItemWithStatus = ({ player, isSelected, onSelect }: { 
+  player: Player; 
+  isSelected: boolean; 
+  onSelect: () => void; 
+}) => {
+  const { data: injuryStatus } = usePlayerInjuryStatus(player.id);
+  const isInjured = injuryStatus?.status === 'active';
+
+  return (
+    <CommandItem
+      key={player.id}
+      value={`${player.id}`}
+      onSelect={onSelect}
+      className="text-club-light-gray light:text-gray-900 hover:bg-club-gold/20 light:hover:bg-yellow-600/10 data-[selected]:bg-club-gold/20 light:data-[selected]:bg-yellow-600/10"
+    >
+      <Check
+        className={`mr-2 h-4 w-4 ${
+          isSelected ? "opacity-100 text-club-gold light:text-yellow-600" : "opacity-0"
+        }`}
+      />
+      <div className="flex flex-1 items-center justify-between">
+        <div className="flex items-center gap-2">
+          <PlayerAvatar player={player} size="sm" />
+          <div>
+            <span className="text-club-light-gray light:text-gray-900">{player.name}</span>
+            {player.position && (
+              <span className="ml-2 text-xs text-club-light-gray/70 light:text-gray-600">
+                ({player.position})
+              </span>
+            )}
+            {player.number && (
+              <span className="ml-2 text-xs text-club-gold/70 light:text-yellow-600/70">
+                #{player.number}
+              </span>
+            )}
+            {isInjured && (
+              <Badge variant="outline" className="ml-2 text-xs bg-red-500/10 text-red-500 border-red-500/30">
+                Injured
+              </Badge>
+            )}
+          </div>
+        </div>
+      </div>
+    </CommandItem>
+  );
+};
 
 export function MultiPlayerSelect({
   players,
@@ -127,43 +175,41 @@ export function MultiPlayerSelect({
                   const isSelected = selectedPlayerIds.includes(player.id);
                   const isDisabled = selectedPlayerIds.length >= maxSelections && !isSelected;
                   
-                  return (
-                    <CommandItem
-                      key={player.id}
-                      value={`${player.id}`}
-                      disabled={isDisabled}
-                      onSelect={() => handleSelect(player.id)}
-                      className="text-club-light-gray light:text-gray-900 hover:bg-club-gold/20 light:hover:bg-yellow-600/10 data-[selected]:bg-club-gold/20 light:data-[selected]:bg-yellow-600/10"
-                    >
-                      <Check
-                        className={`mr-2 h-4 w-4 ${
-                          isSelected ? "opacity-100 text-club-gold light:text-yellow-600" : "opacity-0"
-                        }`}
-                      />
-                      <div className="flex flex-1 items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <PlayerAvatar player={player} size="sm" />
-                          <div>
-                            <span className="text-club-light-gray light:text-gray-900">{player.name}</span>
-                            {player.position && (
-                              <span className="ml-2 text-xs text-club-light-gray/70 light:text-gray-600">
-                                ({player.position})
-                              </span>
-                            )}
-                            {player.number && (
-                              <span className="ml-2 text-xs text-club-gold/70 light:text-yellow-600/70">
-                                #{player.number}
-                              </span>
-                            )}
+                  if (isDisabled) {
+                    return (
+                      <CommandItem
+                        key={player.id}
+                        value={`${player.id}`}
+                        disabled={true}
+                        className="text-club-light-gray/50 light:text-gray-500"
+                      >
+                        <div className="flex flex-1 items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <PlayerAvatar player={player} size="sm" />
+                            <div>
+                              <span className="text-club-light-gray/50 light:text-gray-500">{player.name}</span>
+                              {player.position && (
+                                <span className="ml-2 text-xs text-club-light-gray/30 light:text-gray-400">
+                                  ({player.position})
+                                </span>
+                              )}
+                            </div>
                           </div>
-                        </div>
-                        {isDisabled && (
                           <span className="text-xs text-club-light-gray/50 light:text-gray-500">
                             Max {maxSelections} players
                           </span>
-                        )}
-                      </div>
-                    </CommandItem>
+                        </div>
+                      </CommandItem>
+                    );
+                  }
+                  
+                  return (
+                    <PlayerItemWithStatus
+                      key={player.id}
+                      player={player}
+                      isSelected={isSelected}
+                      onSelect={() => handleSelect(player.id)}
+                    />
                   );
                 })}
               </CommandGroup>
