@@ -2,15 +2,21 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/types";
-import { HeartPulse, TrendingUp, BarChart3, Star, Target, Users } from "lucide-react";
+import { HeartPulse, TrendingUp, BarChart3, Star, Target, Users, Calendar } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PerformanceTrendsCard } from "../PerformanceTrends";
+import { SquadAvailabilityCalendar } from "./performance-director/SquadAvailabilityCalendar";
+import { DevelopmentTrajectories } from "./performance-director/DevelopmentTrajectories";
+import { PerformanceBenchmarking } from "./performance-director/PerformanceBenchmarking";
+import { useState } from "react";
 
 interface PerformanceDirectorDashboardProps {
   profile: UserProfile;
 }
 
 export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDashboardProps) => {
+  const [activeTab, setActiveTab] = useState<'overview' | 'availability' | 'development' | 'benchmarking'>('overview');
+
   // Sample player data for performance trends
   const samplePlayer = {
     id: 1,
@@ -40,179 +46,194 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
           Performance Director Dashboard
         </h1>
         <p className="text-sm xs:text-base sm:text-lg text-club-light-gray/70 px-1">
-          Player development and performance analysis
+          Advanced player development and performance analysis
         </p>
       </div>
 
-      {/* Main Stats Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-        {/* Squad Availability */}
-        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
-              <HeartPulse className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              Squad Availability
-            </CardTitle>
-            <CardDescription className="text-club-light-gray/70 text-xs sm:text-sm">
-              Player fitness status
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">18</div>
-              <div className="text-xs sm:text-sm text-club-light-gray/70">Available</div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-center">
-              <div className="bg-club-black/40 rounded py-2 px-1">
-                <div className="text-lg font-bold text-amber-500">3</div>
-                <div className="text-xs text-club-light-gray/70">Light Training</div>
-              </div>
-              <div className="bg-club-black/40 rounded py-2 px-1">
-                <div className="text-lg font-bold text-red-500">4</div>
-                <div className="text-xs text-club-light-gray/70">Injured</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Development Progress */}
-        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
-              <TrendingUp className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              Development Progress
-            </CardTitle>
-            <CardDescription className="text-club-light-gray/70 text-xs sm:text-sm">
-              Player improvement tracking
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">78%</div>
-              <div className="text-xs sm:text-sm text-club-light-gray/70">Targets Met</div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-center">
-              <div className="bg-club-black/40 rounded py-2 px-1">
-                <div className="text-lg font-bold text-green-500">15</div>
-                <div className="text-xs text-club-light-gray/70">On Track</div>
-              </div>
-              <div className="bg-club-black/40 rounded py-2 px-1">
-                <div className="text-lg font-bold text-amber-500">7</div>
-                <div className="text-xs text-club-light-gray/70">Need Focus</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Performance Benchmarks */}
-        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
-          <CardHeader className="pb-2">
-            <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
-              <BarChart3 className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
-              Performance Analysis
-            </CardTitle>
-            <CardDescription className="text-club-light-gray/70 text-xs sm:text-sm">
-              League comparisons
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="text-center">
-              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">Above</div>
-              <div className="text-xs sm:text-sm text-club-light-gray/70">League Average</div>
-            </div>
-            <div className="grid grid-cols-2 gap-2 text-center">
-              <div className="bg-club-black/40 rounded py-2 px-1">
-                <div className="text-lg font-bold text-green-500">9/12</div>
-                <div className="text-xs text-club-light-gray/70">KPIs Met</div>
-              </div>
-              <div className="bg-club-black/40 rounded py-2 px-1">
-                <div className="text-lg font-bold text-blue-500">3</div>
-                <div className="text-xs text-club-light-gray/70">Top Talents</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Navigation Tabs */}
+      <div className="flex flex-wrap gap-2 mb-6">
+        <Button
+          variant={activeTab === 'overview' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setActiveTab('overview')}
+          className={activeTab === 'overview' ? 'bg-club-gold text-club-black' : 'border-club-gold/30'}
+        >
+          <BarChart3 className="mr-2 h-4 w-4" />
+          Overview
+        </Button>
+        <Button
+          variant={activeTab === 'availability' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setActiveTab('availability')}
+          className={activeTab === 'availability' ? 'bg-club-gold text-club-black' : 'border-club-gold/30'}
+        >
+          <Calendar className="mr-2 h-4 w-4" />
+          Squad Availability
+        </Button>
+        <Button
+          variant={activeTab === 'development' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setActiveTab('development')}
+          className={activeTab === 'development' ? 'bg-club-gold text-club-black' : 'border-club-gold/30'}
+        >
+          <Target className="mr-2 h-4 w-4" />
+          Development
+        </Button>
+        <Button
+          variant={activeTab === 'benchmarking' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setActiveTab('benchmarking')}
+          className={activeTab === 'benchmarking' ? 'bg-club-gold text-club-black' : 'border-club-gold/30'}
+        >
+          <TrendingUp className="mr-2 h-4 w-4" />
+          Benchmarking
+        </Button>
       </div>
 
-      {/* Enhanced Performance Trends Section */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        <div className="lg:col-span-2">
-          <PerformanceTrendsCard player={samplePlayer} />
-        </div>
-      </div>
+      {/* Tab Content */}
+      {activeTab === 'overview' && (
+        <>
+          {/* Main Stats Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+            {/* Squad Availability */}
+            <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
+                  <HeartPulse className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  Squad Availability
+                </CardTitle>
+                <CardDescription className="text-club-light-gray/70 text-xs sm:text-sm">
+                  Player fitness status
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-center">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">18</div>
+                  <div className="text-xs sm:text-sm text-club-light-gray/70">Available</div>
+                </div>
+                <div className="grid grid-cols-2 gap-2 text-center">
+                  <div className="bg-club-black/40 rounded py-2 px-1">
+                    <div className="text-lg font-bold text-amber-500">3</div>
+                    <div className="text-xs text-club-light-gray/70">Light Training</div>
+                  </div>
+                  <div className="bg-club-black/40 rounded py-2 px-1">
+                    <div className="text-lg font-bold text-red-500">4</div>
+                    <div className="text-xs text-club-light-gray/70">Injured</div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
 
-      {/* Additional Performance Information */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
-        {/* Development Tracker */}
-        <Card className="bg-club-dark-gray border-club-gold/20">
-          <CardHeader>
-            <CardTitle className="flex items-center text-club-gold">
-              <Target className="mr-2 h-5 w-5" />
-              Development Tracker
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-club-light-gray">First Team</span>
-                  <Badge className="bg-green-600/80">78% On Target</Badge>
+            {/* Development Progress */}
+            <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
+                  <TrendingUp className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  Development Progress
+                </CardTitle>
+                <CardDescription className="text-club-light-gray/70 text-xs sm:text-sm">
+                  Player improvement tracking
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-center">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">78%</div>
+                  <div className="text-xs sm:text-sm text-club-light-gray/70">Targets Met</div>
                 </div>
-                <div className="flex gap-1 h-2">
-                  <div className="bg-green-600 rounded-l h-full" style={{width: "78%"}}></div>
-                  <div className="bg-amber-500 h-full" style={{width: "15%"}}></div>
-                  <div className="bg-red-500 rounded-r h-full" style={{width: "7%"}}></div>
+                <div className="grid grid-cols-2 gap-2 text-center">
+                  <div className="bg-club-black/40 rounded py-2 px-1">
+                    <div className="text-lg font-bold text-green-500">15</div>
+                    <div className="text-xs text-club-light-gray/70">On Track</div>
+                  </div>
+                  <div className="bg-club-black/40 rounded py-2 px-1">
+                    <div className="text-lg font-bold text-amber-500">7</div>
+                    <div className="text-xs text-club-light-gray/70">Need Focus</div>
+                  </div>
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-club-light-gray">U23s</span>
-                  <Badge className="bg-amber-600/80">65% On Target</Badge>
-                </div>
-                <div className="flex gap-1 h-2">
-                  <div className="bg-green-600 rounded-l h-full" style={{width: "65%"}}></div>
-                  <div className="bg-amber-500 h-full" style={{width: "20%"}}></div>
-                  <div className="bg-red-500 rounded-r h-full" style={{width: "15%"}}></div>
-                </div>
-              </div>
+              </CardContent>
+            </Card>
 
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-club-light-gray">Academy</span>
-                  <Badge className="bg-green-600/80">72% On Target</Badge>
+            {/* Performance Benchmarks */}
+            <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
+              <CardHeader className="pb-2">
+                <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
+                  <BarChart3 className="mr-2 h-4 w-4 sm:h-5 sm:w-5" />
+                  Performance Analysis
+                </CardTitle>
+                <CardDescription className="text-club-light-gray/70 text-xs sm:text-sm">
+                  League comparisons
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-center">
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">78th</div>
+                  <div className="text-xs sm:text-sm text-club-light-gray/70">Percentile</div>
                 </div>
-                <div className="flex gap-1 h-2">
-                  <div className="bg-green-600 rounded-l h-full" style={{width: "72%"}}></div>
-                  <div className="bg-amber-500 h-full" style={{width: "18%"}}></div>
-                  <div className="bg-red-500 rounded-r h-full" style={{width: "10%"}}></div>
+                <div className="grid grid-cols-2 gap-2 text-center">
+                  <div className="bg-club-black/40 rounded py-2 px-1">
+                    <div className="text-lg font-bold text-green-500">Rank 3</div>
+                    <div className="text-xs text-club-light-gray/70">League Position</div>
+                  </div>
+                  <div className="bg-club-black/40 rounded py-2 px-1">
+                    <div className="text-lg font-bold text-blue-500">↗</div>
+                    <div className="text-xs text-club-light-gray/70">Improving</div>
+                  </div>
                 </div>
-              </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Enhanced Performance Trends */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
+            <div className="lg:col-span-2">
+              <PerformanceTrendsCard player={samplePlayer} />
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Performance Actions */}
-        <Card className="bg-club-dark-gray border-club-gold/20">
-          <CardHeader>
-            <CardTitle className="flex items-center text-club-gold">
-              <Users className="mr-2 h-5 w-5" />
-              Performance Actions
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Button variant="outline" className="w-full border-club-gold/20 hover:bg-club-gold/10">
-              View Development Report
-            </Button>
-            <Button variant="outline" className="w-full border-club-gold/20 hover:bg-club-gold/10">
-              Performance Benchmarks
-            </Button>
-            <Button variant="outline" className="w-full border-club-gold/20 hover:bg-club-gold/10">
-              Talent ID Dashboard
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+          {/* Quick Actions */}
+          <Card className="bg-club-dark-gray border-club-gold/20">
+            <CardHeader>
+              <CardTitle className="flex items-center text-club-gold">
+                <Star className="mr-2 h-5 w-5" />
+                Quick Actions
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Button 
+                variant="outline" 
+                className="border-club-gold/20 hover:bg-club-gold/10"
+                onClick={() => setActiveTab('development')}
+              >
+                Development Report
+              </Button>
+              <Button 
+                variant="outline" 
+                className="border-club-gold/20 hover:bg-club-gold/10"
+                onClick={() => setActiveTab('benchmarking')}
+              >
+                Performance Benchmarks
+              </Button>
+              <Button 
+                variant="outline" 
+                className="border-club-gold/20 hover:bg-club-gold/10"
+                onClick={() => setActiveTab('availability')}
+              >
+                Squad Availability
+              </Button>
+              <Button 
+                variant="outline" 
+                className="border-club-gold/20 hover:bg-club-gold/10"
+              >
+                Export Reports
+              </Button>
+            </CardContent>
+          </Card>
+        </>
+      )}
+
+      {activeTab === 'availability' && <SquadAvailabilityCalendar />}
+      {activeTab === 'development' && <DevelopmentTrajectories />}
+      {activeTab === 'benchmarking' && <PerformanceBenchmarking />}
     </div>
   );
 };
