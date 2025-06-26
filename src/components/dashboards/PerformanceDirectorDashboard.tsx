@@ -2,12 +2,13 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { UserProfile } from "@/types";
-import { HeartPulse, TrendingUp, BarChart3, Star, Target, Users, Calendar } from "lucide-react";
+import { HeartPulse, TrendingUp, BarChart3, Star, Target, Users, Calendar, Activity } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PerformanceTrendsCard } from "../PerformanceTrends";
 import { SquadAvailabilityCalendar } from "./performance-director/SquadAvailabilityCalendar";
 import { DevelopmentTrajectories } from "./performance-director/DevelopmentTrajectories";
 import { PerformanceBenchmarking } from "./performance-director/PerformanceBenchmarking";
+import { PlayerPerformanceMonitor } from "./performance-director/PlayerPerformanceMonitor";
 import { useState } from "react";
 
 interface PerformanceDirectorDashboardProps {
@@ -15,7 +16,7 @@ interface PerformanceDirectorDashboardProps {
 }
 
 export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDashboardProps) => {
-  const [activeTab, setActiveTab] = useState<'overview' | 'availability' | 'development' | 'benchmarking'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'availability' | 'development' | 'benchmarking' | 'performance'>('overview');
 
   // Sample player data for performance trends
   const samplePlayer = {
@@ -60,6 +61,15 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
         >
           <BarChart3 className="mr-2 h-4 w-4" />
           Overview
+        </Button>
+        <Button
+          variant={activeTab === 'performance' ? 'default' : 'outline'}
+          size="sm"
+          onClick={() => setActiveTab('performance')}
+          className={activeTab === 'performance' ? 'bg-club-gold text-club-black' : 'border-club-gold/30'}
+        >
+          <Activity className="mr-2 h-4 w-4" />
+          Performance Monitor
         </Button>
         <Button
           variant={activeTab === 'availability' ? 'default' : 'outline'}
@@ -153,7 +163,7 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
               </CardContent>
             </Card>
 
-            {/* Performance Benchmarks */}
+            {/* Performance Analysis */}
             <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
@@ -198,7 +208,14 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
                 Quick Actions
               </CardTitle>
             </CardHeader>
-            <CardContent className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <CardContent className="grid grid-cols-2 md:grid-cols-5 gap-4">
+              <Button 
+                variant="outline" 
+                className="border-club-gold/20 hover:bg-club-gold/10"
+                onClick={() => setActiveTab('performance')}
+              >
+                Performance Monitor
+              </Button>
               <Button 
                 variant="outline" 
                 className="border-club-gold/20 hover:bg-club-gold/10"
@@ -231,6 +248,7 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
         </>
       )}
 
+      {activeTab === 'performance' && <PlayerPerformanceMonitor />}
       {activeTab === 'availability' && <SquadAvailabilityCalendar />}
       {activeTab === 'development' && <DevelopmentTrajectories />}
       {activeTab === 'benchmarking' && <PerformanceBenchmarking />}
