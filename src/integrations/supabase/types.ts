@@ -601,6 +601,79 @@ export type Database = {
           },
         ]
       }
+      player_coach_assessments: {
+        Row: {
+          areas_for_improvement: string | null
+          assessment_date: string
+          coach_id: string | null
+          created_at: string | null
+          development_notes: string | null
+          id: number
+          mental_rating: number | null
+          overall_rating: number | null
+          physical_rating: number | null
+          player_id: number | null
+          recommendation: string | null
+          strengths: string | null
+          tactical_rating: number | null
+          technical_rating: number | null
+        }
+        Insert: {
+          areas_for_improvement?: string | null
+          assessment_date: string
+          coach_id?: string | null
+          created_at?: string | null
+          development_notes?: string | null
+          id?: number
+          mental_rating?: number | null
+          overall_rating?: number | null
+          physical_rating?: number | null
+          player_id?: number | null
+          recommendation?: string | null
+          strengths?: string | null
+          tactical_rating?: number | null
+          technical_rating?: number | null
+        }
+        Update: {
+          areas_for_improvement?: string | null
+          assessment_date?: string
+          coach_id?: string | null
+          created_at?: string | null
+          development_notes?: string | null
+          id?: number
+          mental_rating?: number | null
+          overall_rating?: number | null
+          physical_rating?: number | null
+          player_id?: number | null
+          recommendation?: string | null
+          strengths?: string | null
+          tactical_rating?: number | null
+          technical_rating?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_coach_assessments_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_coach_assessments_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_coach_assessments_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_contracts: {
         Row: {
           contract_end_date: string | null
@@ -704,6 +777,182 @@ export type Database = {
           },
         ]
       }
+      player_development_milestones: {
+        Row: {
+          coach_id: string | null
+          completed_date: string | null
+          created_at: string | null
+          id: number
+          importance_level: number | null
+          milestone_description: string | null
+          milestone_type: string
+          player_id: number | null
+          status: string | null
+          target_date: string | null
+        }
+        Insert: {
+          coach_id?: string | null
+          completed_date?: string | null
+          created_at?: string | null
+          id?: number
+          importance_level?: number | null
+          milestone_description?: string | null
+          milestone_type: string
+          player_id?: number | null
+          status?: string | null
+          target_date?: string | null
+        }
+        Update: {
+          coach_id?: string | null
+          completed_date?: string | null
+          created_at?: string | null
+          id?: number
+          importance_level?: number | null
+          milestone_description?: string | null
+          milestone_type?: string
+          player_id?: number | null
+          status?: string | null
+          target_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_development_milestones_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_development_milestones_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_development_milestones_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_development_pathways: {
+        Row: {
+          created_at: string | null
+          current_level: string
+          demotion_date: string | null
+          id: number
+          pathway_stage: string | null
+          player_id: number | null
+          promotion_date: string | null
+          status: string | null
+          target_level: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          current_level?: string
+          demotion_date?: string | null
+          id?: number
+          pathway_stage?: string | null
+          player_id?: number | null
+          promotion_date?: string | null
+          status?: string | null
+          target_level?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          current_level?: string
+          demotion_date?: string | null
+          id?: number
+          pathway_stage?: string | null
+          player_id?: number | null
+          promotion_date?: string | null
+          status?: string | null
+          target_level?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_development_pathways_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_development_pathways_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_development_recommendations: {
+        Row: {
+          created_at: string | null
+          created_by: string | null
+          focus_area: string | null
+          id: number
+          player_id: number | null
+          priority_level: number | null
+          recommendation_type: string | null
+          specific_recommendations: string | null
+          status: string | null
+          target_completion_date: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          created_by?: string | null
+          focus_area?: string | null
+          id?: number
+          player_id?: number | null
+          priority_level?: number | null
+          recommendation_type?: string | null
+          specific_recommendations?: string | null
+          status?: string | null
+          target_completion_date?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          created_by?: string | null
+          focus_area?: string | null
+          id?: number
+          player_id?: number | null
+          priority_level?: number | null
+          recommendation_type?: string | null
+          specific_recommendations?: string | null
+          status?: string | null
+          target_completion_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_development_recommendations_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_development_recommendations_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_development_recommendations_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_disciplinary: {
         Row: {
           card_type: string | null
@@ -739,6 +988,63 @@ export type Database = {
           },
           {
             foreignKeyName: "player_disciplinary_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_educational_progress: {
+        Row: {
+          academic_support_needed: boolean | null
+          academic_year: string | null
+          attendance_percentage: number | null
+          behavioral_notes: string | null
+          created_at: string | null
+          education_level: string | null
+          id: number
+          player_id: number | null
+          subjects_grades: Json | null
+          tutor_assigned: boolean | null
+          updated_at: string | null
+        }
+        Insert: {
+          academic_support_needed?: boolean | null
+          academic_year?: string | null
+          attendance_percentage?: number | null
+          behavioral_notes?: string | null
+          created_at?: string | null
+          education_level?: string | null
+          id?: number
+          player_id?: number | null
+          subjects_grades?: Json | null
+          tutor_assigned?: boolean | null
+          updated_at?: string | null
+        }
+        Update: {
+          academic_support_needed?: boolean | null
+          academic_year?: string | null
+          attendance_percentage?: number | null
+          behavioral_notes?: string | null
+          created_at?: string | null
+          education_level?: string | null
+          id?: number
+          player_id?: number | null
+          subjects_grades?: Json | null
+          tutor_assigned?: boolean | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_educational_progress_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_educational_progress_player_id_fkey"
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "players"
@@ -787,6 +1093,76 @@ export type Database = {
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_guardian_communications: {
+        Row: {
+          communication_date: string
+          communication_type: string | null
+          content: string | null
+          created_at: string | null
+          follow_up_date: string | null
+          follow_up_required: boolean | null
+          guardian_email: string | null
+          guardian_name: string | null
+          guardian_phone: string | null
+          id: number
+          player_id: number | null
+          staff_member_id: string | null
+          subject: string | null
+        }
+        Insert: {
+          communication_date: string
+          communication_type?: string | null
+          content?: string | null
+          created_at?: string | null
+          follow_up_date?: string | null
+          follow_up_required?: boolean | null
+          guardian_email?: string | null
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          id?: number
+          player_id?: number | null
+          staff_member_id?: string | null
+          subject?: string | null
+        }
+        Update: {
+          communication_date?: string
+          communication_type?: string | null
+          content?: string | null
+          created_at?: string | null
+          follow_up_date?: string | null
+          follow_up_required?: boolean | null
+          guardian_email?: string | null
+          guardian_name?: string | null
+          guardian_phone?: string | null
+          id?: number
+          player_id?: number | null
+          staff_member_id?: string | null
+          subject?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_guardian_communications_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_guardian_communications_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_guardian_communications_staff_member_id_fkey"
+            columns: ["staff_member_id"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]

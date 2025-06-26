@@ -4,16 +4,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { TrendingUp, TrendingDown, Target, BarChart3, ArrowUp, ArrowDown, Minus } from "lucide-react";
+import { TrendingUp, TrendingDown, Target, BarChart3, ArrowUp, ArrowDown, Minus, Users, Calendar, Brain } from "lucide-react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { usePlayerData } from "@/hooks/use-player-data";
+import { useDevelopmentData } from "@/hooks/use-development-data";
 import { LoadingOverlay } from "@/components/LoadingOverlay";
+import { DevelopmentPathwayVisualizer } from "@/components/development/DevelopmentPathwayVisualizer";
+import { DevelopmentMilestonesTimeline } from "@/components/development/DevelopmentMilestonesTimeline";
+import { PlayerDevelopmentInsights } from "@/components/development/PlayerDevelopmentInsights";
 
 export const DevelopmentTrajectories = () => {
-  const [selectedView, setSelectedView] = useState<'overview' | 'individual' | 'targets'>('overview');
-  const { players, loading } = usePlayerData();
+  const [selectedView, setSelectedView] = useState<'overview' | 'pathways' | 'milestones' | 'insights'>('overview');
+  const { players, loading: playersLoading } = usePlayerData();
+  const { 
+    pathways, 
+    milestones, 
+    assessments, 
+    recommendations, 
+    loading: developmentLoading 
+  } = useDevelopmentData();
 
-  // Mock development data - in real app, this would come from player_development_goals and tracking
+  const loading = playersLoading || developmentLoading;
+
+  // Mock development data for charts - enhanced with real structure
   const developmentData = [
     {
       playerId: 1,
@@ -62,10 +75,10 @@ export const DevelopmentTrajectories = () => {
   ];
 
   const overallProgress = {
-    onTrack: 15,
-    ahead: 3,
-    behind: 4,
-    totalTargets: 22
+    onTrack: pathways.filter(p => p.status === 'active').length,
+    ahead: pathways.filter(p => p.promotion_date).length,
+    behind: pathways.filter(p => p.demotion_date).length,
+    totalTargets: pathways.length || 22
   };
 
   const getVelocityColor = (velocity: string) => {
@@ -89,30 +102,42 @@ export const DevelopmentTrajectories = () => {
         <LoadingOverlay isLoading={loading} message="Loading development data..." />
         
         {/* View Toggle */}
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <Button
             variant={selectedView === 'overview' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setSelectedView('overview')}
             className={selectedView === 'overview' ? 'bg-club-gold text-club-black' : ''}
           >
+            <BarChart3 className="mr-2 h-4 w-4" />
             Overview
           </Button>
           <Button
-            variant={selectedView === 'individual' ? 'default' : 'outline'}
+            variant={selectedView === 'pathways' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setSelectedView('individual')}
-            className={selectedView === 'individual' ? 'bg-club-gold text-club-black' : ''}
+            onClick={() => setSelectedView('pathways')}
+            className={selectedView === 'pathways' ? 'bg-club-gold text-club-black' : ''}
           >
-            Individual Trajectories
+            <Users className="mr-2 h-4 w-4" />
+            Development Pathways
           </Button>
           <Button
-            variant={selectedView === 'targets' ? 'default' : 'outline'}
+            variant={selectedView === 'milestones' ? 'default' : 'outline'}
             size="sm"
-            onClick={() => setSelectedView('targets')}
-            className={selectedView === 'targets' ? 'bg-club-gold text-club-black' : ''}
+            onClick={() => setSelectedView('milestones')}
+            className={selectedView === 'milestones' ? 'bg-club-gold text-club-black' : ''}
           >
-            Target Analysis
+            <Calendar className="mr-2 h-4 w-4" />
+            Milestones Timeline
+          </Button>
+          <Button
+            variant={selectedView === 'insights' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedView('insights')}
+            className={selectedView === 'insights' ? 'bg-club-gold text-club-black' : ''}
+          >
+            <Brain className="mr-2 h-4 w-4" />
+            Actionable Insights
           </Button>
         </div>
 
@@ -203,7 +228,25 @@ export const DevelopmentTrajectories = () => {
           </Card>
         )}
 
-        {selectedView === 'individual' && (
+        {selectedView === 'pathways' && (
+          <DevelopmentPathwayVisualizer players={players} pathways={pathways} />
+        )}
+
+        {selectedView === 'milestones' && (
+          <DevelopmentMilestonesTimeline milestones={milestones} players={players} />
+        )}
+
+        {selectedView === 'insights' && (
+          <PlayerDevelopmentInsights 
+            players={players}
+            pathways={pathways}
+            milestones={milestones}
+            recommendations={recommendations}
+            assessments={assessments}
+          />
+        )}
+
+        {selectedView === 'overview' && (
           <div className="space-y-6">
             {developmentData.map((player) => {
               const progressPercentage = Math.round(((player.currentRating - player.startRating) / (player.targetRating - player.startRating)) * 100);
