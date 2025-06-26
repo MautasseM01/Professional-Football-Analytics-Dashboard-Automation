@@ -1,3 +1,4 @@
+
 import { Player } from "@/types";
 import { StatCard } from "./StatCard";
 import { EnhancedDisciplinaryCard } from "./EnhancedDisciplinaryCard";
@@ -19,7 +20,7 @@ import {
   TooltipProvider, 
   TooltipTrigger 
 } from "@/components/ui/tooltip";
-import { useResponsiveBreakpoint } from "@/hooks/use-orientation";
+import { useResponsiveBreakpoint, getSemanticBreakpoint } from "@/hooks/use-orientation";
 import { ErrorFallback } from "./ErrorStates/ErrorFallback";
 import { useMemo } from "react";
 
@@ -28,7 +29,7 @@ interface PlayerStatCardsProps {
 }
 
 export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
-  const breakpoint = useResponsiveBreakpoint();
+  const breakpoint = getSemanticBreakpoint(useResponsiveBreakpoint());
   
   const { passCompletionRate, shotsAccuracy, goalsPlusAssists, gridConfig } = useMemo(() => {
     // Safely calculate pass completion rate

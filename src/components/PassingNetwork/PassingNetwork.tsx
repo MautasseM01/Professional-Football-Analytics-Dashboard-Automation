@@ -8,7 +8,7 @@ import { useNetworkData } from "./hooks/useNetworkData";
 import { getEdgeColor, getEdgeWidth } from "./utils/networkUtils";
 import { PassingNetworkProps } from "./types";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useResponsiveBreakpoint } from "@/hooks/use-orientation";
+import { useResponsiveBreakpoint, getSemanticBreakpoint } from "@/hooks/use-orientation";
 import { useHapticFeedback } from "@/hooks/use-haptic-feedback";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ export const PassingNetwork = ({
   const [detailLevel, setDetailLevel] = useState<'overview' | 'detailed'>('overview');
   const containerRef = useRef<HTMLDivElement | null>(null);
   const isMobile = useIsMobile();
-  const breakpoint = useResponsiveBreakpoint();
+  const breakpoint = getSemanticBreakpoint(useResponsiveBreakpoint());
   const { triggerHaptic } = useHapticFeedback();
 
   // Use custom hook to get network data

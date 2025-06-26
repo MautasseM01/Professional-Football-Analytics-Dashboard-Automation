@@ -29,14 +29,47 @@ interface TabletPresentationModeProps {
   onExit?: () => void;
 }
 
+interface OverviewData {
+  totalPlayers: number;
+  availablePlayers: number;
+  developmentProgress: number;
+  performanceIndex: number;
+}
+
+interface DevelopmentData {
+  month: string;
+  progress: number;
+  target: number;
+}
+
+interface PlayerData {
+  id: number;
+  name: string;
+  position: string;
+  rating: number;
+  improvement: string;
+}
+
+interface TeamData {
+  team: string;
+  performance: number;
+  players: number;
+}
+
+interface SlideData {
+  title: string;
+  type: 'overview' | 'development' | 'players' | 'teams';
+  data: OverviewData | DevelopmentData[] | PlayerData[] | TeamData[];
+}
+
 export const TabletPresentationMode = ({ onExit }: TabletPresentationModeProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [selectedPlayer, setSelectedPlayer] = useState<any>(null);
+  const [selectedPlayer, setSelectedPlayer] = useState<PlayerData | null>(null);
   const { triggerHaptic } = useHapticFeedback();
 
-  // Mock presentation data
-  const slides = [
+  // Mock presentation data with proper typing
+  const slides: SlideData[] = [
     { 
       title: 'Executive Overview', 
       type: 'overview',
@@ -139,33 +172,34 @@ export const TabletPresentationMode = ({ onExit }: TabletPresentationModeProps) 
   const renderSlideContent = () => {
     switch (currentSlideData.type) {
       case 'overview':
+        const overviewData = currentSlideData.data as OverviewData;
         return (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 h-full">
             <Card className="bg-club-dark-gray/50 border-club-gold/20 flex items-center justify-center">
               <CardContent className="p-6 text-center">
                 <Users className="h-12 w-12 text-club-gold mx-auto mb-4" />
-                <div className="text-4xl font-bold text-club-gold">{currentSlideData.data.totalPlayers}</div>
+                <div className="text-4xl font-bold text-club-gold">{overviewData.totalPlayers}</div>
                 <div className="text-club-light-gray">Total Players</div>
               </CardContent>
             </Card>
             <Card className="bg-club-dark-gray/50 border-green-500/20 flex items-center justify-center">
               <CardContent className="p-6 text-center">
                 <Activity className="h-12 w-12 text-green-500 mx-auto mb-4" />
-                <div className="text-4xl font-bold text-green-500">{currentSlideData.data.availablePlayers}</div>
+                <div className="text-4xl font-bold text-green-500">{overviewData.availablePlayers}</div>
                 <div className="text-club-light-gray">Available</div>
               </CardContent>
             </Card>
             <Card className="bg-club-dark-gray/50 border-blue-500/20 flex items-center justify-center">
               <CardContent className="p-6 text-center">
                 <TrendingUp className="h-12 w-12 text-blue-500 mx-auto mb-4" />
-                <div className="text-4xl font-bold text-blue-500">{currentSlideData.data.developmentProgress}%</div>
+                <div className="text-4xl font-bold text-blue-500">{overviewData.developmentProgress}%</div>
                 <div className="text-club-light-gray">Development</div>
               </CardContent>
             </Card>
             <Card className="bg-club-dark-gray/50 border-purple-500/20 flex items-center justify-center">
               <CardContent className="p-6 text-center">
                 <Award className="h-12 w-12 text-purple-500 mx-auto mb-4" />
-                <div className="text-4xl font-bold text-purple-500">{currentSlideData.data.performanceIndex}</div>
+                <div className="text-4xl font-bold text-purple-500">{overviewData.performanceIndex}</div>
                 <div className="text-club-light-gray">Performance</div>
               </CardContent>
             </Card>
@@ -173,10 +207,11 @@ export const TabletPresentationMode = ({ onExit }: TabletPresentationModeProps) 
         );
 
       case 'development':
+        const developmentData = currentSlideData.data as DevelopmentData[];
         return (
           <ResponsiveChartContainer className="h-full">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={currentSlideData.data}>
+              <LineChart data={developmentData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="month" stroke="#9CA3AF" />
                 <YAxis stroke="#9CA3AF" />
@@ -208,9 +243,10 @@ export const TabletPresentationMode = ({ onExit }: TabletPresentationModeProps) 
         );
 
       case 'players':
+        const playersData = currentSlideData.data as PlayerData[];
         return (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 h-full">
-            {currentSlideData.data.map((player: any, index: number) => (
+            {playersData.map((player: PlayerData, index: number) => (
               <Card 
                 key={player.id}
                 className="bg-club-dark-gray/50 border-club-gold/20 cursor-pointer hover:border-club-gold/40 transition-all"
@@ -234,10 +270,11 @@ export const TabletPresentationMode = ({ onExit }: TabletPresentationModeProps) 
         );
 
       case 'teams':
+        const teamsData = currentSlideData.data as TeamData[];
         return (
           <ResponsiveChartContainer className="h-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={currentSlideData.data}>
+              <BarChart data={teamsData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
                 <XAxis dataKey="team" stroke="#9CA3AF" />
                 <YAxis stroke="#9CA3AF" />
@@ -372,7 +409,7 @@ export const TabletPresentationMode = ({ onExit }: TabletPresentationModeProps) 
             <CardContent>
               <div className="space-y-4">
                 <div className="text-center">
-                  <PlayerAvatar player={selectedPlayer} size="xl" className="mx-auto mb-4" />
+                  <PlayerAvatar player={selectedPlayer} size="lg" className="mx-auto mb-4" />
                   <Badge variant="outline" className="mb-2">{selectedPlayer.position}</Badge>
                 </div>
                 <div className="grid grid-cols-2 gap-4 text-center">

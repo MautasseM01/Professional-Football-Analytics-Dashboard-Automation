@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 
 export type ScreenOrientation = 'portrait' | 'landscape';
-export type ResponsiveBreakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
+export type ResponsiveBreakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl' | 'mobile' | 'tablet-portrait' | 'tablet-landscape' | 'desktop' | 'large';
 
 export const useOrientation = () => {
   const [orientation, setOrientation] = useState<ScreenOrientation>('portrait');
@@ -37,12 +37,19 @@ export const useResponsiveBreakpoint = (): ResponsiveBreakpoint => {
   useEffect(() => {
     const updateBreakpoint = () => {
       const width = window.innerWidth;
-      if (width < 480) setBreakpoint('xs');
-      else if (width < 640) setBreakpoint('sm');
-      else if (width < 768) setBreakpoint('md');
-      else if (width < 1024) setBreakpoint('lg');
-      else if (width < 1280) setBreakpoint('xl');
-      else setBreakpoint('2xl');
+      if (width < 480) {
+        setBreakpoint('xs');
+      } else if (width < 640) {
+        setBreakpoint('sm');
+      } else if (width < 768) {
+        setBreakpoint('md');
+      } else if (width < 1024) {
+        setBreakpoint('lg');
+      } else if (width < 1280) {
+        setBreakpoint('xl');
+      } else {
+        setBreakpoint('2xl');
+      }
     };
 
     updateBreakpoint();
@@ -51,6 +58,25 @@ export const useResponsiveBreakpoint = (): ResponsiveBreakpoint => {
   }, []);
 
   return breakpoint;
+};
+
+// Helper function to get semantic breakpoint names
+export const getSemanticBreakpoint = (breakpoint: ResponsiveBreakpoint): ResponsiveBreakpoint => {
+  switch (breakpoint) {
+    case 'xs':
+    case 'sm':
+      return 'mobile';
+    case 'md':
+      return 'tablet-portrait';
+    case 'lg':
+      return 'tablet-landscape';
+    case 'xl':
+      return 'desktop';
+    case '2xl':
+      return 'large';
+    default:
+      return breakpoint;
+  }
 };
 
 export const useDeviceCapabilities = () => {
