@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { usePlayerData } from "@/hooks/use-player-data";
+import { useDevelopmentData } from "@/hooks/use-development-data";
 import { useUserProfile } from "@/hooks/use-user-profile";
 import { PlayerSelector } from "@/components/PlayerSelector";
 import { RoleBasedContent } from "@/components/RoleBasedContent";
@@ -9,10 +10,23 @@ import { BackToTopButton } from "@/components/BackToTopButton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { PlayerDevelopmentHeader } from "@/components/development/PlayerDevelopmentHeader";
 import { PlayerDevelopmentTabs } from "@/components/development/PlayerDevelopmentTabs";
+import { DevelopmentPathwayVisualizer } from "@/components/development/DevelopmentPathwayVisualizer";
+import { DevelopmentMilestonesTimeline } from "@/components/development/DevelopmentMilestonesTimeline";
+import { PlayerDevelopmentInsights } from "@/components/development/PlayerDevelopmentInsights";
 import { Target, Award } from "lucide-react";
 
 const PlayerDevelopment = () => {
   const { players, selectedPlayer, selectPlayer, loading, refreshData } = usePlayerData();
+  const { 
+    pathways, 
+    milestones, 
+    assessments, 
+    communications, 
+    educationalProgress, 
+    recommendations,
+    loading: developmentLoading,
+    error: developmentError
+  } = useDevelopmentData();
   const { profile } = useUserProfile();
   const [showSidebar, setShowSidebar] = useState(true);
 
@@ -21,7 +35,7 @@ const PlayerDevelopment = () => {
     refreshData();
   };
 
-  // Mock development data - in real app this would come from API
+  // Mock development data for fallback - in real app this would come from API
   const developmentData = {
     goals: [
       {
@@ -85,6 +99,8 @@ const PlayerDevelopment = () => {
     ]
   };
 
+  const isLoading = loading || developmentLoading;
+
   return (
     <div className="flex h-screen bg-gradient-to-br from-slate-900 via-club-black to-slate-900 dark:from-slate-900 dark:via-club-black dark:to-slate-900 text-gray-100 dark:text-gray-100 transition-colors duration-300">
       {showSidebar && <DashboardSidebar />}
@@ -107,6 +123,15 @@ const PlayerDevelopment = () => {
               </Alert>
             </RoleBasedContent>
 
+            {/* Development Error State */}
+            {developmentError && (
+              <Alert className="bg-red-500/10 border-red-500/30">
+                <AlertDescription className="text-red-400">
+                  Error loading development data: {developmentError}
+                </AlertDescription>
+              </Alert>
+            )}
+
             {/* Player Selector - Hidden for player role */}
             <RoleBasedContent 
               allowedRoles={['admin', 'management', 'coach', 'analyst', 'performance_director']}
@@ -116,21 +141,52 @@ const PlayerDevelopment = () => {
                 players={players}
                 selectedPlayer={selectedPlayer}
                 onPlayerSelect={selectPlayer}
-                loading={loading}
+                loading={isLoading}
               />
             </RoleBasedContent>
 
             {/* Loading State */}
-            {loading && (
+            {isLoading && (
               <div className="flex items-center justify-center min-h-[50vh]">
                 <div className="animate-spin w-8 h-8 border-4 border-club-gold border-t-transparent rounded-full"></div>
               </div>
             )}
 
             {/* Main Content */}
-            {selectedPlayer && !loading ? (
-              <PlayerDevelopmentTabs developmentData={developmentData} />
-            ) : !loading && (
+            {selectedPlayer && !isLoading ? (
+              <div className="space-y-6">
+                {/* Enhanced Development Components */}
+                <RoleBasedContent 
+                  allowedRoles={['admin', 'management', 'coach', 'analyst', 'performance_director']}
+                  fallback={null}
+                >
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <DevelopmentPathwayVisualizer 
+                      players={[selectedPlayer]} 
+                      pathways={pathways.filter(p => p.player_id === selectedPlayer.id)} 
+                    />
+                    <DevelopmentMilestonesTimeline 
+                      milestones={milestones.filter(m => m.player_id === selectedPlayer.id)} 
+                      players={[selectedPlayer]}
+                      selectedPlayerId={selectedPlayer.id}
+                    />
+                  </div>
+                  
+                  <PlayerDevelopmentInsights 
+                    pathways={pathways.filter(p => p.player_id === selectedPlayer.id)}
+                    milestones={milestones.filter(m => m.player_id === selectedPlayer.id)}
+                    assessments={assessments.filter(a => a.player_id === selectedPlayer.id)}
+                    communications={communications.filter(c => c.player_id === selectedPlayer.id)}
+                    educationalProgress={educationalProgress.filter(e => e.player_id === selectedPlayer.id)}
+                    recommendations={recommendations.filter(r => r.player_id === selectedPlayer.id)}
+                    players={[selectedPlayer]}
+                  />
+                </RoleBasedContent>
+
+                {/* Original Development Tabs */}
+                <PlayerDevelopmentTabs developmentData={developmentData} />
+              </div>
+            ) : !isLoading && (
               <div className="flex items-center justify-center min-h-[50vh] text-center px-4">
                 <div className="space-y-2">
                   <Award className="h-12 w-12 text-club-gold/50 mx-auto" />
