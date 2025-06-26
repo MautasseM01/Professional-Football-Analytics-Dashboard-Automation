@@ -3,13 +3,15 @@ import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { TrendingUp, TrendingDown, Target, BarChart3, ArrowUp, ArrowDown, Minus } from "lucide-react";
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, ResponsiveContainer, BarChart, Bar } from "recharts";
 import { usePlayerData } from "@/hooks/use-player-data";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 
 export const DevelopmentTrajectories = () => {
   const [selectedView, setSelectedView] = useState<'overview' | 'individual' | 'targets'>('overview');
-  const { players } = usePlayerData();
+  const { players, loading } = usePlayerData();
 
   // Mock development data - in real app, this would come from player_development_goals and tracking
   const developmentData = [
@@ -82,170 +84,225 @@ export const DevelopmentTrajectories = () => {
   };
 
   return (
-    <div className="space-y-6">
-      {/* View Toggle */}
-      <div className="flex gap-2">
-        <Button
-          variant={selectedView === 'overview' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setSelectedView('overview')}
-          className={selectedView === 'overview' ? 'bg-club-gold text-club-black' : ''}
-        >
-          Overview
-        </Button>
-        <Button
-          variant={selectedView === 'individual' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setSelectedView('individual')}
-          className={selectedView === 'individual' ? 'bg-club-gold text-club-black' : ''}
-        >
-          Individual Trajectories
-        </Button>
-        <Button
-          variant={selectedView === 'targets' ? 'default' : 'outline'}
-          size="sm"
-          onClick={() => setSelectedView('targets')}
-          className={selectedView === 'targets' ? 'bg-club-gold text-club-black' : ''}
-        >
-          Target Analysis
-        </Button>
-      </div>
-
-      {selectedView === 'overview' && (
-        <Card className="bg-club-dark-gray border-club-gold/20">
-          <CardHeader>
-            <CardTitle className="flex items-center text-club-gold">
-              <Target className="mr-2 h-5 w-5" />
-              Development Progress Overview
-            </CardTitle>
-            <CardDescription className="text-club-light-gray/70">
-              Squad development status vs season targets
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-              <div className="text-center p-4 bg-club-black/40 rounded-lg">
-                <div className="text-2xl font-bold text-green-500">{overallProgress.ahead}</div>
-                <div className="text-sm text-club-light-gray/70">Ahead of Target</div>
-              </div>
-              <div className="text-center p-4 bg-club-black/40 rounded-lg">
-                <div className="text-2xl font-bold text-club-gold">{overallProgress.onTrack}</div>
-                <div className="text-sm text-club-light-gray/70">On Track</div>
-              </div>
-              <div className="text-center p-4 bg-club-black/40 rounded-lg">
-                <div className="text-2xl font-bold text-orange-500">{overallProgress.behind}</div>
-                <div className="text-sm text-club-light-gray/70">Behind Target</div>
-              </div>
-              <div className="text-center p-4 bg-club-black/40 rounded-lg">
-                <div className="text-2xl font-bold text-club-light-gray">
-                  {Math.round(((overallProgress.ahead + overallProgress.onTrack) / overallProgress.totalTargets) * 100)}%
-                </div>
-                <div className="text-sm text-club-light-gray/70">Success Rate</div>
-              </div>
-            </div>
-
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={developmentData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                  <XAxis dataKey="name" stroke="#9CA3AF" fontSize={12} />
-                  <YAxis stroke="#9CA3AF" fontSize={12} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1F2937', 
-                      border: '1px solid #D97706', 
-                      borderRadius: '8px',
-                      color: '#F3F4F6'
-                    }} 
-                  />
-                  <Bar dataKey="currentRating" fill="#D97706" name="Current Rating" />
-                  <Bar dataKey="targetRating" fill="#059669" name="Target Rating" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {selectedView === 'individual' && (
-        <div className="space-y-6">
-          {developmentData.map((player) => {
-            const progressPercentage = Math.round(((player.currentRating - player.startRating) / (player.targetRating - player.startRating)) * 100);
-            
-            return (
-              <Card key={player.playerId} className="bg-club-dark-gray border-club-gold/20">
-                <CardHeader>
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <CardTitle className="text-club-gold">{player.name}</CardTitle>
-                      <CardDescription className="text-club-light-gray/70">{player.position}</CardDescription>
-                    </div>
-                    <div className="text-right">
-                      <Badge className={`${getVelocityColor(player.velocity)} bg-transparent border`}>
-                        {player.velocity} progress
-                      </Badge>
-                      <p className="text-sm text-club-light-gray/70 mt-1">{progressPercentage}% to target</p>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Development Trajectory Chart */}
-                    <div>
-                      <h4 className="text-sm font-medium text-club-light-gray mb-4">Development Trajectory</h4>
-                      <div className="h-48">
-                        <ResponsiveContainer width="100%" height="100%">
-                          <LineChart data={player.trajectory}>
-                            <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
-                            <XAxis dataKey="month" stroke="#9CA3AF" fontSize={12} />
-                            <YAxis stroke="#9CA3AF" fontSize={12} />
-                            <Tooltip 
-                              contentStyle={{ 
-                                backgroundColor: '#1F2937', 
-                                border: '1px solid #D97706', 
-                                borderRadius: '8px',
-                                color: '#F3F4F6'
-                              }} 
-                            />
-                            <Line type="monotone" dataKey="rating" stroke="#D97706" strokeWidth={2} name="Actual" />
-                            <Line type="monotone" dataKey="target" stroke="#059669" strokeWidth={2} strokeDasharray="5 5" name="Target" />
-                          </LineChart>
-                        </ResponsiveContainer>
-                      </div>
-                    </div>
-
-                    {/* Attribute Breakdown */}
-                    <div>
-                      <h4 className="text-sm font-medium text-club-light-gray mb-4">Attribute Progress</h4>
-                      <div className="space-y-3">
-                        {Object.entries(player.attributes).map(([attr, data]) => (
-                          <div key={attr} className="p-3 bg-club-black/40 rounded-lg">
-                            <div className="flex justify-between items-center mb-2">
-                              <span className="text-sm capitalize text-club-light-gray">{attr}</span>
-                              <div className="flex items-center gap-1">
-                                {getChangeIcon(data.change)}
-                                <span className="text-xs text-club-light-gray/70">
-                                  {data.current}/{data.target}
-                                </span>
-                              </div>
-                            </div>
-                            <div className="w-full bg-club-black/60 rounded-full h-2">
-                              <div 
-                                className="bg-club-gold h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${(data.current / data.target) * 100}%` }}
-                              />
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+    <TooltipProvider>
+      <div className="space-y-6 relative">
+        <LoadingOverlay isLoading={loading} message="Loading development data..." />
+        
+        {/* View Toggle */}
+        <div className="flex gap-2">
+          <Button
+            variant={selectedView === 'overview' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedView('overview')}
+            className={selectedView === 'overview' ? 'bg-club-gold text-club-black' : ''}
+          >
+            Overview
+          </Button>
+          <Button
+            variant={selectedView === 'individual' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedView('individual')}
+            className={selectedView === 'individual' ? 'bg-club-gold text-club-black' : ''}
+          >
+            Individual Trajectories
+          </Button>
+          <Button
+            variant={selectedView === 'targets' ? 'default' : 'outline'}
+            size="sm"
+            onClick={() => setSelectedView('targets')}
+            className={selectedView === 'targets' ? 'bg-club-gold text-club-black' : ''}
+          >
+            Target Analysis
+          </Button>
         </div>
-      )}
-    </div>
+
+        {selectedView === 'overview' && (
+          <Card className="bg-club-dark-gray border-club-gold/20">
+            <CardHeader>
+              <CardTitle className="flex items-center text-club-gold">
+                <Target className="mr-2 h-5 w-5" />
+                Development Progress Overview
+              </CardTitle>
+              <CardDescription className="text-club-light-gray/70">
+                Squad development status vs season targets
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="text-center p-4 bg-club-black/40 rounded-lg hover:bg-club-gold/10 transition-colors cursor-pointer">
+                      <div className="text-2xl font-bold text-green-500">{overallProgress.ahead}</div>
+                      <div className="text-sm text-club-light-gray/70">Ahead of Target</div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Players exceeding their development targets</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="text-center p-4 bg-club-black/40 rounded-lg hover:bg-club-gold/10 transition-colors cursor-pointer">
+                      <div className="text-2xl font-bold text-club-gold">{overallProgress.onTrack}</div>
+                      <div className="text-sm text-club-light-gray/70">On Track</div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Players meeting their development targets</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="text-center p-4 bg-club-black/40 rounded-lg hover:bg-club-gold/10 transition-colors cursor-pointer">
+                      <div className="text-2xl font-bold text-orange-500">{overallProgress.behind}</div>
+                      <div className="text-sm text-club-light-gray/70">Behind Target</div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Players falling behind their development targets</p>
+                  </TooltipContent>
+                </Tooltip>
+                
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <div className="text-center p-4 bg-club-black/40 rounded-lg hover:bg-club-gold/10 transition-colors cursor-pointer">
+                      <div className="text-2xl font-bold text-club-light-gray">
+                        {Math.round(((overallProgress.ahead + overallProgress.onTrack) / overallProgress.totalTargets) * 100)}%
+                      </div>
+                      <div className="text-sm text-club-light-gray/70">Success Rate</div>
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Overall development target achievement rate</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={developmentData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                    <XAxis dataKey="name" stroke="#9CA3AF" fontSize={12} />
+                    <YAxis stroke="#9CA3AF" fontSize={12} />
+                    <RechartsTooltip 
+                      contentStyle={{ 
+                        backgroundColor: '#1F2937', 
+                        border: '1px solid #D97706', 
+                        borderRadius: '8px',
+                        color: '#F3F4F6'
+                      }} 
+                    />
+                    <Bar dataKey="currentRating" fill="#D97706" name="Current Rating" />
+                    <Bar dataKey="targetRating" fill="#059669" name="Target Rating" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {selectedView === 'individual' && (
+          <div className="space-y-6">
+            {developmentData.map((player) => {
+              const progressPercentage = Math.round(((player.currentRating - player.startRating) / (player.targetRating - player.startRating)) * 100);
+              
+              return (
+                <Card key={player.playerId} className="bg-club-dark-gray border-club-gold/20">
+                  <CardHeader>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <CardTitle className="text-club-gold">{player.name}</CardTitle>
+                        <CardDescription className="text-club-light-gray/70">{player.position}</CardDescription>
+                      </div>
+                      <div className="text-right">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Badge className={`${getVelocityColor(player.velocity)} bg-transparent border cursor-pointer`}>
+                              {player.velocity} progress
+                            </Badge>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Development velocity indicator</p>
+                          </TooltipContent>
+                        </Tooltip>
+                        <p className="text-sm text-club-light-gray/70 mt-1">{progressPercentage}% to target</p>
+                      </div>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      {/* Development Trajectory Chart */}
+                      <div>
+                        <h4 className="text-sm font-medium text-club-light-gray mb-4">Development Trajectory</h4>
+                        <div className="h-48">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <LineChart data={player.trajectory}>
+                              <CartesianGrid strokeDasharray="3 3" stroke="#374151" />
+                              <XAxis dataKey="month" stroke="#9CA3AF" fontSize={12} />
+                              <YAxis stroke="#9CA3AF" fontSize={12} />
+                              <RechartsTooltip 
+                                contentStyle={{ 
+                                  backgroundColor: '#1F2937', 
+                                  border: '1px solid #D97706', 
+                                  borderRadius: '8px',
+                                  color: '#F3F4F6'
+                                }} 
+                              />
+                              <Line type="monotone" dataKey="rating" stroke="#D97706" strokeWidth={2} name="Actual" />
+                              <Line type="monotone" dataKey="target" stroke="#059669" strokeWidth={2} strokeDasharray="5 5" name="Target" />
+                            </LineChart>
+                          </ResponsiveContainer>
+                        </div>
+                      </div>
+
+                      {/* Attribute Breakdown */}
+                      <div>
+                        <h4 className="text-sm font-medium text-club-light-gray mb-4">Attribute Progress</h4>
+                        <div className="space-y-3">
+                          {Object.entries(player.attributes).map(([attr, data]) => (
+                            <Tooltip key={attr}>
+                              <TooltipTrigger asChild>
+                                <div className="p-3 bg-club-black/40 rounded-lg hover:bg-club-gold/10 transition-colors cursor-pointer">
+                                  <div className="flex justify-between items-center mb-2">
+                                    <span className="text-sm capitalize text-club-light-gray">{attr}</span>
+                                    <div className="flex items-center gap-1">
+                                      {getChangeIcon(data.change)}
+                                      <span className="text-xs text-club-light-gray/70">
+                                        {data.current}/{data.target}
+                                      </span>
+                                    </div>
+                                  </div>
+                                  <div className="w-full bg-club-black/60 rounded-full h-2">
+                                    <div 
+                                      className="bg-club-gold h-2 rounded-full transition-all duration-300"
+                                      style={{ width: `${(data.current / data.target) * 100}%` }}
+                                    />
+                                  </div>
+                                </div>
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <div>
+                                  <p className="font-medium capitalize">{attr}</p>
+                                  <p className="text-sm">Current: {data.current} / Target: {data.target}</p>
+                                  <p className="text-xs text-club-light-gray/70">
+                                    {data.change > 0 ? `+${data.change}` : data.change} change this period
+                                  </p>
+                                </div>
+                              </TooltipContent>
+                            </Tooltip>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </TooltipProvider>
   );
 };

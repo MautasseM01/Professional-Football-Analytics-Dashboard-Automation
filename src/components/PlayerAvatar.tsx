@@ -1,91 +1,45 @@
 
+import { User } from "lucide-react";
 import { Player } from "@/types";
 
 interface PlayerAvatarProps {
-  player: Player;
-  size?: "xs" | "sm" | "md" | "lg";
+  player?: Player | { name?: string; id?: number };
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
-export const PlayerAvatar = ({ player, size = "md", className = "" }: PlayerAvatarProps) => {
+export const PlayerAvatar = ({ player, size = 'md', className = '' }: PlayerAvatarProps) => {
   const sizeClasses = {
-    xs: "h-6 w-6",
-    sm: "h-8 w-8",
-    md: "h-12 w-12", 
-    lg: "h-24 w-24"
+    sm: 'w-8 h-8',
+    md: 'w-10 h-10',
+    lg: 'w-12 h-12'
   };
 
-  const textSizes = {
-    xs: "text-xs",
-    sm: "text-xs",
-    md: "text-sm",
-    lg: "text-xl"
+  const iconSizes = {
+    sm: 'h-4 w-4',
+    md: 'h-5 w-5',
+    lg: 'h-6 w-6'
   };
 
-  const numberSizes = {
-    xs: "text-sm font-bold",
-    sm: "text-lg font-black",
-    md: "text-xl font-black",
-    lg: "text-3xl font-black"
-  };
+  if (!player || !player.name) {
+    return (
+      <div className={`${sizeClasses[size]} bg-club-dark-gray border border-club-gold/20 rounded-full flex items-center justify-center ${className}`}>
+        <User className={`${iconSizes[size]} text-club-light-gray/50`} />
+      </div>
+    );
+  }
 
-  // Generate player initials as fallback
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(word => word.charAt(0).toUpperCase())
-      .slice(0, 2)
-      .join('');
-  };
-
-  const initials = getInitials(player.name || "Player");
-  
-  // Debug logging to verify player data
-  console.log(`PlayerAvatar Debug - Player: ${player.name}, ID: ${player.id}, Number: ${player.number}`);
-  
-  // Read player number directly from database field with fallback
-  const playerNumber = player.number || null;
+  // Generate initials from player name
+  const initials = player.name
+    .split(' ')
+    .map(name => name.charAt(0))
+    .join('')
+    .toUpperCase()
+    .slice(0, 2);
 
   return (
-    <div 
-      className={`
-        ${sizeClasses[size]} 
-        ${className} 
-        relative flex items-center justify-center 
-        rounded-full
-        bg-gradient-to-br from-club-gold to-club-gold/80
-        border-2 border-white
-        shadow-lg
-        transition-all duration-200
-        hover:scale-110 hover:shadow-xl hover:shadow-club-gold/30
-        cursor-pointer
-      `}
-    >
-      {/* Jersey Number (Priority Display) */}
-      {playerNumber && playerNumber > 0 ? (
-        <span 
-          className={`
-            ${numberSizes[size]} 
-            text-white 
-            select-none
-            drop-shadow-md
-          `}
-        >
-          {playerNumber}
-        </span>
-      ) : (
-        /* Fallback to Player Initials */
-        <span 
-          className={`
-            ${textSizes[size]} 
-            font-bold text-white 
-            select-none
-            drop-shadow-sm
-          `}
-        >
-          {initials}
-        </span>
-      )}
+    <div className={`${sizeClasses[size]} bg-club-gold/20 border border-club-gold/30 rounded-full flex items-center justify-center ${className}`}>
+      <span className="text-club-gold font-medium text-sm">{initials}</span>
     </div>
   );
 };
