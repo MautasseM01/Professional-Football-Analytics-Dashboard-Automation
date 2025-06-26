@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { TouchFeedbackButton } from '@/components/TouchFeedbackButton';
 import { 
   Target, 
   TrendingUp, 
@@ -11,7 +12,9 @@ import {
   FileText,
   Eye,
   Settings,
-  Activity
+  Activity,
+  Presentation,
+  Monitor
 } from 'lucide-react';
 import { DevelopmentReportGenerator } from '@/components/development/DevelopmentReportGenerator';
 import { BenchmarkDashboard } from '@/components/development/BenchmarkDashboard';
@@ -20,11 +23,17 @@ import { WorkflowAutomation } from '@/components/development/WorkflowAutomation'
 import { DevelopmentPathwayVisualizer } from '@/components/development/DevelopmentPathwayVisualizer';
 import { DevelopmentMilestonesTimeline } from '@/components/development/DevelopmentMilestonesTimeline';
 import { PlayerDevelopmentInsights } from '@/components/development/PlayerDevelopmentInsights';
+import { ExecutiveSummaryMode } from './ExecutiveSummaryMode';
+import { TabletPresentationMode } from './TabletPresentationMode';
+import { EnhancedPlayerPerformanceMonitor } from './EnhancedPlayerPerformanceMonitor';
 import { useDevelopmentData } from '@/hooks/use-development-data';
 import { usePlayerData } from '@/hooks/use-player-data';
 
 export const DevelopmentTrajectories = () => {
   const [activeTab, setActiveTab] = useState<string>('overview');
+  const [executiveMode, setExecutiveMode] = useState(false);
+  const [presentationMode, setPresentationMode] = useState(false);
+  
   const { 
     pathways, 
     milestones, 
@@ -39,8 +48,27 @@ export const DevelopmentTrajectories = () => {
 
   const handleGenerateReport = (reportType: string, teamLevel: string) => {
     console.log(`Generating ${reportType} report for ${teamLevel}`);
-    // Implementation for report generation would go here
   };
+
+  if (executiveMode) {
+    return (
+      <ExecutiveSummaryMode 
+        onClose={() => setExecutiveMode(false)}
+        onPresentationMode={() => {
+          setExecutiveMode(false);
+          setPresentationMode(true);
+        }}
+      />
+    );
+  }
+
+  if (presentationMode) {
+    return (
+      <TabletPresentationMode 
+        onExit={() => setPresentationMode(false)}
+      />
+    );
+  }
 
   if (loading) {
     return (
@@ -62,12 +90,36 @@ export const DevelopmentTrajectories = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-bold text-club-gold">Development Workflow Management</h2>
-        <p className="text-club-light-gray/70">
-          Comprehensive player development tracking, reporting, and workflow automation
-        </p>
+      {/* Enhanced Header */}
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold text-club-gold">Development Workflow Management</h2>
+            <p className="text-club-light-gray/70">
+              Comprehensive player development tracking, reporting, and workflow automation
+            </p>
+          </div>
+          
+          {/* Executive Mode Controls */}
+          <div className="flex gap-2">
+            <TouchFeedbackButton
+              variant="outline"
+              onClick={() => setExecutiveMode(true)}
+              className="border-club-gold/30"
+            >
+              <Monitor className="mr-2 h-4 w-4" />
+              Executive Mode
+            </TouchFeedbackButton>
+            <TouchFeedbackButton
+              variant="outline"
+              onClick={() => setPresentationMode(true)}
+              className="border-club-gold/30"
+            >
+              <Presentation className="mr-2 h-4 w-4" />
+              Present
+            </TouchFeedbackButton>
+          </div>
+        </div>
       </div>
 
       {/* Navigation Tabs */}
@@ -127,6 +179,7 @@ export const DevelopmentTrajectories = () => {
                   players={players}
                 />
               </div>
+              <EnhancedPlayerPerformanceMonitor />
             </TabsContent>
 
             <TabsContent value="reports" className="mt-6">

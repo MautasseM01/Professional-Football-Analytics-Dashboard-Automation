@@ -1,61 +1,98 @@
 
 import { useState, useEffect } from 'react';
 
-export type Orientation = 'portrait' | 'landscape';
+export type ScreenOrientation = 'portrait' | 'landscape';
+export type ResponsiveBreakpoint = 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl';
 
 export const useOrientation = () => {
-  const [orientation, setOrientation] = useState<Orientation>('portrait');
+  const [orientation, setOrientation] = useState<ScreenOrientation>('portrait');
 
   useEffect(() => {
     const updateOrientation = () => {
-      if (typeof window !== 'undefined') {
-        const isLandscape = window.innerWidth > window.innerHeight;
-        setOrientation(isLandscape ? 'landscape' : 'portrait');
+      if (screen.orientation) {
+        setOrientation(screen.orientation.angle === 0 || screen.orientation.angle === 180 ? 'portrait' : 'landscape');
+      } else {
+        // Fallback for browsers without screen.orientation
+        setOrientation(window.innerHeight > window.innerWidth ? 'portrait' : 'landscape');
       }
     };
 
     updateOrientation();
-    window.addEventListener('resize', updateOrientation);
-    window.addEventListener('orientationchange', updateOrientation);
 
-    return () => {
-      window.removeEventListener('resize', updateOrientation);
-      window.removeEventListener('orientationchange', updateOrientation);
-    };
+    if (screen.orientation) {
+      screen.orientation.addEventListener('change', updateOrientation);
+      return () => screen.orientation.removeEventListener('change', updateOrientation);
+    } else {
+      window.addEventListener('resize', updateOrientation);
+      return () => window.removeEventListener('resize', updateOrientation);
+    }
   }, []);
 
   return orientation;
 };
 
-export const useResponsiveBreakpoint = () => {
-  const [breakpoint, setBreakpoint] = useState<'mobile' | 'tablet-portrait' | 'tablet-landscape' | 'desktop' | 'large'>('mobile');
+export const useResponsiveBreakpoint = (): ResponsiveBreakpoint => {
+  const [breakpoint, setBreakpoint] = useState<ResponsiveBreakpoint>('md');
 
   useEffect(() => {
     const updateBreakpoint = () => {
-      if (typeof window !== 'undefined') {
-        const width = window.innerWidth;
-        
-        if (width >= 1200) {
-          setBreakpoint('large');
-        } else if (width >= 1024) {
-          setBreakpoint('desktop');
-        } else if (width >= 768) {
-          setBreakpoint('tablet-landscape');
-        } else if (width >= 640) {
-          setBreakpoint('tablet-portrait');
-        } else {
-          setBreakpoint('mobile');
-        }
-      }
+      const width = window.innerWidth;
+      if (width < 480) setBreakpoint('xs');
+      else if (width < 640) setBreakpoint('sm');
+      else if (width < 768) setBreakpoint('md');
+      else if (width < 1024) setBreakpoint('lg');
+      else if (width < 1280) setBreakpoint('xl');
+      else setBreakpoint('2xl');
     };
 
     updateBreakpoint();
     window.addEventListener('resize', updateBreakpoint);
-
-    return () => {
-      window.removeEventListener('resize', updateBreakpoint);
-    };
+    return () => window.removeEventListener('resize', updateBreakpoint);
   }, []);
 
   return breakpoint;
+};
+
+export const useDeviceCapabilities = () => {
+  const [capabilities, setCapabilities] = useState({
+    hasCamera: false,
+    hasMicrophone: false,
+    hasGeolocation: false,
+    hasVibration: false,
+    hasFullscreen: false,
+    hasShare: false,
+    isOnline: navigator.onLine
+  });
+
+  useEffect(() => {
+    const checkCapabilities = async () => {
+      const newCapabilities = {
+        hasCamera: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+        hasMicrophone: !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia),
+        hasGeolocation: !!navigator.geolocation,
+        hasVibration: !!navigator.vibrate,
+        hasFullscreen: !!(document.documentElement.requestFullscreen),
+        hasShare: !!navigator.share,
+        isOnline: navigator.onLine
+      };
+
+      setCapabilities(newCapabilities);
+    };
+
+    checkCapabilities();
+
+    const handleOnlineChange = () => {
+      setCapabilities(prev => ({ ...prev, isOnline: navigator.onLine }));
+    };
+
+    window.addEventListener('online', handleOnlineChange);
+    window.addEventListener('offline', handleOnlineChange);
+
+    return () => {
+      window.removeEventListener('online', handleOnlineChange);
+      window.removeEventListener('offline', handleOnlineChange);
+    };
+  }, []);
+
+  return capabilities;
 };
