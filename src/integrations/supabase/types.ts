@@ -601,6 +601,109 @@ export type Database = {
           },
         ]
       }
+      player_contracts: {
+        Row: {
+          contract_end_date: string | null
+          contract_start_date: string | null
+          contract_type: string | null
+          created_at: string | null
+          id: number
+          player_id: number | null
+          salary_per_week: number | null
+          status: string | null
+        }
+        Insert: {
+          contract_end_date?: string | null
+          contract_start_date?: string | null
+          contract_type?: string | null
+          created_at?: string | null
+          id?: number
+          player_id?: number | null
+          salary_per_week?: number | null
+          status?: string | null
+        }
+        Update: {
+          contract_end_date?: string | null
+          contract_start_date?: string | null
+          contract_type?: string | null
+          created_at?: string | null
+          id?: number
+          player_id?: number | null
+          salary_per_week?: number | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_contracts_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_contracts_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_development_goals: {
+        Row: {
+          coach_id: string | null
+          created_at: string | null
+          goal_description: string | null
+          id: number
+          player_id: number | null
+          priority: string | null
+          status: string | null
+          target_date: string | null
+        }
+        Insert: {
+          coach_id?: string | null
+          created_at?: string | null
+          goal_description?: string | null
+          id?: number
+          player_id?: number | null
+          priority?: string | null
+          status?: string | null
+          target_date?: string | null
+        }
+        Update: {
+          coach_id?: string | null
+          created_at?: string | null
+          goal_description?: string | null
+          id?: number
+          player_id?: number | null
+          priority?: string | null
+          status?: string | null
+          target_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_development_goals_coach_id_fkey"
+            columns: ["coach_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_development_goals_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_development_goals_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_disciplinary: {
         Row: {
           card_type: string | null
@@ -681,6 +784,60 @@ export type Database = {
           },
           {
             foreignKeyName: "player_eligibility_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_injuries: {
+        Row: {
+          body_part: string | null
+          created_at: string | null
+          expected_return_date: string | null
+          id: number
+          injury_date: string | null
+          injury_type: string | null
+          notes: string | null
+          player_id: number | null
+          severity: string | null
+          status: string | null
+        }
+        Insert: {
+          body_part?: string | null
+          created_at?: string | null
+          expected_return_date?: string | null
+          id?: number
+          injury_date?: string | null
+          injury_type?: string | null
+          notes?: string | null
+          player_id?: number | null
+          severity?: string | null
+          status?: string | null
+        }
+        Update: {
+          body_part?: string | null
+          created_at?: string | null
+          expected_return_date?: string | null
+          id?: number
+          injury_date?: string | null
+          injury_type?: string | null
+          notes?: string | null
+          player_id?: number | null
+          severity?: string | null
+          status?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_injuries_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_injuries_player_id_fkey"
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "players"
@@ -887,6 +1044,58 @@ export type Database = {
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player_training_attendance: {
+        Row: {
+          attended: boolean | null
+          created_at: string | null
+          id: number
+          notes: string | null
+          performance_rating: number | null
+          player_id: number | null
+          training_session_id: number | null
+        }
+        Insert: {
+          attended?: boolean | null
+          created_at?: string | null
+          id?: number
+          notes?: string | null
+          performance_rating?: number | null
+          player_id?: number | null
+          training_session_id?: number | null
+        }
+        Update: {
+          attended?: boolean | null
+          created_at?: string | null
+          id?: number
+          notes?: string | null
+          performance_rating?: number | null
+          player_id?: number | null
+          training_session_id?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_training_attendance_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_training_attendance_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_training_attendance_training_session_id_fkey"
+            columns: ["training_session_id"]
+            isOneToOne: false
+            referencedRelation: "training_sessions"
             referencedColumns: ["id"]
           },
         ]
@@ -1119,6 +1328,55 @@ export type Database = {
           },
         ]
       }
+      starting_eleven: {
+        Row: {
+          created_at: string | null
+          formation: string | null
+          id: number
+          match_id: number | null
+          player_id: number | null
+          position_on_field: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          formation?: string | null
+          id?: number
+          match_id?: number | null
+          player_id?: number | null
+          position_on_field?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          formation?: string | null
+          id?: number
+          match_id?: number | null
+          player_id?: number | null
+          position_on_field?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "starting_eleven_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "starting_eleven_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "starting_eleven_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       team_admin_status: {
         Row: {
           admin_violations: string[] | null
@@ -1143,6 +1401,33 @@ export type Database = {
           last_updated?: string | null
           points_deducted?: number | null
           season?: string | null
+        }
+        Relationships: []
+      }
+      training_sessions: {
+        Row: {
+          created_at: string | null
+          duration_minutes: number | null
+          id: number
+          location: string | null
+          session_date: string | null
+          session_type: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: number
+          location?: string | null
+          session_date?: string | null
+          session_type?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          duration_minutes?: number | null
+          id?: number
+          location?: string | null
+          session_date?: string | null
+          session_type?: string | null
         }
         Relationships: []
       }

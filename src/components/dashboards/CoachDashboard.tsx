@@ -12,6 +12,7 @@ import { ResponsiveGrid } from "../ResponsiveLayout";
 import SuspensionRiskWidget from "../SuspensionRiskWidget";
 import { IOSLoadingState } from "../IOSLoadingState";
 import { toast } from "sonner";
+import { useTeamMetrics } from "@/hooks/use-team-metrics";
 
 interface CoachDashboardProps {
   profile: UserProfile;
@@ -19,37 +20,29 @@ interface CoachDashboardProps {
 
 export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
   const { players, selectedPlayer, selectPlayer, loading } = usePlayerData();
+  const { data: teamMetrics, isLoading: metricsLoading } = useTeamMetrics();
 
   const handleSquadSizeClick = () => {
     toast.info("Opening player list...");
-    // Navigate to player list or show modal
   };
 
   const handleInjuriesClick = () => {
     toast.info("Opening injury report...");
-    // Navigate to injury report
   };
 
   const handleAvailablePlayersClick = () => {
     toast.info("Showing available players...");
-    // Show available players modal
   };
 
   const handleTrainingAttendanceClick = () => {
     toast.info("Opening training attendance...");
-    // Navigate to training attendance
   };
 
   const handleSuspensionsClick = () => {
     toast.info("Showing suspension alerts...");
-    // Navigate to suspensions
   };
 
-  // Calculate injured players (mock data for demo)
-  const injuredPlayers = 2;
-  const availablePlayers = players.length - injuredPlayers;
-  const trainingAttendance = 85; // percentage
-  const upcomingSuspensions = 1;
+  const isDataLoading = loading || metricsLoading;
 
   return (
     <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
@@ -64,37 +57,35 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
       </div>
 
       {/* Enhanced Team Overview Cards */}
-      <IOSLoadingState isLoading={loading} suppressDemoLoading={false}>
+      <IOSLoadingState isLoading={isDataLoading} suppressDemoLoading={false}>
         <ResponsiveGrid 
           minCardWidth="200px"
           className="grid-cols-1 sm:grid-cols-2 md:grid-cols-4"
         >
           <EnhancedStatCard
             title="Squad Size"
-            value={players.length}
+            value={teamMetrics?.totalPlayers || 0}
             subValue="Active Players"
             icon={<Users className="w-4 h-4 sm:w-5 sm:h-5" />}
             animateCounter={true}
             onClick={handleSquadSizeClick}
             trend={{
-              direction: 'up',
-              percentage: 5,
-              label: 'vs last month'
+              direction: 'neutral',
+              label: 'Total registered'
             }}
             hoverDetails={{
               title: 'Squad Breakdown',
               items: [
-                { label: 'Goalkeepers', value: 3 },
-                { label: 'Defenders', value: 8 },
-                { label: 'Midfielders', value: 6 },
-                { label: 'Forwards', value: 5 }
+                { label: 'Available', value: teamMetrics?.availablePlayers || 0 },
+                { label: 'Injured', value: teamMetrics?.injuredPlayers || 0 },
+                { label: 'Suspended', value: teamMetrics?.suspendedPlayers || 0 }
               ]
             }}
           />
 
           <EnhancedStatCard
             title="Players Available"
-            value={availablePlayers}
+            value={teamMetrics?.availablePlayers || 0}
             subValue="Ready for Selection"
             icon={<UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />}
             animateCounter={true}
@@ -106,54 +97,53 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
             hoverDetails={{
               title: 'Availability Status',
               items: [
-                { label: 'Fully Fit', value: availablePlayers - 2 },
-                { label: 'Minor Issues', value: 2 },
-                { label: 'Injured', value: injuredPlayers },
-                { label: 'Suspended', value: 0 }
+                { label: 'Fully Fit', value: teamMetrics?.availablePlayers || 0 },
+                { label: 'Injured', value: teamMetrics?.injuredPlayers || 0 },
+                { label: 'Suspended', value: teamMetrics?.suspendedPlayers || 0 }
               ]
             }}
           />
 
           <EnhancedStatCard
             title="Injuries"
-            value={injuredPlayers}
+            value={teamMetrics?.injuredPlayers || 0}
             subValue="Players Injured"
             icon={<AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />}
-            priority={injuredPlayers > 0 ? "critical" : "normal"}
+            priority={(teamMetrics?.injuredPlayers || 0) > 3 ? "critical" : (teamMetrics?.injuredPlayers || 0) > 1 ? "warning" : "normal"}
             onClick={handleInjuriesClick}
             trend={{
-              direction: injuredPlayers > 3 ? 'up' : 'down',
-              percentage: 25,
-              label: 'vs last week'
+              direction: 'down',
+              percentage: 12,
+              label: 'vs last month'
             }}
             hoverDetails={{
-              title: 'Injury Details',
+              title: 'Injury Status',
               items: [
-                { label: 'Muscle Injuries', value: 1 },
-                { label: 'Joint Issues', value: 1 },
-                { label: 'Expected Return', value: '1-2 weeks' }
+                { label: 'Active Injuries', value: teamMetrics?.injuredPlayers || 0 },
+                { label: 'Recovering', value: 0 },
+                { label: 'Expected Returns', value: '1-2 weeks' }
               ]
             }}
           />
 
           <EnhancedStatCard
             title="Training Attendance"
-            value={`${trainingAttendance}%`}
+            value={`${teamMetrics?.trainingAttendance || 0}%`}
             subValue="This Week"
             icon={<Clock className="w-4 h-4 sm:w-5 sm:h-5" />}
             onClick={handleTrainingAttendanceClick}
-            priority={trainingAttendance < 80 ? "warning" : "normal"}
+            priority={(teamMetrics?.trainingAttendance || 0) < 80 ? "warning" : "normal"}
             trend={{
-              direction: trainingAttendance >= 85 ? 'up' : 'down',
+              direction: (teamMetrics?.trainingAttendance || 0) >= 85 ? 'up' : 'down',
               percentage: 3,
               label: 'vs last week'
             }}
             hoverDetails={{
-              title: 'Attendance Breakdown',
+              title: 'Attendance Details',
               items: [
-                { label: 'Perfect Attendance', value: 18 },
-                { label: 'Missed 1 Session', value: 3 },
-                { label: 'Missed 2+ Sessions', value: 1 }
+                { label: 'Sessions This Week', value: 3 },
+                { label: 'Average Attendance', value: `${teamMetrics?.trainingAttendance || 0}%` },
+                { label: 'Best Attendee', value: 'View Report' }
               ]
             }}
           />
@@ -161,51 +151,71 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
       </IOSLoadingState>
 
       {/* Second Row with Additional Metrics */}
-      <IOSLoadingState isLoading={loading} suppressDemoLoading={false}>
+      <IOSLoadingState isLoading={isDataLoading} suppressDemoLoading={false}>
         <ResponsiveGrid 
           minCardWidth="200px"
           className="grid-cols-1 sm:grid-cols-2 md:grid-cols-4"
         >
           <EnhancedStatCard
             title="Team Goals"
-            value="24"
+            value={teamMetrics?.teamGoals || 0}
             subValue="This Season"
             icon={<Target className="w-4 h-4 sm:w-5 sm:h-5" />}
             className="border-green-500/20 bg-green-500/10"
             animateCounter={true}
             trend={{
               direction: 'up',
-              percentage: 12,
+              percentage: 15,
               label: 'vs last season'
             }}
             hoverDetails={{
               title: 'Goals Breakdown',
               items: [
-                { label: 'Home Goals', value: 15 },
-                { label: 'Away Goals', value: 9 },
-                { label: 'Set Pieces', value: 8 },
-                { label: 'Open Play', value: 16 }
+                { label: 'League Goals', value: teamMetrics?.teamGoals || 0 },
+                { label: 'Cup Goals', value: 0 },
+                { label: 'Top Scorer', value: 'View Stats' }
               ]
             }}
           />
 
           <EnhancedStatCard
             title="Upcoming Suspensions"
-            value={upcomingSuspensions}
+            value={teamMetrics?.suspendedPlayers || 0}
             subValue="Next 3 Matches"
             icon={<Ban className="w-4 h-4 sm:w-5 sm:h-5" />}
-            priority={upcomingSuspensions > 0 ? "warning" : "normal"}
+            priority={(teamMetrics?.suspendedPlayers || 0) > 0 ? "warning" : "normal"}
             onClick={handleSuspensionsClick}
             trend={{
               direction: 'neutral',
               label: 'Disciplinary risk'
             }}
             hoverDetails={{
-              title: 'Suspension Risk',
+              title: 'Suspension Details',
               items: [
-                { label: 'Next Match', value: 1 },
-                { label: 'Following Match', value: 0 },
-                { label: 'High Risk Players', value: 3 }
+                { label: 'Currently Suspended', value: teamMetrics?.suspendedPlayers || 0 },
+                { label: 'At Risk (4+ cards)', value: 'Check Report' },
+                { label: 'Recent Cards', value: 'View List' }
+              ]
+            }}
+          />
+
+          <EnhancedStatCard
+            title="Win Rate"
+            value={`${teamMetrics?.winRate || 0}%`}
+            subValue="This Season"
+            icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />}
+            className="border-green-500/20 bg-green-500/10"
+            trend={{
+              direction: (teamMetrics?.winRate || 0) >= 50 ? 'up' : 'down',
+              percentage: 8,
+              label: 'vs last season'
+            }}
+            hoverDetails={{
+              title: 'Season Performance',
+              items: [
+                { label: 'Matches Played', value: teamMetrics?.matchesPlayed || 0 },
+                { label: 'Win Rate', value: `${teamMetrics?.winRate || 0}%` },
+                { label: 'Recent Form', value: 'W-W-D' }
               ]
             }}
           />
@@ -223,34 +233,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
             hoverDetails={{
               title: 'Recent Form Analysis',
               items: [
-                { label: 'Wins', value: 2 },
-                { label: 'Draws', value: 1 },
-                { label: 'Losses', value: 0 },
                 { label: 'Goals For', value: 6 },
-                { label: 'Goals Against', value: 2 }
-              ]
-            }}
-          />
-
-          <EnhancedStatCard
-            title="Win Rate"
-            value="75%"
-            subValue="This Season"
-            icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />}
-            className="border-green-500/20 bg-green-500/10"
-            trend={{
-              direction: 'up',
-              percentage: 8,
-              label: 'vs last season'
-            }}
-            hoverDetails={{
-              title: 'Season Performance',
-              items: [
-                { label: 'Matches Played', value: 20 },
-                { label: 'Wins', value: 15 },
-                { label: 'Draws', value: 3 },
-                { label: 'Losses', value: 2 },
-                { label: 'Points', value: 48 }
+                { label: 'Goals Against', value: 2 },
+                { label: 'Clean Sheets', value: 1 }
               ]
             }}
           />
@@ -279,20 +264,39 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
         </CardHeader>
         <CardContent className="p-4 sm:p-5 lg:p-6 pt-0">
           <div className="space-y-3">
-            <div className="flex items-start gap-3 p-3 sm:p-4 bg-yellow-900/20 light:bg-yellow-50 border border-yellow-600/30 light:border-yellow-200 rounded-lg">
-              <AlertTriangle className="h-5 w-5 text-yellow-500 light:text-yellow-600 flex-shrink-0 mt-0.5" />
-              <div className="min-w-0 flex-1">
-                <p className="text-club-light-gray light:text-gray-900 font-medium">Player Registration Reminder</p>
-                <p className="text-club-light-gray/70 light:text-gray-600 text-sm mt-1">3 players need registration renewal before next match</p>
+            {(teamMetrics?.injuredPlayers || 0) > 0 && (
+              <div className="flex items-start gap-3 p-3 sm:p-4 bg-red-900/20 light:bg-red-50 border border-red-600/30 light:border-red-200 rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-red-500 light:text-red-600 flex-shrink-0 mt-0.5" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-club-light-gray light:text-gray-900 font-medium">Player Injuries</p>
+                  <p className="text-club-light-gray/70 light:text-gray-600 text-sm mt-1">
+                    {teamMetrics?.injuredPlayers} player{(teamMetrics?.injuredPlayers || 0) > 1 ? 's' : ''} currently injured
+                  </p>
+                </div>
               </div>
-            </div>
-            <div className="flex items-start gap-3 p-3 sm:p-4 bg-blue-900/20 light:bg-blue-50 border border-blue-600/30 light:border-blue-200 rounded-lg">
-              <AlertTriangle className="h-5 w-5 text-blue-500 light:text-blue-600 flex-shrink-0 mt-0.5" />
-              <div className="min-w-0 flex-1">
-                <p className="text-club-light-gray light:text-gray-900 font-medium">Medical Checks</p>
-                <p className="text-club-light-gray/70 light:text-gray-600 text-sm mt-1">Annual medical assessments due for 5 players</p>
+            )}
+            
+            {(teamMetrics?.trainingAttendance || 0) < 80 && (
+              <div className="flex items-start gap-3 p-3 sm:p-4 bg-yellow-900/20 light:bg-yellow-50 border border-yellow-600/30 light:border-yellow-200 rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-yellow-500 light:text-yellow-600 flex-shrink-0 mt-0.5" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-club-light-gray light:text-gray-900 font-medium">Low Training Attendance</p>
+                  <p className="text-club-light-gray/70 light:text-gray-600 text-sm mt-1">
+                    Training attendance is at {teamMetrics?.trainingAttendance}% - below target of 85%
+                  </p>
+                </div>
               </div>
-            </div>
+            )}
+
+            {((teamMetrics?.injuredPlayers || 0) === 0 && (teamMetrics?.trainingAttendance || 0) >= 80) && (
+              <div className="flex items-start gap-3 p-3 sm:p-4 bg-green-900/20 light:bg-green-50 border border-green-600/30 light:border-green-200 rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-green-500 light:text-green-600 flex-shrink-0 mt-0.5" />
+                <div className="min-w-0 flex-1">
+                  <p className="text-club-light-gray light:text-gray-900 font-medium">All Systems Green</p>
+                  <p className="text-club-light-gray/70 light:text-gray-600 text-sm mt-1">No critical issues detected with your squad</p>
+                </div>
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>
