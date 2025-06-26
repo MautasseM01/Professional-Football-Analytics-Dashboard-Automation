@@ -9,7 +9,9 @@ import {
   DevelopmentPathway, 
   DevelopmentMilestone, 
   DevelopmentRecommendation,
-  CoachAssessment 
+  CoachAssessment,
+  GuardianCommunication,
+  EducationalProgress
 } from '@/hooks/use-development-data';
 import { 
   TrendingUp, 
@@ -29,6 +31,8 @@ interface PlayerDevelopmentInsightsProps {
   milestones: DevelopmentMilestone[];
   recommendations: DevelopmentRecommendation[];
   assessments: CoachAssessment[];
+  communications: GuardianCommunication[];
+  educationalProgress: EducationalProgress[];
 }
 
 export const PlayerDevelopmentInsights = ({ 
@@ -36,7 +40,9 @@ export const PlayerDevelopmentInsights = ({
   pathways, 
   milestones, 
   recommendations,
-  assessments 
+  assessments,
+  communications,
+  educationalProgress
 }: PlayerDevelopmentInsightsProps) => {
   // Calculate insights
   const playersReadyForPromotion = pathways.filter(p => {
