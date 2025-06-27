@@ -26,9 +26,15 @@ interface AnalystDashboardProps {
 
 export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
   const { players, selectedPlayer, selectPlayer, loading } = usePlayerData();
-  const { squadAvailability, loading: squadLoading } = useSquadAvailability();
-  const { developmentProgress, loading: devLoading } = useDevelopmentProgress();
+  const squadAvailabilityQuery = useSquadAvailability();
+  const developmentProgressQuery = useDevelopmentProgress();
   const [exportLoading, setExportLoading] = useState<string | null>(null);
+
+  // Extract data from query results
+  const squadAvailability = squadAvailabilityQuery.data;
+  const squadLoading = squadAvailabilityQuery.isLoading;
+  const developmentProgress = developmentProgressQuery.data;
+  const devLoading = developmentProgressQuery.isLoading;
 
   // Calculate analytics metrics from real data
   const totalDataPoints = players.length * 47; // 47 metrics per player
