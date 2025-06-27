@@ -10,6 +10,12 @@ import { DevelopmentTrajectories } from "./performance-director/DevelopmentTraje
 import { PerformanceBenchmarking } from "./performance-director/PerformanceBenchmarking";
 import { PlayerPerformanceMonitor } from "./performance-director/PlayerPerformanceMonitor";
 import { useState } from "react";
+import { useSquadAvailability } from "@/hooks/use-squad-availability";
+import { useDevelopmentProgress } from "@/hooks/use-development-progress";
+import { usePerformanceBenchmarks } from "@/hooks/use-performance-benchmarks";
+import { useYouthTeams } from "@/hooks/use-youth-teams";
+import { usePlayerData } from "@/hooks/use-player-data";
+import { LoadingOverlay } from "@/components/LoadingOverlay";
 
 interface PerformanceDirectorDashboardProps {
   profile: UserProfile;
@@ -18,29 +24,40 @@ interface PerformanceDirectorDashboardProps {
 export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDashboardProps) => {
   const [activeTab, setActiveTab] = useState<'overview' | 'availability' | 'development' | 'benchmarking' | 'performance'>('overview');
 
-  // Sample player data for performance trends
-  const samplePlayer = {
+  // Fetch real data from database
+  const { data: squadAvailability, isLoading: squadLoading } = useSquadAvailability();
+  const { data: developmentProgress, isLoading: developmentLoading } = useDevelopmentProgress();
+  const { data: performanceBenchmarks, isLoading: benchmarksLoading } = usePerformanceBenchmarks();
+  const { data: youthTeams, isLoading: teamsLoading } = useYouthTeams();
+  const { players } = usePlayerData();
+
+  // Use first available player for performance trends
+  const samplePlayer = players && players.length > 0 ? players[0] : {
     id: 1,
-    name: "Key Player Analysis",
+    name: "Loading Player Data...",
     position: "Midfielder",
-    matches: 15,
-    distance: 11.2,
-    passes_attempted: 89,
-    passes_completed: 76,
-    shots_total: 3,
-    shots_on_target: 2,
-    tackles_attempted: 5,
-    tackles_won: 3,
-    sprintDistance: 2.8,
-    maxSpeed: 32.1,
-    passCompletionPct: 85,
-    number: 10,
-    heatmapUrl: "/placeholder-heatmap.jpg",
-    reportUrl: "/placeholder-report.pdf"
+    matches: 0,
+    distance: 0,
+    passes_attempted: 0,
+    passes_completed: 0,
+    shots_total: 0,
+    shots_on_target: 0,
+    tackles_attempted: 0,
+    tackles_won: 0,
+    sprintDistance: 0,
+    maxSpeed: 0,
+    passCompletionPct: 0,
+    number: 0,
+    heatmapUrl: "",
+    reportUrl: ""
   };
 
+  const isLoading = squadLoading || developmentLoading || benchmarksLoading || teamsLoading;
+
   return (
-    <div className="space-y-3 xs:space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8">
+    <div className="space-y-3 xs:space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 p-2 xs:p-3 sm:p-4 md:p-6 lg:p-8 relative">
+      <LoadingOverlay isLoading={isLoading} message="Loading performance data..." />
+      
       {/* Welcome Header */}
       <div className="flex flex-col gap-2">
         <h1 className="text-lg xs:text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-club-gold px-1">
@@ -103,9 +120,9 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
       {/* Tab Content */}
       {activeTab === 'overview' && (
         <>
-          {/* Main Stats Cards */}
+          {/* Main Stats Cards - Now using real data */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6">
-            {/* Squad Availability */}
+            {/* Squad Availability - Real Data */}
             <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
@@ -118,23 +135,29 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">18</div>
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">
+                    {squadAvailability?.availablePlayers || 0}
+                  </div>
                   <div className="text-xs sm:text-sm text-club-light-gray/70">Available</div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-center">
                   <div className="bg-club-black/40 rounded py-2 px-1">
-                    <div className="text-lg font-bold text-amber-500">3</div>
+                    <div className="text-lg font-bold text-amber-500">
+                      {squadAvailability?.lightTraining || 0}
+                    </div>
                     <div className="text-xs text-club-light-gray/70">Light Training</div>
                   </div>
                   <div className="bg-club-black/40 rounded py-2 px-1">
-                    <div className="text-lg font-bold text-red-500">4</div>
+                    <div className="text-lg font-bold text-red-500">
+                      {squadAvailability?.injuredPlayers || 0}
+                    </div>
                     <div className="text-xs text-club-light-gray/70">Injured</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Development Progress */}
+            {/* Development Progress - Real Data */}
             <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
@@ -147,23 +170,29 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">78%</div>
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">
+                    {developmentProgress?.targetsMetPercentage || 0}%
+                  </div>
                   <div className="text-xs sm:text-sm text-club-light-gray/70">Targets Met</div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-center">
                   <div className="bg-club-black/40 rounded py-2 px-1">
-                    <div className="text-lg font-bold text-green-500">15</div>
+                    <div className="text-lg font-bold text-green-500">
+                      {developmentProgress?.onTrackCount || 0}
+                    </div>
                     <div className="text-xs text-club-light-gray/70">On Track</div>
                   </div>
                   <div className="bg-club-black/40 rounded py-2 px-1">
-                    <div className="text-lg font-bold text-amber-500">7</div>
+                    <div className="text-lg font-bold text-amber-500">
+                      {developmentProgress?.needFocusCount || 0}
+                    </div>
                     <div className="text-xs text-club-light-gray/70">Need Focus</div>
                   </div>
                 </div>
               </CardContent>
             </Card>
 
-            {/* Performance Analysis */}
+            {/* Performance Analysis - Real Data */}
             <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-dark-gray/80 transition-all duration-300">
               <CardHeader className="pb-2">
                 <CardTitle className="flex items-center text-club-gold text-base sm:text-lg">
@@ -176,17 +205,25 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
               </CardHeader>
               <CardContent className="space-y-3">
                 <div className="text-center">
-                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">78th</div>
+                  <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold">
+                    {performanceBenchmarks?.leaguePercentile || 0}th
+                  </div>
                   <div className="text-xs sm:text-sm text-club-light-gray/70">Percentile</div>
                 </div>
                 <div className="grid grid-cols-2 gap-2 text-center">
                   <div className="bg-club-black/40 rounded py-2 px-1">
-                    <div className="text-lg font-bold text-green-500">Rank 3</div>
+                    <div className="text-lg font-bold text-green-500">
+                      Rank {performanceBenchmarks?.leagueRanking || 0}
+                    </div>
                     <div className="text-xs text-club-light-gray/70">League Position</div>
                   </div>
                   <div className="bg-club-black/40 rounded py-2 px-1">
-                    <div className="text-lg font-bold text-blue-500">↗</div>
-                    <div className="text-xs text-club-light-gray/70">Improving</div>
+                    <div className="text-lg font-bold text-blue-500">
+                      {performanceBenchmarks?.trendDirection === 'up' ? '↗' : '→'}
+                    </div>
+                    <div className="text-xs text-club-light-gray/70">
+                      {performanceBenchmarks?.trendDirection === 'up' ? 'Improving' : 'Stable'}
+                    </div>
                   </div>
                 </div>
               </CardContent>
