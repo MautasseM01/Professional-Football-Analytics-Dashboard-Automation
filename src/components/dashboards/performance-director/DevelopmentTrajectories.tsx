@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -82,7 +81,7 @@ export const DevelopmentTrajectories = () => {
     return (
       <Card className="bg-club-dark-gray border-red-500/20">
         <CardContent className="p-6 text-center">
-          <p className="text-red-400">Error loading development data: {error}</p>
+          <p className="text-red-400">Error loading development data: {error.message}</p>
         </CardContent>
       </Card>
     );

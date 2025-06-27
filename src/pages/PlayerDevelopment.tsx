@@ -127,7 +127,7 @@ const PlayerDevelopment = () => {
             {developmentError && (
               <Alert className="bg-red-500/10 border-red-500/30">
                 <AlertDescription className="text-red-400">
-                  Error loading development data: {developmentError}
+                  Error loading development data: {developmentError.message}
                 </AlertDescription>
               </Alert>
             )}
