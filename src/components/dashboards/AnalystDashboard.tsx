@@ -17,16 +17,18 @@ import {
   Download,
   Database,
   Settings,
-  RefreshCw
+  RefreshCw,
+  AlertCircle
 } from "lucide-react";
 import { ResponsiveGrid } from "../ResponsiveLayout";
+import { toast } from "sonner";
 
 interface AnalystDashboardProps {
   profile: UserProfile;
 }
 
 export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
-  const { players, selectedPlayer, selectPlayer, loading } = usePlayerData();
+  const { players, selectedPlayer, selectPlayer, loading, error } = usePlayerData();
   const squadAvailabilityQuery = useSquadAvailability();
   const developmentProgressQuery = useDevelopmentProgress();
   const analyticsQuery = useAnalystAnalytics();
@@ -44,20 +46,47 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
     analyticsQuery.refetch();
     squadAvailabilityQuery.refetch();
     developmentProgressQuery.refetch();
+    toast.success("Analytics data refreshed");
   };
 
   const formatNumber = (num: number): string => {
+    if (num >= 1000000) {
+      return `${(num / 1000000).toFixed(1)}M`;
+    }
     if (num >= 1000) {
       return `${(num / 1000).toFixed(1)}K`;
     }
     return num.toString();
   };
 
+  // Check if user has analyst access
+  const hasAnalystAccess = profile?.role === 'analyst' || 
+                          profile?.role === 'admin' || 
+                          profile?.role === 'management' ||
+                          profile?.role === 'performance_director';
+
+  if (!hasAnalystAccess) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px] p-6">
+        <Card className="bg-club-dark-gray border-club-gold/20 max-w-md">
+          <CardContent className="p-6 text-center">
+            <AlertCircle className="h-16 w-16 text-club-gold mx-auto mb-4" />
+            <h2 className="text-xl font-bold text-club-gold mb-2">Access Restricted</h2>
+            <p className="text-club-light-gray/70">
+              You need analyst-level permissions to access this dashboard.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-      <div className="mb-4 sm:mb-6 flex items-center justify-between">
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 bg-club-black min-h-screen">
+      {/* Header Section */}
+      <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold mb-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold mb-2">
             Analytics Dashboard
           </h1>
           <p className="text-sm sm:text-base text-club-light-gray/70">
@@ -67,18 +96,25 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
         <TouchFeedbackButton
           variant="outline"
           onClick={handleRefreshData}
-          className="border-club-gold/30 hover:border-club-gold/50"
+          className="
+            border-club-gold/30 hover:border-club-gold/50 
+            hover:bg-club-gold/10 transition-all duration-300
+            text-club-light-gray hover:text-club-gold
+            disabled:opacity-50 disabled:cursor-not-allowed
+            min-h-[44px] px-4
+          "
           disabled={analyticsLoading}
         >
           <RefreshCw className={`h-4 w-4 mr-2 ${analyticsLoading ? 'animate-spin' : ''}`} />
-          Refresh
+          <span className="hidden sm:inline">Refresh Data</span>
+          <span className="sm:hidden">Refresh</span>
         </TouchFeedbackButton>
       </div>
 
       {/* Analytics Overview Cards */}
       <ResponsiveGrid 
-        minCardWidth="250px"
-        className="grid-cols-2 md:grid-cols-4"
+        minCardWidth="280px"
+        className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
       >
         <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/10 transition-all duration-300 group">
           <CardHeader className="p-4 sm:p-6 pb-2">
@@ -144,38 +180,38 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
       {/* Secondary Analytics Row */}
       <ResponsiveGrid 
         minCardWidth="200px"
-        className="grid-cols-2 md:grid-cols-4"
+        className="grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4"
       >
-        <Card className="bg-club-dark-gray border-club-gold/20">
-          <CardContent className="p-4 text-center">
-            <div className="text-lg font-bold text-club-gold">
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="text-lg sm:text-xl font-bold text-club-gold">
               {analyticsLoading ? '...' : analytics?.matchCount || 0}
             </div>
             <p className="text-xs text-club-light-gray/70">Matches Analyzed</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-club-dark-gray border-club-gold/20">
-          <CardContent className="p-4 text-center">
-            <div className="text-lg font-bold text-club-gold">
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="text-lg sm:text-xl font-bold text-club-gold">
               {analyticsLoading ? '...' : analytics?.metricsTracked || 0}
             </div>
             <p className="text-xs text-club-light-gray/70">Metrics Tracked</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-club-dark-gray border-club-gold/20">
-          <CardContent className="p-4 text-center">
-            <div className="text-lg font-bold text-club-gold">
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="text-lg sm:text-xl font-bold text-club-gold">
               {analyticsLoading ? '...' : analytics?.avgMatchRating || 0}
             </div>
             <p className="text-xs text-club-light-gray/70">Avg Match Rating</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-club-dark-gray border-club-gold/20">
-          <CardContent className="p-4 text-center">
-            <div className="text-lg font-bold text-club-gold">
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="text-lg sm:text-xl font-bold text-club-gold">
               {analyticsLoading ? '...' : analytics?.reportsGenerated || 0}
             </div>
             <p className="text-xs text-club-light-gray/70">Reports Generated</p>
@@ -194,7 +230,7 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
         <CardContent className="p-4 sm:p-6 pt-0">
           <ResponsiveGrid 
             minCardWidth="280px"
-            className="grid-cols-1 sm:grid-cols-2 gap-3"
+            className="grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
           >
             <TouchFeedbackButton
               variant="outline"
@@ -263,16 +299,23 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
         </CardContent>
       </Card>
 
-      {/* Player Selector */}
-      <PlayerSelector
-        players={players}
-        selectedPlayer={selectedPlayer}
-        onPlayerSelect={selectPlayer}
-        loading={loading}
-      />
+      {/* Enhanced Player Selector Integration */}
+      <div className="bg-club-dark-gray/50 rounded-lg p-4 sm:p-6 border border-club-gold/10">
+        <PlayerSelector
+          players={players}
+          selectedPlayer={selectedPlayer}
+          onPlayerSelect={selectPlayer}
+          loading={loading}
+          error={error}
+        />
+      </div>
 
       {/* Player Stats Component */}
-      {selectedPlayer && <PlayerStats player={selectedPlayer} />}
+      {selectedPlayer && (
+        <div className="bg-club-dark-gray/50 rounded-lg p-4 sm:p-6 border border-club-gold/10">
+          <PlayerStats player={selectedPlayer} />
+        </div>
+      )}
     </div>
   );
 };
