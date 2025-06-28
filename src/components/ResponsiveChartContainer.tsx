@@ -3,13 +3,13 @@ import React, { useMemo } from 'react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useResponsiveBreakpoint } from '@/hooks/use-orientation';
 import { cn } from '@/lib/utils';
-import { ChartContainer } from '@/components/ui/chart';
+import { ChartContainer, ChartConfig } from '@/components/ui/chart';
 import { clubChartTheme } from '@/components/charts/ChartTheme';
 
 interface ResponsiveChartContainerProps {
   children: React.ReactElement;
   className?: string;
-  config?: Record<string, { color: string; label?: string }>;
+  config?: ChartConfig;
   aspectRatio?: number;
   minHeight?: number;
   showInteractions?: boolean;
