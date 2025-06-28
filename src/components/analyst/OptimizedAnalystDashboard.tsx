@@ -87,17 +87,17 @@ export const OptimizedAnalystDashboard = ({ profile }: OptimizedAnalystDashboard
     return num.toString();
   }, []);
 
-  // Progressive loading stages
+  // Progressive loading stages with proper typing
   const loadingStages = useMemo(() => [
     {
       name: 'Analytics Overview',
-      status: analyticsLoading ? 'loading' : analytics ? 'complete' : 'pending',
+      status: (analyticsLoading ? 'loading' : analytics ? 'complete' : 'pending') as 'pending' | 'loading' | 'complete' | 'error',
       progress: analyticsLoading ? 50 : analytics ? 100 : 0,
       message: analyticsLoading ? 'Loading performance metrics...' : undefined
     },
     {
       name: 'Recent Matches',
-      status: matchesLoading ? 'loading' : recentMatches ? 'complete' : 'pending',
+      status: (matchesLoading ? 'loading' : recentMatches ? 'complete' : 'pending') as 'pending' | 'loading' | 'complete' | 'error',
       progress: matchesLoading ? 70 : recentMatches ? 100 : 0,
       message: matchesLoading ? 'Fetching match data...' : undefined
     },

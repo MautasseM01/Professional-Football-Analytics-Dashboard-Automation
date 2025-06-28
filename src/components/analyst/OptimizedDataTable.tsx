@@ -104,16 +104,20 @@ export const OptimizedDataTable = ({ className }: OptimizedDataTableProps) => {
 
   const sortedPlayers = useMemo(() => {
     return [...allPlayers].sort((a, b) => {
-      const aValue = a[sortField] || 0;
-      const bValue = b[sortField] || 0;
+      const aValue = a[sortField];
+      const bValue = b[sortField];
       
       if (sortField === 'name') {
+        const aStr = String(aValue || '');
+        const bStr = String(bValue || '');
         return sortDirection === 'asc' 
-          ? aValue.localeCompare(bValue)
-          : bValue.localeCompare(aValue);
+          ? aStr.localeCompare(bStr)
+          : bStr.localeCompare(aStr);
       }
       
-      return sortDirection === 'asc' ? aValue - bValue : bValue - aValue;
+      const aNum = Number(aValue || 0);
+      const bNum = Number(bValue || 0);
+      return sortDirection === 'asc' ? aNum - bNum : bNum - aNum;
     });
   }, [allPlayers, sortField, sortDirection]);
 
@@ -242,6 +246,7 @@ export const OptimizedDataTable = ({ className }: OptimizedDataTableProps) => {
           <div className="h-96">
             <List
               height={384}
+              width="100%"
               itemCount={sortedPlayers.length + (hasNextPage ? 1 : 0)}
               itemSize={80}
               itemData={{
