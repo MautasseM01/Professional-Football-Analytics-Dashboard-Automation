@@ -310,10 +310,13 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
         />
       </div>
 
-      {/* Player Stats Component */}
+      {/* Enhanced Player Stats Component with Analyst Features */}
       {selectedPlayer && (
         <div className="bg-club-dark-gray/50 rounded-lg p-4 sm:p-6 border border-club-gold/10">
-          <PlayerStats player={selectedPlayer} />
+          <PlayerStats 
+            player={selectedPlayer} 
+            analystMode={true}
+          />
         </div>
       )}
     </div>
