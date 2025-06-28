@@ -1,4 +1,3 @@
-
 import { usePlayerData } from "@/hooks/use-player-data";
 import { useSquadAvailability } from "@/hooks/use-squad-availability";
 import { useDevelopmentProgress } from "@/hooks/use-development-progress";
@@ -25,6 +24,8 @@ import {
 } from "lucide-react";
 import { ResponsiveGrid } from "../ResponsiveLayout";
 import { toast } from "sonner";
+import { AdvancedExportDialog } from "@/components/analyst/AdvancedExportDialog";
+import { ScheduledReportsManager } from "@/components/analyst/ScheduledReportsManager";
 
 interface AnalystDashboardProps {
   profile: UserProfile;
@@ -96,22 +97,25 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
             Real-time performance analytics and data insights
           </p>
         </div>
-        <TouchFeedbackButton
-          variant="outline"
-          onClick={handleRefreshData}
-          className="
-            border-club-gold/30 hover:border-club-gold/50 
-            hover:bg-club-gold/10 transition-all duration-300
-            text-club-light-gray hover:text-club-gold
-            disabled:opacity-50 disabled:cursor-not-allowed
-            min-h-[44px] px-4
-          "
-          disabled={analyticsLoading}
-        >
-          <RefreshCw className={`h-4 w-4 mr-2 ${analyticsLoading ? 'animate-spin' : ''}`} />
-          <span className="hidden sm:inline">Refresh Data</span>
-          <span className="sm:hidden">Refresh</span>
-        </TouchFeedbackButton>
+        <div className="flex items-center gap-3">
+          <AdvancedExportDialog />
+          <TouchFeedbackButton
+            variant="outline"
+            onClick={handleRefreshData}
+            className="
+              border-club-gold/30 hover:border-club-gold/50 
+              hover:bg-club-gold/10 transition-all duration-300
+              text-club-light-gray hover:text-club-gold
+              disabled:opacity-50 disabled:cursor-not-allowed
+              min-h-[44px] px-4
+            "
+            disabled={analyticsLoading}
+          >
+            <RefreshCw className={`h-4 w-4 mr-2 ${analyticsLoading ? 'animate-spin' : ''}`} />
+            <span className="hidden sm:inline">Refresh Data</span>
+            <span className="sm:hidden">Refresh</span>
+          </TouchFeedbackButton>
+        </div>
       </div>
 
       {/* Primary Analytics Overview Cards */}
@@ -180,7 +184,7 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
         </Card>
       </ResponsiveGrid>
 
-      {/* Secondary Analytics Row - Now matching primary style */}
+      {/* Secondary Analytics Row */}
       <ResponsiveGrid 
         minCardWidth="280px"
         className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
@@ -246,33 +250,67 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
         </Card>
       </ResponsiveGrid>
 
+      {/* Scheduled Reports Manager */}
+      <ScheduledReportsManager />
+
       {/* Advanced Analytics Tools */}
       <Card className="bg-club-dark-gray border-club-gold/20">
         <CardHeader className="p-4 sm:p-6">
-          <CardTitle className="text-club-gold text-lg sm:text-xl">Database Export Tools</CardTitle>
+          <CardTitle className="text-club-gold text-lg sm:text-xl">Professional Export Tools</CardTitle>
           <CardDescription className="text-club-light-gray/70">
-            Export and analyze real-time data from the database
+            Advanced data export capabilities for professional analyst workflows
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 sm:p-6 pt-0">
           <ResponsiveGrid 
-            minCardWidth="280px"
-            className="grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
+            minCardWidth="300px"
+            className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4"
           >
+            <AdvancedExportDialog
+              trigger={
+                <TouchFeedbackButton
+                  variant="outline"
+                  className="
+                    min-h-[60px] w-full justify-start p-4
+                    border-club-gold/30 hover:border-club-gold/50 
+                    hover:bg-club-gold/10 transition-all duration-300
+                    text-club-light-gray hover:text-club-gold
+                  "
+                >
+                  <div className="flex items-center gap-3">
+                    <FileText className="h-6 w-6" />
+                    <div className="text-left">
+                      <div className="font-medium">Professional Reports</div>
+                      <div className="text-xs text-club-light-gray/60">PDF, Excel, CSV exports</div>
+                    </div>
+                  </div>
+                </TouchFeedbackButton>
+              }
+            />
+
             <TouchFeedbackButton
               variant="outline"
               onClick={() => handleExport('player-data')}
               disabled={exportLoading === 'player-data'}
               className="
-                min-h-[44px] w-full justify-start 
+                min-h-[60px] w-full justify-start p-4
                 border-club-gold/30 hover:border-club-gold/50 
                 hover:bg-club-gold/10 transition-all duration-300
                 text-club-light-gray hover:text-club-gold
                 disabled:opacity-50 disabled:cursor-not-allowed
               "
             >
-              <Download className="mr-2 h-4 w-4" />
-              {exportLoading === 'player-data' ? 'Exporting...' : `Export Player Data (${analytics?.playerCount || 0})`}
+              <div className="flex items-center gap-3">
+                <Download className="h-6 w-6" />
+                <div className="text-left">
+                  <div className="font-medium">
+                    {exportLoading === 'player-data' ? 'Exporting...' : 'Quick Player Export'}
+                  </div>
+                  <div className="text-xs text-club-light-gray/60">
+                    {analytics?.playerCount || 0} players
+                  </div>
+                </div>
+              </div>
             </TouchFeedbackButton>
 
             <TouchFeedbackButton
@@ -280,47 +318,22 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
               onClick={() => handleExport('team-report')}
               disabled={exportLoading === 'team-report'}
               className="
-                min-h-[44px] w-full justify-start 
+                min-h-[60px] w-full justify-start p-4
                 border-club-gold/30 hover:border-club-gold/50 
                 hover:bg-club-gold/10 transition-all duration-300
                 text-club-light-gray hover:text-club-gold
                 disabled:opacity-50 disabled:cursor-not-allowed
               "
             >
-              <FileText className="mr-2 h-4 w-4" />
-              {exportLoading === 'team-report' ? 'Generating...' : 'Generate Team Report'}
-            </TouchFeedbackButton>
-
-            <TouchFeedbackButton
-              variant="outline"
-              onClick={() => handleExport('performance-trends')}
-              disabled={exportLoading === 'performance-trends'}
-              className="
-                min-h-[44px] w-full justify-start 
-                border-club-gold/30 hover:border-club-gold/50 
-                hover:bg-club-gold/10 transition-all duration-300
-                text-club-light-gray hover:text-club-gold
-                disabled:opacity-50 disabled:cursor-not-allowed
-              "
-            >
-              <BarChart3 className="mr-2 h-4 w-4" />
-              {exportLoading === 'performance-trends' ? 'Analyzing...' : 'Performance Trends'}
-            </TouchFeedbackButton>
-
-            <TouchFeedbackButton
-              variant="outline"
-              onClick={() => handleExport('predictive-analysis')}
-              disabled={exportLoading === 'predictive-analysis'}
-              className="
-                min-h-[44px] w-full justify-start 
-                border-club-gold/30 hover:border-club-gold/50 
-                hover:bg-club-gold/10 transition-all duration-300
-                text-club-light-gray hover:text-club-gold
-                disabled:opacity-50 disabled:cursor-not-allowed
-              "
-            >
-              <Settings className="mr-2 h-4 w-4" />
-              {exportLoading === 'predictive-analysis' ? 'Processing...' : 'Predictive Analysis'}
+              <div className="flex items-center gap-3">
+                <BarChart3 className="h-6 w-6" />
+                <div className="text-left">
+                  <div className="font-medium">
+                    {exportLoading === 'team-report' ? 'Generating...' : 'Team Analysis'}
+                  </div>
+                  <div className="text-xs text-club-light-gray/60">Match performance report</div>
+                </div>
+              </div>
             </TouchFeedbackButton>
           </ResponsiveGrid>
         </CardContent>
