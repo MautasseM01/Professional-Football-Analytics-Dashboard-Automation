@@ -18,7 +18,10 @@ import {
   Database,
   Settings,
   RefreshCw,
-  AlertCircle
+  AlertCircle,
+  Target,
+  Activity,
+  Star
 } from "lucide-react";
 import { ResponsiveGrid } from "../ResponsiveLayout";
 import { toast } from "sonner";
@@ -111,7 +114,7 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
         </TouchFeedbackButton>
       </div>
 
-      {/* Analytics Overview Cards */}
+      {/* Primary Analytics Overview Cards */}
       <ResponsiveGrid 
         minCardWidth="280px"
         className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
@@ -177,44 +180,68 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
         </Card>
       </ResponsiveGrid>
 
-      {/* Secondary Analytics Row */}
+      {/* Secondary Analytics Row - Now matching primary style */}
       <ResponsiveGrid 
-        minCardWidth="200px"
-        className="grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4"
+        minCardWidth="280px"
+        className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
       >
-        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
-          <CardContent className="p-3 sm:p-4 text-center">
-            <div className="text-lg sm:text-xl font-bold text-club-gold">
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/10 transition-all duration-300 group">
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
+              <span>Matches Analyzed</span>
+              <BarChart3 className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
               {analyticsLoading ? '...' : analytics?.matchCount || 0}
             </div>
-            <p className="text-xs text-club-light-gray/70">Matches Analyzed</p>
+            <p className="text-xs text-club-light-gray/70">Total Matches</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
-          <CardContent className="p-3 sm:p-4 text-center">
-            <div className="text-lg sm:text-xl font-bold text-club-gold">
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/10 transition-all duration-300 group">
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
+              <span>Metrics Tracked</span>
+              <Target className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
               {analyticsLoading ? '...' : analytics?.metricsTracked || 0}
             </div>
-            <p className="text-xs text-club-light-gray/70">Metrics Tracked</p>
+            <p className="text-xs text-club-light-gray/70">Performance Metrics</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
-          <CardContent className="p-3 sm:p-4 text-center">
-            <div className="text-lg sm:text-xl font-bold text-club-gold">
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/10 transition-all duration-300 group">
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
+              <span>Avg Match Rating</span>
+              <Star className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
               {analyticsLoading ? '...' : analytics?.avgMatchRating || 0}
             </div>
-            <p className="text-xs text-club-light-gray/70">Avg Match Rating</p>
+            <p className="text-xs text-club-light-gray/70">Team Average</p>
           </CardContent>
         </Card>
 
-        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
-          <CardContent className="p-3 sm:p-4 text-center">
-            <div className="text-lg sm:text-xl font-bold text-club-gold">
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/10 transition-all duration-300 group">
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
+              <span>Reports Generated</span>
+              <Activity className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
               {analyticsLoading ? '...' : analytics?.reportsGenerated || 0}
             </div>
-            <p className="text-xs text-club-light-gray/70">Reports Generated</p>
+            <p className="text-xs text-club-light-gray/70">Analysis Reports</p>
           </CardContent>
         </Card>
       </ResponsiveGrid>

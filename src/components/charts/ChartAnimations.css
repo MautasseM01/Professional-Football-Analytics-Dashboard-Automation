@@ -1,0 +1,90 @@
+
+/* Chart Animation Styles */
+@keyframes shimmer {
+  0% { 
+    background-position: -200% 0; 
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% { 
+    background-position: 200% 0; 
+    opacity: 0.3;
+  }
+}
+
+@keyframes chartFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(212, 175, 55, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(212, 175, 55, 0.6);
+  }
+}
+
+.chart-container {
+  animation: chartFadeIn 0.8s ease-out;
+}
+
+.chart-interactive:hover {
+  animation: pulseGlow 2s infinite;
+}
+
+.chart-loading {
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(212, 175, 55, 0.1),
+    transparent
+  );
+  background-size: 200% 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Responsive chart elements */
+@media (max-width: 768px) {
+  .chart-container {
+    transform: scale(0.95);
+    transform-origin: center;
+  }
+  
+  .chart-tooltip {
+    font-size: 0.875rem;
+    max-width: 200px;
+  }
+}
+
+@media (max-width: 480px) {
+  .chart-container {
+    transform: scale(0.9);
+  }
+  
+  .chart-tooltip {
+    font-size: 0.75rem;
+    max-width: 150px;
+  }
+}
+
+/* Touch-friendly interactive elements */
+@media (hover: none) and (pointer: coarse) {
+  .chart-interactive {
+    transform: none !important;
+  }
+  
+  .chart-interactive:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease-out;
+  }
+}

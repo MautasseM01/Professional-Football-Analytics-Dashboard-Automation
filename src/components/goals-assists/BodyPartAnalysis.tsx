@@ -2,7 +2,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Player } from "@/types";
 import { useGoalsData } from "@/hooks/use-goals-data";
-import { ChartLoadingSkeleton } from "@/components/LoadingStates";
+import { ChartSkeleton } from "@/components/charts/ChartSkeleton";
+import { ResponsiveChartContainer } from "@/components/ResponsiveChartContainer";
+import { chartAxisConfig, chartTooltipConfig, chartAnimationConfig } from "@/components/charts/ChartTheme";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface BodyPartAnalysisProps {
@@ -12,7 +14,7 @@ interface BodyPartAnalysisProps {
 export const BodyPartAnalysis = ({ player }: BodyPartAnalysisProps) => {
   const { goals, loading, error } = useGoalsData(player);
 
-  if (loading) return <ChartLoadingSkeleton />;
+  if (loading) return <ChartSkeleton height={400} showLegend={false} />;
   if (error) return <div className="text-red-500">Error: {error}</div>;
 
   const bodyPartData = goals.reduce((acc, goal) => {
@@ -30,13 +32,18 @@ export const BodyPartAnalysis = ({ player }: BodyPartAnalysisProps) => {
   const CustomTooltip = ({ active, payload, label }: any) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-club-black/95 dark:bg-club-black/95 light:bg-white/95 border border-club-gold/30 dark:border-club-gold/30 light:border-gray-200 rounded-lg p-3 shadow-lg backdrop-blur-sm">
-          <p className="text-club-gold dark:text-club-gold light:text-gray-900 font-medium">{label}</p>
-          <p className="text-club-light-gray dark:text-club-light-gray light:text-gray-700">
-            Goals: <span className="font-bold text-club-gold dark:text-club-gold light:text-gray-900">{payload[0].value}</span>
+        <div 
+          className="bg-club-black/95 border border-club-gold/30 rounded-lg p-3 shadow-lg backdrop-blur-sm"
+          style={chartTooltipConfig.contentStyle}
+        >
+          <p className="text-club-gold font-medium" style={chartTooltipConfig.labelStyle}>
+            {label}
           </p>
-          <p className="text-club-light-gray dark:text-club-light-gray light:text-gray-700">
-            Percentage: <span className="font-bold text-club-gold dark:text-club-gold light:text-gray-900">{payload[0].payload.percentage}%</span>
+          <p className="text-club-light-gray">
+            Goals: <span className="font-bold text-club-gold">{payload[0].value}</span>
+          </p>
+          <p className="text-club-light-gray">
+            Percentage: <span className="font-bold text-club-gold">{payload[0].payload.percentage}%</span>
           </p>
         </div>
       );
@@ -45,55 +52,61 @@ export const BodyPartAnalysis = ({ player }: BodyPartAnalysisProps) => {
   };
 
   return (
-    <Card className="bg-club-black/40 dark:bg-club-black/40 light:bg-white/90 border-club-gold/20 dark:border-club-gold/20 light:border-gray-200 backdrop-blur-sm">
+    <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-all duration-300">
       <CardHeader className="pb-3">
-        <CardTitle className="text-club-gold dark:text-club-gold light:text-gray-900 text-lg font-semibold">
+        <CardTitle className="text-club-gold text-lg font-semibold flex items-center gap-2">
           Goals by Body Part
+          <div className="w-2 h-2 bg-club-gold rounded-full animate-pulse" />
         </CardTitle>
       </CardHeader>
       <CardContent>
         {goals.length === 0 ? (
-          <p className="text-club-light-gray/60 dark:text-club-light-gray/60 light:text-gray-500 text-center py-8">No goals data available</p>
+          <p className="text-club-light-gray/60 text-center py-8">No goals data available</p>
         ) : (
           <div className="space-y-6">
-            <div className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={chartData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
-                  <CartesianGrid 
-                    strokeDasharray="3 3" 
-                    stroke="rgba(212, 175, 55, 0.1)"
-                    vertical={false}
-                  />
-                  <XAxis 
-                    dataKey="name" 
-                    tick={{ fontSize: 12, fill: 'var(--club-light-gray)' }}
-                    axisLine={{ stroke: 'rgba(212, 175, 55, 0.2)' }}
-                    tickLine={{ stroke: 'rgba(212, 175, 55, 0.2)' }}
-                  />
-                  <YAxis 
-                    tick={{ fontSize: 12, fill: 'var(--club-light-gray)' }}
-                    axisLine={{ stroke: 'rgba(212, 175, 55, 0.2)' }}
-                    tickLine={{ stroke: 'rgba(212, 175, 55, 0.2)' }}
-                  />
-                  <Tooltip content={<CustomTooltip />} />
-                  <Bar 
-                    dataKey="goals" 
-                    fill="#D4AF37"
-                    radius={[6, 6, 0, 0]}
-                    style={{
-                      filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))',
-                    }}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
+            <ResponsiveChartContainer minHeight={320} showInteractions={true}>
+              <BarChart 
+                data={chartData} 
+                {...chartAnimationConfig}
+              >
+                <CartesianGrid 
+                  strokeDasharray="3 3" 
+                  stroke="rgba(212, 175, 55, 0.1)"
+                  vertical={false}
+                />
+                <XAxis 
+                  dataKey="name" 
+                  {...chartAxisConfig}
+                />
+                <YAxis 
+                  {...chartAxisConfig}
+                />
+                <Tooltip content={<CustomTooltip />} />
+                <Bar 
+                  dataKey="goals" 
+                  fill="#D4AF37"
+                  radius={[6, 6, 0, 0]}
+                  style={{
+                    filter: 'drop-shadow(0 4px 6px rgba(0,0,0,0.3))',
+                  }}
+                />
+              </BarChart>
+            </ResponsiveChartContainer>
+            
             <div className="grid grid-cols-1 gap-3">
-              {chartData.map((item) => (
-                <div key={item.name} className="flex items-center justify-between p-3 rounded-lg border border-club-gold/10 dark:border-club-gold/10 light:border-gray-100 bg-club-black/20 dark:bg-club-black/20 light:bg-gray-50/50">
-                  <span className="text-sm font-medium text-club-light-gray dark:text-club-light-gray light:text-gray-700">{item.name}</span>
+              {chartData.map((item, index) => (
+                <div 
+                  key={item.name} 
+                  className="flex items-center justify-between p-3 rounded-lg border border-club-gold/10 bg-club-black/20 hover:bg-club-gold/5 transition-all duration-300"
+                  style={{ 
+                    animationDelay: `${index * 0.1}s`,
+                    animation: 'fade-in 0.5s ease-out forwards'
+                  }}
+                >
+                  <span className="text-sm font-medium text-club-light-gray">{item.name}</span>
                   <div className="flex items-center gap-3 text-sm">
-                    <span className="font-bold text-club-gold dark:text-club-gold light:text-gray-900">{item.goals}</span>
-                    <span className="text-club-light-gray/70 dark:text-club-light-gray/70 light:text-gray-500">({item.percentage}%)</span>
+                    <span className="font-bold text-club-gold">{item.goals}</span>
+                    <span className="text-club-light-gray/70">({item.percentage}%)</span>
                   </div>
                 </div>
               ))}
