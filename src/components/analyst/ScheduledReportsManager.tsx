@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -61,8 +60,8 @@ export const ScheduledReportsManager = () => {
 
   const [newReport, setNewReport] = useState({
     name: '',
-    frequency: 'weekly' as const,
-    format: 'pdf' as const,
+    frequency: 'weekly' as 'daily' | 'weekly' | 'monthly',
+    format: 'pdf' as 'pdf' | 'excel' | 'csv',
     recipients: '',
     dataCategories: [] as string[]
   });
@@ -106,16 +105,14 @@ export const ScheduledReportsManager = () => {
     }
 
     const nextRun = new Date();
-    switch (newReport.frequency) {
-      case 'daily':
-        nextRun.setDate(nextRun.getDate() + 1);
-        break;
-      case 'weekly':
-        nextRun.setDate(nextRun.getDate() + 7);
-        break;
-      case 'monthly':
-        nextRun.setMonth(nextRun.getMonth() + 1);
-        break;
+    const frequency = newReport.frequency;
+    
+    if (frequency === 'daily') {
+      nextRun.setDate(nextRun.getDate() + 1);
+    } else if (frequency === 'weekly') {
+      nextRun.setDate(nextRun.getDate() + 7);
+    } else if (frequency === 'monthly') {
+      nextRun.setMonth(nextRun.getMonth() + 1);
     }
 
     const report: ScheduledReport = {
@@ -190,7 +187,7 @@ export const ScheduledReportsManager = () => {
                 <Label className="text-club-light-gray">Frequency</Label>
                 <Select
                   value={newReport.frequency}
-                  onValueChange={(value: any) => setNewReport(prev => ({ ...prev, frequency: value }))}
+                  onValueChange={(value: 'daily' | 'weekly' | 'monthly') => setNewReport(prev => ({ ...prev, frequency: value }))}
                 >
                   <SelectTrigger className="bg-club-black border-club-gold/30">
                     <SelectValue />
@@ -207,7 +204,7 @@ export const ScheduledReportsManager = () => {
                 <Label className="text-club-light-gray">Format</Label>
                 <Select
                   value={newReport.format}
-                  onValueChange={(value: any) => setNewReport(prev => ({ ...prev, format: value }))}
+                  onValueChange={(value: 'pdf' | 'excel' | 'csv') => setNewReport(prev => ({ ...prev, format: value }))}
                 >
                   <SelectTrigger className="bg-club-black border-club-gold/30">
                     <SelectValue />
