@@ -21,8 +21,6 @@ import {
   AlertCircle
 } from "lucide-react";
 import { ResponsiveGrid } from "../ResponsiveLayout";
-import { EnhancedDashboardLayout } from "../EnhancedDashboardLayout";
-import { IOSDashboardGrid } from "../IOSDashboardGrid";
 import { toast } from "sonner";
 
 interface AnalystDashboardProps {
@@ -44,12 +42,10 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
   const analytics = analyticsQuery.data;
   const analyticsLoading = analyticsQuery.isLoading;
 
-  const handleRefreshData = async () => {
-    await Promise.all([
-      analyticsQuery.refetch(),
-      squadAvailabilityQuery.refetch(),
-      developmentProgressQuery.refetch()
-    ]);
+  const handleRefreshData = () => {
+    analyticsQuery.refetch();
+    squadAvailabilityQuery.refetch();
+    developmentProgressQuery.refetch();
     toast.success("Analytics data refreshed");
   };
 
@@ -86,178 +82,243 @@ export const AnalystDashboard = ({ profile }: AnalystDashboardProps) => {
   }
 
   return (
-    <EnhancedDashboardLayout>
-      <IOSDashboardGrid
-        title="Analytics Dashboard"
-        subtitle="Real-time performance analytics and data insights"
-        onRefresh={handleRefreshData}
-        className="bg-gradient-to-br from-club-black via-club-dark-gray to-club-black"
+    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 bg-club-black min-h-screen">
+      {/* Header Section */}
+      <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold mb-2">
+            Analytics Dashboard
+          </h1>
+          <p className="text-sm sm:text-base text-club-light-gray/70">
+            Real-time performance analytics and data insights
+          </p>
+        </div>
+        <TouchFeedbackButton
+          variant="outline"
+          onClick={handleRefreshData}
+          className="
+            border-club-gold/30 hover:border-club-gold/50 
+            hover:bg-club-gold/10 transition-all duration-300
+            text-club-light-gray hover:text-club-gold
+            disabled:opacity-50 disabled:cursor-not-allowed
+            min-h-[44px] px-4
+          "
+          disabled={analyticsLoading}
+        >
+          <RefreshCw className={`h-4 w-4 mr-2 ${analyticsLoading ? 'animate-spin' : ''}`} />
+          <span className="hidden sm:inline">Refresh Data</span>
+          <span className="sm:hidden">Refresh</span>
+        </TouchFeedbackButton>
+      </div>
+
+      {/* Analytics Overview Cards */}
+      <ResponsiveGrid 
+        minCardWidth="280px"
+        className="grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6"
       >
-        {/* Analytics Overview Cards */}
-        <ResponsiveGrid 
-          minCardWidth="260px"
-          className="col-span-full grid-cols-1 sm:grid-cols-2 lg:grid-cols-4"
-        >
-          <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-all duration-300 group touch-manipulation">
-            <CardHeader className="p-4 pb-2">
-              <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
-                <span>Data Points</span>
-                <Database className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
-                {analyticsLoading ? '...' : formatNumber(analytics?.totalDataPoints || 0)}
-              </div>
-              <p className="text-xs text-club-light-gray/70">Performance Records</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-all duration-300 group touch-manipulation">
-            <CardHeader className="p-4 pb-2">
-              <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
-                <span>Active Players</span>
-                <PieChart className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
-                {analyticsLoading ? '...' : analytics?.playerCount || 0}
-              </div>
-              <p className="text-xs text-club-light-gray/70">Current Season</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-all duration-300 group touch-manipulation">
-            <CardHeader className="p-4 pb-2">
-              <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
-                <span>Goals Scored</span>
-                <TrendingUp className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
-                {analyticsLoading ? '...' : analytics?.goalCount || 0}
-              </div>
-              <p className="text-xs text-club-light-gray/70">Total Goals</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-all duration-300 group touch-manipulation">
-            <CardHeader className="p-4 pb-2">
-              <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
-                <span>Assists</span>
-                <FileText className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="p-4 pt-0">
-              <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
-                {analyticsLoading ? '...' : analytics?.assistCount || 0}
-              </div>
-              <p className="text-xs text-club-light-gray/70">Total Assists</p>
-            </CardContent>
-          </Card>
-        </ResponsiveGrid>
-
-        {/* Secondary Analytics Row */}
-        <ResponsiveGrid 
-          minCardWidth="180px"
-          className="col-span-full grid-cols-2 sm:grid-cols-4"
-        >
-          <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300 touch-manipulation">
-            <CardContent className="p-3 sm:p-4 text-center">
-              <div className="text-lg sm:text-xl font-bold text-club-gold">
-                {analyticsLoading ? '...' : analytics?.matchCount || 0}
-              </div>
-              <p className="text-xs text-club-light-gray/70">Matches</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300 touch-manipulation">
-            <CardContent className="p-3 sm:p-4 text-center">
-              <div className="text-lg sm:text-xl font-bold text-club-gold">
-                {analyticsLoading ? '...' : analytics?.metricsTracked || 0}
-              </div>
-              <p className="text-xs text-club-light-gray/70">Metrics</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300 touch-manipulation">
-            <CardContent className="p-3 sm:p-4 text-center">
-              <div className="text-lg sm:text-xl font-bold text-club-gold">
-                {analyticsLoading ? '...' : analytics?.avgMatchRating || 0}
-              </div>
-              <p className="text-xs text-club-light-gray/70">Avg Rating</p>
-            </CardContent>
-          </Card>
-
-          <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300 touch-manipulation">
-            <CardContent className="p-3 sm:p-4 text-center">
-              <div className="text-lg sm:text-xl font-bold text-club-gold">
-                {analyticsLoading ? '...' : analytics?.reportsGenerated || 0}
-              </div>
-              <p className="text-xs text-club-light-gray/70">Reports</p>
-            </CardContent>
-          </Card>
-        </ResponsiveGrid>
-
-        {/* Export Tools */}
-        <Card className="col-span-full bg-club-dark-gray border-club-gold/20">
-          <CardHeader className="p-4 sm:p-6">
-            <CardTitle className="text-club-gold text-lg sm:text-xl">Export Tools</CardTitle>
-            <CardDescription className="text-club-light-gray/70">
-              Export and analyze real-time data
-            </CardDescription>
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/10 transition-all duration-300 group">
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
+              <span>Data Points</span>
+              <Database className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
+            </CardTitle>
           </CardHeader>
           <CardContent className="p-4 sm:p-6 pt-0">
-            <ResponsiveGrid 
-              minCardWidth="240px"
-              className="grid-cols-1 sm:grid-cols-2"
-            >
-              <TouchFeedbackButton
-                variant="outline"
-                onClick={() => handleExport('player-data')}
-                disabled={exportLoading === 'player-data'}
-                className="min-h-[44px] w-full justify-start border-club-gold/30 hover:border-club-gold/50 hover:bg-club-gold/10 text-club-light-gray hover:text-club-gold"
-              >
-                <Download className="mr-2 h-4 w-4" />
-                {exportLoading === 'player-data' ? 'Exporting...' : `Player Data (${analytics?.playerCount || 0})`}
-              </TouchFeedbackButton>
-
-              <TouchFeedbackButton
-                variant="outline"
-                onClick={() => handleExport('performance-trends')}
-                disabled={exportLoading === 'performance-trends'}
-                className="min-h-[44px] w-full justify-start border-club-gold/30 hover:border-club-gold/50 hover:bg-club-gold/10 text-club-light-gray hover:text-club-gold"
-              >
-                <BarChart3 className="mr-2 h-4 w-4" />
-                {exportLoading === 'performance-trends' ? 'Analyzing...' : 'Performance Trends'}
-              </TouchFeedbackButton>
-            </ResponsiveGrid>
+            <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
+              {analyticsLoading ? '...' : formatNumber(analytics?.totalDataPoints || 0)}
+            </div>
+            <p className="text-xs text-club-light-gray/70">Performance Records</p>
           </CardContent>
         </Card>
 
-        {/* Player Selector */}
-        <div className="col-span-full bg-club-dark-gray/50 rounded-lg p-4 sm:p-6 border border-club-gold/10">
-          <PlayerSelector
-            players={players}
-            selectedPlayer={selectedPlayer}
-            onPlayerSelect={selectPlayer}
-            loading={loading}
-            error={error}
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/10 transition-all duration-300 group">
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
+              <span>Active Players</span>
+              <PieChart className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
+              {analyticsLoading ? '...' : analytics?.playerCount || 0}
+            </div>
+            <p className="text-xs text-club-light-gray/70">Current Season</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/10 transition-all duration-300 group">
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
+              <span>Goals Scored</span>
+              <TrendingUp className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
+              {analyticsLoading ? '...' : analytics?.goalCount || 0}
+            </div>
+            <p className="text-xs text-club-light-gray/70">Total Goals</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/10 transition-all duration-300 group">
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
+              <span>Assists</span>
+              <FileText className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="p-4 sm:p-6 pt-0">
+            <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
+              {analyticsLoading ? '...' : analytics?.assistCount || 0}
+            </div>
+            <p className="text-xs text-club-light-gray/70">Total Assists</p>
+          </CardContent>
+        </Card>
+      </ResponsiveGrid>
+
+      {/* Secondary Analytics Row */}
+      <ResponsiveGrid 
+        minCardWidth="200px"
+        className="grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4"
+      >
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="text-lg sm:text-xl font-bold text-club-gold">
+              {analyticsLoading ? '...' : analytics?.matchCount || 0}
+            </div>
+            <p className="text-xs text-club-light-gray/70">Matches Analyzed</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="text-lg sm:text-xl font-bold text-club-gold">
+              {analyticsLoading ? '...' : analytics?.metricsTracked || 0}
+            </div>
+            <p className="text-xs text-club-light-gray/70">Metrics Tracked</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="text-lg sm:text-xl font-bold text-club-gold">
+              {analyticsLoading ? '...' : analytics?.avgMatchRating || 0}
+            </div>
+            <p className="text-xs text-club-light-gray/70">Avg Match Rating</p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/5 transition-colors duration-300">
+          <CardContent className="p-3 sm:p-4 text-center">
+            <div className="text-lg sm:text-xl font-bold text-club-gold">
+              {analyticsLoading ? '...' : analytics?.reportsGenerated || 0}
+            </div>
+            <p className="text-xs text-club-light-gray/70">Reports Generated</p>
+          </CardContent>
+        </Card>
+      </ResponsiveGrid>
+
+      {/* Advanced Analytics Tools */}
+      <Card className="bg-club-dark-gray border-club-gold/20">
+        <CardHeader className="p-4 sm:p-6">
+          <CardTitle className="text-club-gold text-lg sm:text-xl">Database Export Tools</CardTitle>
+          <CardDescription className="text-club-light-gray/70">
+            Export and analyze real-time data from the database
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="p-4 sm:p-6 pt-0">
+          <ResponsiveGrid 
+            minCardWidth="280px"
+            className="grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4"
+          >
+            <TouchFeedbackButton
+              variant="outline"
+              onClick={() => handleExport('player-data')}
+              disabled={exportLoading === 'player-data'}
+              className="
+                min-h-[44px] w-full justify-start 
+                border-club-gold/30 hover:border-club-gold/50 
+                hover:bg-club-gold/10 transition-all duration-300
+                text-club-light-gray hover:text-club-gold
+                disabled:opacity-50 disabled:cursor-not-allowed
+              "
+            >
+              <Download className="mr-2 h-4 w-4" />
+              {exportLoading === 'player-data' ? 'Exporting...' : `Export Player Data (${analytics?.playerCount || 0})`}
+            </TouchFeedbackButton>
+
+            <TouchFeedbackButton
+              variant="outline"
+              onClick={() => handleExport('team-report')}
+              disabled={exportLoading === 'team-report'}
+              className="
+                min-h-[44px] w-full justify-start 
+                border-club-gold/30 hover:border-club-gold/50 
+                hover:bg-club-gold/10 transition-all duration-300
+                text-club-light-gray hover:text-club-gold
+                disabled:opacity-50 disabled:cursor-not-allowed
+              "
+            >
+              <FileText className="mr-2 h-4 w-4" />
+              {exportLoading === 'team-report' ? 'Generating...' : 'Generate Team Report'}
+            </TouchFeedbackButton>
+
+            <TouchFeedbackButton
+              variant="outline"
+              onClick={() => handleExport('performance-trends')}
+              disabled={exportLoading === 'performance-trends'}
+              className="
+                min-h-[44px] w-full justify-start 
+                border-club-gold/30 hover:border-club-gold/50 
+                hover:bg-club-gold/10 transition-all duration-300
+                text-club-light-gray hover:text-club-gold
+                disabled:opacity-50 disabled:cursor-not-allowed
+              "
+            >
+              <BarChart3 className="mr-2 h-4 w-4" />
+              {exportLoading === 'performance-trends' ? 'Analyzing...' : 'Performance Trends'}
+            </TouchFeedbackButton>
+
+            <TouchFeedbackButton
+              variant="outline"
+              onClick={() => handleExport('predictive-analysis')}
+              disabled={exportLoading === 'predictive-analysis'}
+              className="
+                min-h-[44px] w-full justify-start 
+                border-club-gold/30 hover:border-club-gold/50 
+                hover:bg-club-gold/10 transition-all duration-300
+                text-club-light-gray hover:text-club-gold
+                disabled:opacity-50 disabled:cursor-not-allowed
+              "
+            >
+              <Settings className="mr-2 h-4 w-4" />
+              {exportLoading === 'predictive-analysis' ? 'Processing...' : 'Predictive Analysis'}
+            </TouchFeedbackButton>
+          </ResponsiveGrid>
+        </CardContent>
+      </Card>
+
+      {/* Enhanced Player Selector Integration */}
+      <div className="bg-club-dark-gray/50 rounded-lg p-4 sm:p-6 border border-club-gold/10">
+        <PlayerSelector
+          players={players}
+          selectedPlayer={selectedPlayer}
+          onPlayerSelect={selectPlayer}
+          loading={loading}
+          error={error}
+        />
+      </div>
+
+      {/* Enhanced Player Stats Component with Analyst Features */}
+      {selectedPlayer && (
+        <div className="bg-club-dark-gray/50 rounded-lg p-4 sm:p-6 border border-club-gold/10">
+          <PlayerStats 
+            player={selectedPlayer} 
+            analystMode={true}
           />
         </div>
-
-        {/* Player Stats */}
-        {selectedPlayer && (
-          <div className="col-span-full bg-club-dark-gray/50 rounded-lg p-4 sm:p-6 border border-club-gold/10">
-            <PlayerStats 
-              player={selectedPlayer} 
-              analystMode={true}
-            />
-          </div>
-        )}
-      </IOSDashboardGrid>
-    </EnhancedDashboardLayout>
+      )}
+    </div>
   );
 };
