@@ -76,9 +76,9 @@ export const usePlayerData = () => {
         clean_sheets: Number(player.clean_sheets) || 0,
         saves: Number(player.saves) || 0,
         season: player.season || '2024-25',
-        touches: Number(player.touches) || 0,
-        possession_won: Number(player.possession_won) || 0,
-        possession_lost: Number(player.possession_lost) || 0,
+        touches: 0, // Default value since field doesn't exist yet
+        possession_won: 0, // Default value since field doesn't exist yet
+        possession_lost: 0, // Default value since field doesn't exist yet
       }));
 
       console.log("Transformed players:", transformedPlayers);

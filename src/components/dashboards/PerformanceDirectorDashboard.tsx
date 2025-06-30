@@ -1,7 +1,6 @@
-
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { UserProfile } from "@/types";
+import { UserProfile, Player } from "@/types";
 import { HeartPulse, TrendingUp, BarChart3, Star, Target, Users, Calendar, Activity } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { PerformanceTrendsCard } from "../PerformanceTrends";
@@ -46,7 +45,6 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
     tackles_won: 0,
     sprintDistance: 0,
     maxSpeed: 0,
-    passCompletionPct: 0,
     number: 0,
     heatmapUrl: "",
     reportUrl: "",

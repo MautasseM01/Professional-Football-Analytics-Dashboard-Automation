@@ -221,7 +221,7 @@ export const HeatmapCard = ({
                           <span className="hidden sm:inline">•</span>
                           <span>{player.matches} matches</span>
                           <span className="hidden sm:inline">•</span>
-                          <span>{player.distance}km avg</span>
+                          <span>{player.distance_covered}km avg</span>
                         </>}
                     </div>}
                 </div>
@@ -241,7 +241,7 @@ export const HeatmapCard = ({
                 <div className={cn("rounded-lg border border-club-gold/20 text-center transition-all duration-300", viewMode === 'compact' ? "p-2" : "p-3", theme === 'dark' ? "bg-club-black/30" : "bg-white/50")}>
                   <div className={cn("mb-1", viewMode === 'compact' ? "text-xs" : "text-xs", theme === 'dark' ? "text-club-light-gray/70" : "text-gray-500")}>Distance</div>
                   <div className={cn("font-bold text-club-gold transition-all duration-300", viewMode === 'compact' ? "text-base" : "text-lg")}>
-                    {player.distance}km
+                    {player.distance_covered}km
                   </div>
                 </div>
                 <div className={cn("rounded-lg border border-club-gold/20 text-center transition-all duration-300", viewMode === 'compact' ? "p-2" : "p-3", theme === 'dark' ? "bg-club-black/30" : "bg-white/50")}>
