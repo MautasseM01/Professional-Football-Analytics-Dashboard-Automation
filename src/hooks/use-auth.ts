@@ -2,11 +2,17 @@
 import { useUserProfile } from "@/hooks/use-user-profile";
 
 export const useAuth = () => {
-  const { profile, user, isLoading } = useUserProfile();
+  const { profile, loading, error } = useUserProfile();
 
   return {
-    user,
+    user: profile ? {
+      id: profile.id,
+      email: profile.email,
+      user_metadata: {
+        name: profile.full_name
+      }
+    } : null,
     profile,
-    isLoading
+    isLoading: loading
   };
 };

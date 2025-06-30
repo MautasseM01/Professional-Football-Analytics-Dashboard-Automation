@@ -25,11 +25,8 @@ const GoalsAssistsAnalysis = () => {
   const { goals, assists, loading: goalsLoading, refetch: refetchGoals } = useGoalsData(selectedPlayer);
   const isMobile = useIsMobile();
 
-  const handlePlayerSelect = (playerId: number) => {
-    const player = players.find(p => p.id === playerId);
-    if (player) {
-      setSelectedPlayer(player);
-    }
+  const handlePlayerSelect = (player: Player) => {
+    setSelectedPlayer(player);
   };
 
   const handleRefresh = async () => {
