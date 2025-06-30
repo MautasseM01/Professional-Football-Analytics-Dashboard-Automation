@@ -75,6 +75,20 @@ export type Database = {
             referencedRelation: "players"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_assists_player"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_assists_player"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
         ]
       }
       audit_logs: {
@@ -296,6 +310,20 @@ export type Database = {
           y_coordinate?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "fk_goals_assisted_by_player"
+            columns: ["assisted_by_player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_goals_assisted_by_player"
+            columns: ["assisted_by_player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "goals_assisted_by_fkey"
             columns: ["assisted_by_player_id"]
@@ -1604,6 +1632,27 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "fk_player_match_performance_match"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_player_match_performance_player"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_player_match_performance_player"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "player_match_performance_match_id_fkey"
             columns: ["match_id"]
             isOneToOne: false
@@ -1787,7 +1836,6 @@ export type Database = {
           created_at: string | null
           crosses_attempted: number | null
           crosses_completed: number | null
-          distance: number | null
           distance_covered: number | null
           dribbles_attempted: number | null
           dribbles_successful: number | null
@@ -1829,7 +1877,6 @@ export type Database = {
           created_at?: string | null
           crosses_attempted?: number | null
           crosses_completed?: number | null
-          distance?: number | null
           distance_covered?: number | null
           dribbles_attempted?: number | null
           dribbles_successful?: number | null
@@ -1871,7 +1918,6 @@ export type Database = {
           created_at?: string | null
           crosses_attempted?: number | null
           crosses_completed?: number | null
-          distance?: number | null
           distance_covered?: number | null
           dribbles_attempted?: number | null
           dribbles_successful?: number | null

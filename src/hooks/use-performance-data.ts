@@ -95,6 +95,7 @@ export const usePerformanceData = (player: Player | null, metric: string, timePe
                 value = Number(perf.match_rating) || 0;
                 break;
               case "distance":
+              case "distance_covered":
                 value = Number(perf.distance_covered) || 0;
                 break;
               case "sprintDistance":
@@ -112,13 +113,25 @@ export const usePerformanceData = (player: Player | null, metric: string, timePe
               case "pass_accuracy":
                 value = Number(perf.pass_accuracy) || 0;
                 break;
+              case "touches":
+                value = perf.touches || 0;
+                break;
+              case "possession_won":
+                value = perf.possession_won || 0;
+                break;
+              case "possession_lost":
+                value = perf.possession_lost || 0;
+                break;
+              case "dribbles_successful":
+                value = perf.dribbles_successful || 0;
+                break;
               default:
                 value = 0;
             }
 
             // Round value appropriately
             let roundedValue: number;
-            if (metric === "distance" || metric === "sprintDistance") {
+            if (metric === "distance" || metric === "distance_covered" || metric === "sprintDistance") {
               roundedValue = Number(value.toFixed(2));
             } else if (metric === "match_rating" || metric === "pass_accuracy") {
               roundedValue = Number(value.toFixed(1));

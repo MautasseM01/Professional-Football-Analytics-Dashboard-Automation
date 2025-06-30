@@ -4,7 +4,7 @@ export interface Player {
   name: string;
   position: string;
   matches: number;
-  distance: number;
+  distance_covered: number; // Updated to use distance_covered consistently
   passes_attempted: number;
   passes_completed: number;
   shots_total: number;
@@ -14,8 +14,8 @@ export interface Player {
   heatmapUrl: string;
   reportUrl: string;
   maxSpeed?: number;
-  number?: number; // Added player number field
-  sprintDistance?: number; // Added sprint distance field
+  number?: number;
+  sprintDistance?: number;
   // Enhanced properties from database
   goals?: number;
   assists?: number;
@@ -37,6 +37,10 @@ export interface Player {
   clean_sheets?: number;
   saves?: number;
   season?: string;
+  // New fields from database updates
+  touches?: number;
+  possession_won?: number;
+  possession_lost?: number;
 }
 
 export interface AuthUser {
