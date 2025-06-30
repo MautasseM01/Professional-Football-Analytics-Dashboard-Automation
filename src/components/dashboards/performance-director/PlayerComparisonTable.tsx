@@ -65,7 +65,7 @@ export const PlayerComparisonTable = ({ players }: PlayerComparisonTableProps) =
     {
       key: 'distance',
       label: 'Distance (km)',
-      getValue: (player) => player.distance || 0,
+      getValue: (player) => player.distance_covered || 0,
       format: (value) => `${value.toFixed(1)}`,
       benchmarkType: 'higher',
       unit: 'km'

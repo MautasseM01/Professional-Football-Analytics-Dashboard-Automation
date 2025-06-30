@@ -1,5 +1,6 @@
 
 import { useQuery, useInfiniteQuery } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useMemo } from "react";
 
@@ -98,7 +99,7 @@ export const usePaginatedPlayers = (searchTerm: string = '', pageSize: number = 
           possession_won, possession_lost, dribbles_successful
         `)
         .eq('season', '2024-25')
-        .order('match_rating', { ascending: false, nullsLast: true })
+        .order('match_rating', { ascending: false, nullsFirst: false })
         .range(pageParam * pageSize, (pageParam + 1) * pageSize - 1);
 
       if (searchTerm) {

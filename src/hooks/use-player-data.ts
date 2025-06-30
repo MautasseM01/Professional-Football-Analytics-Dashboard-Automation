@@ -1,81 +1,43 @@
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Player } from "@/types";
+import { useAuth } from "@/hooks/use-auth";
 import { toast } from "sonner";
-import { useUserProfile } from "@/hooks/use-user-profile";
 
 export const usePlayerData = () => {
   const [players, setPlayers] = useState<Player[]>([]);
   const [selectedPlayer, setSelectedPlayer] = useState<Player | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { profile } = useUserProfile();
-  const mountedRef = useRef(true);
+  const { user, profile } = useAuth();
 
-  useEffect(() => {
-    mountedRef.current = true;
-    return () => {
-      mountedRef.current = false;
-    };
-  }, []);
-  
   const fetchPlayers = useCallback(async () => {
-    if (!profile) {
-      setError('User profile not loaded');
-      setLoading(false);
-      return;
-    }
-
     try {
       setLoading(true);
       setError(null);
-
-      console.log('Fetching enhanced player data from database');
       
-      const { data, error: fetchError } = await supabase
-        .from("players")
-        .select(`
-          id,
-          name,
-          position,
-          number,
-          matches,
-          goals,
-          assists,
-          shots_total,
-          shots_on_target,
-          passes_attempted,
-          passes_completed,
-          pass_accuracy,
-          tackles_attempted,
-          tackles_won,
-          distance,
-          sprintDistance,
-          maxSpeed,
-          match_rating,
-          minutes_played,
-          last_match_date,
-          heatmapUrl,
-          reportUrl,
-          season,
-          created_at,
-          updated_at
-        `)
+      console.log("Fetching players from database...");
+      
+      const { data, error } = await supabase
+        .from('players')
+        .select('*')
+        .eq('season', '2024-25')
         .order('name');
-      
-      if (fetchError) {
-        console.error('Error fetching players:', fetchError);
-        throw new Error(`Failed to fetch players: ${fetchError.message}`);
+
+      if (error) {
+        console.error("Error fetching players:", error);
+        throw error;
       }
-      
+
+      console.log("Raw players data:", data);
+
       if (!data || data.length === 0) {
-        console.warn('No players found in database');
+        console.warn("No players found in database");
         setPlayers([]);
-        setSelectedPlayer(null);
         return;
       }
-      
+
       // Transform the data to match our Player interface
       const transformedPlayers: Player[] = data.map(player => ({
         id: player.id,
@@ -83,7 +45,7 @@ export const usePlayerData = () => {
         position: player.position || 'N/A',
         number: player.number || undefined,
         matches: Number(player.matches) || 0,
-        distance: Number(player.distance) || 0,
+        distance_covered: Number(player.distance_covered) || 0,
         passes_attempted: Number(player.passes_attempted) || 0,
         passes_completed: Number(player.passes_completed) || 0,
         shots_total: Number(player.shots_total) || 0,
@@ -94,98 +56,81 @@ export const usePlayerData = () => {
         reportUrl: player.reportUrl || '',
         maxSpeed: Number(player.maxSpeed) || 0,
         sprintDistance: Number(player.sprintDistance) || 0,
+        goals: Number(player.goals) || 0,
+        assists: Number(player.assists) || 0,
+        match_rating: Number(player.match_rating) || 0,
+        pass_accuracy: Number(player.pass_accuracy) || 0,
+        minutes_played: Number(player.minutes_played) || 0,
+        last_match_date: player.last_match_date || undefined,
+        aerial_duels_won: Number(player.aerial_duels_won) || 0,
+        aerial_duels_attempted: Number(player.aerial_duels_attempted) || 0,
+        clearances: Number(player.clearances) || 0,
+        interceptions: Number(player.interceptions) || 0,
+        dribbles_successful: Number(player.dribbles_successful) || 0,
+        dribbles_attempted: Number(player.dribbles_attempted) || 0,
+        crosses_completed: Number(player.crosses_completed) || 0,
+        crosses_attempted: Number(player.crosses_attempted) || 0,
+        corners_taken: Number(player.corners_taken) || 0,
+        fouls_suffered: Number(player.fouls_suffered) || 0,
+        fouls_committed: Number(player.fouls_committed) || 0,
+        clean_sheets: Number(player.clean_sheets) || 0,
+        saves: Number(player.saves) || 0,
+        season: player.season || '2024-25',
+        touches: Number(player.touches) || 0,
+        possession_won: Number(player.possession_won) || 0,
+        possession_lost: Number(player.possession_lost) || 0,
       }));
-      
-      // Apply role-based filtering
-      let filteredPlayers = transformedPlayers;
-      
-      if (profile.role === 'player') {
-        // Players can only see their own data
-        filteredPlayers = transformedPlayers.slice(0, 1);
-      }
-      
-      if (mountedRef.current) {
-        setPlayers(filteredPlayers);
-        if (filteredPlayers.length > 0 && !selectedPlayer) {
-          setSelectedPlayer(filteredPlayers[0]);
+
+      console.log("Transformed players:", transformedPlayers);
+      setPlayers(transformedPlayers);
+
+      // Auto-select first player for certain roles or if no selection exists
+      if (transformedPlayers.length > 0 && !selectedPlayer) {
+        if (profile?.role === 'player') {
+          // For player role, try to find their own data
+          const playerData = transformedPlayers.find(p => 
+            p.name.toLowerCase().includes((profile.full_name || '').toLowerCase())
+          );
+          setSelectedPlayer(playerData || transformedPlayers[0]);
+        } else {
+          setSelectedPlayer(transformedPlayers[0]);
         }
       }
 
     } catch (err: any) {
-      console.error('Error in usePlayerData:', err);
-      if (mountedRef.current) {
-        setError(err.message);
-        toast.error(`Failed to load player data: ${err.message}`);
-      }
+      console.error("Error in fetchPlayers:", err);
+      setError(err.message);
+      toast.error(`Failed to load player data: ${err.message}`);
+      setPlayers([]);
     } finally {
-      if (mountedRef.current) {
-        setLoading(false);
-      }
+      setLoading(false);
     }
-  }, [profile, selectedPlayer]);
+  }, [selectedPlayer, profile]);
+
+  const refreshData = useCallback(() => {
+    console.log("Manual refresh triggered");
+    fetchPlayers();
+  }, [fetchPlayers]);
 
   useEffect(() => {
     fetchPlayers();
   }, [fetchPlayers]);
-  
-  useEffect(() => {
-    if (!profile) return;
-    
-    const playersSubscription = supabase
-      .channel('public:players')
-      .on('postgres_changes', { 
-        event: '*', 
-        schema: 'public', 
-        table: 'players' 
-      }, () => {
-        if (mountedRef.current) {
-          fetchPlayers();
-        }
-      })
-      .subscribe();
-    
-    return () => {
-      playersSubscription.unsubscribe();
-    };
-  }, [profile, fetchPlayers]);
-  
-  const selectPlayer = useCallback((id: number) => {
-    const player = players.find(p => p.id === id);
-    if (player) {
-      // Check role-based access
-      if (profile?.role === 'player' && players.length === 1 && player.id !== players[0].id) {
-        toast.error("Access Denied: You can only view your own player data.");
-        return;
-      }
-      
-      setSelectedPlayer(player);
-    }
-  }, [players, profile]);
-  
-  const canAccessPlayerData = useCallback((playerId: number): boolean => {
-    if (!profile) return false;
-    
-    switch (profile.role) {
-      case 'admin':
-      case 'management':
-      case 'coach':
-      case 'analyst':
-      case 'performance_director':
-        return true;
-      case 'player':
-        return players.length === 1 && players[0]?.id === playerId;
-      default:
-        return false;
-    }
-  }, [profile, players]);
-  
+
+  const selectPlayer = (player: Player) => {
+    console.log("Selected player:", player);
+    setSelectedPlayer(player);
+  };
+
+  // Role-based access control
+  const canAccessPlayerData = profile?.role !== 'unassigned';
+
   return {
     players,
     selectedPlayer,
     selectPlayer,
     loading,
     error,
-    refreshData: fetchPlayers,
-    canAccessPlayerData
+    canAccessPlayerData,
+    refreshData
   };
 };

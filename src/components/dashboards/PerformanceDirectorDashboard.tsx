@@ -37,7 +37,7 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
     name: "Loading Player Data...",
     position: "Midfielder",
     matches: 0,
-    distance: 0,
+    distance_covered: 0,
     passes_attempted: 0,
     passes_completed: 0,
     shots_total: 0,
@@ -49,8 +49,30 @@ export const PerformanceDirectorDashboard = ({ profile }: PerformanceDirectorDas
     passCompletionPct: 0,
     number: 0,
     heatmapUrl: "",
-    reportUrl: ""
-  };
+    reportUrl: "",
+    goals: 0,
+    assists: 0,
+    match_rating: 0,
+    pass_accuracy: 0,
+    minutes_played: 0,
+    aerial_duels_won: 0,
+    aerial_duels_attempted: 0,
+    clearances: 0,
+    interceptions: 0,
+    dribbles_successful: 0,
+    dribbles_attempted: 0,
+    crosses_completed: 0,
+    crosses_attempted: 0,
+    corners_taken: 0,
+    fouls_suffered: 0,
+    fouls_committed: 0,
+    clean_sheets: 0,
+    saves: 0,
+    season: "2024-25",
+    touches: 0,
+    possession_won: 0,
+    possession_lost: 0
+  } as Player;
 
   const isLoading = squadLoading || developmentLoading || benchmarksLoading || teamsLoading;
 

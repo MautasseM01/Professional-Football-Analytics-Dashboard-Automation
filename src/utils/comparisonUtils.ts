@@ -42,7 +42,7 @@ export const prepareRadarData = (selectedPlayers: Player[]) => {
 
   // Find max values to normalize data (ensure we don't divide by 0)
   const maxValues = {
-    distance: Math.max(...selectedPlayers.map(p => p.distance || 0), 1),
+    distance_covered: Math.max(...selectedPlayers.map(p => p.distance_covered || 0), 1),
     shots_on_target: Math.max(...selectedPlayers.map(p => p.shots_on_target || 0), 1),
     passes_completed: Math.max(...selectedPlayers.map(p => p.passes_completed || 0), 1),
     tackles_won: Math.max(...selectedPlayers.map(p => p.tackles_won || 0), 1)
@@ -63,7 +63,7 @@ export const prepareRadarData = (selectedPlayers: Player[]) => {
     console.log(`Processing player ${player.name} (${playerIndex})`);
     
     // Distance
-    const distanceValue = player.distance ? (player.distance / maxValues.distance) * 100 : 0;
+    const distanceValue = player.distance_covered ? (player.distance_covered / maxValues.distance_covered) * 100 : 0;
     radarData[0][player.name] = Math.round(distanceValue);
     
     // Shots on Target

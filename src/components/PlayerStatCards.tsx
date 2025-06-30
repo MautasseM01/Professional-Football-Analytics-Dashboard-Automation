@@ -205,7 +205,7 @@ export const PlayerStatCards = ({ player }: PlayerStatCardsProps) => {
                       <Info className="w-3 h-3 text-club-light-gray/60 light:text-gray-500 flex-shrink-0" />
                     </div>
                   } 
-                  value={player.distance ? Number(player.distance).toFixed(1) : "0"} 
+                  value={player.distance_covered ? Number(player.distance_covered).toFixed(1) : "0"} 
                   subValue="km total" 
                   icon={<Activity />} 
                 />
