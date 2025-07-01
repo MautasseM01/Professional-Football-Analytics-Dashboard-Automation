@@ -17,15 +17,22 @@ interface PlayerDashboardProps {
 export const PlayerDashboard = ({ profile }: PlayerDashboardProps) => {
   const { players, selectedPlayer, selectPlayer, loading } = usePlayerData();
 
-  // Get current user's player data for personal stats
-  const currentPlayer = selectedPlayer || players[0];
+  // For player role, try to find their own data first, otherwise use selectedPlayer
+  const currentPlayer = profile.role === 'player' 
+    ? players.find(p => p.name.toLowerCase().includes((profile.full_name || '').toLowerCase())) || selectedPlayer || players[0]
+    : selectedPlayer || players[0];
+
+  // Calculate goals per match safely
+  const goalsPerMatch = currentPlayer?.matches && currentPlayer.matches > 0 
+    ? (currentPlayer.goals || 0) / currentPlayer.matches 
+    : 0;
 
   return (
     <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
       {/* Welcome Header */}
       <div className="mb-4 sm:mb-6">
         <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold mb-2">
-          Welcome back, {profile.full_name || "Player"}
+          Welcome back, {profile.role === 'player' && currentPlayer?.name ? currentPlayer.name : profile.full_name || "Player"}
         </h1>
         <p className="text-sm sm:text-base text-club-light-gray/70">
           Track your performance statistics and development progress
@@ -48,7 +55,7 @@ export const PlayerDashboard = ({ profile }: PlayerDashboardProps) => {
           <StatCard
             title="Goals Scored"
             value={currentPlayer?.goals || 0}
-            subValue={`${((currentPlayer?.goals || 0) / Math.max(currentPlayer?.matches || 1, 1)).toFixed(1)} per match`}
+            subValue={`${goalsPerMatch.toFixed(1)} per match`}
             icon={<Target className="w-4 h-4 sm:w-5 sm:h-5" />}
             className="border-green-500/20 bg-green-500/10"
           />
@@ -63,7 +70,7 @@ export const PlayerDashboard = ({ profile }: PlayerDashboardProps) => {
         </ResponsiveGrid>
       </IOSLoadingState>
 
-      {/* Player Selector - Hidden for player role */}
+      {/* Player Selector - Hidden for player role unless no player data found */}
       <RoleBasedContent allowedRoles={['admin', 'management', 'coach', 'analyst', 'performance_director']}>
         <PlayerSelector
           players={players}
@@ -114,8 +121,8 @@ export const PlayerDashboard = ({ profile }: PlayerDashboardProps) => {
         </CardContent>
       </Card>
 
-      {/* Player Stats Component */}
-      {selectedPlayer && <PlayerStats player={selectedPlayer} />}
+      {/* Player Stats Component - Only show if we have a current player */}
+      {currentPlayer && <PlayerStats player={currentPlayer} />}
     </div>
   );
 };
