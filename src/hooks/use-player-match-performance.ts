@@ -51,61 +51,75 @@ export const usePlayerMatchPerformance = (
     try {
       console.log('Fetching player match performances for player:', player?.id, 'match:', matchId);
 
-      // Build query with proper joins
-      let query = supabase
+      // First get the performance data
+      let performanceQuery = supabase
         .from("player_match_performance")
-        .select(`
-          *,
-          matches!inner(
-            id,
-            date,
-            opponent,
-            result
-          )
-        `);
+        .select("*");
 
       // Apply filters
       if (player) {
-        query = query.eq('player_id', player.id);
+        performanceQuery = performanceQuery.eq('player_id', player.id);
       }
       if (matchId) {
-        query = query.eq('match_id', matchId);
+        performanceQuery = performanceQuery.eq('match_id', matchId);
       }
 
-      const { data, error: queryError } = await query
+      const { data: performanceData, error: performanceError } = await performanceQuery
         .order('id', { ascending: false })
         .limit(limit);
 
-      if (queryError) {
-        console.error("Error fetching player match performances:", queryError);
-        throw new Error(`Failed to fetch match performances: ${queryError.message}`);
+      if (performanceError) {
+        console.error("Error fetching player match performances:", performanceError);
+        throw new Error(`Failed to fetch match performances: ${performanceError.message}`);
       }
 
-      // Transform data safely
-      const transformedPerformances: PlayerMatchPerformance[] = (data || []).map((perf: any) => ({
-        id: perf.id,
-        match_id: perf.match_id,
-        goals: perf.goals || 0,
-        assists: perf.assists || 0,
-        shots_total: perf.shots_total || 0,
-        shots_on_target: perf.shots_on_target || 0,
-        passes_attempted: perf.passes_attempted || 0,
-        passes_completed: perf.passes_completed || 0,
-        pass_accuracy: perf.pass_accuracy || 0,
-        tackles_attempted: perf.tackles_attempted || 0,
-        tackles_won: perf.tackles_won || 0,
-        distance_covered: perf.distance_covered || 0,
-        sprint_distance: perf.sprint_distance || 0,
-        max_speed: perf.max_speed || 0,
-        match_rating: perf.match_rating || 0,
-        minutes_played: perf.minutes_played || 0,
-        touches: perf.touches || 0,
-        dribbles_successful: perf.dribbles_successful || 0,
-        aerial_duels_won: perf.aerial_duels_won || 0,
-        opponent: perf.matches?.opponent || 'Unknown',
-        match_date: perf.matches?.date || '',
-        result: perf.matches?.result || 'N/A'
-      }));
+      if (!performanceData || performanceData.length === 0) {
+        setPerformances([]);
+        console.log('No performance data found');
+        return;
+      }
+
+      // Now get the match data separately
+      const matchIds = performanceData.map(perf => perf.match_id);
+      const { data: matchData, error: matchError } = await supabase
+        .from("matches")
+        .select("id, date, opponent, result")
+        .in('id', matchIds);
+
+      if (matchError) {
+        console.error("Error fetching match data:", matchError);
+        throw new Error(`Failed to fetch match data: ${matchError.message}`);
+      }
+
+      // Combine the data
+      const transformedPerformances: PlayerMatchPerformance[] = performanceData.map((perf: any) => {
+        const matchInfo = matchData?.find(match => match.id === perf.match_id);
+        
+        return {
+          id: perf.id,
+          match_id: perf.match_id,
+          goals: perf.goals || 0,
+          assists: perf.assists || 0,
+          shots_total: perf.shots_total || 0,
+          shots_on_target: perf.shots_on_target || 0,
+          passes_attempted: perf.passes_attempted || 0,
+          passes_completed: perf.passes_completed || 0,
+          pass_accuracy: perf.pass_accuracy || 0,
+          tackles_attempted: perf.tackles_attempted || 0,
+          tackles_won: perf.tackles_won || 0,
+          distance_covered: perf.distance_covered || 0,
+          sprint_distance: perf.sprint_distance || 0,
+          max_speed: perf.max_speed || 0,
+          match_rating: perf.match_rating || 0,
+          minutes_played: perf.minutes_played || 0,
+          touches: perf.touches || 0,
+          dribbles_successful: perf.dribbles_successful || 0,
+          aerial_duels_won: perf.aerial_duels_won || 0,
+          opponent: matchInfo?.opponent || 'Unknown',
+          match_date: matchInfo?.date || '',
+          result: matchInfo?.result || 'N/A'
+        };
+      });
 
       setPerformances(transformedPerformances);
       console.log('Successfully loaded player match performances:', transformedPerformances.length);
