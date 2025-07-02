@@ -1,4 +1,3 @@
-
 import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,7 +11,7 @@ import { TableLoadingSkeleton } from "@/components/LoadingStates";
 import { getPassCompletionPercentage, getHighestValuesInRow, formatPercentage } from "@/utils/comparisonUtils";
 import { useSorting } from "./hooks/useSorting";
 import { SortControls } from "./components/SortControls";
-import { MetricConfig } from "./types";
+import { MetricConfig, SortableMetric } from "./types";
 
 interface ProfessionalPerformanceTableProps {
   selectedPlayers: Player[];
@@ -28,7 +27,7 @@ export const ProfessionalPerformanceTable = ({
 
   const metrics: MetricConfig[] = [
     {
-      key: 'distance',
+      key: 'distance' as SortableMetric,
       label: 'Total Distance',
       shortLabel: 'Distance',
       mobileLabel: 'Dist',
@@ -40,7 +39,7 @@ export const ProfessionalPerformanceTable = ({
       priority: 1
     },
     {
-      key: 'passCompletion',
+      key: 'passCompletion' as SortableMetric,
       label: 'Pass Completion',
       shortLabel: 'Pass %',
       mobileLabel: 'Pass',
@@ -52,7 +51,7 @@ export const ProfessionalPerformanceTable = ({
       priority: 1
     },
     {
-      key: 'shots',
+      key: 'shots' as SortableMetric,
       label: 'Shots on Target',
       shortLabel: 'Shots',
       mobileLabel: 'SOT',
@@ -64,7 +63,7 @@ export const ProfessionalPerformanceTable = ({
       priority: 2
     },
     {
-      key: 'tackles',
+      key: 'tackles' as SortableMetric,
       label: 'Tackles Won',
       shortLabel: 'Tackles',
       mobileLabel: 'Tack',
@@ -168,7 +167,7 @@ export const ProfessionalPerformanceTable = ({
     }
   };
 
-  const getSortIcon = (columnKey: string) => {
+  const getSortIcon = (columnKey: SortableMetric) => {
     if (sortState.metric !== columnKey) {
       return <ArrowUpDown className="w-3 h-3 text-gray-400" />;
     }
@@ -183,7 +182,7 @@ export const ProfessionalPerformanceTable = ({
     icon: Icon, 
     className = "" 
   }: { 
-    metric: string; 
+    metric: SortableMetric; 
     label: string; 
     icon?: any; 
     className?: string; 
@@ -263,7 +262,7 @@ export const ProfessionalPerformanceTable = ({
                 )}>
                   <tr>
                     <SortableHeader 
-                      metric="name" 
+                      metric={'name' as SortableMetric}
                       label="Player" 
                       className={cn(
                         "sticky left-0 z-20 min-w-[180px]",
