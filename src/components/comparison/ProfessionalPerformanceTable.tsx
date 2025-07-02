@@ -1,8 +1,8 @@
-import { useMemo, useRef, useState, useEffect } from "react";
+import { useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
-import { TrendingUp, BarChart3, Medal, Target, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react";
+import { TrendingUp, BarChart3, Medal, Target, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
 import { Player } from "@/types";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -24,12 +24,6 @@ export const ProfessionalPerformanceTable = ({
 }: ProfessionalPerformanceTableProps) => {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
-  const [scrollState, setScrollState] = useState({
-    canScrollLeft: false,
-    canScrollRight: false,
-    showScrollIndicator: false
-  });
 
   const metrics: MetricConfig[] = [
     {
@@ -82,6 +76,7 @@ export const ProfessionalPerformanceTable = ({
     }
   ];
 
+  // Responsive metric filtering
   const visibleMetrics = useMemo(() => {
     if (typeof window === 'undefined') return metrics;
     const screenWidth = window.innerWidth;
@@ -94,8 +89,9 @@ export const ProfessionalPerformanceTable = ({
     return metrics;
   }, [typeof window !== 'undefined' ? window.innerWidth : 0]);
 
+  // Use the sorting hook
   const {
-    sortState: sortingState,
+    sortState,
     handleSort,
     clearSort,
     sortedPlayers
@@ -104,6 +100,7 @@ export const ProfessionalPerformanceTable = ({
     metrics: visibleMetrics
   });
 
+  // Calculate highest values for each metric
   const highestValues = useMemo(() => {
     return visibleMetrics.reduce((acc, metric) => {
       acc[metric.key] = getHighestValuesInRow(selectedPlayers, metric.getValue);
@@ -111,50 +108,7 @@ export const ProfessionalPerformanceTable = ({
     }, {} as Record<string, Record<number, boolean>>);
   }, [selectedPlayers, visibleMetrics]);
 
-  // Scroll state management
-  useEffect(() => {
-    const checkScroll = () => {
-      if (!scrollContainerRef.current) return;
-      
-      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
-      const canScrollLeft = scrollLeft > 0;
-      const canScrollRight = scrollLeft < scrollWidth - clientWidth - 1;
-      const showScrollIndicator = scrollWidth > clientWidth;
-      
-      setScrollState({
-        canScrollLeft,
-        canScrollRight,
-        showScrollIndicator
-      });
-    };
-
-    const scrollContainer = scrollContainerRef.current;
-    if (scrollContainer) {
-      checkScroll();
-      scrollContainer.addEventListener('scroll', checkScroll, { passive: true });
-      window.addEventListener('resize', checkScroll);
-      
-      return () => {
-        scrollContainer.removeEventListener('scroll', checkScroll);
-        window.removeEventListener('resize', checkScroll);
-      };
-    }
-  }, [selectedPlayers, visibleMetrics]);
-
-  const scrollToDirection = (direction: 'left' | 'right') => {
-    if (!scrollContainerRef.current) return;
-    
-    const scrollAmount = scrollContainerRef.current.clientWidth * 0.8;
-    const targetScroll = direction === 'left' 
-      ? scrollContainerRef.current.scrollLeft - scrollAmount
-      : scrollContainerRef.current.scrollLeft + scrollAmount;
-    
-    scrollContainerRef.current.scrollTo({
-      left: targetScroll,
-      behavior: 'smooth'
-    });
-  };
-
+  // Performance level calculation with better thresholds
   const getPerformanceLevel = (value: number | null, metric: MetricConfig, allValues: number[]) => {
     if (value === null || value === undefined) return 'none';
     
@@ -214,10 +168,10 @@ export const ProfessionalPerformanceTable = ({
   };
 
   const getSortIcon = (columnKey: SortableMetric) => {
-    if (sortingState.metric !== columnKey) {
+    if (sortState.metric !== columnKey) {
       return <ArrowUpDown className="w-3 h-3 text-gray-400" />;
     }
-    return sortingState.direction === 'asc' 
+    return sortState.direction === 'asc' 
       ? <ArrowUp className="w-3 h-3 text-club-gold" />
       : <ArrowDown className="w-3 h-3 text-club-gold" />;
   };
@@ -238,7 +192,7 @@ export const ProfessionalPerformanceTable = ({
         "text-left font-semibold cursor-pointer transition-all duration-200",
         "hover:bg-club-gold/5 hover:text-club-gold",
         "border-b border-club-gold/20 py-4 px-4",
-        sortingState.metric === metric && "text-club-gold bg-club-gold/5",
+        sortState.metric === metric && "text-club-gold bg-club-gold/5",
         className
       )}
       onClick={() => handleSort(metric)}
@@ -278,8 +232,8 @@ export const ProfessionalPerformanceTable = ({
             </p>
             
             <SortControls 
-              currentMetric={sortingState.metric} 
-              currentDirection={sortingState.direction} 
+              currentMetric={sortState.metric} 
+              currentDirection={sortState.direction} 
               metrics={visibleMetrics} 
               onSort={handleSort} 
               onClear={clearSort} 
@@ -295,48 +249,11 @@ export const ProfessionalPerformanceTable = ({
           </div>
         ) : (
           <div className="relative">
-            {/* Scroll hint arrows */}
-            {scrollState.showScrollIndicator && scrollState.canScrollLeft && (
-              <button
-                onClick={() => scrollToDirection('left')}
-                className={cn(
-                  "absolute left-2 top-1/2 -translate-y-1/2 z-30",
-                  "w-8 h-8 rounded-full bg-club-gold/20 hover:bg-club-gold/30",
-                  "flex items-center justify-center transition-all duration-300",
-                  "shadow-lg backdrop-blur-sm border border-club-gold/30",
-                  "hover:scale-110 hover:shadow-club-gold/20 hover:shadow-lg"
-                )}
-              >
-                <ChevronLeft className="w-4 h-4 text-club-gold" />
-              </button>
-            )}
-            
-            {scrollState.showScrollIndicator && scrollState.canScrollRight && (
-              <button
-                onClick={() => scrollToDirection('right')}
-                className={cn(
-                  "absolute right-2 top-1/2 -translate-y-1/2 z-30",
-                  "w-8 h-8 rounded-full bg-club-gold/20 hover:bg-club-gold/30",
-                  "flex items-center justify-center transition-all duration-300",
-                  "shadow-lg backdrop-blur-sm border border-club-gold/30",
-                  "hover:scale-110 hover:shadow-club-gold/20 hover:shadow-lg"
-                )}
-              >
-                <ChevronRight className="w-4 h-4 text-club-gold" />
-              </button>
-            )}
-
-            <div 
-              ref={scrollContainerRef}
-              className={cn(
-                "w-full overflow-x-auto scroll-smooth",
-                "custom-gold-scrollbar"
-              )}
-              style={{
-                scrollbarWidth: 'thin',
-                scrollbarColor: '#D4AF37 transparent'
-              }}
-            >
+            <div className={cn(
+              "w-full overflow-x-auto",
+              "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-club-gold/30",
+              "hover:scrollbar-thumb-club-gold/50"
+            )}>
               <table className="w-full border-separate border-spacing-0 min-w-[800px]">
                 <thead className={cn(
                   "sticky top-0 z-10",
@@ -494,34 +411,6 @@ export const ProfessionalPerformanceTable = ({
           </div>
         )}
       </CardContent>
-
-      {/* Custom Scrollbar Styles */}
-      <style jsx>{`
-        .custom-gold-scrollbar::-webkit-scrollbar {
-          height: 6px;
-        }
-        
-        .custom-gold-scrollbar::-webkit-scrollbar-track {
-          background: transparent;
-          border-radius: 3px;
-        }
-        
-        .custom-gold-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(90deg, #D4AF37, #F4D03F);
-          border-radius: 3px;
-          box-shadow: 0 0 8px rgba(212, 175, 55, 0.3);
-          transition: all 0.3s ease;
-        }
-        
-        .custom-gold-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(90deg, #F4D03F, #D4AF37);
-          box-shadow: 0 0 12px rgba(212, 175, 55, 0.5);
-        }
-        
-        .custom-gold-scrollbar::-webkit-scrollbar-corner {
-          background: transparent;
-        }
-      `}</style>
     </Card>
   );
 };
