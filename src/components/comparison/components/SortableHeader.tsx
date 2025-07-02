@@ -15,6 +15,7 @@ interface SortableHeaderProps {
   unit?: string;
   description?: string;
   className?: string;
+  style?: React.CSSProperties;
 }
 
 export const SortableHeader = ({
@@ -26,7 +27,8 @@ export const SortableHeader = ({
   icon: Icon,
   unit,
   description,
-  className
+  className,
+  style
 }: SortableHeaderProps) => {
   const { theme } = useTheme();
   const isActive = currentMetric === metric;
@@ -39,11 +41,14 @@ export const SortableHeader = ({
   };
 
   return (
-    <th className={cn(
-      "text-center transition-all duration-200",
-      isActive && "bg-club-gold/10 border-club-gold/30",
-      className
-    )}>
+    <th 
+      className={cn(
+        "text-center transition-all duration-200",
+        isActive && "bg-club-gold/10 border-club-gold/30",
+        className
+      )}
+      style={style}
+    >
       <Button
         variant="ghost"
         size="sm"
