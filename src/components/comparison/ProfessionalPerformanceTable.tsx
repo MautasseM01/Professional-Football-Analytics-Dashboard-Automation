@@ -1,8 +1,9 @@
-import { useMemo } from "react";
+
+import { useMemo, useRef, useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
-import { TrendingUp, BarChart3, Medal, Target, ArrowUpDown, ArrowUp, ArrowDown } from "lucide-react";
+import { TrendingUp, BarChart3, Medal, Target, ArrowUpDown, ArrowUp, ArrowDown, ChevronLeft, ChevronRight } from "lucide-react";
 import { Player } from "@/types";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -24,6 +25,10 @@ export const ProfessionalPerformanceTable = ({
 }: ProfessionalPerformanceTableProps) => {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+  const [showScrollHints, setShowScrollHints] = useState(false);
 
   const metrics: MetricConfig[] = [
     {
@@ -76,18 +81,8 @@ export const ProfessionalPerformanceTable = ({
     }
   ];
 
-  // Responsive metric filtering
-  const visibleMetrics = useMemo(() => {
-    if (typeof window === 'undefined') return metrics;
-    const screenWidth = window.innerWidth;
-    if (screenWidth < 640) {
-      return metrics.filter(m => m.priority === 1);
-    }
-    if (screenWidth < 1024) {
-      return metrics.filter(m => m.priority <= 2);
-    }
-    return metrics;
-  }, [typeof window !== 'undefined' ? window.innerWidth : 0]);
+  // Use all metrics for horizontal scroll design
+  const visibleMetrics = metrics;
 
   // Use the sorting hook
   const {
@@ -108,7 +103,44 @@ export const ProfessionalPerformanceTable = ({
     }, {} as Record<string, Record<number, boolean>>);
   }, [selectedPlayers, visibleMetrics]);
 
-  // Performance level calculation with better thresholds
+  // Scroll detection
+  const checkScrollability = () => {
+    if (scrollContainerRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainerRef.current;
+      setCanScrollLeft(scrollLeft > 0);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
+      setShowScrollHints(scrollWidth > clientWidth);
+    }
+  };
+
+  useEffect(() => {
+    checkScrollability();
+    const container = scrollContainerRef.current;
+    if (container) {
+      container.addEventListener('scroll', checkScrollability);
+      const resizeObserver = new ResizeObserver(checkScrollability);
+      resizeObserver.observe(container);
+      
+      return () => {
+        container.removeEventListener('scroll', checkScrollability);
+        resizeObserver.disconnect();
+      };
+    }
+  }, [selectedPlayers]);
+
+  const scrollLeft = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: -200, behavior: 'smooth' });
+    }
+  };
+
+  const scrollRight = () => {
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+    }
+  };
+
+  // Performance level calculation
   const getPerformanceLevel = (value: number | null, metric: MetricConfig, allValues: number[]) => {
     if (value === null || value === undefined) return 'none';
     
@@ -191,15 +223,15 @@ export const ProfessionalPerformanceTable = ({
       className={cn(
         "text-left font-semibold cursor-pointer transition-all duration-200",
         "hover:bg-club-gold/5 hover:text-club-gold",
-        "border-b border-club-gold/20 py-4 px-4",
+        "border-b border-club-gold/20 py-3 px-4",
         sortState.metric === metric && "text-club-gold bg-club-gold/5",
         className
       )}
       onClick={() => handleSort(metric)}
     >
-      <div className="flex items-center gap-2">
-        {Icon && <Icon className="w-4 h-4" />}
-        <span className="select-none">{label}</span>
+      <div className="flex items-center gap-2 whitespace-nowrap">
+        {Icon && <Icon className="w-4 h-4 flex-shrink-0" />}
+        <span className="select-none truncate">{isMobile ? label.split(' ')[0] : label}</span>
         {getSortIcon(metric)}
       </div>
     </th>
@@ -249,12 +281,75 @@ export const ProfessionalPerformanceTable = ({
           </div>
         ) : (
           <div className="relative">
-            <div className={cn(
-              "w-full overflow-x-auto",
-              "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-club-gold/30",
-              "hover:scrollbar-thumb-club-gold/50"
-            )}>
-              <table className="w-full border-separate border-spacing-0 min-w-[800px]">
+            {/* Scroll Hints */}
+            {showScrollHints && canScrollLeft && (
+              <button
+                onClick={scrollLeft}
+                className={cn(
+                  "absolute left-2 top-1/2 -translate-y-1/2 z-20",
+                  "w-8 h-8 rounded-full bg-club-gold/90 text-club-black",
+                  "flex items-center justify-center shadow-lg",
+                  "hover:bg-club-gold transition-all duration-200",
+                  "backdrop-blur-sm border border-club-gold/30"
+                )}
+              >
+                <ChevronLeft className="w-4 h-4" />
+              </button>
+            )}
+            
+            {showScrollHints && canScrollRight && (
+              <button
+                onClick={scrollRight}
+                className={cn(
+                  "absolute right-2 top-1/2 -translate-y-1/2 z-20",
+                  "w-8 h-8 rounded-full bg-club-gold/90 text-club-black",
+                  "flex items-center justify-center shadow-lg",
+                  "hover:bg-club-gold transition-all duration-200",
+                  "backdrop-blur-sm border border-club-gold/30"
+                )}
+              >
+                <ChevronRight className="w-4 h-4" />
+              </button>
+            )}
+
+            {/* Left fade gradient */}
+            {canScrollLeft && (
+              <div className={cn(
+                "absolute left-0 top-0 bottom-0 w-8 z-10 pointer-events-none",
+                "bg-gradient-to-r",
+                theme === 'dark' 
+                  ? "from-club-dark-gray/80 to-transparent" 
+                  : "from-white/80 to-transparent"
+              )} />
+            )}
+
+            {/* Right fade gradient */}
+            {canScrollRight && (
+              <div className={cn(
+                "absolute right-0 top-0 bottom-0 w-8 z-10 pointer-events-none",
+                "bg-gradient-to-l",
+                theme === 'dark' 
+                  ? "from-club-dark-gray/80 to-transparent" 
+                  : "from-white/80 to-transparent"
+              )} />
+            )}
+
+            {/* Horizontal scroll container */}
+            <div 
+              ref={scrollContainerRef}
+              className={cn(
+                "w-full overflow-x-auto overflow-y-hidden",
+                "scrollbar-thin scrollbar-track-transparent scrollbar-thumb-club-gold/40",
+                "hover:scrollbar-thumb-club-gold/60",
+                "scroll-smooth"
+              )}
+              style={{
+                maxHeight: `${Math.min(600, (sortedPlayers.length + 1) * 80)}px`,
+                scrollbarWidth: 'thin',
+                scrollbarColor: '#D4AF37 transparent'
+              }}
+            >
+              <table className="w-full border-separate border-spacing-0" style={{ minWidth: '800px' }}>
                 <thead className={cn(
                   "sticky top-0 z-10",
                   theme === 'dark' ? "bg-club-black/95" : "bg-gray-50/95",
@@ -265,17 +360,19 @@ export const ProfessionalPerformanceTable = ({
                       metric={'name' as SortableMetric}
                       label="Player" 
                       className={cn(
-                        "sticky left-0 z-20 min-w-[180px]",
+                        "sticky left-0 z-20",
                         theme === 'dark' ? "bg-club-dark-gray/95" : "bg-white/95"
                       )}
+                      style={{ minWidth: '200px', width: '200px' }}
                     />
                     {visibleMetrics.map(metric => (
                       <SortableHeader 
                         key={metric.key}
                         metric={metric.key}
-                        label={isMobile ? metric.mobileLabel : metric.label}
+                        label={metric.label}
                         icon={metric.icon}
-                        className="text-center min-w-[120px]"
+                        className="text-center"
+                        style={{ minWidth: '140px', width: '140px' }}
                       />
                     ))}
                   </tr>
@@ -289,7 +386,7 @@ export const ProfessionalPerformanceTable = ({
                         key={player.id} 
                         className={cn(
                           "transition-all duration-200 hover:scale-[1.01] hover:shadow-lg",
-                          "border-b border-club-gold/10",
+                          "border-b border-club-gold/10 h-16",
                           theme === 'dark' 
                             ? isEvenRow 
                               ? "bg-club-black/20 hover:bg-club-black/40" 
@@ -299,20 +396,23 @@ export const ProfessionalPerformanceTable = ({
                               : "bg-white/50 hover:bg-white/80"
                         )}
                       >
-                        <td className={cn(
-                          "sticky left-0 z-10 py-4 px-4 border-r border-club-gold/10",
-                          theme === 'dark' ? "bg-club-dark-gray/95" : "bg-white/95"
-                        )}>
+                        <td 
+                          className={cn(
+                            "sticky left-0 z-10 py-3 px-4 border-r border-club-gold/10",
+                            theme === 'dark' ? "bg-club-dark-gray/95" : "bg-white/95"
+                          )}
+                          style={{ minWidth: '200px', width: '200px' }}
+                        >
                           <div className="flex items-center gap-3">
-                            <PlayerAvatar player={player} size="md" />
+                            <PlayerAvatar player={player} size="sm" />
                             <div className="min-w-0 flex-1">
                               <div className={cn(
-                                "font-semibold text-base",
+                                "font-semibold text-sm truncate",
                                 theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
                               )}>
                                 {player.name}
                               </div>
-                              <div className="text-sm text-gray-500">
+                              <div className="text-xs text-gray-500 truncate">
                                 {player.position || 'N/A'}
                               </div>
                             </div>
@@ -332,59 +432,40 @@ export const ProfessionalPerformanceTable = ({
                             <td 
                               key={`${player.id}-${metric.key}`} 
                               className={cn(
-                                "text-center py-4 px-4 transition-all duration-200",
+                                "text-center py-3 px-4 transition-all duration-200",
                                 styles.bg,
                                 styles.border,
-                                "border-l border-r"
+                                "border-l border-r h-16"
                               )}
+                              style={{ minWidth: '140px', width: '140px' }}
                             >
-                              <div className="space-y-2">
+                              <div className="flex flex-col items-center justify-center h-full gap-1">
                                 <div className={cn(
-                                  "font-bold text-lg",
+                                  "font-bold text-base",
                                   styles.text
                                 )}>
                                   {metric.format(value)}
                                 </div>
                                 
-                                {(isHighest || level !== 'none') && (
-                                  <div className="flex justify-center">
+                                {(isHighest || (level !== 'none' && value !== null)) && (
+                                  <Badge 
+                                    variant="outline" 
+                                    className={cn(
+                                      "text-xs font-medium px-2 py-0",
+                                      isHighest 
+                                        ? "bg-club-gold/20 text-club-gold border-club-gold/40"
+                                        : cn(styles.bg, styles.text, styles.border)
+                                    )}
+                                  >
                                     {isHighest ? (
-                                      <Badge 
-                                        variant="outline" 
-                                        className="bg-club-gold/20 text-club-gold border-club-gold/40 text-xs font-semibold"
-                                      >
+                                      <>
                                         <Medal className="w-3 h-3 mr-1" />
                                         Best
-                                      </Badge>
+                                      </>
                                     ) : (
-                                      <Badge 
-                                        variant="outline" 
-                                        className={cn(
-                                          "text-xs font-medium",
-                                          styles.bg,
-                                          styles.text,
-                                          styles.border
-                                        )}
-                                      >
-                                        {level.charAt(0).toUpperCase() + level.slice(1)}
-                                      </Badge>
+                                      level.charAt(0).toUpperCase() + level.slice(1)
                                     )}
-                                  </div>
-                                )}
-                                
-                                {/* Performance bar */}
-                                {value !== null && allValues.length > 1 && (
-                                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1">
-                                    <div 
-                                      className={cn(
-                                        "h-1 rounded-full transition-all duration-300",
-                                        isHighest ? "bg-club-gold" : styles.text.replace('text-', 'bg-')
-                                      )}
-                                      style={{ 
-                                        width: `${Math.min(100, Math.max(10, (value / Math.max(...allValues)) * 100))}%` 
-                                      }}
-                                    />
-                                  </div>
+                                  </Badge>
                                 )}
                               </div>
                             </td>
@@ -396,18 +477,26 @@ export const ProfessionalPerformanceTable = ({
                 </tbody>
               </table>
             </div>
-            
-            {/* Mobile indicator */}
-            {visibleMetrics.length < metrics.length && (
-              <div className="absolute bottom-4 right-4">
-                <Badge 
-                  variant="outline" 
-                  className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs"
-                >
-                  {metrics.length - visibleMetrics.length} more metrics on desktop
-                </Badge>
-              </div>
-            )}
+
+            {/* Custom scrollbar styling */}
+            <style jsx>{`
+              .scroll-smooth::-webkit-scrollbar {
+                height: 6px;
+              }
+              .scroll-smooth::-webkit-scrollbar-track {
+                background: transparent;
+                border-radius: 3px;
+              }
+              .scroll-smooth::-webkit-scrollbar-thumb {
+                background: #D4AF37;
+                border-radius: 3px;
+                box-shadow: 0 0 4px rgba(212, 175, 55, 0.3);
+              }
+              .scroll-smooth::-webkit-scrollbar-thumb:hover {
+                background: #B8941F;
+                box-shadow: 0 0 6px rgba(212, 175, 55, 0.5);
+              }
+            `}</style>
           </div>
         )}
       </CardContent>
