@@ -1,4 +1,3 @@
-
 import { useMemo, useRef } from "react";
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,7 +46,7 @@ export const PerformanceRadarChart = ({
     selectedPlayers.forEach((player, index) => {
       config[player.name] = { 
         color: playerColors[index % playerColors.length],
-        jerseyNumber: player.jersey_number?.toString() || (index + 1).toString()
+        jerseyNumber: player.number?.toString() || (index + 1).toString()
       };
     });
     
