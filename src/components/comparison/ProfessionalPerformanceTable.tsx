@@ -230,7 +230,7 @@ export const ProfessionalPerformanceTable = ({
             }}>
                   <thead className={cn("sticky top-0 z-10", theme === 'dark' ? "bg-club-black/95" : "bg-gray-50/95", "backdrop-blur-sm")}>
                     <tr>
-                      <SortableHeader metric={'name' as SortableMetric} label="Player" currentMetric={sortState.metric} currentDirection={sortState.direction} onSort={handleSort} className={cn("sticky left-0 z-20 border-b border-club-gold/20 py-3 px-4", theme === 'dark' ? "bg-club-dark-gray/95" : "bg-white/95")} style={{
+                      <SortableHeader metric={'name' as SortableMetric} label="Player" currentMetric={sortState.metric} currentDirection={sortState.direction} onSort={handleSort} className={cn("player-column border-b border-club-gold/20 py-3 px-4", theme === 'dark' ? "bg-club-dark-gray/95" : "bg-white/95")} style={{
                     minWidth: '200px',
                     width: '200px'
                   }} />
@@ -245,7 +245,7 @@ export const ProfessionalPerformanceTable = ({
                     {sortedPlayers.map((player, index) => {
                   const isEvenRow = index % 2 === 0;
                   return <tr key={player.id} className={cn("transition-all duration-200 h-16", "border-b border-club-gold/10", theme === 'dark' ? isEvenRow ? "bg-club-black/20 hover:bg-club-black/40" : "bg-club-dark-gray/20 hover:bg-club-dark-gray/40" : isEvenRow ? "bg-gray-50/30 hover:bg-gray-50/60" : "bg-white/50 hover:bg-white/80")}>
-                          <td className={cn("sticky left-0 z-10 py-3 px-4 border-r border-club-gold/10", theme === 'dark' ? "bg-club-dark-gray/95" : "bg-white/95")} style={{
+                          <td className={cn("player-column py-3 px-4 border-r border-club-gold/10", theme === 'dark' ? "bg-club-dark-gray/95" : "bg-white/95")} style={{
                       minWidth: '200px',
                       width: '200px'
                     }}>
@@ -295,7 +295,7 @@ export const ProfessionalPerformanceTable = ({
         </CardContent>
       </Card>
 
-      {/* Custom scrollbar styling */}
+      {/* Custom scrollbar styling and responsive sticky column */}
       <style>{`
         .scroll-smooth::-webkit-scrollbar {
           height: 6px;
@@ -312,6 +312,22 @@ export const ProfessionalPerformanceTable = ({
         .scroll-smooth::-webkit-scrollbar-thumb:hover {
           background: #B8941F;
           box-shadow: 0 0 6px rgba(212, 175, 55, 0.5);
+        }
+        
+        /* Responsive sticky column behavior */
+        @media (min-width: 768px) {
+          .player-column {
+            position: sticky !important;
+            left: 0 !important;
+            z-index: 20 !important;
+          }
+        }
+        
+        @media (max-width: 767px) {
+          .player-column {
+            position: static !important;
+            z-index: auto !important;
+          }
         }
       `}</style>
     </>;
