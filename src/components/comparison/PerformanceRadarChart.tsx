@@ -1,5 +1,5 @@
 import { useMemo, useRef } from "react";
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart3, Download } from "lucide-react";
@@ -295,6 +295,14 @@ export const PerformanceRadarChart = ({
                     }}
                     className="text-xs font-medium"
                   />
+                  <PolarRadiusAxis 
+                    angle={90}
+                    domain={[0, 100]}
+                    tick={{ 
+                      fill: theme === 'dark' ? "#9CA3AF" : "#6B7280", 
+                      fontSize: 10 
+                    }}
+                  />
                   
                   {selectedPlayers.map((player, index) => (
                     <Radar
@@ -303,20 +311,17 @@ export const PerformanceRadarChart = ({
                       dataKey={player.name}
                       stroke={playerColors[index % playerColors.length]}
                       fill={playerColors[index % playerColors.length]}
-                      fillOpacity={0.15}
-                      strokeWidth={3}
+                      fillOpacity={0.1}
+                      strokeWidth={2.5}
                       dot={{ 
-                        r: isMobile ? 5 : 6, 
+                        r: isMobile ? 4 : 5, 
                         fill: playerColors[index % playerColors.length],
                         stroke: "#fff",
-                        strokeWidth: 2,
+                        strokeWidth: 1.5,
                         style: { 
-                          cursor: 'pointer',
-                          filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.1))'
+                          cursor: 'pointer'
                         }
                       }}
-                      animationBegin={index * 200}
-                      animationDuration={800}
                     />
                   ))}
                   
