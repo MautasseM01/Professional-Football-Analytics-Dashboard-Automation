@@ -34,37 +34,10 @@ export const PerformanceRadarChart = ({
   ];
 
   const radarData = useMemo(() => {
-    if (!selectedPlayers || selectedPlayers.length === 0) {
-      return [];
-    }
-
-    // Create radar data structure for Recharts
-    const categories = [
-      { category: "Distance", key: "distance_covered" },
-      { category: "Shots on Target", key: "shots_on_target" },
-      { category: "Passes Completed", key: "passes_completed" },
-      { category: "Tackles Won", key: "tackles_won" }
-    ];
-
-    // Find max values for normalization
-    const maxValues = categories.reduce((acc, cat) => {
-      const values = selectedPlayers.map(p => p[cat.key] || 0).filter(v => v > 0);
-      acc[cat.key] = values.length > 0 ? Math.max(...values) : 1;
-      return acc;
-    }, {} as Record<string, number>);
-
-    // Create data points for each category
-    return categories.map(cat => {
-      const dataPoint: any = { category: cat.category, fullMark: 100 };
-      
-      selectedPlayers.forEach(player => {
-        const value = player[cat.key] || 0;
-        const normalizedValue = maxValues[cat.key] > 0 ? (value / maxValues[cat.key]) * 100 : 0;
-        dataPoint[player.name] = Math.round(normalizedValue);
-      });
-      
-      return dataPoint;
-    });
+    console.log("Preparing radar data for players:", selectedPlayers);
+    const data = prepareRadarData(selectedPlayers);
+    console.log("Radar data prepared:", data);
+    return data;
   }, [selectedPlayers]);
 
   const chartConfig = useMemo(() => {
@@ -286,20 +259,20 @@ export const PerformanceRadarChart = ({
             </div>
             
             <div 
-              className="w-full relative z-10 flex items-center justify-center"
-              style={{ height: isMobile ? '400px' : '500px' }}
+              className="w-full relative z-10"
+              style={{ height: isMobile ? '350px' : '450px' }}
             >
-                  <RadarChart 
-                    data={radarData} 
-                    width={isMobile ? 350 : 450}
-                    height={isMobile ? 350 : 450}
-                    margin={{ 
-                      top: 40, 
-                      right: isMobile ? 40 : 60, 
-                      bottom: 40, 
-                      left: isMobile ? 40 : 60 
-                    }}
-                  >
+              <ResponsiveContainer width="100%" height="100%">
+                <RadarChart 
+                  data={radarData} 
+                  className="mx-auto"
+                  margin={{ 
+                    top: 40, 
+                    right: isMobile ? 40 : 60, 
+                    bottom: 40, 
+                    left: isMobile ? 40 : 60 
+                  }}
+                >
                   <defs>
                     <radialGradient id="radarGradient" cx="50%" cy="50%" r="50%">
                       <stop offset="0%" stopColor={theme === 'dark' ? '#D4AF37' : '#D4AF37'} stopOpacity={0.1} />
@@ -308,8 +281,8 @@ export const PerformanceRadarChart = ({
                   </defs>
                   
                   <PolarGrid 
-                    stroke={theme === 'dark' ? "#4A5568" : "#CBD5E0"} 
-                    strokeWidth={1.5}
+                    stroke={theme === 'dark' ? "#555" : "#e2e8f0"} 
+                    strokeWidth={1}
                     gridType="polygon"
                     radialLines={true}
                   />
@@ -350,6 +323,7 @@ export const PerformanceRadarChart = ({
                   <Tooltip content={<CustomTooltip />} />
                   <Legend content={<CustomLegend />} />
                 </RadarChart>
+              </ResponsiveContainer>
             </div>
             
             {/* Performance insights */}
