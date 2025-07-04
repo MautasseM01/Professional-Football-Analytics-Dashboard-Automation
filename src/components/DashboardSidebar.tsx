@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
@@ -43,20 +43,21 @@ export const DashboardSidebar = () => {
       document.body.style.overflow = 'unset';
     };
   }, [isMobile, mobileOpen]);
-  const filteredNavigationItems = navigationItems.filter(item => {
-    const hasItemAccess = hasAccess(profile?.role, item.allowedRoles);
-    return hasItemAccess;
-  }).map(item => {
-    const filteredSubItems = item.subItems?.filter(subItem => {
-      const hasSubItemAccess = hasAccess(profile?.role, subItem.allowedRoles);
-      return hasSubItemAccess;
-    });
-    return {
-      ...item,
-      subItems: filteredSubItems
-    };
-  });
-  const getActiveParentMenu = (pathname: string) => {
+  const filteredNavigationItems = useMemo(() => 
+    navigationItems.filter(item => {
+      const hasItemAccess = hasAccess(profile?.role, item.allowedRoles);
+      return hasItemAccess;
+    }).map(item => {
+      const filteredSubItems = item.subItems?.filter(subItem => {
+        const hasSubItemAccess = hasAccess(profile?.role, subItem.allowedRoles);
+        return hasSubItemAccess;
+      });
+      return {
+        ...item,
+        subItems: filteredSubItems
+      };
+    }), [profile?.role]);
+  const getActiveParentMenu = useMemo(() => (pathname: string) => {
     for (const item of filteredNavigationItems) {
       if (item.subItems) {
         const isSubItemActive = item.subItems.some(subItem => pathname === subItem.href || pathname.startsWith(subItem.href + '/'));
@@ -66,7 +67,7 @@ export const DashboardSidebar = () => {
       }
     }
     return null;
-  };
+  }, [filteredNavigationItems]);
   useEffect(() => {
     const activeParent = getActiveParentMenu(location.pathname);
     if (activeParent) {
