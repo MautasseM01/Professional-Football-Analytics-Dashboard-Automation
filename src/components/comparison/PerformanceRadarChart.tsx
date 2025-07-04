@@ -1,5 +1,5 @@
 import { useMemo, useRef } from "react";
-import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Legend, Tooltip } from "recharts";
+import { Radar, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, ResponsiveContainer, Tooltip } from "recharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BarChart3, Download } from "lucide-react";
@@ -104,43 +104,79 @@ export const PerformanceRadarChart = ({
     return null;
   };
 
-  // Custom legend component
-  const CustomLegend = (props: any) => {
-    const { payload } = props;
-    if (!payload) return null;
+  // Custom player legend cards component (rendered separately below chart)
+  const PlayerLegendCards = () => {
+    if (selectedPlayers.length === 0) return null;
 
     return (
-      <div className="flex flex-wrap justify-center gap-4 mt-4 px-4">
-        {payload.map((entry: any, index: number) => {
-          const player = selectedPlayers[index];
-          const jerseyNumber = chartConfig[entry.value]?.jerseyNumber;
-          
-          return (
-            <div 
-              key={entry.value}
-              className={cn(
-                "flex items-center gap-2 px-3 py-2 rounded-lg transition-all duration-200",
-                "bg-white/50 dark:bg-gray-800/50 border border-gray-200/50 dark:border-gray-700/50",
-                "hover:bg-white/80 dark:hover:bg-gray-800/80 hover:scale-105"
-              )}
-            >
+      <div className="mt-6 pt-6 border-t border-gray-200/50 dark:border-gray-700/50">
+        <h4 className={cn(
+          "text-sm font-semibold mb-4 text-center",
+          theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
+        )}>
+          Players Comparison
+        </h4>
+        <div className={cn(
+          "grid gap-3",
+          // Responsive grid: 2 cols on mobile, 3 on tablet, 4 on desktop
+          "grid-cols-2 sm:grid-cols-3 lg:grid-cols-4",
+          selectedPlayers.length === 2 && "max-w-md mx-auto",
+          selectedPlayers.length === 3 && "max-w-lg mx-auto"
+        )}>
+          {selectedPlayers.map((player, index) => {
+            const playerColor = playerColors[index % playerColors.length];
+            const jerseyNumber = chartConfig[player.name]?.jerseyNumber;
+            
+            return (
               <div 
-                className="w-4 h-4 rounded-full border-2 border-white shadow-sm"
-                style={{ backgroundColor: entry.color }}
-              />
-              <div className="text-sm">
-                <div className="font-semibold text-gray-900 dark:text-white">
-                  {entry.value}
-                </div>
-                {jerseyNumber && (
-                  <div className="text-xs text-gray-500 dark:text-gray-400">
-                    #{jerseyNumber}
-                  </div>
+                key={player.id}
+                className={cn(
+                  "relative p-3 rounded-xl border border-gray-200/50 dark:border-gray-700/50",
+                  "bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm",
+                  "hover:bg-white/80 dark:hover:bg-gray-800/80",
+                  "hover:scale-105 transition-all duration-200",
+                  "shadow-sm hover:shadow-md"
                 )}
+              >
+                {/* Color indicator */}
+                <div 
+                  className="absolute top-2 right-2 w-3 h-3 rounded-full border-2 border-white shadow-sm"
+                  style={{ backgroundColor: playerColor }}
+                />
+                
+                {/* Player info */}
+                <div className="pr-5">
+                  <div className={cn(
+                    "font-semibold text-sm truncate mb-1",
+                    theme === 'dark' ? "text-white" : "text-gray-900"
+                  )}>
+                    {player.name}
+                  </div>
+                  
+                  <div className="flex items-center justify-between text-xs">
+                    {jerseyNumber && (
+                      <span className={cn(
+                        "px-1.5 py-0.5 rounded text-xs font-medium",
+                        "bg-club-gold/20 text-club-gold border border-club-gold/30"
+                      )}>
+                        #{jerseyNumber}
+                      </span>
+                    )}
+                    
+                    {player.position && (
+                      <span className={cn(
+                        "text-xs",
+                        theme === 'dark' ? "text-gray-400" : "text-gray-600"
+                      )}>
+                        {player.position}
+                      </span>
+                    )}
+                  </div>
+                </div>
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
       </div>
     );
   };
@@ -260,7 +296,7 @@ export const PerformanceRadarChart = ({
             
             <div 
               className="w-full relative z-10"
-              style={{ height: isMobile ? '350px' : '450px' }}
+              style={{ height: isMobile ? '300px' : '400px' }}
             >
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart 
@@ -326,7 +362,6 @@ export const PerformanceRadarChart = ({
                   ))}
                   
                   <Tooltip content={<CustomTooltip />} />
-                  <Legend content={<CustomLegend />} />
                 </RadarChart>
               </ResponsiveContainer>
             </div>
@@ -354,6 +389,9 @@ export const PerformanceRadarChart = ({
                 </div>
               </div>
             </div>
+            
+            {/* Player Legend Cards - Below Chart */}
+            <PlayerLegendCards />
           </div>
         )}
       </CardContent>
