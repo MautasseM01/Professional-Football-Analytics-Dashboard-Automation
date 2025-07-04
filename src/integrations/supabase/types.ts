@@ -473,6 +473,89 @@ export type Database = {
           },
         ]
       }
+      jersey_administrative_log: {
+        Row: {
+          assigned_jersey: number | null
+          commercial_impact_score: number | null
+          conflict_with_player_id: number | null
+          decided_by: string | null
+          decision_reason: string | null
+          decision_timestamp: string | null
+          decision_type: string | null
+          id: number
+          notes: string | null
+          player_id: number | null
+          priority_score: number | null
+          requested_jersey: number | null
+          requires_human_review: boolean | null
+          resolution_method: string | null
+          season: string | null
+        }
+        Insert: {
+          assigned_jersey?: number | null
+          commercial_impact_score?: number | null
+          conflict_with_player_id?: number | null
+          decided_by?: string | null
+          decision_reason?: string | null
+          decision_timestamp?: string | null
+          decision_type?: string | null
+          id?: number
+          notes?: string | null
+          player_id?: number | null
+          priority_score?: number | null
+          requested_jersey?: number | null
+          requires_human_review?: boolean | null
+          resolution_method?: string | null
+          season?: string | null
+        }
+        Update: {
+          assigned_jersey?: number | null
+          commercial_impact_score?: number | null
+          conflict_with_player_id?: number | null
+          decided_by?: string | null
+          decision_reason?: string | null
+          decision_timestamp?: string | null
+          decision_type?: string | null
+          id?: number
+          notes?: string | null
+          player_id?: number | null
+          priority_score?: number | null
+          requested_jersey?: number | null
+          requires_human_review?: boolean | null
+          resolution_method?: string | null
+          season?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "jersey_administrative_log_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "current_squad"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jersey_administrative_log_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "enhanced_player_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jersey_administrative_log_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "jersey_administrative_log_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       league_benchmarks: {
         Row: {
           id: number
@@ -2281,6 +2364,80 @@ export type Database = {
           },
         ]
       }
+      player_status_classifications: {
+        Row: {
+          assigned_by: string | null
+          assignment_date: string | null
+          commercial_value: number | null
+          id: number
+          international_caps: number | null
+          is_captain: boolean | null
+          is_vice_captain: boolean | null
+          notes: string | null
+          player_id: number | null
+          seniority_years: number | null
+          status_tier: string
+          transfer_value_millions: number | null
+        }
+        Insert: {
+          assigned_by?: string | null
+          assignment_date?: string | null
+          commercial_value?: number | null
+          id?: number
+          international_caps?: number | null
+          is_captain?: boolean | null
+          is_vice_captain?: boolean | null
+          notes?: string | null
+          player_id?: number | null
+          seniority_years?: number | null
+          status_tier: string
+          transfer_value_millions?: number | null
+        }
+        Update: {
+          assigned_by?: string | null
+          assignment_date?: string | null
+          commercial_value?: number | null
+          id?: number
+          international_caps?: number | null
+          is_captain?: boolean | null
+          is_vice_captain?: boolean | null
+          notes?: string | null
+          player_id?: number | null
+          seniority_years?: number | null
+          status_tier?: string
+          transfer_value_millions?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "player_status_classifications_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "current_squad"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_status_classifications_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "enhanced_player_info"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_status_classifications_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_season_stats"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_status_classifications_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "players"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_team_assignments: {
         Row: {
           assignment_date: string | null
@@ -2569,6 +2726,39 @@ export type Database = {
           position?: string
           updated_at?: string | null
           work_rate_attacking?: number
+        }
+        Relationships: []
+      }
+      professional_jersey_tiers: {
+        Row: {
+          commercial_significance: number | null
+          created_at: string | null
+          historical_context: string | null
+          id: number
+          jersey_number: number
+          position_preference: string | null
+          requires_admin_approval: boolean | null
+          tier: string
+        }
+        Insert: {
+          commercial_significance?: number | null
+          created_at?: string | null
+          historical_context?: string | null
+          id?: number
+          jersey_number: number
+          position_preference?: string | null
+          requires_admin_approval?: boolean | null
+          tier: string
+        }
+        Update: {
+          commercial_significance?: number | null
+          created_at?: string | null
+          historical_context?: string | null
+          id?: number
+          jersey_number?: number
+          position_preference?: string | null
+          requires_admin_approval?: boolean | null
+          tier?: string
         }
         Relationships: []
       }
@@ -3226,6 +3416,19 @@ export type Database = {
       }
     }
     Functions: {
+      get_professional_jersey_suggestions: {
+        Args: { player_position: string; exclude_taken_jerseys: number[] }
+        Returns: {
+          jersey_number: number
+          tier: string
+          priority_score: number
+          requires_approval: boolean
+        }[]
+      }
+      requires_administrative_review: {
+        Args: { requested_jersey: number; player_status?: string }
+        Returns: boolean
+      }
       resolve_player_conflict_simple: {
         Args: { p_name: string; p_jersey_number: number; p_match_id?: number }
         Returns: Json

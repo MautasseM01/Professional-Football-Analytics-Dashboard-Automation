@@ -95,26 +95,26 @@ export const EnhancedDisciplinaryCard = ({ playerId }: EnhancedDisciplinaryCardP
       </CardHeader>
       <CardContent className="p-4 sm:p-6 pt-0">
         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-club-dark-gray mb-6">
+          <TabsList className="grid w-full grid-cols-3 bg-muted border border-border mb-6 h-auto p-1">
             <TabsTrigger 
               value="overview" 
-              className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all"
             >
-              <BarChart3 className="w-4 h-4 mr-2" />
+              <BarChart3 className="w-4 h-4" />
               Overview
             </TabsTrigger>
             <TabsTrigger 
               value="timeline"
-              className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all"
             >
-              <Clock className="w-4 h-4 mr-2" />
+              <Clock className="w-4 h-4" />
               Timeline
             </TabsTrigger>
             <TabsTrigger 
               value="risk"
-              className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
+              className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-all"
             >
-              <AlertTriangle className="w-4 h-4 mr-2" />
+              <AlertTriangle className="w-4 h-4" />
               Risk
             </TabsTrigger>
           </TabsList>
