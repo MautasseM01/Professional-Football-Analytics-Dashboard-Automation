@@ -53,9 +53,9 @@ export const CoachQuickActions = () => {
   ];
 
   return (
-    <Card className="bg-club-dark-gray border-club-gold/20 light:bg-white light:border-gray-200">
+    <Card className="bg-card border-border">
       <CardHeader className="p-4 sm:p-5 lg:p-6">
-        <CardTitle className="text-club-gold light:text-yellow-600 flex items-center gap-2">
+        <CardTitle className="text-primary flex items-center gap-2">
           <Plus className="w-5 h-5" />
           Quick Actions
         </CardTitle>
@@ -66,7 +66,7 @@ export const CoachQuickActions = () => {
             <Button
               key={index}
               variant={action.variant}
-              className="h-auto p-3 flex flex-col items-center gap-2 text-xs hover:scale-105 transition-transform duration-200"
+              className="h-auto p-4 flex flex-col items-center gap-2 text-xs hover:scale-105 transition-transform duration-200 min-h-[var(--touch-target-comfortable)] touch-manipulation"
               onClick={action.onClick}
             >
               {action.icon}

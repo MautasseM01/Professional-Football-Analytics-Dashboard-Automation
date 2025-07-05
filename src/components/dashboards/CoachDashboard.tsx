@@ -48,10 +48,10 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
     <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
       {/* Welcome Header */}
       <div className="mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-club-gold mb-2">
+        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-primary mb-2">
           Welcome back, {profile.full_name || "Coach"}
         </h1>
-        <p className="text-sm sm:text-base text-club-light-gray/70">
+        <p className="text-sm sm:text-base text-muted-foreground">
           Manage your team's performance and track player development
         </p>
       </div>
@@ -161,7 +161,7 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
             value={teamMetrics?.teamGoals || 0}
             subValue="This Season"
             icon={<Target className="w-4 h-4 sm:w-5 sm:h-5" />}
-            className="border-green-500/20 bg-green-500/10"
+            className="border-primary/20 bg-primary/10"
             animateCounter={true}
             trend={{
               direction: 'up',
@@ -204,7 +204,7 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
             value={`${teamMetrics?.winRate || 0}%`}
             subValue="This Season"
             icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />}
-            className="border-green-500/20 bg-green-500/10"
+            className="border-primary/20 bg-primary/10"
             trend={{
               direction: (teamMetrics?.winRate || 0) >= 50 ? 'up' : 'down',
               percentage: 8,
@@ -225,7 +225,7 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
             value="W-W-D"
             subValue="Last 3 Games"
             icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />}
-            className="border-blue-500/20 bg-blue-500/10"
+            className="border-accent/40 bg-accent/20"
             trend={{
               direction: 'up',
               label: 'Good momentum'
@@ -255,21 +255,21 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
       <SuspensionRiskWidget />
 
       {/* Compliance Alerts for Team */}
-      <Card className="bg-club-dark-gray border-club-gold/20 light:bg-white light:border-gray-200">
+      <Card className="bg-card border-border">
         <CardHeader className="p-4 sm:p-5 lg:p-6">
-          <CardTitle className="text-club-gold light:text-yellow-600">Team Compliance Alerts</CardTitle>
-          <CardDescription className="text-club-light-gray/70 light:text-gray-600">
+          <CardTitle className="text-primary">Team Compliance Alerts</CardTitle>
+          <CardDescription className="text-muted-foreground">
             Important notices for your team
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 sm:p-5 lg:p-6 pt-0">
           <div className="space-y-3">
             {(teamMetrics?.injuredPlayers || 0) > 0 && (
-              <div className="flex items-start gap-3 p-3 sm:p-4 bg-red-900/20 light:bg-red-50 border border-red-600/30 light:border-red-200 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-red-500 light:text-red-600 flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 p-3 sm:p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-club-light-gray light:text-gray-900 font-medium">Player Injuries</p>
-                  <p className="text-club-light-gray/70 light:text-gray-600 text-sm mt-1">
+                  <p className="font-medium">Player Injuries</p>
+                  <p className="text-muted-foreground text-sm mt-1">
                     {teamMetrics?.injuredPlayers} player{(teamMetrics?.injuredPlayers || 0) > 1 ? 's' : ''} currently injured
                   </p>
                 </div>
@@ -277,11 +277,11 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
             )}
             
             {(teamMetrics?.trainingAttendance || 0) < 80 && (
-              <div className="flex items-start gap-3 p-3 sm:p-4 bg-yellow-900/20 light:bg-yellow-50 border border-yellow-600/30 light:border-yellow-200 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-yellow-500 light:text-yellow-600 flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 p-3 sm:p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-club-light-gray light:text-gray-900 font-medium">Low Training Attendance</p>
-                  <p className="text-club-light-gray/70 light:text-gray-600 text-sm mt-1">
+                  <p className="font-medium">Low Training Attendance</p>
+                  <p className="text-muted-foreground text-sm mt-1">
                     Training attendance is at {teamMetrics?.trainingAttendance}% - below target of 85%
                   </p>
                 </div>
@@ -289,11 +289,11 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
             )}
 
             {((teamMetrics?.injuredPlayers || 0) === 0 && (teamMetrics?.trainingAttendance || 0) >= 80) && (
-              <div className="flex items-start gap-3 p-3 sm:p-4 bg-green-900/20 light:bg-green-50 border border-green-600/30 light:border-green-200 rounded-lg">
-                <AlertTriangle className="h-5 w-5 text-green-500 light:text-green-600 flex-shrink-0 mt-0.5" />
+              <div className="flex items-start gap-3 p-3 sm:p-4 bg-primary/10 border border-primary/20 rounded-lg">
+                <AlertTriangle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-club-light-gray light:text-gray-900 font-medium">All Systems Green</p>
-                  <p className="text-club-light-gray/70 light:text-gray-600 text-sm mt-1">No critical issues detected with your squad</p>
+                  <p className="font-medium">All Systems Green</p>
+                  <p className="text-muted-foreground text-sm mt-1">No critical issues detected with your squad</p>
                 </div>
               </div>
             )}
