@@ -145,7 +145,7 @@ export const OptimizedDataTable = ({ className }: OptimizedDataTableProps) => {
     return (
       <Card className={`bg-club-dark-gray border-club-gold/20 ${className}`}>
         <CardContent className="p-6 text-center">
-          <div className="text-red-400 mb-4">Failed to load player data</div>
+          <div className="text-destructive mb-4">Failed to load player data</div>
           <TouchFeedbackButton onClick={() => refetch()} variant="outline">
             <RefreshCw className="h-4 w-4 mr-2" />
             Retry

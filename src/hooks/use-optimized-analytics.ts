@@ -95,8 +95,8 @@ export const usePaginatedPlayers = (searchTerm: string = '', pageSize: number = 
         .from('players')
         .select(`
           id, name, position, number, goals, assists, match_rating,
-          distance_covered, passes_completed, tackles_won, touches,
-          possession_won, possession_lost, dribbles_successful
+          distance_covered, passes_completed, tackles_won, 
+          dribbles_successful, minutes_played, matches
         `)
         .eq('season', '2024-25')
         .order('match_rating', { ascending: false, nullsFirst: false })
