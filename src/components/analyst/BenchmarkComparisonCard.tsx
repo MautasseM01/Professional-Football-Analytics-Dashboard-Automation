@@ -22,11 +22,11 @@ interface BenchmarkComparisonCardProps {
 export const BenchmarkComparisonCard = ({ benchmarks }: BenchmarkComparisonCardProps) => {
   const getStatusColor = (status: BenchmarkData['status']) => {
     switch (status) {
-      case 'excellent': return 'text-green-400 border-green-400/30';
-      case 'above-average': return 'text-blue-400 border-blue-400/30';
-      case 'average': return 'text-club-gold border-club-gold/30';
-      case 'below-average': return 'text-orange-400 border-orange-400/30';
-      default: return 'text-club-light-gray border-club-light-gray/30';
+      case 'excellent': return 'text-emerald-400 border-emerald-400/30';
+      case 'above-average': return 'text-sky-400 border-sky-400/30';
+      case 'average': return 'text-primary border-primary/30';
+      case 'below-average': return 'text-amber-400 border-amber-400/30';
+      default: return 'text-muted-foreground border-muted/30';
     }
   };
 
@@ -50,42 +50,47 @@ export const BenchmarkComparisonCard = ({ benchmarks }: BenchmarkComparisonCardP
   ];
 
   return (
-    <Card className="bg-club-dark-gray border-club-gold/20">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-club-gold text-lg font-semibold flex items-center gap-2">
+    <Card className="bg-card border-border hover:bg-muted/20 transition-all duration-300">
+      <CardHeader className="pb-3 p-4 sm:p-6">
+        <CardTitle className="text-primary text-lg font-semibold flex items-center gap-2">
           <BarChart3 className="h-5 w-5" />
           League Benchmarks
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-4 p-4 sm:p-6 pt-0">
         {benchmarkItems.map(({ key, label, data }) => (
-          <div key={key} className="space-y-2">
+          <div 
+            key={key} 
+            className="space-y-3 p-3 rounded-lg bg-muted/10 border border-muted/20 hover:bg-muted/20 transition-colors"
+          >
             <div className="flex justify-between items-center">
-              <span className="text-sm text-club-light-gray">{label}</span>
+              <span className="text-sm font-medium text-foreground">{label}</span>
               <Badge 
                 variant="outline" 
-                className={`text-xs ${getStatusColor(data.status)} flex items-center gap-1`}
+                className={`text-xs ${getStatusColor(data.status)} flex items-center gap-1 min-h-[var(--touch-target-min)] px-3`}
               >
                 {getStatusIcon(data.status)}
-                {data.status === 'no-data' ? 'No Data' : `${data.percentile}th`}
+                <span className="font-medium">
+                  {data.status === 'no-data' ? 'No Data' : `${data.percentile}th`}
+                </span>
               </Badge>
             </div>
-            <div className="space-y-1">
+            <div className="space-y-2">
               <Progress 
                 value={data.percentile} 
-                className="h-2 bg-club-black"
+                className="h-3 bg-muted"
               />
-              <div className="flex justify-between text-xs text-club-light-gray/70">
+              <div className="flex justify-between text-xs text-muted-foreground">
                 <span>Below Avg</span>
-                <span>League Avg</span>
+                <span className="font-medium">League Avg</span>
                 <span>Top 10%</span>
               </div>
             </div>
           </div>
         ))}
         
-        <div className="pt-3 border-t border-club-gold/10">
-          <p className="text-xs text-club-light-gray/60">
+        <div className="pt-4 border-t border-border">
+          <p className="text-xs text-muted-foreground text-center">
             Benchmarks based on {new Date().getFullYear()}-{(new Date().getFullYear() + 1).toString().slice(-2)} season data
           </p>
         </div>

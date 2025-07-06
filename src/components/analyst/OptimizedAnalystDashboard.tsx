@@ -45,18 +45,18 @@ const MetricCard = React.memo(({
   icon: any;
   loading: boolean;
 }) => (
-  <Card className="bg-club-dark-gray border-club-gold/20 hover:bg-club-gold/10 transition-all duration-300 group">
+  <Card className="bg-card border-border hover:bg-muted/20 transition-all duration-300 group">
     <CardHeader className="p-4 sm:p-6 pb-2">
-      <CardTitle className="flex items-center justify-between text-club-gold text-sm font-medium">
+      <CardTitle className="flex items-center justify-between text-primary text-sm font-medium">
         <span>{title}</span>
-        <Icon className="h-4 w-4 text-club-gold/60 group-hover:text-club-gold transition-colors duration-300" />
+        <Icon className="h-4 w-4 text-primary/60 group-hover:text-primary transition-colors duration-300" />
       </CardTitle>
     </CardHeader>
     <CardContent className="p-4 sm:p-6 pt-0">
-      <div className="text-2xl sm:text-3xl font-bold text-club-gold mb-1">
+      <div className="text-2xl sm:text-3xl font-bold text-primary mb-1">
         {loading ? '...' : value}
       </div>
-      <p className="text-xs text-club-light-gray/70">{subtitle}</p>
+      <p className="text-xs text-muted-foreground">{subtitle}</p>
     </CardContent>
   </Card>
 ));
@@ -111,9 +111,9 @@ export const OptimizedAnalystDashboard = ({ profile }: OptimizedAnalystDashboard
   if (analyticsError) {
     return (
       <div className="p-6">
-        <Card className="bg-club-dark-gray border-club-gold/20">
+        <Card className="bg-card border-border">
           <CardContent className="p-6 text-center">
-            <div className="text-red-400 mb-4">Failed to load analytics data</div>
+            <div className="text-destructive mb-4">Failed to load analytics data</div>
             <TouchFeedbackButton onClick={handleRefreshAll} variant="outline">
               <RefreshCw className="h-4 w-4 mr-2" />
               Retry
@@ -126,14 +126,14 @@ export const OptimizedAnalystDashboard = ({ profile }: OptimizedAnalystDashboard
 
   return (
     <ErrorBoundary>
-      <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 bg-club-black min-h-screen">
+      <div className="space-y-4 sm:space-y-6 p-4 sm:p-6 bg-background min-h-screen">
         {/* Optimized Header */}
         <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-club-gold mb-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-primary mb-2">
               Analytics Dashboard
             </h1>
-            <p className="text-sm sm:text-base text-club-light-gray/70">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Optimized for large datasets and real-time performance
             </p>
           </div>
@@ -142,7 +142,7 @@ export const OptimizedAnalystDashboard = ({ profile }: OptimizedAnalystDashboard
             <TouchFeedbackButton
               variant="outline"
               onClick={handleRefreshAll}
-              className="border-club-gold/30 hover:border-club-gold/50 hover:bg-club-gold/10 text-club-light-gray"
+              className="border-border hover:bg-muted text-foreground min-h-[var(--touch-target-min)]"
               disabled={analyticsLoading || matchesLoading}
             >
               <RefreshCw className={`h-4 w-4 mr-2 ${analyticsLoading || matchesLoading ? 'animate-spin' : ''}`} />
@@ -242,21 +242,21 @@ export const OptimizedAnalystDashboard = ({ profile }: OptimizedAnalystDashboard
 
         {/* Recent Matches Summary */}
         {recentMatches && recentMatches.length > 0 && (
-          <Card className="bg-club-dark-gray border-club-gold/20">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-club-gold">Recent Matches</CardTitle>
+              <CardTitle className="text-primary">Recent Matches</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 {recentMatches.map((match, index) => (
-                  <div key={match.id} className="flex items-center justify-between p-3 rounded-lg bg-club-black/40">
+                  <div key={match.id} className="flex items-center justify-between p-4 rounded-lg bg-muted/10 border border-muted/20 hover:bg-muted/20 transition-colors">
                     <div>
-                      <div className="font-medium text-club-light-gray">{match.opponent}</div>
-                      <div className="text-sm text-club-light-gray/60">{match.competition}</div>
+                      <div className="font-medium text-foreground">{match.opponent}</div>
+                      <div className="text-sm text-muted-foreground">{match.competition}</div>
                     </div>
                     <div className="text-right">
-                      <div className="font-medium text-club-gold">{match.result}</div>
-                      <div className="text-sm text-club-light-gray/60">{match.date}</div>
+                      <div className="font-medium text-primary">{match.result}</div>
+                      <div className="text-sm text-muted-foreground">{match.date}</div>
                     </div>
                   </div>
                 ))}

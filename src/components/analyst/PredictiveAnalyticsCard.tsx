@@ -27,9 +27,9 @@ interface PredictiveAnalyticsCardProps {
 export const PredictiveAnalyticsCard = ({ metrics }: PredictiveAnalyticsCardProps) => {
   const getFormTrendColor = (trend: string) => {
     switch (trend) {
-      case 'improving': return 'text-green-400 border-green-400/30';
-      case 'declining': return 'text-red-400 border-red-400/30';
-      default: return 'text-club-gold border-club-gold/30';
+      case 'improving': return 'text-emerald-400 border-emerald-400/30';
+      case 'declining': return 'text-rose-400 border-rose-400/30';
+      default: return 'text-primary border-primary/30';
     }
   };
 
@@ -43,51 +43,51 @@ export const PredictiveAnalyticsCard = ({ metrics }: PredictiveAnalyticsCardProp
 
   const getRiskColor = (risk: string) => {
     switch (risk) {
-      case 'high': return 'text-red-400 border-red-400/30';
-      case 'medium': return 'text-orange-400 border-orange-400/30';
-      default: return 'text-green-400 border-green-400/30';
+      case 'high': return 'text-rose-400 border-rose-400/30';
+      case 'medium': return 'text-amber-400 border-amber-400/30';
+      default: return 'text-emerald-400 border-emerald-400/30';
     }
   };
 
   return (
-    <Card className="bg-club-dark-gray border-club-gold/20">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-club-gold text-lg font-semibold flex items-center gap-2">
+    <Card className="bg-card border-border hover:bg-muted/20 transition-all duration-300">
+      <CardHeader className="pb-3 p-4 sm:p-6">
+        <CardTitle className="text-primary text-lg font-semibold flex items-center gap-2">
           <Zap className="h-5 w-5" />
           Predictive Analytics
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-6 p-4 sm:p-6 pt-0">
         {/* Current Form */}
-        <div className="space-y-2">
+        <div className="space-y-3 p-3 rounded-lg bg-muted/10 border border-muted/20">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-club-light-gray">Current Form</span>
-            <div className="flex items-center gap-2">
-              <span className="text-lg font-bold text-club-gold">
+            <span className="text-sm font-medium text-foreground">Current Form</span>
+            <div className="flex items-center gap-3">
+              <span className="text-xl font-bold text-primary">
                 {metrics.currentForm.toFixed(1)}
               </span>
               <Badge 
                 variant="outline" 
-                className={`text-xs ${getFormTrendColor(metrics.formTrend)} flex items-center gap-1`}
+                className={`text-xs ${getFormTrendColor(metrics.formTrend)} flex items-center gap-1 min-h-[var(--touch-target-min)] px-3`}
               >
                 {getFormTrendIcon(metrics.formTrend)}
-                {metrics.formTrend}
+                <span className="font-medium capitalize">{metrics.formTrend}</span>
               </Badge>
             </div>
           </div>
-          <Progress value={metrics.currentForm * 10} className="h-2 bg-club-black" />
+          <Progress value={metrics.currentForm * 10} className="h-3 bg-muted" />
         </div>
 
         {/* Injury Risk */}
-        <div className="space-y-2">
+        <div className="space-y-3 p-3 rounded-lg bg-muted/10 border border-muted/20">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-club-light-gray flex items-center gap-1">
+            <span className="text-sm font-medium text-foreground flex items-center gap-2">
               <AlertTriangle className="h-4 w-4" />
-              Injury Risk
+              Injury Risk Assessment
             </span>
             <Badge 
               variant="outline" 
-              className={`text-xs ${getRiskColor(metrics.injuryRisk)}`}
+              className={`text-xs ${getRiskColor(metrics.injuryRisk)} font-medium min-h-[var(--touch-target-min)] px-3`}
             >
               {metrics.injuryRisk.toUpperCase()}
             </Badge>
@@ -95,54 +95,54 @@ export const PredictiveAnalyticsCard = ({ metrics }: PredictiveAnalyticsCardProp
         </div>
 
         {/* Next Match Projection */}
-        <div className="space-y-2">
+        <div className="space-y-3 p-3 rounded-lg bg-muted/10 border border-muted/20">
           <div className="flex justify-between items-center">
-            <span className="text-sm text-club-light-gray flex items-center gap-1">
+            <span className="text-sm font-medium text-foreground flex items-center gap-2">
               <Target className="h-4 w-4" />
-              Next Match
+              Next Match Projection
             </span>
             <div className="text-right">
-              <div className="text-lg font-bold text-club-gold">
+              <div className="text-xl font-bold text-primary">
                 {metrics.nextMatchProjection.rating}
               </div>
-              <div className="text-xs text-club-light-gray/70">
+              <div className="text-xs text-muted-foreground">
                 {metrics.nextMatchProjection.confidence}% confidence
               </div>
             </div>
           </div>
           <Progress 
             value={metrics.nextMatchProjection.confidence} 
-            className="h-1 bg-club-black" 
+            className="h-2 bg-muted" 
           />
         </div>
 
         {/* Season Projections */}
-        <div className="space-y-3 pt-3 border-t border-club-gold/10">
-          <h4 className="text-sm font-medium text-club-gold">Season Projections</h4>
+        <div className="space-y-4 pt-4 border-t border-border">
+          <h4 className="text-sm font-semibold text-primary">Season Projections</h4>
           <div className="grid grid-cols-3 gap-4">
-            <div className="text-center">
-              <div className="text-xl font-bold text-club-gold">
+            <div className="text-center p-3 rounded-lg bg-muted/10 border border-muted/20">
+              <div className="text-2xl font-bold text-primary mb-1">
                 {metrics.seasonProjection.goals}
               </div>
-              <div className="text-xs text-club-light-gray/70">Goals</div>
+              <div className="text-xs text-muted-foreground font-medium">Goals</div>
             </div>
-            <div className="text-center">
-              <div className="text-xl font-bold text-club-gold">
+            <div className="text-center p-3 rounded-lg bg-muted/10 border border-muted/20">
+              <div className="text-2xl font-bold text-primary mb-1">
                 {metrics.seasonProjection.assists}
               </div>
-              <div className="text-xs text-club-light-gray/70">Assists</div>
+              <div className="text-xs text-muted-foreground font-medium">Assists</div>
             </div>
-            <div className="text-center">
-              <div className="text-xl font-bold text-club-gold">
+            <div className="text-center p-3 rounded-lg bg-muted/10 border border-muted/20">
+              <div className="text-2xl font-bold text-primary mb-1">
                 {metrics.seasonProjection.rating}
               </div>
-              <div className="text-xs text-club-light-gray/70">Avg Rating</div>
+              <div className="text-xs text-muted-foreground font-medium">Avg Rating</div>
             </div>
           </div>
         </div>
 
-        <div className="pt-3 border-t border-club-gold/10">
-          <p className="text-xs text-club-light-gray/60">
+        <div className="pt-4 border-t border-border">
+          <p className="text-xs text-muted-foreground text-center italic">
             Projections based on recent performance trends and historical data
           </p>
         </div>
