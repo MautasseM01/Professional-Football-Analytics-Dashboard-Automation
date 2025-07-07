@@ -72,16 +72,16 @@ export const DevelopmentTrajectories = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin w-8 h-8 border-4 border-club-gold border-t-transparent rounded-full"></div>
+        <div className="animate-spin w-8 h-8 border-4 border-primary border-t-transparent rounded-full"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <Card className="bg-club-dark-gray border-red-500/20">
+      <Card className="bg-card border-destructive/20">
         <CardContent className="p-6 text-center">
-          <p className="text-red-400">Error loading development data: {error.message}</p>
+          <p className="text-destructive">Error loading development data: {error.message}</p>
         </CardContent>
       </Card>
     );
@@ -93,8 +93,8 @@ export const DevelopmentTrajectories = () => {
       <div className="flex flex-col gap-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-club-gold">Development Workflow Management</h2>
-            <p className="text-club-light-gray/70">
+            <h2 className="text-2xl font-bold text-primary">Development Workflow Management</h2>
+            <p className="text-muted-foreground">
               Comprehensive player development tracking, reporting, and workflow automation
             </p>
           </div>
@@ -104,7 +104,7 @@ export const DevelopmentTrajectories = () => {
             <TouchFeedbackButton
               variant="outline"
               onClick={() => setExecutiveMode(true)}
-              className="border-club-gold/30"
+              className="border-border hover:bg-muted min-h-[var(--touch-target-min)]"
             >
               <Monitor className="mr-2 h-4 w-4" />
               Executive Mode
@@ -112,7 +112,7 @@ export const DevelopmentTrajectories = () => {
             <TouchFeedbackButton
               variant="outline"
               onClick={() => setPresentationMode(true)}
-              className="border-club-gold/30"
+              className="border-border hover:bg-muted min-h-[var(--touch-target-min)]"
             >
               <Presentation className="mr-2 h-4 w-4" />
               Present
@@ -122,48 +122,48 @@ export const DevelopmentTrajectories = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <Card className="bg-club-dark-gray border-club-gold/20">
+      <Card className="bg-card border-border">
         <CardContent className="p-6">
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-club-black/40">
+            <TabsList className="grid w-full grid-cols-2 lg:grid-cols-6 bg-muted/40">
               <TabsTrigger 
                 value="overview" 
-                className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-h-[var(--touch-target-min)]"
               >
                 <Target className="mr-2 h-4 w-4" />
                 Overview
               </TabsTrigger>
               <TabsTrigger 
                 value="reports" 
-                className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-h-[var(--touch-target-min)]"
               >
                 <FileText className="mr-2 h-4 w-4" />
                 Reports
               </TabsTrigger>
               <TabsTrigger 
                 value="benchmarks" 
-                className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-h-[var(--touch-target-min)]"
               >
                 <TrendingUp className="mr-2 h-4 w-4" />
                 Benchmarks
               </TabsTrigger>
               <TabsTrigger 
                 value="talent" 
-                className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-h-[var(--touch-target-min)]"
               >
                 <Eye className="mr-2 h-4 w-4" />
                 Talent ID
               </TabsTrigger>
               <TabsTrigger 
                 value="workflows" 
-                className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-h-[var(--touch-target-min)]"
               >
                 <Settings className="mr-2 h-4 w-4" />
                 Workflows
               </TabsTrigger>
               <TabsTrigger 
                 value="insights" 
-                className="data-[state=active]:bg-club-gold data-[state=active]:text-club-black"
+                className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground min-h-[var(--touch-target-min)]"
               >
                 <Activity className="mr-2 h-4 w-4" />
                 Insights

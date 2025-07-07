@@ -74,17 +74,17 @@ export const PerformanceBenchmarking = () => {
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case 'improving': return <TrendingUp className="h-4 w-4 text-green-500" />;
-      case 'declining': return <TrendingDown className="h-4 w-4 text-red-500" />;
-      default: return <div className="h-4 w-4 bg-gray-500 rounded-full" />;
+      case 'improving': return <TrendingUp className="h-4 w-4 text-emerald-500" />;
+      case 'declining': return <TrendingDown className="h-4 w-4 text-destructive" />;
+      default: return <div className="h-4 w-4 bg-muted rounded-full" />;
     }
   };
 
   const getPercentileColor = (percentile: number) => {
-    if (percentile >= 80) return 'text-green-500';
-    if (percentile >= 60) return 'text-club-gold';
+    if (percentile >= 80) return 'text-emerald-500';
+    if (percentile >= 60) return 'text-primary';
     if (percentile >= 40) return 'text-orange-500';
-    return 'text-red-500';
+    return 'text-destructive';
   };
 
   const exportToPDF = () => {
@@ -101,7 +101,7 @@ export const PerformanceBenchmarking = () => {
             variant={viewType === 'percentile' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setViewType('percentile')}
-            className={viewType === 'percentile' ? 'bg-club-gold text-club-black' : ''}
+            className={viewType === 'percentile' ? 'bg-primary text-primary-foreground min-h-[var(--touch-target-min)]' : 'border-border hover:bg-muted min-h-[var(--touch-target-min)]'}
           >
             Percentile Rankings
           </Button>
@@ -109,7 +109,7 @@ export const PerformanceBenchmarking = () => {
             variant={viewType === 'comparison' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setViewType('comparison')}
-            className={viewType === 'comparison' ? 'bg-club-gold text-club-black' : ''}
+            className={viewType === 'comparison' ? 'bg-primary text-primary-foreground min-h-[var(--touch-target-min)]' : 'border-border hover:bg-muted min-h-[var(--touch-target-min)]'}
           >
             Position Comparison
           </Button>
@@ -117,7 +117,7 @@ export const PerformanceBenchmarking = () => {
             variant={viewType === 'trends' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setViewType('trends')}
-            className={viewType === 'trends' ? 'bg-club-gold text-club-black' : ''}
+            className={viewType === 'trends' ? 'bg-primary text-primary-foreground min-h-[var(--touch-target-min)]' : 'border-border hover:bg-muted min-h-[var(--touch-target-min)]'}
           >
             Performance Radar
           </Button>
@@ -127,7 +127,7 @@ export const PerformanceBenchmarking = () => {
           variant="outline"
           size="sm"
           onClick={exportToPDF}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 border-border hover:bg-muted min-h-[var(--touch-target-min)]"
         >
           <Download className="h-4 w-4" />
           Export Report
@@ -135,36 +135,36 @@ export const PerformanceBenchmarking = () => {
       </div>
 
       {/* Overall Team Performance */}
-      <Card className="bg-club-dark-gray border-club-gold/20">
+      <Card className="bg-card border-border">
         <CardHeader>
-          <CardTitle className="flex items-center justify-between text-club-gold">
+          <CardTitle className="flex items-center justify-between text-primary">
             <div className="flex items-center">
               <BarChart3 className="mr-2 h-5 w-5" />
               Team Performance Overview
             </div>
             <div className="flex items-center gap-2">
               {getTrendIcon(teamBenchmarks.overall.trend)}
-              <Badge className="bg-club-gold/20 text-club-gold">
+              <Badge className="bg-primary/20 text-primary">
                 {teamBenchmarks.overall.percentile}th percentile
               </Badge>
             </div>
           </CardTitle>
-          <CardDescription className="text-club-light-gray/70">
+          <CardDescription className="text-muted-foreground">
             Ranked #{teamBenchmarks.overall.rank} of {teamBenchmarks.overall.totalTeams} teams in the league
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {teamBenchmarks.categories.map((category) => (
-              <div key={category.name} className="p-4 bg-club-black/40 rounded-lg text-center">
+              <div key={category.name} className="p-4 bg-muted/40 rounded-lg text-center min-h-[var(--touch-target-min)]">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  <h3 className="font-medium text-club-light-gray">{category.name}</h3>
+                  <h3 className="font-medium text-foreground">{category.name}</h3>
                   {getTrendIcon(category.trend)}
                 </div>
                 <div className={`text-2xl font-bold ${getPercentileColor(category.percentile)}`}>
                   {category.percentile}%
                 </div>
-                <div className="text-sm text-club-light-gray/70">
+                <div className="text-sm text-muted-foreground">
                   Rank #{category.rank}
                 </div>
               </div>
@@ -177,19 +177,19 @@ export const PerformanceBenchmarking = () => {
       {viewType === 'comparison' && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {positionBenchmarks.map((position) => (
-            <Card key={position.position} className="bg-club-dark-gray border-club-gold/20">
+            <Card key={position.position} className="bg-card border-border">
               <CardHeader>
-                <CardTitle className="text-club-gold">{position.position} Performance</CardTitle>
-                <CardDescription className="text-club-light-gray/70">
+                <CardTitle className="text-primary">{position.position} Performance</CardTitle>
+                <CardDescription className="text-muted-foreground">
                   vs League Average
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
                   {position.metrics.map((metric) => (
-                    <div key={metric.name} className="p-3 bg-club-black/40 rounded-lg">
+                    <div key={metric.name} className="p-3 bg-muted/40 rounded-lg">
                       <div className="flex justify-between items-center mb-2">
-                        <span className="text-sm text-club-light-gray">{metric.name}</span>
+                        <span className="text-sm text-foreground">{metric.name}</span>
                         <Badge className={`${getPercentileColor(metric.percentile)} bg-transparent border`}>
                           {metric.percentile}th %ile
                         </Badge>
@@ -197,18 +197,18 @@ export const PerformanceBenchmarking = () => {
                       
                       <div className="flex justify-between items-center text-sm">
                         <div>
-                          <span className="text-club-gold font-medium">{metric.value}</span>
-                          <span className="text-club-light-gray/50 ml-2">Our Team</span>
+                          <span className="text-primary font-medium">{metric.value}</span>
+                          <span className="text-muted-foreground/70 ml-2">Our Team</span>
                         </div>
                         <div>
-                          <span className="text-club-light-gray/70">{metric.league}</span>
-                          <span className="text-club-light-gray/50 ml-2">League Avg</span>
+                          <span className="text-muted-foreground">{metric.league}</span>
+                          <span className="text-muted-foreground/70 ml-2">League Avg</span>
                         </div>
                       </div>
 
-                      <div className="mt-2 w-full bg-club-black/60 rounded-full h-2">
+                      <div className="mt-2 w-full bg-muted/60 rounded-full h-2">
                         <div 
-                          className="bg-club-gold h-2 rounded-full transition-all duration-300"
+                          className="bg-primary h-2 rounded-full transition-all duration-300"
                           style={{ width: `${metric.percentile}%` }}
                         />
                       </div>
@@ -223,10 +223,10 @@ export const PerformanceBenchmarking = () => {
 
       {/* Performance Radar */}
       {viewType === 'trends' && (
-        <Card className="bg-club-dark-gray border-club-gold/20">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="text-club-gold">Performance Radar - Team vs League</CardTitle>
-            <CardDescription className="text-club-light-gray/70">
+            <CardTitle className="text-primary">Performance Radar - Team vs League</CardTitle>
+            <CardDescription className="text-muted-foreground">
               Comprehensive performance comparison across key areas
             </CardDescription>
           </CardHeader>
@@ -234,36 +234,36 @@ export const PerformanceBenchmarking = () => {
             <div className="h-96">
               <ResponsiveContainer width="100%" height="100%">
                 <RadarChart data={radarData}>
-                  <PolarGrid stroke="#374151" />
-                  <PolarAngleAxis dataKey="attribute" className="text-club-light-gray" fontSize={12} />
+                  <PolarGrid stroke="hsl(var(--border))" />
+                  <PolarAngleAxis dataKey="attribute" className="text-foreground" fontSize={12} />
                   <PolarRadiusAxis 
                     angle={90} 
                     domain={[0, 100]} 
-                    tick={{ fontSize: 10, fill: '#9CA3AF' }}
+                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
                   />
                   <Radar 
                     name="Our Team" 
                     dataKey="team" 
-                    stroke="#D97706" 
-                    fill="#D97706" 
+                    stroke="hsl(var(--primary))" 
+                    fill="hsl(var(--primary))" 
                     fillOpacity={0.3}
                     strokeWidth={2}
                   />
                   <Radar 
                     name="League Average" 
                     dataKey="league" 
-                    stroke="#6B7280" 
-                    fill="#6B7280" 
+                    stroke="hsl(var(--muted-foreground))" 
+                    fill="hsl(var(--muted-foreground))" 
                     fillOpacity={0.1}
                     strokeWidth={2}
                     strokeDasharray="5 5"
                   />
                   <Tooltip 
                     contentStyle={{ 
-                      backgroundColor: '#1F2937', 
-                      border: '1px solid #D97706', 
+                      backgroundColor: 'hsl(var(--card))', 
+                      border: '1px solid hsl(var(--border))', 
                       borderRadius: '8px',
-                      color: '#F3F4F6'
+                      color: 'hsl(var(--foreground))'
                     }} 
                   />
                 </RadarChart>

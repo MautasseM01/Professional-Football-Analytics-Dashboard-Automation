@@ -26,10 +26,10 @@ export const SquadAvailabilityCalendar = () => {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'minor': return 'bg-yellow-500';
+      case 'minor': return 'bg-amber-500';
       case 'moderate': return 'bg-orange-500';
-      case 'major': return 'bg-red-500';
-      default: return 'bg-gray-500';
+      case 'major': return 'bg-destructive';
+      default: return 'bg-muted';
     }
   };
 
@@ -52,9 +52,9 @@ export const SquadAvailabilityCalendar = () => {
   const getTrainingLoadRecommendation = (injury: any) => {
     const daysUntilReturn = Math.ceil((new Date(injury.expected_return_date).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24));
     
-    if (daysUntilReturn <= 7) return { level: "Light", color: "text-green-600", description: "Individual training only" };
-    if (daysUntilReturn <= 14) return { level: "Moderate", color: "text-yellow-600", description: "Limited group training" };
-    return { level: "Rest", color: "text-red-600", description: "Complete rest required" };
+    if (daysUntilReturn <= 7) return { level: "Light", color: "text-emerald-600", description: "Individual training only" };
+    if (daysUntilReturn <= 14) return { level: "Moderate", color: "text-amber-600", description: "Limited group training" };
+    return { level: "Rest", color: "text-destructive", description: "Complete rest required" };
   };
 
   const isLoading = injuriesLoading || playersLoading;
@@ -65,13 +65,13 @@ export const SquadAvailabilityCalendar = () => {
         <LoadingOverlay isLoading={isLoading} message="Loading squad availability..." />
         
         {/* Match Availability Overview */}
-        <Card className="bg-club-dark-gray border-club-gold/20">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="flex items-center text-club-gold">
+            <CardTitle className="flex items-center text-primary">
               <Calendar className="mr-2 h-5 w-5" />
               Squad Availability - Next 5 Matches
             </CardTitle>
-            <CardDescription className="text-club-light-gray/70">
+            <CardDescription className="text-muted-foreground">
               Player availability forecast for upcoming fixtures
             </CardDescription>
           </CardHeader>
@@ -82,15 +82,15 @@ export const SquadAvailabilityCalendar = () => {
                 return (
                   <Tooltip key={index}>
                     <TooltipTrigger asChild>
-                      <div className="p-4 bg-club-black/40 rounded-lg hover:bg-club-gold/10 transition-colors cursor-pointer">
+                      <div className="p-4 bg-muted/40 rounded-lg hover:bg-muted/60 transition-colors cursor-pointer min-h-[var(--touch-target-min)]">
                         <div className="flex justify-between items-start mb-2">
                           <div>
-                            <p className="font-medium text-club-gold">{match.opponent}</p>
-                            <p className="text-xs text-club-light-gray/70">{format(match.date, 'MMM dd')}</p>
-                            <p className="text-xs text-club-light-gray/50">{match.competition}</p>
+                            <p className="font-medium text-primary">{match.opponent}</p>
+                            <p className="text-xs text-muted-foreground">{format(match.date, 'MMM dd')}</p>
+                            <p className="text-xs text-muted-foreground/70">{match.competition}</p>
                           </div>
                           <Badge 
-                            className={`${availability.percentage >= 90 ? 'bg-green-600' : availability.percentage >= 80 ? 'bg-yellow-600' : 'bg-red-600'} text-white`}
+                            className={`${availability.percentage >= 90 ? 'bg-emerald-600' : availability.percentage >= 80 ? 'bg-amber-600' : 'bg-destructive'} text-white`}
                           >
                             {availability.percentage}%
                           </Badge>
@@ -98,16 +98,16 @@ export const SquadAvailabilityCalendar = () => {
                         
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-club-light-gray/70">Available:</span>
-                            <span className="text-club-gold font-medium">{availability.available}/{availability.total}</span>
+                            <span className="text-muted-foreground">Available:</span>
+                            <span className="text-primary font-medium">{availability.available}/{availability.total}</span>
                           </div>
                           
                           {availability.injured.length > 0 && (
                             <div className="mt-2">
-                              <p className="text-xs text-club-light-gray/50 mb-1">Injured players:</p>
+                              <p className="text-xs text-muted-foreground/70 mb-1">Injured players:</p>
                               <div className="flex flex-wrap gap-1">
                                 {availability.injured.slice(0, 3).map((injury: any) => (
-                                  <Badge key={injury.id} variant="outline" className="text-xs bg-red-500/10 text-red-400 border-red-500/30">
+                                  <Badge key={injury.id} variant="outline" className="text-xs bg-destructive/10 text-destructive border-destructive/30">
                                     {players?.find(p => p.id === injury.player_id)?.name?.split(' ').pop()}
                                   </Badge>
                                 ))}
@@ -123,8 +123,8 @@ export const SquadAvailabilityCalendar = () => {
                     <TooltipContent>
                       <div className="p-2">
                         <p className="font-medium">{match.opponent}</p>
-                        <p className="text-sm text-club-light-gray/70">{format(match.date, 'EEEE, MMMM dd')}</p>
-                        <p className="text-xs text-club-light-gray/50">Click for detailed breakdown</p>
+                        <p className="text-sm text-muted-foreground">{format(match.date, 'EEEE, MMMM dd')}</p>
+                        <p className="text-xs text-muted-foreground/70">Click for detailed breakdown</p>
                       </div>
                     </TooltipContent>
                   </Tooltip>
@@ -135,9 +135,9 @@ export const SquadAvailabilityCalendar = () => {
         </Card>
 
         {/* Detailed Injury Overview */}
-        <Card className="bg-club-dark-gray border-club-gold/20">
+        <Card className="bg-card border-border">
           <CardHeader>
-            <CardTitle className="flex items-center text-club-gold">
+            <CardTitle className="flex items-center text-primary">
               <AlertTriangle className="mr-2 h-5 w-5" />
               Injury Status & Recovery Timeline
             </CardTitle>
@@ -153,13 +153,13 @@ export const SquadAvailabilityCalendar = () => {
                   return (
                     <Tooltip key={injury.id}>
                       <TooltipTrigger asChild>
-                        <div className="p-4 bg-club-black/40 rounded-lg hover:bg-club-gold/10 transition-colors cursor-pointer">
+                        <div className="p-4 bg-muted/40 rounded-lg hover:bg-muted/60 transition-colors cursor-pointer min-h-[var(--touch-target-min)]">
                           <div className="flex items-start justify-between">
                             <div className="flex items-center gap-3">
                               <PlayerAvatar player={player} size="sm" />
                               <div>
-                                <p className="font-medium text-club-gold">{player?.name}</p>
-                                <p className="text-sm text-club-light-gray/70">{player?.position}</p>
+                                <p className="font-medium text-primary">{player?.name}</p>
+                                <p className="text-sm text-muted-foreground">{player?.position}</p>
                               </div>
                             </div>
                             
@@ -167,7 +167,7 @@ export const SquadAvailabilityCalendar = () => {
                               <Badge className={`${getSeverityColor(injury.severity)} text-white mb-1`}>
                                 {injury.severity}
                               </Badge>
-                              <p className="text-xs text-club-light-gray/70">
+                              <p className="text-xs text-muted-foreground">
                                 {daysUntilReturn > 0 ? `${daysUntilReturn} days` : 'Overdue'}
                               </p>
                             </div>
@@ -175,17 +175,17 @@ export const SquadAvailabilityCalendar = () => {
                           
                           <div className="mt-3 grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                             <div>
-                              <p className="text-club-light-gray/50">Injury Type</p>
-                              <p className="text-club-light-gray">{injury.injury_type}</p>
+                              <p className="text-muted-foreground/70">Injury Type</p>
+                              <p className="text-foreground">{injury.injury_type}</p>
                             </div>
                             <div>
-                              <p className="text-club-light-gray/50">Expected Return</p>
-                              <p className="text-club-light-gray">{format(new Date(injury.expected_return_date), 'MMM dd, yyyy')}</p>
+                              <p className="text-muted-foreground/70">Expected Return</p>
+                              <p className="text-foreground">{format(new Date(injury.expected_return_date), 'MMM dd, yyyy')}</p>
                             </div>
                             <div>
-                              <p className="text-club-light-gray/50">Training Load</p>
+                              <p className="text-muted-foreground/70">Training Load</p>
                               <p className={trainingRec.color}>{trainingRec.level}</p>
-                              <p className="text-xs text-club-light-gray/50">{trainingRec.description}</p>
+                              <p className="text-xs text-muted-foreground/70">{trainingRec.description}</p>
                             </div>
                           </div>
                         </div>
@@ -195,9 +195,9 @@ export const SquadAvailabilityCalendar = () => {
                           <p className="font-medium">{player?.name}</p>
                           <p className="text-sm">{injury.injury_type} - {injury.body_part}</p>
                           {injury.notes && (
-                            <p className="text-xs text-club-light-gray/70 mt-1">{injury.notes}</p>
+                            <p className="text-xs text-muted-foreground mt-1">{injury.notes}</p>
                           )}
-                          <p className="text-xs text-club-light-gray/50 mt-1">Click for detailed report</p>
+                          <p className="text-xs text-muted-foreground/70 mt-1">Click for detailed report</p>
                         </div>
                       </TooltipContent>
                     </Tooltip>
@@ -206,8 +206,8 @@ export const SquadAvailabilityCalendar = () => {
               </div>
             ) : (
               <div className="text-center py-8">
-                <Users className="mx-auto h-12 w-12 text-club-light-gray/30" />
-                <p className="mt-2 text-club-light-gray/70">No current injuries - squad fully available!</p>
+                <Users className="mx-auto h-12 w-12 text-muted-foreground/30" />
+                <p className="mt-2 text-muted-foreground">No current injuries - squad fully available!</p>
               </div>
             )}
           </CardContent>
