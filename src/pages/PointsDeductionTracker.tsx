@@ -32,8 +32,8 @@ const PointsDeductionTracker = () => {
 
   return (
     <DashboardLayout 
-      title="Administrative Penalties & Point Deductions" 
-      description="Track and analyze the impact of administrative penalties on team performance"
+      title="Pénalités Administratives et Déductions de Points" 
+      description="Suivez et analysez l'impact des pénalités administratives sur les performances de l'équipe"
     >
       <div className="space-y-6 p-4 sm:p-6">
         
@@ -43,8 +43,8 @@ const PointsDeductionTracker = () => {
             <div className="flex items-center gap-3">
               <AlertTriangle className="h-5 w-5 text-yellow-500 flex-shrink-0" />
               <div>
-                <p className="text-yellow-400 font-medium">Active Points Deduction</p>
-                <p className="text-yellow-300/80 text-sm">Current season: 6 points deducted. Appeal status: Under Review</p>
+                <p className="text-yellow-400 font-medium">Déduction de Points Active</p>
+                <p className="text-yellow-300/80 text-sm">Saison actuelle : 6 points déduits. Statut recours : Sous examen</p>
               </div>
             </div>
           </CardContent>
@@ -57,7 +57,7 @@ const PointsDeductionTracker = () => {
         <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center">
           <div className="flex-1 max-w-sm">
             <Input
-              placeholder="Search deductions..."
+              placeholder="Rechercher déductions..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="bg-club-dark-gray border-club-gold/20"
@@ -68,7 +68,7 @@ const PointsDeductionTracker = () => {
             className="bg-club-gold text-club-black hover:bg-club-gold/90"
           >
             <Download className="mr-2 h-4 w-4" />
-            Export CSV
+            Exporter CSV
           </Button>
         </div>
 

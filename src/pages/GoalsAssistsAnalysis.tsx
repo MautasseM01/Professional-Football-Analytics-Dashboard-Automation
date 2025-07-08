@@ -49,8 +49,8 @@ const GoalsAssistsAnalysis = () => {
 
   return (
     <DashboardLayout 
-      title="Goals & Assists Analysis"
-      description="Comprehensive analysis of goals and assists performance"
+      title="Analyse Buts et Passes Décisives"
+      description="Analyse complète des performances en buts et passes décisives"
       onRefresh={handleRefresh}
     >
       <div className="container-responsive min-h-screen bg-gradient-to-br from-slate-900 via-club-black to-slate-900 dark:from-slate-900 dark:via-club-black dark:to-slate-900 light:from-gray-50 light:via-white light:to-gray-50">
@@ -60,7 +60,7 @@ const GoalsAssistsAnalysis = () => {
             <Alert className="bg-blue-500/10 light:bg-blue-600/20 border-blue-500/30 light:border-blue-600/40">
               <RotateCcw className="h-4 w-4" />
               <AlertDescription className="text-club-light-gray light:text-gray-700 text-sm">
-                For better chart viewing, try rotating your device to landscape mode.
+                Pour une meilleure visualisation des graphiques, essayez de faire pivoter votre appareil en mode paysage.
               </AlertDescription>
             </Alert>
           )}
@@ -105,10 +105,10 @@ const GoalsAssistsAnalysis = () => {
             <div className="flex items-center justify-center min-h-[50vh] text-center px-4">
               <div className="space-y-2">
                 <p className="text-base sm:text-lg text-club-light-gray light:text-gray-700">
-                  No player selected
+                  Aucun joueur sélectionné
                 </p>
                 <p className="text-xs sm:text-sm text-club-light-gray/60 light:text-gray-600">
-                  Please select a player to view their goals and assists analysis
+                  Veuillez sélectionner un joueur pour voir son analyse des buts et passes décisives
                 </p>
               </div>
             </div>

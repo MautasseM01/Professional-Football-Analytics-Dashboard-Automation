@@ -33,10 +33,10 @@ const ShotMap = () => {
               {/* Left section - Title and page info */}
               <div className="flex-1 min-w-0">
                 <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-club-gold dark:text-club-gold truncate">
-                  Shot Map Analysis
+                  Analyse Carte des Tirs
                 </h2>
                 <p className="text-ios-caption text-gray-400 dark:text-gray-400 truncate">
-                  Visualize and analyze shot patterns and outcomes
+                  Visualisez et analysez les modèles et résultats de tirs
                 </p>
               </div>
               
@@ -54,7 +54,7 @@ const ShotMap = () => {
                   size="icon" 
                   className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" 
                   onClick={handleRefresh} 
-                  title="Refresh data" 
+                  title="Actualiser les données" 
                   hapticType="medium"
                 >
                   <RefreshCw size={14} className="sm:hidden text-club-gold" />
@@ -68,7 +68,7 @@ const ShotMap = () => {
                   size="icon" 
                   onClick={() => setShowSidebar(!showSidebar)} 
                   className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" 
-                  title="Toggle sidebar" 
+                  title="Basculer la barre latérale" 
                   hapticType="light"
                 >
                   <Menu size={16} className="sm:hidden text-club-gold" />

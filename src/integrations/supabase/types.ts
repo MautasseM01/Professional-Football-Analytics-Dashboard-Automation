@@ -3421,6 +3421,14 @@ export type Database = {
       }
     }
     Functions: {
+      can_see_all_players: {
+        Args: Record<PropertyKey, never>
+        Returns: boolean
+      }
+      get_player_id: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       get_professional_jersey_suggestions: {
         Args: { player_position: string; exclude_taken_jerseys: number[] }
         Returns: {
@@ -3429,6 +3437,10 @@ export type Database = {
           priority_score: number
           requires_approval: boolean
         }[]
+      }
+      get_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
       }
       requires_administrative_review: {
         Args: { requested_jersey: number; player_status?: string }

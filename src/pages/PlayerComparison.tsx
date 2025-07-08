@@ -29,8 +29,8 @@ const PlayerComparison = () => {
 
   return (
     <DashboardLayout 
-      title="Player Comparison"
-      description="Compare up to 4 players across various performance metrics"
+      title="Comparaison des Joueurs"
+      description="Comparez jusqu'à 4 joueurs selon diverses métriques de performance"
       onRefresh={handleRefresh}
     >
       <div className="container-responsive min-h-screen bg-gradient-to-br from-slate-900 via-club-black to-slate-900 dark:from-slate-900 dark:via-club-black dark:to-slate-900 light:from-gray-50 light:via-white light:to-gray-50">
@@ -65,7 +65,7 @@ const PlayerComparison = () => {
           {selectedPlayers.length === 1 && (
             <div className="text-center py-12">
               <p className="body-normal text-club-light-gray/70 dark:text-gray-400 light:text-gray-500 text-lg">
-                Select at least one more player to start comparing
+                Sélectionnez au moins un autre joueur pour commencer la comparaison
               </p>
             </div>
           )}
@@ -73,7 +73,7 @@ const PlayerComparison = () => {
           {selectedPlayers.length === 0 && (
             <div className="text-center py-12">
               <p className="body-normal text-club-light-gray/70 dark:text-gray-400 light:text-gray-500 text-lg">
-                Select players to start comparing their performance
+                Sélectionnez des joueurs pour commencer à comparer leurs performances
               </p>
             </div>
           )}

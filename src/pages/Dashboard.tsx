@@ -56,10 +56,10 @@ const Dashboard = () => {
       return <div className="p-4 sm:p-6">
           <div className="bg-red-50/90 dark:bg-red-900/30 border border-red-200 dark:border-red-700 rounded-2xl p-6 backdrop-blur-sm">
             <div className="flex flex-col gap-4">
-              <p className="text-ios-body text-red-800 dark:text-red-200">Error loading user profile: {error}</p>
+              <p className="text-ios-body text-red-800 dark:text-red-200">Erreur lors du chargement du profil utilisateur : {error}</p>
               <TouchFeedbackButton variant="outline" className="w-fit bg-white/50 dark:bg-slate-800/50 border-red-200 dark:border-red-700 hover:bg-red-50 dark:hover:bg-red-900/20" onClick={handleRefresh}>
                 <RefreshCw size={16} className="mr-2" />
-                Retry Loading Data
+                Réessayer
               </TouchFeedbackButton>
             </div>
           </div>
@@ -69,10 +69,10 @@ const Dashboard = () => {
       return <div className="p-4 sm:p-6">
           <div className="bg-amber-50/90 dark:bg-amber-900/30 border border-amber-200 dark:border-amber-700 rounded-2xl p-6 backdrop-blur-sm">
             <div className="flex flex-col gap-4">
-              <p className="text-ios-body text-amber-800 dark:text-amber-200">User profile not found. Please try refreshing the page or contact an administrator.</p>
+              <p className="text-ios-body text-amber-800 dark:text-amber-200">Profil utilisateur introuvable. Veuillez actualiser la page ou contacter un administrateur.</p>
               <TouchFeedbackButton variant="outline" className="w-fit bg-white/50 dark:bg-slate-800/50 border-amber-200 dark:border-amber-700 hover:bg-amber-50 dark:hover:bg-amber-900/20" onClick={handleRefresh}>
                 <RefreshCw size={16} className="mr-2" />
-                Retry Loading Data
+                Réessayer
               </TouchFeedbackButton>
             </div>
           </div>
@@ -129,14 +129,14 @@ const Dashboard = () => {
               <ThemeToggle />
               
               {/* Refresh Button */}
-              <TouchFeedbackButton variant="outline" size="icon" className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" onClick={handleRefresh} title="Refresh data" hapticType="medium">
+              <TouchFeedbackButton variant="outline" size="icon" className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" onClick={handleRefresh} title="Actualiser les données" hapticType="medium">
                 <RefreshCw size={14} className="sm:hidden text-club-gold" />
                 <RefreshCw size={16} className="hidden sm:block lg:hidden text-club-gold" />
                 <RefreshCw size={18} className="hidden lg:block text-club-gold" />
               </TouchFeedbackButton>
               
               {/* Menu Toggle */}
-              <TouchFeedbackButton variant="outline" size="icon" onClick={() => setShowSidebar(!showSidebar)} className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" title="Toggle sidebar" hapticType="light">
+              <TouchFeedbackButton variant="outline" size="icon" onClick={() => setShowSidebar(!showSidebar)} className="bg-club-black/50 dark:bg-club-black/50 border-club-gold/30 dark:border-club-gold/30 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" title="Basculer la barre latérale" hapticType="light">
                 <Menu size={16} className="sm:hidden text-club-gold" />
                 <Menu size={18} className="hidden sm:block lg:hidden text-club-gold" />
                 <Menu size={20} className="hidden lg:block text-club-gold" />
