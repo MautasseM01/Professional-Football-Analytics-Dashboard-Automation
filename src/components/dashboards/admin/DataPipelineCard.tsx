@@ -3,59 +3,62 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Database, ClipboardList } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const DataPipelineCard = () => {
+  const { t } = useLanguage();
+  
   const dataImports = [
-    { source: "Match Data Pipeline", status: "operational", lastUpdate: "Today 09:45" },
-    { source: "Training Data Sync", status: "warning", lastUpdate: "Yesterday 18:30" },
-    { source: "Video Analysis Feed", status: "operational", lastUpdate: "Today 10:15" },
-    { source: "GPS Data Service", status: "error", lastUpdate: "3 days ago" }
+    { source: "Match Data Pipeline", status: "operational", lastUpdate: `${t('admin.today')} 09:45` },
+    { source: "Training Data Sync", status: "warning", lastUpdate: "Hier 18:30" },
+    { source: "Video Analysis Feed", status: "operational", lastUpdate: `${t('admin.today')} 10:15` },
+    { source: "GPS Data Service", status: "error", lastUpdate: "Il y a 3 jours" }
   ];
 
   const getStatusBadgeClass = (status: string) => {
     switch (status) {
       case 'operational':
-        return 'bg-green-600/80 text-white border-green-600/80';
+        return 'bg-green-600 text-white border-green-600';
       case 'warning':
-        return 'bg-amber-600/80 text-white border-amber-600/80';
+        return 'bg-amber-600 text-white border-amber-600';
       case 'error':
-        return 'bg-red-600/80 text-white border-red-600/80';
+        return 'bg-red-600 text-white border-red-600';
       default:
-        return 'bg-gray-600/80 text-white border-gray-600/80';
+        return 'bg-muted text-muted-foreground border-border';
     }
   };
 
   return (
-    <Card className="bg-club-dark-gray border-club-gold/20">
-      <CardHeader className="pb-2 p-2 xs:p-3 sm:p-4 md:p-5 lg:p-6 sm:pb-2">
-        <CardTitle className="flex items-center text-club-gold text-xs xs:text-sm sm:text-base md:text-lg">
-          <Database className="mr-2 h-3 w-3 xs:h-4 xs:w-4 sm:h-5 sm:w-5" />
-          Data Pipeline Status
+    <Card className="bg-card border-border hover:border-border/60 transition-colors">
+      <CardHeader className="pb-2">
+        <CardTitle className="flex items-center text-primary text-lg">
+          <Database className="mr-2 h-5 w-5" />
+          {t('admin.dataPipeline')}
         </CardTitle>
-        <CardDescription className="text-club-light-gray/70 text-xs xs:text-sm md:text-base">
-          Import/export operations and system health
+        <CardDescription className="text-muted-foreground">
+          {t('admin.dataPipelineDesc')}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-2 xs:space-y-3 sm:space-y-4 p-2 xs:p-3 sm:p-4 md:p-5 lg:p-6">
+      <CardContent className="space-y-4">
         {/* Data services status */}
         <div>
-          <h4 className="text-xs xs:text-sm md:text-base font-medium text-club-light-gray mb-2">Data Services</h4>
+          <h4 className="text-sm font-medium text-foreground mb-3">{t('admin.dataServices')}</h4>
           <ul className="space-y-2">
             {dataImports.map((service, index) => (
-              <li key={index} className="flex justify-between items-center bg-club-black/40 p-2 xs:p-3 md:p-4 rounded">
-                <div className="flex-1 min-w-0 mr-2 xs:mr-3">
-                  <p className="text-club-light-gray truncate text-xs xs:text-sm md:text-base">{service.source}</p>
-                  <p className="text-xs md:text-sm text-club-light-gray/70">Last update: {service.lastUpdate}</p>
+              <li key={index} className="flex justify-between items-center bg-muted/30 p-3 rounded-lg touch-target-44">
+                <div className="flex-1 min-w-0 mr-3">
+                  <p className="text-foreground truncate text-sm">{service.source}</p>
+                  <p className="text-xs text-muted-foreground">Dernière màj: {service.lastUpdate}</p>
                 </div>
                 <Badge 
                   className={`
-                    w-20 h-8 flex items-center justify-center
-                    text-xs md:text-sm font-medium rounded-md
+                    min-w-[80px] h-8 flex items-center justify-center
+                    text-xs font-medium rounded-md
                     flex-shrink-0
                     ${getStatusBadgeClass(service.status)}
                   `}
                 >
-                  <span className="truncate">{service.status}</span>
+                  <span className="truncate">{t(`admin.${service.status}`) || service.status}</span>
                 </Badge>
               </li>
             ))}
@@ -63,41 +66,41 @@ export const DataPipelineCard = () => {
         </div>
         
         {/* Data operations */}
-        <div className="grid grid-cols-1 xs:grid-cols-2 gap-2">
-          <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 text-xs xs:text-sm md:text-base h-8 xs:h-9 md:h-10 touch-target-44">
-            Schedule Import
+        <div className="grid grid-cols-2 gap-3">
+          <Button variant="outline" className="min-h-[48px] text-sm touch-target-44">
+            {t('admin.scheduleImport')}
           </Button>
-          <Button variant="outline" className="border-club-gold/20 hover:bg-club-gold/10 text-xs xs:text-sm md:text-base h-8 xs:h-9 md:h-10 touch-target-44">
-            Export Data
+          <Button variant="outline" className="min-h-[48px] text-sm touch-target-44">
+            {t('admin.exportData')}
           </Button>
         </div>
         
         {/* System diagnostics */}
-        <div className="mt-2 xs:mt-3 sm:mt-4">
-          <Card className="bg-club-black/40 border-club-gold/10">
-            <CardHeader className="py-2 px-2 xs:px-3 md:px-4">
-              <CardTitle className="text-xs xs:text-sm md:text-base flex items-center text-club-light-gray">
-                <ClipboardList className="mr-2 h-3 w-3 xs:h-4 xs:w-4 text-club-gold" />
-                System Diagnostics
+        <div>
+          <Card className="bg-muted/30 border-border/50">
+            <CardHeader className="py-3 px-4">
+              <CardTitle className="text-sm flex items-center text-foreground">
+                <ClipboardList className="mr-2 h-4 w-4 text-primary" />
+                {t('admin.systemDiagnostics')}
               </CardTitle>
             </CardHeader>
-            <CardContent className="py-2 px-2 xs:px-3 md:px-4">
-              <ul className="space-y-1 text-xs md:text-sm">
+            <CardContent className="py-3 px-4">
+              <ul className="space-y-2 text-sm">
                 <li className="flex justify-between">
-                  <span className="text-club-light-gray/70">Database Status:</span>
-                  <span className="text-green-400">Online</span>
+                  <span className="text-muted-foreground">{t('admin.databaseStatus')}:</span>
+                  <span className="text-green-600">{t('admin.online')}</span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-club-light-gray/70">API Services:</span>
-                  <span className="text-green-400">Operational</span>
+                  <span className="text-muted-foreground">{t('admin.apiServices')}:</span>
+                  <span className="text-green-600">{t('admin.operational')}</span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-club-light-gray/70">Storage:</span>
-                  <span className="text-amber-400">78% Used</span>
+                  <span className="text-muted-foreground">{t('admin.storage')}:</span>
+                  <span className="text-amber-600">78% {t('admin.used')}</span>
                 </li>
                 <li className="flex justify-between">
-                  <span className="text-club-light-gray/70">Last Backup:</span>
-                  <span className="text-club-light-gray">Today 03:00</span>
+                  <span className="text-muted-foreground">{t('admin.lastBackup')}:</span>
+                  <span className="text-foreground">{t('admin.today')} 03:00</span>
                 </li>
               </ul>
             </CardContent>
