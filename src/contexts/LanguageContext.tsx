@@ -171,6 +171,28 @@ const translations = {
     'role.admin': 'Administrateur',
     'role.unassigned': 'Non assigné',
 
+    // Unassigned Role Dashboard
+    'unassigned.welcome': 'Bienvenue sur Striker Insights Arena',
+    'unassigned.accountCreated': 'Votre compte a été créé avec succès',
+    'unassigned.roleAssignmentPending': 'Attribution de Rôle en Attente',
+    'unassigned.accessLimited': 'Votre compte a été créé, mais aucun rôle ne vous a encore été attribué. Votre accès aux fonctionnalités sera limité jusqu\'à ce qu\'un administrateur vous attribue le rôle approprié.',
+    'unassigned.nextStepsTitle': 'Que se passe-t-il ensuite ?',
+    'unassigned.step1': 'Un administrateur examinera votre compte et vous attribuera le rôle approprié en fonction de votre position au sein de l\'organisation.',
+    'unassigned.step2': 'Une fois votre rôle attribué, vous aurez accès aux fonctionnalités et aux données pertinentes pour votre position.',
+    'unassigned.step3': 'Vous recevrez une notification par email lorsque votre compte sera entièrement configuré.',
+    'unassigned.contactAdmin': 'Contacter l\'Administrateur',
+    'unassigned.viewDocs': 'Consulter la Documentation',
+    'unassigned.needHelp': 'Si vous pensez qu\'il s\'agit d\'une erreur ou si vous avez des questions, veuillez contacter l\'administrateur système à',
+    'unassigned.statusPending': 'Statut : En attente d\'attribution de rôle',
+    'unassigned.estimatedTime': 'Temps d\'attribution estimé : 24-48 heures',
+    'unassigned.roleTypes': 'Types de rôles disponibles',
+    'unassigned.playerRole': 'Joueur - Accès aux statistiques personnelles et au développement',
+    'unassigned.coachRole': 'Entraîneur - Gestion d\'équipe et analyse tactique',
+    'unassigned.analystRole': 'Analyste - Outils d\'analyse avancés et rapports',
+    'unassigned.directorRole': 'Directeur - Vue d\'ensemble stratégique et benchmarks',
+    'unassigned.managementRole': 'Direction - Métriques exécutives et gouvernance',
+    'unassigned.adminRole': 'Administrateur - Configuration système et gestion utilisateurs',
+
     // Login & Authentication
     'auth.welcomeBack': 'Bon retour',
     'auth.login': 'Connexion',
