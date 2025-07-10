@@ -2,6 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar, Clock, MapPin } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface UpcomingEvent {
   id: string;
@@ -13,6 +14,8 @@ interface UpcomingEvent {
 }
 
 export const CoachMiniCalendar = () => {
+  const { t } = useLanguage();
+  
   const upcomingEvents: UpcomingEvent[] = [
     {
       id: '1',
@@ -51,13 +54,13 @@ export const CoachMiniCalendar = () => {
   const getEventBadgeColor = (type: string) => {
     switch (type) {
       case 'match':
-        return 'bg-red-500/20 text-red-400 border-red-500/30';
+        return 'bg-gradient-to-r from-red-500/20 to-red-600/20 text-red-400 border-red-500/30';
       case 'training':
-        return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+        return 'bg-gradient-to-r from-blue-500/20 to-blue-600/20 text-blue-400 border-blue-500/30';
       case 'meeting':
-        return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+        return 'bg-gradient-to-r from-amber-500/20 to-amber-600/20 text-amber-400 border-amber-500/30';
       default:
-        return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
+        return 'bg-gradient-to-r from-muted/20 to-muted/30 text-muted-foreground border-muted/30';
     }
   };
 
@@ -75,11 +78,11 @@ export const CoachMiniCalendar = () => {
   };
 
   return (
-    <Card className="bg-card border-border">
+    <Card className="bg-gradient-to-br from-background to-secondary/20 border-border/50 shadow-lg">
       <CardHeader className="p-4 sm:p-5 lg:p-6">
         <CardTitle className="text-primary flex items-center gap-2">
           <Calendar className="w-5 h-5" />
-          Upcoming Schedule
+          {t('coach.upcomingSchedule')}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 sm:p-5 lg:p-6 pt-0">
@@ -87,29 +90,29 @@ export const CoachMiniCalendar = () => {
           {upcomingEvents.map((event) => (
             <div 
               key={event.id} 
-              className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg hover:bg-muted transition-colors duration-200 cursor-pointer min-h-[var(--touch-target-comfortable)] touch-manipulation"
+              className="flex items-center gap-4 p-4 bg-gradient-to-r from-card/80 to-card/50 border border-border/50 rounded-xl hover:from-card hover:to-card/80 hover:border-primary/20 transition-all duration-300 cursor-pointer min-h-[60px] touch-manipulation hover:shadow-md active:scale-98"
             >
-              <div className="text-lg flex-shrink-0">
+              <div className="text-2xl flex-shrink-0 p-2 bg-primary/10 rounded-lg">
                 {getEventIcon(event.type)}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2 mb-1">
-                  <span className="font-medium text-sm truncate">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="font-semibold text-sm text-foreground truncate">
                     {event.title}
                   </span>
-                  <Badge className={`text-xs px-2 py-0.5 ${getEventBadgeColor(event.type)}`}>
+                  <Badge className={`text-xs px-2 py-1 font-medium rounded-md ${getEventBadgeColor(event.type)}`}>
                     {event.type}
                   </Badge>
                 </div>
-                <div className="flex items-center gap-3 text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Clock className="w-3 h-3" />
-                    <span>{event.date} at {event.time}</span>
+                <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="w-3.5 h-3.5" />
+                    <span className="font-medium">{event.date} à {event.time}</span>
                   </div>
                   {event.location && (
-                    <div className="flex items-center gap-1">
-                      <MapPin className="w-3 h-3" />
-                      <span className="truncate">{event.location}</span>
+                    <div className="flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5" />
+                      <span className="truncate font-medium">{event.location}</span>
                     </div>
                   )}
                 </div>

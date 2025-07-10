@@ -13,6 +13,7 @@ import SuspensionRiskWidget from "../SuspensionRiskWidget";
 import { IOSLoadingState } from "../IOSLoadingState";
 import { toast } from "sonner";
 import { useTeamMetrics } from "@/hooks/use-team-metrics";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 interface CoachDashboardProps {
   profile: UserProfile;
@@ -21,6 +22,7 @@ interface CoachDashboardProps {
 export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
   const { players, selectedPlayer, selectPlayer, loading } = usePlayerData();
   const { data: teamMetrics, isLoading: metricsLoading } = useTeamMetrics();
+  const { t } = useLanguage();
 
   const handleSquadSizeClick = () => {
     toast.info("Opening player list...");
@@ -45,16 +47,17 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
   const isDataLoading = loading || metricsLoading;
 
   return (
-    <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-      {/* Welcome Header */}
-      <div className="mb-4 sm:mb-6">
-        <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-primary mb-2">
-          Welcome back, {profile.full_name || "Coach"}
-        </h1>
-        <p className="text-sm sm:text-base text-muted-foreground">
-          Manage your team's performance and track player development
-        </p>
-      </div>
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-background/80">
+      <div className="container max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-6">
+        {/* Welcome Header */}
+        <div className="mb-6">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-primary to-primary/70 bg-clip-text text-transparent mb-3">
+            {t('coach.welcomeBack')}, {profile.full_name || "Coach"}
+          </h1>
+          <p className="text-muted-foreground text-lg">
+            {t('coach.manageTeam')}
+          </p>
+        </div>
 
       {/* Enhanced Team Overview Cards */}
       <IOSLoadingState isLoading={isDataLoading} suppressDemoLoading={false}>
@@ -63,9 +66,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
           className="grid-cols-1 sm:grid-cols-2 md:grid-cols-4"
         >
           <EnhancedStatCard
-            title="Squad Size"
+            title={t('coach.squadSize')}
             value={teamMetrics?.totalPlayers || 0}
-            subValue="Active Players"
+            subValue={t('coach.activePlayers')}
             icon={<Users className="w-4 h-4 sm:w-5 sm:h-5" />}
             animateCounter={true}
             onClick={handleSquadSizeClick}
@@ -84,9 +87,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
           />
 
           <EnhancedStatCard
-            title="Players Available"
+            title={t('coach.playersAvailable')}
             value={teamMetrics?.availablePlayers || 0}
-            subValue="Ready for Selection"
+            subValue={t('coach.readyForSelection')}
             icon={<UserCheck className="w-4 h-4 sm:w-5 sm:h-5" />}
             animateCounter={true}
             onClick={handleAvailablePlayersClick}
@@ -105,9 +108,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
           />
 
           <EnhancedStatCard
-            title="Injuries"
+            title={t('coach.injuries')}
             value={teamMetrics?.injuredPlayers || 0}
-            subValue="Players Injured"
+            subValue={t('coach.playersInjured')}
             icon={<AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5" />}
             priority={(teamMetrics?.injuredPlayers || 0) > 3 ? "critical" : (teamMetrics?.injuredPlayers || 0) > 1 ? "warning" : "normal"}
             onClick={handleInjuriesClick}
@@ -127,9 +130,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
           />
 
           <EnhancedStatCard
-            title="Training Attendance"
+            title={t('coach.trainingAttendance')}
             value={`${teamMetrics?.trainingAttendance || 0}%`}
-            subValue="This Week"
+            subValue={t('coach.thisWeek')}
             icon={<Clock className="w-4 h-4 sm:w-5 sm:h-5" />}
             onClick={handleTrainingAttendanceClick}
             priority={(teamMetrics?.trainingAttendance || 0) < 80 ? "warning" : "normal"}
@@ -157,9 +160,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
           className="grid-cols-1 sm:grid-cols-2 md:grid-cols-4"
         >
           <EnhancedStatCard
-            title="Team Goals"
+            title={t('coach.teamGoals')}
             value={teamMetrics?.teamGoals || 0}
-            subValue="This Season"
+            subValue={t('coach.thisSeason')}
             icon={<Target className="w-4 h-4 sm:w-5 sm:h-5" />}
             className="border-primary/20 bg-primary/10"
             animateCounter={true}
@@ -179,9 +182,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
           />
 
           <EnhancedStatCard
-            title="Upcoming Suspensions"
+            title={t('coach.upcomingSuspensions')}
             value={teamMetrics?.suspendedPlayers || 0}
-            subValue="Next 3 Matches"
+            subValue={t('coach.next3Matches')}
             icon={<Ban className="w-4 h-4 sm:w-5 sm:h-5" />}
             priority={(teamMetrics?.suspendedPlayers || 0) > 0 ? "warning" : "normal"}
             onClick={handleSuspensionsClick}
@@ -200,9 +203,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
           />
 
           <EnhancedStatCard
-            title="Win Rate"
+            title={t('coach.winRate')}
             value={`${teamMetrics?.winRate || 0}%`}
-            subValue="This Season"
+            subValue={t('coach.thisSeason')}
             icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />}
             className="border-primary/20 bg-primary/10"
             trend={{
@@ -221,9 +224,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
           />
 
           <EnhancedStatCard
-            title="Form"
+            title={t('coach.form')}
             value="W-W-D"
-            subValue="Last 3 Games"
+            subValue={t('coach.last3Games')}
             icon={<TrendingUp className="w-4 h-4 sm:w-5 sm:h-5" />}
             className="border-accent/40 bg-accent/20"
             trend={{
@@ -257,9 +260,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
       {/* Compliance Alerts for Team */}
       <Card className="bg-card border-border">
         <CardHeader className="p-4 sm:p-5 lg:p-6">
-          <CardTitle className="text-primary">Team Compliance Alerts</CardTitle>
+          <CardTitle className="text-primary">{t('coach.teamComplianceAlerts')}</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Important notices for your team
+            {t('coach.importantNotices')}
           </CardDescription>
         </CardHeader>
         <CardContent className="p-4 sm:p-5 lg:p-6 pt-0">
@@ -268,9 +271,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
               <div className="flex items-start gap-3 p-3 sm:p-4 bg-destructive/10 border border-destructive/20 rounded-lg">
                 <AlertTriangle className="h-5 w-5 text-destructive flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium">Player Injuries</p>
+                  <p className="font-medium">{t('coach.playerInjuriesAlert')}</p>
                   <p className="text-muted-foreground text-sm mt-1">
-                    {teamMetrics?.injuredPlayers} player{(teamMetrics?.injuredPlayers || 0) > 1 ? 's' : ''} currently injured
+                    {teamMetrics?.injuredPlayers} joueur{(teamMetrics?.injuredPlayers || 0) > 1 ? 's' : ''} actuellement blessé{(teamMetrics?.injuredPlayers || 0) > 1 ? 's' : ''}
                   </p>
                 </div>
               </div>
@@ -280,9 +283,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
               <div className="flex items-start gap-3 p-3 sm:p-4 bg-amber-500/10 border border-amber-500/20 rounded-lg">
                 <AlertTriangle className="h-5 w-5 text-amber-500 flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium">Low Training Attendance</p>
+                  <p className="font-medium">{t('coach.lowTrainingAttendance')}</p>
                   <p className="text-muted-foreground text-sm mt-1">
-                    Training attendance is at {teamMetrics?.trainingAttendance}% - below target of 85%
+                    La présence aux entraînements est à {teamMetrics?.trainingAttendance}% - en dessous de l'objectif de 85%
                   </p>
                 </div>
               </div>
@@ -292,8 +295,8 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
               <div className="flex items-start gap-3 p-3 sm:p-4 bg-primary/10 border border-primary/20 rounded-lg">
                 <AlertTriangle className="h-5 w-5 text-primary flex-shrink-0 mt-0.5" />
                 <div className="min-w-0 flex-1">
-                  <p className="font-medium">All Systems Green</p>
-                  <p className="text-muted-foreground text-sm mt-1">No critical issues detected with your squad</p>
+                  <p className="font-medium">{t('coach.allSystemsGreen')}</p>
+                  <p className="text-muted-foreground text-sm mt-1">{t('coach.noCriticalIssues')}</p>
                 </div>
               </div>
             )}
@@ -309,8 +312,9 @@ export const CoachDashboard = ({ profile }: CoachDashboardProps) => {
         loading={loading}
       />
 
-      {/* Player Stats Component */}
-      {selectedPlayer && <PlayerStats player={selectedPlayer} />}
+        {/* Player Stats Component */}
+        {selectedPlayer && <PlayerStats player={selectedPlayer} />}
+      </div>
     </div>
   );
 };

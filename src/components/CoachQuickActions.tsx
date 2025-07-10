@@ -11,66 +11,77 @@ import {
   Plus
 } from "lucide-react";
 import { ResponsiveGrid } from "./ResponsiveLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export const CoachQuickActions = () => {
+  const { t } = useLanguage();
+  
   const quickActions = [
     {
-      title: "Team Selection",
-      icon: <Users className="w-4 h-4" />,
+      title: t('coach.teamSelection'),
+      icon: <Users className="w-5 h-5" />,
       onClick: () => console.log("Open team selection"),
-      variant: "default" as const
+      variant: "default" as const,
+      className: "bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg"
     },
     {
-      title: "Training Plan",
-      icon: <ClipboardList className="w-4 h-4" />,
+      title: t('coach.trainingPlan'),
+      icon: <ClipboardList className="w-5 h-5" />,
       onClick: () => console.log("Open training plan"),
-      variant: "outline" as const
+      variant: "outline" as const,
+      className: "border-primary/20 hover:bg-primary/10 hover:border-primary/40"
     },
     {
-      title: "Schedule Match",
-      icon: <Calendar className="w-4 h-4" />,
+      title: t('coach.scheduleMatch'),
+      icon: <Calendar className="w-5 h-5" />,
       onClick: () => console.log("Schedule match"),
-      variant: "outline" as const
+      variant: "outline" as const,
+      className: "border-primary/20 hover:bg-primary/10 hover:border-primary/40"
     },
     {
-      title: "Set Goals",
-      icon: <Target className="w-4 h-4" />,
+      title: t('coach.setGoals'),
+      icon: <Target className="w-5 h-5" />,
       onClick: () => console.log("Set team goals"),
-      variant: "outline" as const
+      variant: "outline" as const,
+      className: "border-primary/20 hover:bg-primary/10 hover:border-primary/40"
     },
     {
-      title: "Player Feedback",
-      icon: <MessageSquare className="w-4 h-4" />,
+      title: t('coach.playerFeedback'),
+      icon: <MessageSquare className="w-5 h-5" />,
       onClick: () => console.log("Give player feedback"),
-      variant: "outline" as const
+      variant: "outline" as const,
+      className: "border-primary/20 hover:bg-primary/10 hover:border-primary/40"
     },
     {
-      title: "Match Report",
-      icon: <FileText className="w-4 h-4" />,
+      title: t('coach.matchReport'),
+      icon: <FileText className="w-5 h-5" />,
       onClick: () => console.log("Create match report"),
-      variant: "outline" as const
+      variant: "outline" as const,
+      className: "border-primary/20 hover:bg-primary/10 hover:border-primary/40"
     }
   ];
 
   return (
-    <Card className="bg-card border-border">
+    <Card className="bg-gradient-to-br from-background to-primary/5 border-primary/10 shadow-lg">
       <CardHeader className="p-4 sm:p-5 lg:p-6">
         <CardTitle className="text-primary flex items-center gap-2">
           <Plus className="w-5 h-5" />
-          Quick Actions
+          {t('coach.quickActions')}
         </CardTitle>
       </CardHeader>
       <CardContent className="p-4 sm:p-5 lg:p-6 pt-0">
-        <ResponsiveGrid minCardWidth="140px" className="gap-3">
+        <ResponsiveGrid minCardWidth="150px" className="gap-4">
           {quickActions.map((action, index) => (
             <Button
               key={index}
               variant={action.variant}
-              className="h-auto p-4 flex flex-col items-center gap-2 text-xs hover:scale-105 transition-transform duration-200 min-h-[var(--touch-target-comfortable)] touch-manipulation"
+              className={`h-auto p-4 flex flex-col items-center gap-3 text-sm font-medium hover:scale-105 active:scale-95 transition-all duration-200 min-h-[80px] touch-manipulation shadow-sm hover:shadow-md ${action.className}`}
               onClick={action.onClick}
             >
-              {action.icon}
-              <span className="text-center leading-tight">{action.title}</span>
+              <div className="flex-shrink-0">
+                {action.icon}
+              </div>
+              <span className="text-center leading-tight text-xs">{action.title}</span>
             </Button>
           ))}
         </ResponsiveGrid>
