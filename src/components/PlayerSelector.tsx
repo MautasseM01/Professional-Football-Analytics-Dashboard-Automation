@@ -54,11 +54,13 @@ export const PlayerSelector = ({
   return (
     <Card className="bg-club-dark-gray border-club-gold/20 light:bg-white light:border-gray-200">
       <CardHeader className="p-4 sm:p-5 lg:p-6">
-        <CardTitle className="flex items-center gap-2 text-club-gold light:text-yellow-600">
+        <CardTitle className="flex items-center gap-2 text-primary">
           <Users className="w-5 h-5" />
+          {/* TODO: Add translation */}
           Player Selection
         </CardTitle>
-        <CardDescription className="text-club-light-gray/70 light:text-gray-600">
+        <CardDescription className="text-muted-foreground">
+          {/* TODO: Add translation */}
           Choose a player to view their detailed statistics and performance data
         </CardDescription>
       </CardHeader>
@@ -67,23 +69,24 @@ export const PlayerSelector = ({
         <IOSLoadingState isLoading={loading} suppressDemoLoading={false}>
           {/* Search Input */}
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-club-light-gray/50 light:text-gray-400 w-4 h-4" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
             <Input
-              placeholder="Search players by name or position..."
+              placeholder={/* TODO: Add translation */ "Search players by name or position..."}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 bg-club-black/40 light:bg-gray-50 border-club-gold/30 light:border-gray-300 text-club-light-gray light:text-gray-900 placeholder:text-club-light-gray/50 light:placeholder:text-gray-500"
+              className="pl-10 bg-background/50 border-border text-foreground placeholder:text-muted-foreground focus:border-primary transition-colors"
             />
           </div>
 
           {/* Player Selection */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-medium text-club-light-gray light:text-gray-700">
+              <h3 className="text-sm font-medium text-foreground">
+                {/* TODO: Add translation */}
                 Select Player ({filteredPlayers.length} available)
               </h3>
               {selectedPlayer && (
-                <Badge variant="outline" className="text-club-gold light:text-yellow-600 border-club-gold/30 light:border-yellow-600/30">
+                <Badge variant="outline" className="text-primary border-primary/30">
                   {selectedPlayer.position}
                 </Badge>
               )}
@@ -93,25 +96,25 @@ export const PlayerSelector = ({
               value={selectedPlayer?.id.toString() || ""} 
               onValueChange={handlePlayerSelect}
             >
-              <SelectTrigger className="bg-club-black/40 light:bg-gray-50 border-club-gold/30 light:border-gray-300 text-club-light-gray light:text-gray-900">
-                <SelectValue placeholder="Choose a player..." />
+              <SelectTrigger className="bg-background/50 border-border text-foreground hover:border-primary transition-colors">
+                <SelectValue placeholder={/* TODO: Add translation */ "Choose a player..."} />
               </SelectTrigger>
-              <SelectContent className="bg-club-dark-gray light:bg-white border-club-gold/30 light:border-gray-200 max-h-60">
+              <SelectContent className="bg-popover border-border max-h-60">
                 {filteredPlayers.map((player) => (
                   <SelectItem 
                     key={player.id} 
                     value={player.id.toString()}
-                    className="text-club-light-gray light:text-gray-900 hover:bg-club-gold/10 light:hover:bg-yellow-600/10 focus:bg-club-gold/20 light:focus:bg-yellow-600/20"
+                    className="text-foreground hover:bg-accent focus:bg-accent"
                   >
                     <div className="flex items-center gap-3 w-full">
                       <PlayerAvatar player={player} size="sm" />
                       <div className="flex-1 min-w-0">
                         <div className="font-medium truncate">{player.name}</div>
-                        <div className="text-xs text-club-light-gray/60 light:text-gray-500 truncate">
+                        <div className="text-xs text-muted-foreground truncate">
                           {player.position} • #{player.number || 'N/A'}
                         </div>
                       </div>
-                      <div className="text-xs text-club-gold light:text-yellow-600 font-medium">
+                      <div className="text-xs text-primary font-medium">
                         {player.goals || 0}G
                       </div>
                     </div>
@@ -123,36 +126,36 @@ export const PlayerSelector = ({
 
           {/* Selected Player Info */}
           {selectedPlayer && (
-            <div className="p-4 bg-club-black/40 light:bg-gray-50 rounded-lg border border-club-gold/20 light:border-gray-200">
+            <div className="p-4 bg-accent/20 rounded-lg border border-border">
               <div className="flex items-center gap-4">
                 <PlayerAvatar player={selectedPlayer} size="md" />
                 <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-club-light-gray light:text-gray-900 truncate">
+                  <h4 className="font-semibold text-foreground truncate">
                     {selectedPlayer.name}
                   </h4>
-                  <p className="text-sm text-club-light-gray/70 light:text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     {selectedPlayer.position} • #{selectedPlayer.number || 'N/A'}
                   </p>
                   <div className="flex items-center gap-4 mt-2 text-xs">
-                    <span className="text-club-gold light:text-yellow-600 font-medium">
+                    <span className="text-primary font-medium">
                       {selectedPlayer.matches || 0} matches
                     </span>
-                    <span className="text-club-light-gray/60 light:text-gray-500">
+                    <span className="text-muted-foreground">
                       {selectedPlayer.goals || 0} goals
                     </span>
-                    <span className="text-club-light-gray/60 light:text-gray-500">
+                    <span className="text-muted-foreground">
                       {selectedPlayer.assists || 0} assists
                     </span>
                   </div>
                 </div>
                 <div className="text-right">
-                  <div className="flex items-center gap-1 text-club-gold light:text-yellow-600">
+                  <div className="flex items-center gap-1 text-primary">
                     <TrendingUp className="w-4 h-4" />
                     <span className="text-sm font-medium">
                       {selectedPlayer.match_rating ? Number(selectedPlayer.match_rating).toFixed(1) : '0.0'}
                     </span>
                   </div>
-                  <p className="text-xs text-club-light-gray/60 light:text-gray-500">Rating</p>
+                  <p className="text-xs text-muted-foreground">Rating</p>
                 </div>
               </div>
             </div>
@@ -160,9 +163,9 @@ export const PlayerSelector = ({
 
           {/* No players found */}
           {filteredPlayers.length === 0 && !loading && (
-            <div className="text-center py-8 text-club-light-gray/60 light:text-gray-500">
+            <div className="text-center py-8 text-muted-foreground">
               <Users className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>No players found matching your search</p>
+              <p>{/* TODO: Add translation */}No players found matching your search</p>
             </div>
           )}
         </IOSLoadingState>

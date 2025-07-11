@@ -45,10 +45,10 @@ const PlayerStatsPage = () => {
           <div className="flex justify-between items-center px-3 sm:px-4 lg:px-6 py-[23px] gap-2 sm:gap-4">
             {/* Left section - Title and page info */}
             <div className="flex-1 min-w-0">
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold text-club-gold dark:text-club-gold light:text-yellow-600 truncate">
+              <h2 className="text-lg sm:text-xl lg:text-2xl font-bold bg-gradient-to-r from-primary to-primary-variant bg-clip-text text-transparent truncate">
                 {t('nav.individualStats')}
               </h2>
-              <p className="text-ios-caption text-gray-400 dark:text-gray-400 light:text-gray-600 truncate">
+              <p className="text-ios-caption text-muted-foreground truncate">
                 {t('page.playerStats.description')}
               </p>
             </div>
@@ -62,17 +62,17 @@ const PlayerStatsPage = () => {
               <ThemeToggle />
               
               {/* Refresh Button */}
-              <TouchFeedbackButton variant="outline" size="icon" className="bg-club-black/50 dark:bg-club-black/50 light:bg-white/90 border-club-gold/30 dark:border-club-gold/30 light:border-gray-300 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 light:hover:bg-yellow-600/20 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" onClick={handleRefresh} title={t('common.refreshData')} hapticType="medium">
-                <RefreshCw size={14} className="sm:hidden text-club-gold light:text-yellow-600" />
-                <RefreshCw size={16} className="hidden sm:block lg:hidden text-club-gold light:text-yellow-600" />
-                <RefreshCw size={18} className="hidden lg:block text-club-gold light:text-yellow-600" />
+              <TouchFeedbackButton variant="outline" size="icon" className="bg-background/80 border-border hover:bg-accent h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm transition-all duration-200 hover:scale-105" onClick={handleRefresh} title={t('common.refreshData')} hapticType="medium">
+                <RefreshCw size={14} className="sm:hidden text-primary" />
+                <RefreshCw size={16} className="hidden sm:block lg:hidden text-primary" />
+                <RefreshCw size={18} className="hidden lg:block text-primary" />
               </TouchFeedbackButton>
               
               {/* Menu Toggle */}
-              <TouchFeedbackButton variant="outline" size="icon" onClick={() => setShowSidebar(!showSidebar)} className="bg-club-black/50 dark:bg-club-black/50 light:bg-white/90 border-club-gold/30 dark:border-club-gold/30 light:border-gray-300 hover:bg-club-gold/10 dark:hover:bg-club-gold/10 light:hover:bg-yellow-600/20 h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm" title={t('common.toggleSidebar')} hapticType="light">
-                <Menu size={16} className="sm:hidden text-club-gold light:text-yellow-600" />
-                <Menu size={18} className="hidden sm:block lg:hidden text-club-gold light:text-yellow-600" />
-                <Menu size={20} className="hidden lg:block text-club-gold light:text-yellow-600" />
+              <TouchFeedbackButton variant="outline" size="icon" onClick={() => setShowSidebar(!showSidebar)} className="bg-background/80 border-border hover:bg-accent h-8 w-8 sm:h-9 sm:w-9 lg:h-10 lg:w-10 backdrop-blur-sm transition-all duration-200 hover:scale-105" title={t('common.toggleSidebar')} hapticType="light">
+                <Menu size={16} className="sm:hidden text-primary" />
+                <Menu size={18} className="hidden sm:block lg:hidden text-primary" />
+                <Menu size={20} className="hidden lg:block text-primary" />
               </TouchFeedbackButton>
             </div>
           </div>
@@ -90,10 +90,10 @@ const PlayerStatsPage = () => {
 
             {/* Role-based access information */}
             <RoleBasedContent allowedRoles={['player']}>
-              <Alert className="bg-club-gold/10 light:bg-yellow-600/20 border-club-gold/30 light:border-yellow-600/40">
-                <Info className="h-4 w-4" />
-                <AlertDescription className="text-club-light-gray light:text-gray-700 text-sm sm:text-base">
-                  {profile?.role === 'player' ? "Vous ne pouvez voir que vos propres statistiques et données de performance." : t('message.selectPlayerToView')}
+            <Alert className="bg-gradient-to-r from-accent/20 to-accent/10 border-accent/30">
+                <Info className="h-4 w-4 text-primary" />
+                <AlertDescription className="text-foreground text-sm sm:text-base">
+                  {profile?.role === 'player' ? t('playerStats.roleAccess.player') : t('message.selectPlayerToView')}
                 </AlertDescription>
               </Alert>
             </RoleBasedContent>
@@ -109,11 +109,11 @@ const PlayerStatsPage = () => {
             {/* No player selected message */}
             {!selectedPlayer && !loading && <div className="flex items-center justify-center min-h-[50vh] text-center px-4">
                 <div className="space-y-2">
-                  <p className="text-base sm:text-lg text-club-light-gray light:text-gray-700">
-                    {profile?.role === 'player' ? t('message.loadingPlayerProfile') : t('error.noPlayerSelected')}
+                  <p className="text-base sm:text-lg text-foreground">
+                    {profile?.role === 'player' ? t('playerStats.roleAccess.loading') : t('error.noPlayerSelected')}
                   </p>
-                  <p className="text-xs sm:text-sm text-club-light-gray/60 light:text-gray-600">
-                    {profile?.role === 'player' ? "Veuillez patienter pendant que nous chargeons vos statistiques" : t('message.selectPlayerToView')}
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {profile?.role === 'player' ? t('playerStats.roleAccess.loadingStats') : t('message.selectPlayerToView')}
                   </p>
                 </div>
               </div>}

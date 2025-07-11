@@ -148,8 +148,8 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
   return (
     <Card className="bg-club-black/80 border-club-gold/30 light:bg-white light:border-gray-200">
       <CardHeader>
-        <CardTitle className="text-club-gold light:text-yellow-600 flex items-center justify-between">
-          <span>Player Profile</span>
+        <CardTitle className="text-primary flex items-center justify-between">
+          <span>{/* TODO: Add translation */}Player Profile</span>
           <div className="flex items-center gap-2">
             <div className={`w-3 h-3 rounded-full ${formIndicator.dot}`} title={formIndicator.label} />
           </div>
@@ -161,18 +161,18 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
           <div className="flex flex-col items-center sm:items-start space-y-3">
             <PlayerAvatar player={player} size="lg" />
             <div className="text-center sm:text-left">
-              <h3 className="text-xl font-bold text-club-light-gray light:text-gray-900">
+              <h3 className="text-xl font-bold text-foreground">
                 {player.name || 'Unknown Player'}
               </h3>
-              <p className="text-club-light-gray/80 light:text-gray-600">
+              <p className="text-muted-foreground">
                 {player.position || 'Unknown Position'} {player.number && `• #${player.number}`}
               </p>
               <div className="flex items-center gap-2 mt-2">
-                <Badge variant="secondary" className={`${getRatingColor(overallRating)} bg-club-gold/20 light:bg-yellow-600/20`}>
+                <Badge variant="secondary" className={`${getRatingColor(overallRating)} bg-accent/20`}>
                   Overall: {overallRating}
                 </Badge>
                 {attributes?.preferred_foot && (
-                  <Badge variant="outline" className="border-club-gold/30 text-club-light-gray light:border-gray-300 light:text-gray-600">
+                  <Badge variant="outline" className="border-border text-foreground">
                     {attributes.preferred_foot} Footed
                   </Badge>
                 )}
@@ -182,79 +182,79 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
 
           {/* Stats Grid */}
           <div className="flex-1 grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="text-center p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
-              <div className="text-lg sm:text-xl font-bold text-club-gold light:text-yellow-600">
+            <div className="text-center p-3 bg-accent/20 rounded-lg">
+              <div className="text-lg sm:text-xl font-bold text-primary">
                 {player.matches || 0}
               </div>
-              <div className="text-xs text-club-light-gray/80 light:text-gray-600">Matches</div>
+              <div className="text-xs text-muted-foreground">Matches</div>
             </div>
             
-            <div className="text-center p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
+            <div className="text-center p-3 bg-accent/20 rounded-lg">
               <div className="text-lg sm:text-xl font-bold text-green-500">
                 {player.goals || 0}
               </div>
-              <div className="text-xs text-club-light-gray/80 light:text-gray-600">Goals</div>
+              <div className="text-xs text-muted-foreground">Goals</div>
             </div>
             
-            <div className="text-center p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
+            <div className="text-center p-3 bg-accent/20 rounded-lg">
               <div className="text-lg sm:text-xl font-bold text-blue-500">
                 {player.assists || 0}
               </div>
-              <div className="text-xs text-club-light-gray/80 light:text-gray-600">Assists</div>
+              <div className="text-xs text-muted-foreground">Assists</div>
             </div>
             
-            <div className="text-center p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
+            <div className="text-center p-3 bg-accent/20 rounded-lg">
               <div className="text-lg sm:text-xl font-bold text-purple-500">
                 {player.match_rating ? player.match_rating.toFixed(1) : '0.0'}
               </div>
-              <div className="text-xs text-club-light-gray/80 light:text-gray-600">Rating</div>
+              <div className="text-xs text-muted-foreground">Rating</div>
             </div>
           </div>
         </div>
 
         {/* Coaching-Specific Information */}
-        <div className="mt-6 pt-4 border-t border-club-gold/30 light:border-gray-200">
+        <div className="mt-6 pt-4 border-t border-border">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Form Indicator */}
-            <div className="flex items-center gap-3 p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
-              <Activity className="w-5 h-5 text-club-gold light:text-yellow-600" />
+            <div className="flex items-center gap-3 p-3 bg-accent/20 rounded-lg">
+              <Activity className="w-5 h-5 text-primary" />
               <div>
-                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Current Form</div>
+                <div className="text-sm font-medium text-foreground">Current Form</div>
                 <div className="flex items-center gap-2">
                   <div className={`w-2 h-2 rounded-full ${formIndicator.dot}`} />
-                  <span className="text-xs text-club-light-gray/70 light:text-gray-600">{formIndicator.label}</span>
+                  <span className="text-xs text-muted-foreground">{formIndicator.label}</span>
                 </div>
               </div>
             </div>
 
             {/* Contract Status */}
-            <div className="flex items-center gap-3 p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
-              <FileText className="w-5 h-5 text-club-gold light:text-yellow-600" />
+            <div className="flex items-center gap-3 p-3 bg-accent/20 rounded-lg">
+              <FileText className="w-5 h-5 text-primary" />
               <div>
-                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Contract</div>
-                <div className="text-xs text-club-light-gray/70 light:text-gray-600">
+                <div className="text-sm font-medium text-foreground">Contract</div>
+                <div className="text-xs text-muted-foreground">
                   {contractStatus.daysRemaining} days left
                 </div>
               </div>
             </div>
 
             {/* Injury Status */}
-            <div className="flex items-center gap-3 p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
-              <Shield className="w-5 h-5 text-club-gold light:text-yellow-600" />
+            <div className="flex items-center gap-3 p-3 bg-accent/20 rounded-lg">
+              <Shield className="w-5 h-5 text-primary" />
               <div>
-                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Fitness</div>
-                <div className="text-xs text-club-light-gray/70 light:text-gray-600">
+                <div className="text-sm font-medium text-foreground">Fitness</div>
+                <div className="text-xs text-muted-foreground">
                   {injuryHistory.riskLevel} Risk
                 </div>
               </div>
             </div>
 
             {/* Disciplinary Record */}
-            <div className="flex items-center gap-3 p-3 bg-club-black/40 light:bg-gray-50 rounded-lg">
-              <AlertTriangle className="w-5 h-5 text-club-gold light:text-yellow-600" />
+            <div className="flex items-center gap-3 p-3 bg-accent/20 rounded-lg">
+              <AlertTriangle className="w-5 h-5 text-primary" />
               <div>
-                <div className="text-sm font-medium text-club-light-gray light:text-gray-900">Discipline</div>
-                <div className="text-xs text-club-light-gray/70 light:text-gray-600">
+                <div className="text-sm font-medium text-foreground">Discipline</div>
+                <div className="text-xs text-muted-foreground">
                   {disciplinaryData?.yellowCards || 0}Y {disciplinaryData?.redCards || 0}R
                 </div>
               </div>
@@ -264,8 +264,8 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
 
         {/* Top Attributes Section */}
         {topAttributes.length > 0 && (
-          <div className="mt-6 pt-4 border-t border-club-gold/30 light:border-gray-200">
-            <h4 className="font-semibold text-club-gold light:text-yellow-600 mb-3">
+          <div className="mt-6 pt-4 border-t border-border">
+            <h4 className="font-semibold text-primary mb-3">
               Top Attributes
             </h4>
             <div className="flex flex-wrap gap-2">
@@ -273,7 +273,7 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
                 <Badge 
                   key={index}
                   variant="outline" 
-                  className="border-club-gold/30 text-club-light-gray light:border-gray-300 light:text-gray-600"
+                  className="border-border text-foreground"
                 >
                   {attr.name}: {attr.value}
                 </Badge>
@@ -287,14 +287,14 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
           <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-club-light-gray light:text-gray-700">Work Rate:</span>
-                <span className="font-medium text-club-light-gray light:text-gray-900">
+                <span className="text-muted-foreground">Work Rate:</span>
+                <span className="font-medium text-foreground">
                   {attributes.work_rate_attacking || 50}/100 ATT | {attributes.work_rate_defensive || 50}/100 DEF
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-club-light-gray light:text-gray-700">Skill Moves:</span>
-                <span className="font-medium text-club-light-gray light:text-gray-900">
+                <span className="text-muted-foreground">Skill Moves:</span>
+                <span className="font-medium text-foreground">
                   ★{attributes.skill_moves_rating || 3} | Weak Foot: ★{attributes.weak_foot_rating || 3}
                 </span>
               </div>
@@ -302,14 +302,14 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
             
             <div className="space-y-2">
               <div className="flex justify-between">
-                <span className="text-club-light-gray light:text-gray-700">Leadership:</span>
-                <span className="font-medium text-club-light-gray light:text-gray-900">
+                <span className="text-muted-foreground">Leadership:</span>
+                <span className="font-medium text-foreground">
                   {attributes.leadership || 50}/100
                 </span>
               </div>
               <div className="flex justify-between">
-                <span className="text-club-light-gray light:text-gray-700">Mental Strength:</span>
-                <span className="font-medium text-club-light-gray light:text-gray-900">
+                <span className="text-muted-foreground">Mental Strength:</span>
+                <span className="font-medium text-foreground">
                   {attributes.mental_strength || 50}/100
                 </span>
               </div>
@@ -318,7 +318,7 @@ export const PlayerProfileCard = ({ player }: PlayerProfileCardProps) => {
         )}
 
         {/* Quick Action Buttons */}
-        <div className="mt-6 pt-4 border-t border-club-gold/30 light:border-gray-200">
+        <div className="mt-6 pt-4 border-t border-border">
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" className="flex items-center gap-2">
               <Calendar className="w-4 h-4" />
