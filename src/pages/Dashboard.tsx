@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { usePlayerData } from "@/hooks/use-player-data";
-import { useUserProfile } from "@/hooks/use-user-profile";
+import { useAuth } from "@/hooks/use-auth";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { DashboardSidebar } from "@/components/DashboardSidebar";
 import { TestModeIndicator } from "@/components/TestModeIndicator";
@@ -22,18 +22,25 @@ import { Menu, RefreshCw, Sparkles } from "lucide-react";
 import { TouchFeedbackButton } from "@/components/TouchFeedbackButton";
 
 const Dashboard = () => {
+  console.log("Dashboard: Starting render");
+  
   const {
     loading: playerDataLoading,
     refreshData
   } = usePlayerData();
-  const {
-    profile,
-    loading: profileLoading,
-    error
-  } = useUserProfile();
-  const {
-    t
-  } = useLanguage();
+  
+  console.log("Dashboard: Got playerData hook");
+  
+  // Get profile through useAuth to avoid circular dependency
+  const { profile } = useAuth();
+  const profileLoading = false; // Profile loading is handled by useAuth/usePlayerData
+  const error = null;
+  
+  console.log("Dashboard: Got profile through useAuth");
+  
+  const { t } = useLanguage();
+  
+  console.log("Dashboard: Got language hook");
   const [showSidebar, setShowSidebar] = useState(true);
   const handleRefresh = () => {
     console.log("Manual refresh triggered");
