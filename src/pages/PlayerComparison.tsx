@@ -6,10 +6,12 @@ import { ProfessionalPerformanceTable } from "@/components/comparison/Profession
 import { PerformanceRadarChart } from "@/components/comparison/PerformanceRadarChart";
 import { Player } from "@/types";
 import { useRealPlayers } from "@/hooks/use-real-players";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 const PlayerComparison = () => {
   const [selectedPlayers, setSelectedPlayers] = useState<Player[]>([]);
   const { isLoading: playersLoading } = useRealPlayers();
+  const { t } = useLanguage();
 
   const handlePlayerSelect = (player: Player) => {
     if (selectedPlayers.length < 4 && !selectedPlayers.some(p => p.id === player.id)) {
@@ -29,8 +31,8 @@ const PlayerComparison = () => {
 
   return (
     <DashboardLayout 
-      title="Comparaison des Joueurs"
-      description="Comparez jusqu'à 4 joueurs selon diverses métriques de performance"
+      title={t('comparison.title')}
+      description={t('comparison.subtitle')}
       onRefresh={handleRefresh}
     >
       <div className="container-responsive min-h-screen bg-gradient-to-br from-slate-900 via-club-black to-slate-900 dark:from-slate-900 dark:via-club-black dark:to-slate-900 light:from-gray-50 light:via-white light:to-gray-50">
@@ -51,7 +53,7 @@ const PlayerComparison = () => {
               />
               
               <div className="flex justify-center">
-                <div className="w-full max-w-2xl">
+                <div className="w-full max-w-5xl">
                   <PerformanceRadarChart 
                     selectedPlayers={selectedPlayers}
                     loading={playersLoading}
@@ -65,7 +67,7 @@ const PlayerComparison = () => {
           {selectedPlayers.length === 1 && (
             <div className="text-center py-12">
               <p className="body-normal text-club-light-gray/70 dark:text-gray-400 light:text-gray-500 text-lg">
-                Sélectionnez au moins un autre joueur pour commencer la comparaison
+                {t('comparison.selectAtLeastTwo')}
               </p>
             </div>
           )}
@@ -73,7 +75,7 @@ const PlayerComparison = () => {
           {selectedPlayers.length === 0 && (
             <div className="text-center py-12">
               <p className="body-normal text-club-light-gray/70 dark:text-gray-400 light:text-gray-500 text-lg">
-                Sélectionnez des joueurs pour commencer à comparer leurs performances
+                {t('comparison.selectPlayersToStart')}
               </p>
             </div>
           )}

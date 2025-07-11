@@ -5,6 +5,7 @@ import { PlayerAvatar } from "@/components/PlayerAvatar";
 import { TrendingUp, BarChart3, Medal, Target, ChevronLeft, ChevronRight } from "lucide-react";
 import { Player } from "@/types";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { TableLoadingSkeleton } from "@/components/LoadingStates";
@@ -21,57 +22,57 @@ export const ProfessionalPerformanceTable = ({
   selectedPlayers,
   loading
 }: ProfessionalPerformanceTableProps) => {
-  const {
-    theme
-  } = useTheme();
+  const { theme } = useTheme();
+  const { t } = useLanguage();
   const isMobile = useIsMobile();
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const [showScrollHints, setShowScrollHints] = useState(false);
+
   const metrics: MetricConfig[] = [{
     key: 'distance' as SortableMetric,
-    label: 'Total Distance',
-    shortLabel: 'Distance',
-    mobileLabel: 'Dist',
+    label: t('comparison.distance'),
+    shortLabel: t('comparison.distanceShort'),
+    mobileLabel: t('comparison.distanceMobile'),
     getValue: player => player.distance || null,
     format: value => value ? `${value.toFixed(1)} km` : 'N/A',
     unit: 'km',
     icon: TrendingUp,
-    description: 'Total distance covered during the match',
+    description: t('comparison.totalDistanceDesc'),
     priority: 1
   }, {
     key: 'passCompletion' as SortableMetric,
-    label: 'Pass Completion',
-    shortLabel: 'Pass %',
-    mobileLabel: 'Pass',
+    label: t('comparison.passCompletion'),
+    shortLabel: t('comparison.passCompletionShort'),
+    mobileLabel: t('comparison.passCompletionMobile'),
     getValue: player => player.passes_attempted && player.passes_attempted > 0 ? getPassCompletionPercentage(player) : null,
     format: value => value ? formatPercentage(value) : 'N/A',
     unit: '%',
     icon: Target,
-    description: 'Percentage of successful passes',
+    description: t('comparison.passCompletionDesc'),
     priority: 1
   }, {
     key: 'shots' as SortableMetric,
-    label: 'Shots on Target',
-    shortLabel: 'Shots',
-    mobileLabel: 'SOT',
+    label: t('comparison.shotsOnTarget'),
+    shortLabel: t('comparison.shotsShort'),
+    mobileLabel: t('comparison.shotsMobile'),
     getValue: player => player.shots_on_target || null,
     format: value => value !== null ? value.toString() : 'N/A',
     unit: '',
     icon: BarChart3,
-    description: 'Number of shots that were on target',
+    description: t('comparison.shotsOnTargetDesc'),
     priority: 2
   }, {
     key: 'tackles' as SortableMetric,
-    label: 'Tackles Won',
-    shortLabel: 'Tackles',
-    mobileLabel: 'Tack',
+    label: t('comparison.tacklesWon'),
+    shortLabel: t('comparison.tacklesShort'),
+    mobileLabel: t('comparison.tacklesMobile'),
     getValue: player => player.tackles_won || null,
     format: value => value !== null ? value.toString() : 'N/A',
     unit: '',
     icon: Medal,
-    description: 'Number of successful tackles',
+    description: t('comparison.tacklesWonDesc'),
     priority: 2
   }];
   const visibleMetrics = metrics;
@@ -190,13 +191,13 @@ export const ProfessionalPerformanceTable = ({
             <div className="flex items-center gap-3">
               <TrendingUp className="w-6 h-6 text-club-gold flex-shrink-0" />
               <CardTitle className={cn("text-xl font-bold", theme === 'dark' ? "text-club-light-gray" : "text-gray-900")}>
-                Professional Performance Analysis
+                {t('comparison.performanceAnalysis')}
               </CardTitle>
             </div>
             
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
               <p className={cn("text-sm", theme === 'dark' ? "text-club-light-gray/70" : "text-gray-600")}>
-                Comprehensive performance metrics and statistical analysis
+                {t('comparison.comprehensiveMetrics')}
               </p>
               
               <SortControls currentMetric={sortState.metric} currentDirection={sortState.direction} metrics={visibleMetrics} onSort={handleSort} onClear={clearSort} />
@@ -230,7 +231,7 @@ export const ProfessionalPerformanceTable = ({
             }}>
                   <thead className={cn("sticky top-0 z-10", theme === 'dark' ? "bg-club-black/95" : "bg-gray-50/95", "backdrop-blur-sm")}>
                     <tr>
-                      <SortableHeader metric={'name' as SortableMetric} label="Player" currentMetric={sortState.metric} currentDirection={sortState.direction} onSort={handleSort} className={cn("player-column border-b border-club-gold/20 py-3 px-4", theme === 'dark' ? "bg-club-dark-gray/95" : "bg-white/95")} style={{
+                      <SortableHeader metric={'name' as SortableMetric} label={t('comparison.player')} currentMetric={sortState.metric} currentDirection={sortState.direction} onSort={handleSort} className={cn("player-column border-b border-club-gold/20 py-3 px-4", theme === 'dark' ? "bg-club-dark-gray/95" : "bg-white/95")} style={{
                     minWidth: '200px',
                     width: '200px'
                   }} />
@@ -280,8 +281,8 @@ export const ProfessionalPerformanceTable = ({
                                   {(isHighest || level !== 'none' && value !== null) && <Badge variant="outline" className={cn("text-xs font-medium px-2 py-0", isHighest ? "bg-club-gold/20 text-club-gold border-club-gold/40" : cn(styles.bg, styles.text, styles.border))}>
                                       {isHighest ? <>
                                           <Medal className="w-3 h-3 mr-1" />
-                                          Best
-                                        </> : level.charAt(0).toUpperCase() + level.slice(1)}
+                                          {t('comparison.best')}
+                                        </> : t(`comparison.${level}`)}
                                     </Badge>}
                                 </div>
                               </td>;

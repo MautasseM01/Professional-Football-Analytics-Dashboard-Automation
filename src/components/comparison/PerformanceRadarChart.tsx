@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { BarChart3, Download } from "lucide-react";
 import { Player } from "@/types";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { ChartSkeleton } from "@/components/charts/ChartSkeleton";
@@ -20,6 +21,7 @@ export const PerformanceRadarChart = ({
   loading
 }: PerformanceRadarChartProps) => {
   const { theme } = useTheme();
+  const { t } = useLanguage();
   const isMobile = useIsMobile();
   const chartRef = useRef<HTMLDivElement>(null);
 
@@ -114,7 +116,7 @@ export const PerformanceRadarChart = ({
           "text-sm font-semibold mb-4 text-center",
           theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
         )}>
-          Players Comparison
+          {t('comparison.playersComparison')}
         </h4>
         <div className={cn(
           "grid gap-3",
@@ -199,13 +201,13 @@ export const PerformanceRadarChart = ({
                   "text-lg font-semibold",
                   theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
                 )}>
-                  Performance Radar Chart
+                  {t('comparison.radarChart')}
                 </CardTitle>
                 <CardDescription className={cn(
                   "text-sm",
                   theme === 'dark' ? "text-club-light-gray/60" : "text-gray-600"
                 )}>
-                  Select players to see their performance comparison
+                  {t('comparison.selectTwoOrMore')}
                 </CardDescription>
               </div>
             </div>
@@ -219,7 +221,7 @@ export const PerformanceRadarChart = ({
               : "border-club-gold/30 text-gray-500"
           )}>
             <p className="text-center">
-              Select 2 or more players to display the radar chart
+              {t('comparison.selectTwoOrMore')}
             </p>
           </div>
         </CardContent>
@@ -244,13 +246,13 @@ export const PerformanceRadarChart = ({
                 "text-lg font-semibold",
                 theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
               )}>
-                Performance Radar Chart
+                {t('comparison.radarChart')}
               </CardTitle>
               <CardDescription className={cn(
                 "text-sm",
                 theme === 'dark' ? "text-club-light-gray/60" : "text-gray-600"
               )}>
-                Comprehensive performance comparison across key metrics
+                {t('comparison.comprehensiveComparison')}
               </CardDescription>
             </div>
           </div>
@@ -265,7 +267,7 @@ export const PerformanceRadarChart = ({
             )}
           >
             <Download className="w-4 h-4" />
-            Export
+            {t('comparison.export')}
           </Button>
         </div>
       </CardHeader>
@@ -370,21 +372,21 @@ export const PerformanceRadarChart = ({
             <div className="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
                 <div className="bg-white/60 dark:bg-black/40 rounded-lg p-3">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Categories</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">{t('comparison.categories')}</div>
                   <div className="text-lg font-bold text-club-gold">{radarData.length}</div>
                 </div>
                 <div className="bg-white/60 dark:bg-black/40 rounded-lg p-3">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Players</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">{t('comparison.players')}</div>
                   <div className="text-lg font-bold text-club-gold">{selectedPlayers.length}</div>
                 </div>
                 <div className="bg-white/60 dark:bg-black/40 rounded-lg p-3">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Best Avg</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">{t('comparison.bestAvg')}</div>
                   <div className="text-lg font-bold text-club-gold">
                     {radarData.length > 0 ? Math.max(...radarData.map(d => Math.max(...selectedPlayers.map((_, i) => d[selectedPlayers[i].name] || 0)))).toFixed(0) : '0'}
                   </div>
                 </div>
                 <div className="bg-white/60 dark:bg-black/40 rounded-lg p-3">
-                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">Range</div>
+                  <div className="text-xs text-gray-500 dark:text-gray-400 font-medium">{t('comparison.range')}</div>
                   <div className="text-lg font-bold text-club-gold">0-100</div>
                 </div>
               </div>

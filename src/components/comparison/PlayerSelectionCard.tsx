@@ -8,6 +8,7 @@ import { Users, Plus, X } from "lucide-react";
 import { Player } from "@/types";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { cn } from "@/lib/utils";
 import { useRealPlayers } from "@/hooks/use-real-players";
 import { TableLoadingSkeleton } from "@/components/LoadingStates";
@@ -25,6 +26,7 @@ export const PlayerSelectionCard = ({
 }: PlayerSelectionCardProps) => {
   const { theme } = useTheme();
   const isMobile = useIsMobile();
+  const { t } = useLanguage();
   const [showAllPlayers, setShowAllPlayers] = useState(false);
   
   const { data: availablePlayers = [], isLoading, error } = useRealPlayers();
@@ -48,7 +50,7 @@ export const PlayerSelectionCard = ({
     return (
       <Card className={cn("border-red-500/20", theme === 'dark' ? "bg-club-dark-gray/60" : "bg-white/80")}>
         <CardContent className="p-6 text-center">
-          <p className="text-red-500">Error loading players: {error.message}</p>
+          <p className="text-red-500">{t('comparison.errorLoading')}: {error.message}</p>
         </CardContent>
       </Card>
     );
@@ -67,10 +69,10 @@ export const PlayerSelectionCard = ({
             responsiveClasses.headerText,
             theme === 'dark' ? "text-club-light-gray" : "text-gray-900"
           )}>
-            Player Selection
+            {t('comparison.playerSelection')}
           </CardTitle>
           <Badge variant="outline" className="ml-auto bg-club-gold/10 border-club-gold/30 text-club-gold">
-            {selectedPlayers.length}/4 selected
+            {selectedPlayers.length}/4 {t('common.selected')}
           </Badge>
         </div>
       </CardHeader>
@@ -84,7 +86,7 @@ export const PlayerSelectionCard = ({
               responsiveClasses.fontSize,
               theme === 'dark' ? "text-club-light-gray" : "text-gray-800"
             )}>
-              Selected Players
+              {t('comparison.selectedPlayers')}
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {selectedPlayers.map((player) => (
@@ -105,7 +107,7 @@ export const PlayerSelectionCard = ({
                       {player.name}
                     </div>
                     <div className="text-xs text-gray-500 truncate">
-                      {player.position} • {player.matches} matches
+                      {player.position} • {player.matches} {t('comparison.matches')}
                     </div>
                   </div>
                   <Button
@@ -129,7 +131,7 @@ export const PlayerSelectionCard = ({
             responsiveClasses.fontSize,
             theme === 'dark' ? "text-club-light-gray" : "text-gray-800"
           )}>
-            Available Players
+            {t('comparison.availablePlayers')}
           </h3>
 
           {isLoading ? (
@@ -140,8 +142,8 @@ export const PlayerSelectionCard = ({
               "text-sm text-gray-500"
             )}>
               {selectedPlayers.length === 4 
-                ? "Maximum players selected" 
-                : "No available players"
+                ? t('comparison.maxSelected')
+                : t('comparison.noAvailable')
               }
             </p>
           ) : (
@@ -172,7 +174,7 @@ export const PlayerSelectionCard = ({
                           {player.name}
                         </div>
                         <div className="text-xs text-gray-500 truncate">
-                          {player.position} • {player.matches} matches
+                          {player.position} • {player.matches} {t('comparison.matches')}
                         </div>
                       </div>
                       <Plus className="w-4 h-4 text-club-gold flex-shrink-0" />
@@ -188,8 +190,8 @@ export const PlayerSelectionCard = ({
                   className="w-full mt-3 border-club-gold/30 text-club-gold hover:bg-club-gold/10"
                 >
                   {showAllPlayers 
-                    ? `Show Less` 
-                    : `Show ${unselectedPlayers.length - displayedPlayers.length} More Players`
+                    ? t('comparison.showLess')
+                    : t('comparison.showMore').replace('%d', (unselectedPlayers.length - displayedPlayers.length).toString())
                   }
                 </Button>
               )}
