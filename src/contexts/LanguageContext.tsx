@@ -35,6 +35,7 @@ const translations = {
     'nav.tacticalAnalysis': 'Analyse Tactique',
     'nav.pointsDeductions': 'Pénalités de Points',
     'nav.matchDataImport': 'Import Données Match',
+    'nav.aiAnalytics': 'Analyses IA',
     'nav.goalsAssists': 'Buts et Passes Décisives',
     'header.title': 'Striker Insights Arena',
     'header.dashboard': 'Tableau de Bord',
@@ -582,6 +583,7 @@ const translations = {
     'nav.shotMap': 'Shot Map',
     'nav.teamOverview': 'Team Overview',
     'nav.tacticalAnalysis': 'Tactical Analysis',
+    'nav.aiAnalytics': 'AI Analytics',
     'header.title': 'Striker Insights Arena',
     'header.dashboard': 'Dashboard'
   },

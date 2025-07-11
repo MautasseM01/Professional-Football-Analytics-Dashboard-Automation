@@ -13,7 +13,8 @@ import {
   Zap,
   Shield,
   Upload,
-  AlertTriangle
+  AlertTriangle,
+  Brain
 } from "lucide-react";
 import { UserRole } from "@/types";
 
@@ -108,6 +109,14 @@ export const navigationItems: NavigationItem[] = [
         translationKey: 'nav.pointsDeductions',
       },
     ],
+  },
+  {
+    name: 'AI Analytics',
+    href: '/analytics',
+    icon: Brain,
+    current: false,
+    allowedRoles: ['coach', 'analyst', 'performance_director', 'management', 'admin'],
+    translationKey: 'nav.aiAnalytics',
   },
   {
     name: 'Match Data Import',

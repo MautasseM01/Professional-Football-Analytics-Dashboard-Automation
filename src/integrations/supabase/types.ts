@@ -594,6 +594,42 @@ export type Database = {
         }
         Relationships: []
       }
+      match_analysis: {
+        Row: {
+          analysis_data: Json
+          analysis_method: string
+          created_at: string | null
+          date: string
+          id: string
+          match_id: string
+          processing_time: number | null
+          updated_at: string | null
+          video_source: string | null
+        }
+        Insert: {
+          analysis_data: Json
+          analysis_method: string
+          created_at?: string | null
+          date: string
+          id?: string
+          match_id: string
+          processing_time?: number | null
+          updated_at?: string | null
+          video_source?: string | null
+        }
+        Update: {
+          analysis_data?: Json
+          analysis_method?: string
+          created_at?: string | null
+          date?: string
+          id?: string
+          match_id?: string
+          processing_time?: number | null
+          updated_at?: string | null
+          video_source?: string | null
+        }
+        Relationships: []
+      }
       match_passes: {
         Row: {
           created_at: string | null
