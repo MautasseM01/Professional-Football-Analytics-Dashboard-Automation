@@ -74,12 +74,17 @@ export interface CoachAssessment {
   id: number;
   player_id: number;
   assessment_date: string;
-  assessor_id?: string;
-  overall_progress_percentage?: number;
-  notes?: string;
-  created_at: string;
+  coach_id?: string;
   overall_rating?: number;
+  technical_rating?: number;
+  tactical_rating?: number;
+  physical_rating?: number;
+  mental_rating?: number;
+  strengths?: string;
+  areas_for_improvement?: string;
+  development_notes?: string;
   recommendation?: string;
+  created_at: string;
 }
 
 export interface GuardianCommunication {
@@ -146,10 +151,10 @@ export const useDevelopmentData = () => {
   });
 
   const assessments = useQuery({
-    queryKey: ['development-assessments'],
+    queryKey: ['coach-assessments'],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('development_assessments')
+        .from('player_coach_assessments')
         .select(`
           *,
           players!inner(id, name, position)

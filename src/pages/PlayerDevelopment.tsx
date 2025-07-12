@@ -13,6 +13,8 @@ import { PlayerDevelopmentTabs } from "@/components/development/PlayerDevelopmen
 import { DevelopmentPathwayVisualizer } from "@/components/development/DevelopmentPathwayVisualizer";
 import { DevelopmentMilestonesTimeline } from "@/components/development/DevelopmentMilestonesTimeline";
 import { PlayerDevelopmentInsights } from "@/components/development/PlayerDevelopmentInsights";
+import { EnhancedDevelopmentDashboard } from "@/components/development/EnhancedDevelopmentDashboard";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Target, Award } from "lucide-react";
 
 const PlayerDevelopment = () => {
@@ -154,38 +156,73 @@ const PlayerDevelopment = () => {
 
             {/* Main Content */}
             {selectedPlayer && !isLoading ? (
-              <div className="space-y-6">
-                {/* Enhanced Development Components */}
-                <RoleBasedContent 
-                  allowedRoles={['admin', 'management', 'coach', 'analyst', 'performance_director']}
-                  fallback={null}
-                >
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <DevelopmentPathwayVisualizer 
-                      players={[selectedPlayer]} 
-                      pathways={pathways.filter(p => p.player_id === selectedPlayer.id)} 
-                    />
-                    <DevelopmentMilestonesTimeline 
-                      milestones={milestones.filter(m => m.player_id === selectedPlayer.id)} 
-                      players={[selectedPlayer]}
-                      selectedPlayerId={selectedPlayer.id}
-                    />
-                  </div>
-                  
-                  <PlayerDevelopmentInsights 
-                    pathways={pathways.filter(p => p.player_id === selectedPlayer.id)}
-                    milestones={milestones.filter(m => m.player_id === selectedPlayer.id)}
-                    assessments={assessments.filter(a => a.player_id === selectedPlayer.id)}
-                    communications={communications.filter(c => c.player_id === selectedPlayer.id)}
-                    educationalProgress={educationalProgress.filter(e => e.player_id === selectedPlayer.id)}
-                    recommendations={recommendations.filter(r => r.player_id === selectedPlayer.id)}
-                    players={[selectedPlayer]}
-                  />
-                </RoleBasedContent>
+              <Tabs defaultValue="overview" className="space-y-6">
+                <div className="border-b border-club-gold/20">
+                  <TabsList className="bg-club-dark-gray border-club-gold/20 w-full justify-start h-auto p-1">
+                    <TabsTrigger 
+                      value="overview" 
+                      className="data-[state=active]:bg-club-gold/20 px-4 py-2 text-sm"
+                    >
+                      Development Overview
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="insights" 
+                      className="data-[state=active]:bg-club-gold/20 px-4 py-2 text-sm"
+                    >
+                      Insights & Analytics
+                    </TabsTrigger>
+                    <TabsTrigger 
+                      value="goals" 
+                      className="data-[state=active]:bg-club-gold/20 px-4 py-2 text-sm"
+                    >
+                      Goals & Progress
+                    </TabsTrigger>
+                  </TabsList>
+                </div>
 
-                {/* Original Development Tabs */}
-                <PlayerDevelopmentTabs developmentData={developmentData} />
-              </div>
+                <TabsContent value="overview" className="space-y-6 mt-6">
+                  <EnhancedDevelopmentDashboard 
+                    player={selectedPlayer}
+                    pathway={pathways.find(p => p.player_id === selectedPlayer.id)}
+                    milestones={milestones.filter(m => m.player_id === selectedPlayer.id)}
+                    recommendations={recommendations.filter(r => r.player_id === selectedPlayer.id)}
+                    assessments={assessments.filter(a => a.player_id === selectedPlayer.id)}
+                  />
+                </TabsContent>
+
+                <TabsContent value="insights" className="space-y-6 mt-6">
+                  <RoleBasedContent 
+                    allowedRoles={['admin', 'management', 'coach', 'analyst', 'performance_director']}
+                    fallback={null}
+                  >
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                      <DevelopmentPathwayVisualizer 
+                        players={[selectedPlayer]} 
+                        pathways={pathways.filter(p => p.player_id === selectedPlayer.id)} 
+                      />
+                      <DevelopmentMilestonesTimeline 
+                        milestones={milestones.filter(m => m.player_id === selectedPlayer.id)} 
+                        players={[selectedPlayer]}
+                        selectedPlayerId={selectedPlayer.id}
+                      />
+                    </div>
+                    
+                    <PlayerDevelopmentInsights 
+                      pathways={pathways.filter(p => p.player_id === selectedPlayer.id)}
+                      milestones={milestones.filter(m => m.player_id === selectedPlayer.id)}
+                      assessments={assessments.filter(a => a.player_id === selectedPlayer.id)}
+                      communications={communications.filter(c => c.player_id === selectedPlayer.id)}
+                      educationalProgress={educationalProgress.filter(e => e.player_id === selectedPlayer.id)}
+                      recommendations={recommendations.filter(r => r.player_id === selectedPlayer.id)}
+                      players={[selectedPlayer]}
+                    />
+                  </RoleBasedContent>
+                </TabsContent>
+
+                <TabsContent value="goals" className="space-y-6 mt-6">
+                  <PlayerDevelopmentTabs developmentData={developmentData} />
+                </TabsContent>
+              </Tabs>
             ) : !isLoading && (
               <div className="flex items-center justify-center min-h-[50vh] text-center px-4">
                 <div className="space-y-2">
