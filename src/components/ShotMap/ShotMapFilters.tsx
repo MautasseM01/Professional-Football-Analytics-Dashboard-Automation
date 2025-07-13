@@ -1,21 +1,14 @@
-import { 
-  Player
-} from "@/types";
-import { 
-  ShotFilters,
-  Shot,
-  ShotOutcome
-} from "@/types/shot";
-import { Filter, CalendarDays, User } from "lucide-react";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
-import { Button } from "@/components/ui/button";
+import { ShotFilters, ShotOutcome } from "@/types/shot";
+import { Player } from "@/types";
 import { PlayerAvatar } from "@/components/PlayerAvatar";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface ShotMapFiltersProps {
   players: Player[];
@@ -34,139 +27,131 @@ export const ShotMapFilters = ({
 }: ShotMapFiltersProps) => {
   const periods = ["First Half", "Second Half", "Extra Time", "Penalties"];
   const outcomes: ShotOutcome[] = ["Goal", "Shot on Target", "Shot Off Target", "Blocked Shot"];
-  
-  // Get the selected player for display
-  const selectedPlayer = players.find(p => p.id === filters.playerId);
-  
+
   return (
-    <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-        <h2 className="text-lg sm:text-xl font-semibold text-club-gold flex items-center gap-2">
-          <Filter size={18} className="sm:size-5" />
-          Filters
-        </h2>
-        <Button 
-          variant="outline" 
-          size="sm"
-          onClick={onResetFilters}
-          className="border-club-gold/30 text-club-gold hover:bg-club-gold/10 w-full sm:w-auto"
-        >
-          Reset Filters
-        </Button>
-      </div>
-      
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <div className="space-y-2">
-          <label className="text-xs sm:text-sm flex items-center gap-1 text-club-light-gray/70">
-            <User size={14} className="sm:size-4" />
-            Player
-          </label>
-          <Select
-            value={filters.playerId?.toString() || ""}
-            onValueChange={(value) => 
-              onApplyFilters({ playerId: value ? Number(value) : null })
-            }
-          >
-            <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray w-full h-10 sm:h-9">
-              <SelectValue placeholder="All players">
-                {selectedPlayer ? (
-                  <div className="flex items-center gap-2">
-                    <PlayerAvatar player={selectedPlayer} size="sm" />
-                    <span>{selectedPlayer.number || '?'} {selectedPlayer.name} - {selectedPlayer.position}</span>
-                  </div>
-                ) : (
-                  "All players"
-                )}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-              <SelectItem value="all-players">All players</SelectItem>
-              {players.map((player) => (
-                <SelectItem key={player.id} value={player.id.toString()}>
-                  <div className="flex items-center gap-2">
-                    <PlayerAvatar player={player} size="sm" />
-                    <span>{player.number || '?'} {player.name} - {player.position}</span>
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+    <Card className="bg-card/80 backdrop-blur-sm border-border">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base flex items-center gap-2">
+          <div className="w-2 h-2 rounded-full bg-primary"></div>
+          Shot Filters
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Player
+            </label>
+            <Select
+              value={filters.playerId?.toString() || ""}
+              onValueChange={(value) => 
+                onApplyFilters({ playerId: value !== "all-players" ? parseInt(value) : null })
+              }
+            >
+              <SelectTrigger className="bg-background border-border text-foreground">
+                <SelectValue placeholder="All players" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-border">
+                <SelectItem value="all-players">All players</SelectItem>
+                {players.map((player) => (
+                  <SelectItem key={player.id} value={player.id.toString()}>
+                    <div className="flex items-center gap-2">
+                      <PlayerAvatar player={player} size="sm" />
+                      <span>{player.name}</span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Match
+            </label>
+            <Select
+              value={filters.matchId?.toString() || ""}
+              onValueChange={(value) => 
+                onApplyFilters({ matchId: value !== "all-matches" ? parseInt(value) : null })
+              }
+            >
+              <SelectTrigger className="bg-background border-border text-foreground">
+                <SelectValue placeholder="All matches" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-border">
+                <SelectItem value="all-matches">All matches</SelectItem>
+                {matches.map((match) => (
+                  <SelectItem key={match.id} value={match.id.toString()}>
+                    {match.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Period
+            </label>
+            <Select
+              value={filters.period || ""}
+              onValueChange={(value) => 
+                onApplyFilters({ period: value !== "all-periods" ? value : null })
+              }
+            >
+              <SelectTrigger className="bg-background border-border text-foreground">
+                <SelectValue placeholder="All periods" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-border">
+                <SelectItem value="all-periods">All periods</SelectItem>
+                {periods.map((period) => (
+                  <SelectItem key={period} value={period}>
+                    {period}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Outcome
+            </label>
+            <Select
+              value={filters.outcome?.toString() || ""}
+              onValueChange={(value) => 
+                onApplyFilters({ outcome: value !== "all-outcomes" ? value as ShotOutcome : null })
+              }
+            >
+              <SelectTrigger className="bg-background border-border text-foreground">
+                <SelectValue placeholder="All outcomes" />
+              </SelectTrigger>
+              <SelectContent className="bg-background border-border">
+                <SelectItem value="all-outcomes">All outcomes</SelectItem>
+                {outcomes.map((outcome) => (
+                  <SelectItem key={outcome} value={outcome}>
+                    {outcome}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </div>
         
-        
-        <div className="space-y-2">
-          <label className="text-xs sm:text-sm flex items-center gap-1 text-club-light-gray/70">
-            <CalendarDays size={14} className="sm:size-4" />
-            Match
-          </label>
-          <Select
-            value={filters.matchId?.toString() || ""}
-            onValueChange={(value) => 
-              onApplyFilters({ matchId: value !== "all-matches" ? Number(value) : null })
-            }
+        <div className="flex items-center gap-2 pt-4 border-t border-border">
+          <button
+            onClick={onResetFilters}
+            className="px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors border border-border rounded-md hover:bg-muted"
           >
-            <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray w-full h-10 sm:h-9">
-              <SelectValue placeholder="All matches" />
-            </SelectTrigger>
-            <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-              <SelectItem value="all-matches">All matches</SelectItem>
-              {matches.map((match) => (
-                <SelectItem key={match.id} value={match.id.toString()}>
-                  {match.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        
-        <div className="space-y-2">
-          <label className="text-xs sm:text-sm flex items-center gap-1 text-club-light-gray/70">
-            Period
-          </label>
-          <Select
-            value={filters.period?.toString() || ""}
-            onValueChange={(value) => 
-              onApplyFilters({ period: value !== "all-periods" ? value : null })
+            Reset Filters
+          </button>
+          <div className="text-xs text-muted-foreground">
+            {filters.playerId || filters.matchId || filters.period || filters.outcome ? 
+              "Filters applied" : "No filters applied"
             }
-          >
-            <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray w-full h-10 sm:h-9">
-              <SelectValue placeholder="All periods" />
-            </SelectTrigger>
-            <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-              <SelectItem value="all-periods">All periods</SelectItem>
-              {periods.map((period) => (
-                <SelectItem key={period} value={period}>
-                  {period}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          </div>
         </div>
-        
-        <div className="space-y-2">
-          <label className="text-xs sm:text-sm flex items-center gap-1 text-club-light-gray/70">
-            Outcome
-          </label>
-          <Select
-            value={filters.outcome?.toString() || ""}
-            onValueChange={(value) => 
-              onApplyFilters({ outcome: value !== "all-outcomes" ? value as ShotOutcome : null })
-            }
-          >
-            <SelectTrigger className="bg-club-black border-club-gold/30 text-club-light-gray w-full h-10 sm:h-9">
-              <SelectValue placeholder="All outcomes" />
-            </SelectTrigger>
-            <SelectContent className="bg-club-black border-club-gold/30 text-club-light-gray">
-              <SelectItem value="all-outcomes">All outcomes</SelectItem>
-              {outcomes.map((outcome) => (
-                <SelectItem key={outcome} value={outcome}>
-                  {outcome}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };

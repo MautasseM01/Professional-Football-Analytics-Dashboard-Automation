@@ -6,6 +6,7 @@ import { usePlayerData } from "@/hooks/use-player-data";
 import { ShotMapFilters } from "@/components/ShotMap/ShotMapFilters";
 import { ShotMapVisualization } from "@/components/ShotMap/ShotMapVisualization";
 import { ShotMapLegend } from "@/components/ShotMap/ShotMapLegend";
+import { ShotMapStats } from "@/components/ShotMap/ShotMapStats";
 import { BackToTopButton } from "@/components/BackToTopButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { LanguageSelector } from "@/components/LanguageSelector";
@@ -81,31 +82,30 @@ const ShotMap = () => {
         </header>
         
         <main className="bg-transparent transition-colors duration-300 w-full">
-          <div className="space-y-4 sm:space-y-6 p-4 sm:p-6">
-            {/* Filters */}
-            <div className="bg-club-dark-gray/50 rounded-lg p-3 sm:p-4">
-              <ShotMapFilters 
-                players={players}
-                matches={matches}
-                filters={filters}
-                onApplyFilters={updateFilters}
-                onResetFilters={resetFilters}
-              />
-            </div>
+          <div className="space-y-6 p-4 sm:p-6">
+            <ShotMapFilters 
+              players={players}
+              matches={matches}
+              filters={filters}
+              onApplyFilters={updateFilters}
+              onResetFilters={resetFilters}
+            />
 
-            {/* Legend */}
-            <div>
+            <div className="grid lg:grid-cols-2 gap-6">
               <ShotMapLegend />
-            </div>
-
-            {/* Visualization */}
-            <div>
-              <ShotMapVisualization 
+              <ShotMapStats 
                 shots={shots} 
-                loading={loading} 
-                filterLoading={filterLoading} 
+                selectedPlayer={filters.playerId ? 
+                  players.find(p => p.id === filters.playerId)?.name : undefined
+                }
               />
             </div>
+
+            <ShotMapVisualization 
+              shots={shots} 
+              loading={loading}
+              filterLoading={false}
+            />
 
             {error && (
               <div className="bg-red-900/30 border border-red-700 text-red-100 p-3 sm:p-4 rounded-lg">
