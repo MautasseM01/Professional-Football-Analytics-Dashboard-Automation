@@ -2816,6 +2816,7 @@ export type Database = {
           outcome: string
           period: string
           player_id: number
+          player_name: string | null
           x_coordinate: number
           y_coordinate: number
         }
@@ -2831,6 +2832,7 @@ export type Database = {
           outcome: string
           period: string
           player_id: number
+          player_name?: string | null
           x_coordinate: number
           y_coordinate: number
         }
@@ -2846,6 +2848,7 @@ export type Database = {
           outcome?: string
           period?: string
           player_id?: number
+          player_name?: string | null
           x_coordinate?: number
           y_coordinate?: number
         }
